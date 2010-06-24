@@ -1,7 +1,9 @@
 package com.imaginea.android.sugarcrm.restapi;
 
 import junit.framework.TestCase;
-import android.test.suitebuilder.annotation.SmallTest;
+
+import com.imaginea.android.sugarcrm.util.RestUtil;
+import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * 
@@ -13,9 +15,24 @@ import android.test.suitebuilder.annotation.SmallTest;
  */
 public class RestAPITest extends TestCase {
 
-	@SmallTest
-	public void testContactsList() throws Exception {
+	protected String mSessionId;
 
+	@Override
+	protected void setUp() throws Exception {
+
+		super.setUp();
+		authenticate();
 	}
 
+	public void authenticate() throws Exception {
+		String url = "http://192.168.1.83/sugarcrm/service/v2/rest.php";
+		String userName = "will";
+		String password = "will";
+		String md5Password;
+
+		md5Password = Util.MD5(password);
+
+		mSessionId = RestUtil.loginToSugarCRM(url, userName, md5Password);
+		assertNotNull(mSessionId);
+	}
 }
