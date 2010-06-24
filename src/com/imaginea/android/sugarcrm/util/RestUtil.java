@@ -26,6 +26,8 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_NAME;
 
 import android.util.Log;
 
+import com.imaginea.android.sugarcrm.RestUtilConstants;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -312,7 +314,7 @@ public class RestUtil {
         final String response = EntityUtils.toString(res.getEntity());
         Log.i(LOG_TAG, "moduleFields : " + response);
         JSONObject jsonResponse = new JSONObject(response);
-        return jsonResponse;
+        return jsonResponse.getJSONObject(RestUtilConstants.MODULE_FIELDS);
     }
 
     public static Object getValueFromMap(Map<String, Map<String, Object>> map, String beanId, String key){
