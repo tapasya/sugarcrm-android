@@ -2,6 +2,8 @@ package com.imaginea.android.sugarcrm.restapi;
 
 import junit.framework.TestCase;
 
+import android.test.AndroidTestCase;
+
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.Util;
 
@@ -15,7 +17,7 @@ import com.imaginea.android.sugarcrm.util.Util;
  * See {@link com.imaginea.android.sugarcrm.AllTests} for documentation on
  * running all tests and individual tests in this application.
  */
-public class RestAPITest extends TestCase {
+public class RestAPITest extends AndroidTestCase {
 
 	/**
 	 * used by module specific unit tests
