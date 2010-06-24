@@ -277,7 +277,7 @@ public class RestUtil {
      *         'link_fields' -- Array - The vardef information on the link fields
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static void getModuleFields(String url, String sessionId, String moduleName,
+    public static JSONObject getModuleFields(String url, String sessionId, String moduleName,
                                     String[] fields) throws JSONException, ClientProtocolException,
                                     IOException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
@@ -306,12 +306,13 @@ public class RestUtil {
         if (res.getEntity() == null) {
             Log.i(LOG_TAG, "FAILED TO CONNECT!");
             // return (ArrayList<String>) Collections.EMPTY_LIST;
-            return;
+            return null;
         }
 
         final String response = EntityUtils.toString(res.getEntity());
         Log.i(LOG_TAG, "moduleFields : " + response);
-        // JSONObject jsonResponse = new JSONObject(response);
+        JSONObject jsonResponse = new JSONObject(response);
+        return jsonResponse;
     }
 
     public static Object getValueFromMap(Map<String, Map<String, Object>> map, String beanId, String key){
