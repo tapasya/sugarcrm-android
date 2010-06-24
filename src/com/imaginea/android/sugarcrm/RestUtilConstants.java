@@ -38,6 +38,14 @@ public interface RestUtilConstants {
 
     public static final String MODULE_NAME = "module_name";
 
+    public static final String QUERY = "query";
+
+    public static final String ORDER_BY = "order_by";
+
+    public static final String OFFSET = "offset";
+
+    public static final String SELECT_FIELDS = "select_fields";
+
     // params for the output JSON
     public static final String ID = "id";
 
