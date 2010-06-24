@@ -20,6 +20,9 @@ public class RestAPITest extends TestCase {
 	/**
 	 * used by module specific unit tests
 	 */
+	protected String url = "http://192.168.1.83/sugarcrm/service/v2/rest.php";
+	protected String userName = "will";
+	protected String password = "will";
 	protected String mSessionId;
 
 	@Override
@@ -30,9 +33,7 @@ public class RestAPITest extends TestCase {
 	}
 
 	public void authenticate() throws Exception {
-		String url = "http://192.168.1.83/sugarcrm/service/v2/rest.php";
-		String userName = "will";
-		String password = "will";
+		
 		String md5Password;
 
 		md5Password = Util.MD5(password);
