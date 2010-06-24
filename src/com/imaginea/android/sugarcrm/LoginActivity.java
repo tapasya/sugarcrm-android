@@ -28,29 +28,28 @@ public class LoginActivity extends Activity {
         String md5Password;
         try {
             md5Password = Util.MD5(password);
-            RestUtil restUtil = new RestUtil();
-            String sessionId = restUtil.loginToSugarCRM(url, username, md5Password);
+            String sessionId = RestUtil.loginToSugarCRM(url, username, md5Password);
             Log.i(LOG_TAG, "sessionId : " + sessionId);
 
             SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
             app.setSessionId(sessionId);
 
-            List<String> modules = restUtil.getAvailableModules(url, app.getSessionId());
+            List<String> modules = RestUtil.getAvailableModules(url, app.getSessionId());
             Log.i(LOG_TAG, modules.toString());
 
             String moduleName = "Accounts";
             String[] fields = new String[] {};
-            restUtil.getModuleFields(url, app.getSessionId(), moduleName, fields);
+            RestUtil.getModuleFields(url, app.getSessionId(), moduleName, fields);
 
             moduleName = "Accounts";
             String query = "", orderBy = "";
             int offset = 0;
-            String[] selectFields = new String[] {};
+            String[] selectFields = new String[] { "name" };
             String[] linkNameToFieldsArray = new String[] {};
             int maxResults = 10, deleted = 0;
 
             // List<String> entryList =
-            restUtil.getEntryList(url, app.getSessionId(), moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
+            RestUtil.getEntryList(url, app.getSessionId(), moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
             // Log.i(LOG_TAG, entryList.toString());
 
         } catch (NoSuchAlgorithmException e) {
