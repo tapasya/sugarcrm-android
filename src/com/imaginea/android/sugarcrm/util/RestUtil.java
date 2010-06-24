@@ -313,4 +313,19 @@ public class RestUtil {
         Log.i(LOG_TAG, "moduleFields : " + response);
         // JSONObject jsonResponse = new JSONObject(response);
     }
+
+    public static Object getValueFromMap(Map<String, Map<String, Object>> map, String beanId, String key){
+        for(Map.Entry<String, Map<String, Object>> entry : map.entrySet()){
+            if(entry.getKey().toString().equals(beanId)){
+                Map<String, Object> mp = (Map<String, Object>)entry.getValue();
+                for(Map.Entry<String, Object> ent : mp.entrySet()){
+                    if(ent.getKey().toString().equals(key)){
+                        return ent.getValue();
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }
+
