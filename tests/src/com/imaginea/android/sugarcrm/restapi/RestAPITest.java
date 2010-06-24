@@ -7,6 +7,8 @@ import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * 
+ * Extend this class for module specific unit tests.
+ * 
  * Since this test doesn't need a {@link android.content.Context}, or any other
  * dependencies injected, it simply extends the standard {@link TestCase}.
  * 
@@ -15,6 +17,9 @@ import com.imaginea.android.sugarcrm.util.Util;
  */
 public class RestAPITest extends TestCase {
 
+	/**
+	 * used by module specific unit tests
+	 */
 	protected String mSessionId;
 
 	@Override
