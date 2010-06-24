@@ -33,14 +33,14 @@ public class LoginActivity extends Activity {
             Log.i(LOG_TAG, "sessionId : " + sessionId);
 
             SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
-            app.setmSessionId(sessionId);
+            app.setSessionId(sessionId);
 
-            List<String> modules = restUtil.getAvailableModules(url, app.getmSessionId());
+            List<String> modules = restUtil.getAvailableModules(url, app.getSessionId());
             Log.i(LOG_TAG, modules.toString());
 
             String moduleName = "Accounts";
             String[] fields = new String[] {};
-            restUtil.getModuleFields(url, app.getmSessionId(), moduleName, fields);
+            restUtil.getModuleFields(url, app.getSessionId(), moduleName, fields);
 
             moduleName = "Accounts";
             String query = "", orderBy = "";
@@ -50,7 +50,7 @@ public class LoginActivity extends Activity {
             int maxResults = 10, deleted = 0;
 
             // List<String> entryList =
-            restUtil.getEntryList(url, app.getmSessionId(), moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
+            restUtil.getEntryList(url, app.getSessionId(), moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
             // Log.i(LOG_TAG, entryList.toString());
 
         } catch (NoSuchAlgorithmException e) {
