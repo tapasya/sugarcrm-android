@@ -12,9 +12,13 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.METHOD;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULES;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULE_NAME;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME_VALUE_LIST;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.OFFSET;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.ORDER_BY;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.PASSWORD;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.QUERY;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.RESPONSE_TYPE;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.REST_DATA;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SELECT_FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.SESSION;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_AUTH;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_NAME;
@@ -46,10 +50,10 @@ public class RestUtil {
 
     public final static String LOG_TAG = "RestUtil";
 
-    private HttpClient httpClient = new DefaultHttpClient();
+    private static HttpClient httpClient = new DefaultHttpClient();
 
-    public List<String> getAvailableModules(String url, String sessionId) throws JSONException,
-                                    ClientProtocolException, IOException {
+    public static List<String> getAvailableModules(String url, String sessionId)
+                                    throws JSONException, ClientProtocolException, IOException {
         JSONObject sessId = new JSONObject();
         sessId.put(SESSION, sessionId);
 
@@ -77,7 +81,7 @@ public class RestUtil {
         return new ArrayList<String>(Arrays.asList(responseObj.get(MODULES).toString().split(",")));
     }
 
-    public void getEntryList(String url, String sessionId, String moduleName, String query,
+    public static void getEntryList(String url, String sessionId, String moduleName, String query,
                                     String orderBy, int offset, String[] selectFields,
                                     String[] linkNameToFieldsArray, int maxResults, int deleted)
                                     throws JSONException, ClientProtocolException, IOException {
@@ -88,7 +92,10 @@ public class RestUtil {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put("select_fields", arr);
+        data.put(QUERY, "");
+        data.put(ORDER_BY, "");
+        data.put(OFFSET, "");
+        data.put(SELECT_FIELDS, arr);
 
         String restData = org.json.simple.JSONValue.toJSONString(data);
         Log.i(LOG_TAG, "restData : " + restData);
@@ -116,17 +123,16 @@ public class RestUtil {
         // JSONObject responseObj = new JSONObject(response);
         // return new
         // ArrayList<String>(Arrays.asList(responseObj.get(ENTRY_LIST).toString().split(",")));
-
     }
 
-    public void getModuleFields(String url, String sessionId, String moduleName, String[] fields)
-                                    throws JSONException, ClientProtocolException, IOException {
+    public static void getModuleFields(String url, String sessionId, String moduleName,
+                                    String[] fields) throws JSONException, ClientProtocolException,
+                                    IOException {
         Map<String, String> data = new LinkedHashMap<String, String>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
 
         String restData = org.json.simple.JSONValue.toJSONString(data);
-        Log.i(LOG_TAG, "restData" + restData);
 
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost req = new HttpPost(url);
@@ -154,10 +160,9 @@ public class RestUtil {
         // JSONObject responseObj = new JSONObject(response);
         // return new
         // ArrayList<String>(Arrays.asList(responseObj.get(MODULE_FIELDS).toString().split(",")));
-
     }
 
-    public String loginToSugarCRM(String url, String username, String password)
+    public static String loginToSugarCRM(String url, String username, String password)
                                     throws JSONException, ClientProtocolException, IOException {
         JSONObject credentials = new JSONObject();
         credentials.put(USER_NAME, username);
@@ -194,7 +199,6 @@ public class RestUtil {
         final String response = EntityUtils.toString(resLogin.getEntity());
         JSONObject responseObj = new JSONObject(response);
         return responseObj.get(ID).toString();
-
     }
 
 }
