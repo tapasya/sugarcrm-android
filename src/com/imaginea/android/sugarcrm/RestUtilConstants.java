@@ -46,6 +46,8 @@ public interface RestUtilConstants {
 
     public static final String SELECT_FIELDS = "select_fields";
 
+    public static final String FIELDS = "fields";
+
     // params for the output JSON
     public static final String ID = "id";
 
