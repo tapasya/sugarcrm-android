@@ -57,4 +57,8 @@ public interface RestUtilConstants {
 
     public static final String ENTRY_LIST = "entry_list";
 
+    public static final String RELATIONSHIP_LIST = "relationship_list";
+
+    public static final String RESULT_COUNT = "result_count";
+
 }

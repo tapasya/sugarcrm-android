@@ -15,8 +15,11 @@ import java.util.Map;
 public class SBList {
 
     private JSONArray mEntryListJson;
+
     private JSONArray mRelationshipListJson;
+
     private int resultCount;
+
     private SugarBean[] sugarBeans;
 
     public SBList(String jsonText) throws JSONException {
@@ -25,8 +28,8 @@ public class SBList {
         this.mEntryListJson = responseObj.getJSONArray(ENTRY_LIST);
         this.mRelationshipListJson = responseObj.getJSONArray(RELATIONSHIP_LIST);
     }
-    
-    public int getSize(){
+
+    public int getSize() {
         return resultCount;
     }
 
@@ -34,8 +37,8 @@ public class SBList {
         sugarBeans = new SugarBean[mEntryListJson.length()];
         for (int i = 0; i < mEntryListJson.length(); i++) {
             sugarBeans[i] = new SugarBean();
-            sugarBeans[i].setBeanId( ((JSONObject) mEntryListJson.get(i)).get("id").toString() );
-            
+            sugarBeans[i].setBeanId(((JSONObject) mEntryListJson.get(i)).get("id").toString());
+
             String nameValueList = ((JSONObject) mEntryListJson.get(i)).get("name_value_list").toString();
             JSONObject nameVal = new JSONObject(nameValueList);
             Iterator iter = nameVal.keys();
