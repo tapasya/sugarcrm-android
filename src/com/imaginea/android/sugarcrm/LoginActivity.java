@@ -12,7 +12,6 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 public class LoginActivity extends Activity {
 
@@ -33,24 +32,6 @@ public class LoginActivity extends Activity {
 
             SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
             app.setSessionId(sessionId);
-
-            List<String> modules = RestUtil.getAvailableModules(url, app.getSessionId());
-            Log.i(LOG_TAG, modules.toString());
-
-            String moduleName = "Accounts";
-            String[] fields = new String[] {};
-            RestUtil.getModuleFields(url, app.getSessionId(), moduleName, fields);
-
-            moduleName = "Accounts";
-            String query = "", orderBy = "";
-            int offset = 0;
-            String[] selectFields = new String[] { "name" };
-            String[] linkNameToFieldsArray = new String[] {};
-            int maxResults = 10, deleted = 0;
-
-            // List<String> entryList =
-            RestUtil.getEntryList(url, app.getSessionId(), moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
-            // Log.i(LOG_TAG, entryList.toString());
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
