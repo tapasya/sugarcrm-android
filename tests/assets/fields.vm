@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+#foreach ($field in $fields)
+ <item type="field" name="$field">$field</item>
+#end
+</resources>

@@ -1,0 +1,11 @@
+package com.imaginea.android.sugarcrm;
+
+public interface ModuleFields {
+
+	#foreach ($field in $fields)
+   
+        public static final String $field.toUpperCase() = "$field";
+        
+	#end
+
+}
