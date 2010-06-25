@@ -40,18 +40,12 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.parser.ContainerFactory;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -107,23 +101,21 @@ public class RestUtil {
      *         [value] => 0 ) [3] => Array ( [name] => primary_address [value] => 0 ) ) ) ) )
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static Map<String, Map<String, Object>> getEntryList(String url, String sessionId,
-                                    String moduleName, String query, String orderBy, int offset,
+    public static SBList getEntryList(String url, String sessionId, String moduleName,
+                                    String query, String orderBy, int offset,
                                     String[] selectFields, String[] linkNameToFieldsArray,
                                     int maxResults, int deleted) throws JSONException,
                                     ClientProtocolException, IOException {
 
-        JSONArray fieldsArr = new JSONArray(Arrays.asList(selectFields));
-
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put(QUERY, "");
-        data.put(ORDER_BY, "");
-        data.put(OFFSET, "");
-        data.put(SELECT_FIELDS, fieldsArr);
-        data.put("link_name_to_fields_array", "");
-        data.put("max_results", "5");
+        data.put(QUERY, query);
+        data.put(ORDER_BY, orderBy);
+        data.put(OFFSET, offset);
+        data.put(SELECT_FIELDS, new JSONArray(Arrays.asList(selectFields)));
+        data.put("link_name_to_fields_array", linkNameToFieldsArray);
+        data.put("max_results", maxResults);
 
         String restData = org.json.simple.JSONValue.toJSONString(data);
         Log.i(LOG_TAG, "restData : " + restData);
@@ -142,29 +134,9 @@ public class RestUtil {
         HttpResponse res = httpClient.execute(req);
         if (res.getEntity() == null) {
             Log.i(LOG_TAG, "FAILED TO CONNECT!");
-            return Collections.emptyMap();
+            return null;
         }
-        final String response = EntityUtils.toString(res.getEntity());
-        JSONObject responseObj = new JSONObject(response);
-        JSONArray entryListJson = responseObj.getJSONArray("entry_list");
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        for (int i = 0; i < entryListJson.length(); i++) {
-            String id = ((JSONObject) entryListJson.get(i)).get("id").toString();
-            String nameValueList = ((JSONObject) entryListJson.get(i)).get("name_value_list").toString();
-
-            JSONObject nameVal = new JSONObject(nameValueList);
-            Iterator iter = nameVal.keys();
-            Map<String, Object> fields = new HashMap<String, Object>();
-            while (iter.hasNext()) {
-                String key = (String) iter.next();
-                String val = ((JSONObject) (nameVal.get(key))).get("value").toString();
-                fields.put(key, val);
-                Log.i(LOG_TAG, key + " : " + val);
-            }
-            map.put(id, fields);
-        }
-        Log.i(LOG_TAG, map.toString());
-        return map;
+        return new SBList(EntityUtils.toString(res.getEntity()).toString());
     }
 
     /**
@@ -317,18 +289,9 @@ public class RestUtil {
         return jsonResponse.getJSONObject(RestUtilConstants.MODULE_FIELDS);
     }
 
-    public static Object getValueFromMap(Map<String, Map<String, Object>> map, String beanId, String key){
-        for(Map.Entry<String, Map<String, Object>> entry : map.entrySet()){
-            if(entry.getKey().toString().equals(beanId)){
-                Map<String, Object> mp = (Map<String, Object>)entry.getValue();
-                for(Map.Entry<String, Object> ent : mp.entrySet()){
-                    if(ent.getKey().toString().equals(key)){
-                        return ent.getValue();
-                    }
-                }
-            }
-        }
-        return null;
+    public static Object getValueFromMap(Map<String, Map<String, Object>> map, String beanId,
+                                    String key) {
+        Map<String, Object> nameValuePair = (Map<String, Object>) map.get(beanId);
+        return nameValuePair.get(key).toString();
     }
 }
-
