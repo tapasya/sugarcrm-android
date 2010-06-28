@@ -1,17 +1,22 @@
 package com.imaginea.android.sugarcrm.util;
 
 import static com.imaginea.android.sugarcrm.RestUtilConstants.APPLICATION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.DESCRIPTION;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_AVAILABLE_MODULES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY_LIST;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_MODULE_FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.ID;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.IDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.INPUT_TYPE;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.JSON;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.LOGIN;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.METHOD;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULES;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULE_NAME;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME_VALUE_LIST;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.OFFSET;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.ORDER_BY;
@@ -30,6 +35,7 @@ import com.imaginea.android.sugarcrm.RestUtilConstants;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -56,35 +62,34 @@ public class RestUtil {
     private static HttpClient httpClient = new DefaultHttpClient();
 
     /**
-     * Retrieve a list of beans. This is the primary method for getting list of SugarBeans from
-     * Sugar using the SOAP API.
+     * Retrieve a list of beans. This is the primary method for getting list of SugarBeans
      * 
      * @param String
-     *            $session -- Session ID returned by a previous call to login.
+     *            session -- Session ID returned by a previous call to login.
      * @param String
-     *            $module_name -- The name of the module to return records from. This name should be
+     *            module_name -- The name of the module to return records from. This name should be
      *            the name the module was developed under (changing a tab name is studio does not
      *            affect the name that should be passed into this method)..
      * @param String
-     *            $query -- SQL where clause without the word 'where'
+     *            query -- SQL where clause without the word 'where'
      * @param String
-     *            $order_by -- SQL order by clause without the phrase 'order by'
+     *            order_by -- SQL order by clause without the phrase 'order by'
      * @param integer
-     *            $offset -- The record offset to start from.
+     *            offset -- The record offset to start from.
      * @param Array
-     *            $select_fields -- A list of the fields to be included in the results. This
-     *            optional parameter allows for only needed fields to be retrieved.
+     *            select_fields -- A list of the fields to be included in the results. This optional
+     *            parameter allows for only needed fields to be retrieved.
      * @param Array
-     *            $link_name_to_fields_array -- A list of link_names and for each link_name, what
+     *            link_name_to_fields_array -- A list of link_names and for each link_name, what
      *            fields value to be returned. For ex.'link_name_to_fields_array' =>
      *            array(array('name' => 'email_addresses', 'value' => array('id', 'email_address',
      *            'opt_out', 'primary_address')))
      * @param integer
-     *            $max_results -- The maximum number of records to return. The default is the sugar
+     *            max_results -- The maximum number of records to return. The default is the sugar
      *            configuration value for 'list_max_entries_per_page'
      * @param integer
-     *            $deleted -- false if deleted records should not be include, true if deleted
-     *            records should be included.
+     *            deleted -- false if deleted records should not be include, true if deleted records
+     *            should be included.
      * @return Array 'result_count' -- integer - The number of records returned 'next_offset' --
      *         integer - The start of the next page (This will always be the previous offset plus
      *         the number of rows returned. It does not indicate if there is additional data unless
@@ -101,7 +106,7 @@ public class RestUtil {
      *         [value] => 0 ) [3] => Array ( [name] => primary_address [value] => 0 ) ) ) ) )
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static SBList getEntryList(String url, String sessionId, String moduleName,
+    public static SBParser getEntryList(String url, String sessionId, String moduleName,
                                     String query, String orderBy, int offset,
                                     String[] selectFields, String[] linkNameToFieldsArray,
                                     int maxResults, int deleted) throws JSONException,
@@ -136,7 +141,75 @@ public class RestUtil {
             Log.i(LOG_TAG, "FAILED TO CONNECT!");
             return null;
         }
-        return new SBList(EntityUtils.toString(res.getEntity()).toString());
+        return new SBParser(EntityUtils.toString(res.getEntity()).toString());
+    }
+
+    public static SBParser getEntries(String url, String sessionId, String moduleName,
+                                    String[] ids, String[] selectFields,
+                                    String[] linkNameToFieldsArray) throws JSONException,
+                                    ClientProtocolException, IOException {
+
+        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        data.put(SESSION, sessionId);
+        data.put(MODULE_NAME, moduleName);
+        data.put(IDS, ids);
+        data.put(SELECT_FIELDS, new JSONArray(Arrays.asList(selectFields)));
+        data.put("link_name_to_fields_array", linkNameToFieldsArray);
+
+        String restData = org.json.simple.JSONValue.toJSONString(data);
+        Log.i(LOG_TAG, "restData : " + restData);
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost req = new HttpPost(url);
+        // Add your data
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        nameValuePairs.add(new BasicNameValuePair(METHOD, GET_ENTRIES));
+        nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
+        nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
+        nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData));
+        req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+        // Send POST request
+        HttpResponse res = httpClient.execute(req);
+        if (res.getEntity() == null) {
+            Log.i(LOG_TAG, "FAILED TO CONNECT!");
+            return null;
+        }
+        return new SBParser(EntityUtils.toString(res.getEntity()).toString());
+    }
+
+    public static SugarBean getEntry(String url, String sessionId, String moduleName, String id,
+                                    String[] selectFields, String[] linkNameToFieldsArray)
+                                    throws JSONException, ClientProtocolException, IOException,
+                                    ParseException, SugarCrmException {
+
+        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        data.put(SESSION, sessionId);
+        data.put(MODULE_NAME, moduleName);
+        data.put(ID, id);
+        data.put(SELECT_FIELDS, new JSONArray(Arrays.asList(selectFields)));
+        data.put("link_name_to_fields_array", linkNameToFieldsArray);
+
+        String restData = org.json.simple.JSONValue.toJSONString(data);
+        Log.i(LOG_TAG, "restData : " + restData);
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost req = new HttpPost(url);
+        // Add your data
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        nameValuePairs.add(new BasicNameValuePair(METHOD, GET_ENTRY));
+        nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
+        nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
+        nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData));
+        req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+        // Send POST request
+        HttpResponse res = httpClient.execute(req);
+        if (res.getEntity() == null) {
+            Log.i(LOG_TAG, "FAILED TO CONNECT!");
+            return null;
+        }
+        return new SugarBean(EntityUtils.toString(res.getEntity()).toString());
     }
 
     /**
@@ -155,10 +228,12 @@ public class RestUtil {
      * @return Array - id - String id is the session_id of the session that was created. -
      *         module_name - String - module name of user - name_value_list - Array - The name value
      *         pair of user_id, user_name, user_language, user_currency_id, user_currency_name
+     * @throws SugarCrmException
      * @exception 'SoapFault' -- The SOAP error, if any
      */
     public static String loginToSugarCRM(String url, String username, String password)
-                                    throws JSONException, ClientProtocolException, IOException {
+                                    throws JSONException, ClientProtocolException, IOException,
+                                    SugarCrmException {
         JSONObject credentials = new JSONObject();
         credentials.put(USER_NAME, username);
         credentials.put(PASSWORD, password);
@@ -193,7 +268,13 @@ public class RestUtil {
 
         final String response = EntityUtils.toString(resLogin.getEntity());
         JSONObject responseObj = new JSONObject(response);
-        return responseObj.get(ID).toString();
+        Log.i(LOG_TAG, response);
+        try {
+            String sessionId = responseObj.get(ID).toString();
+            return sessionId;
+        } catch (JSONException e) {
+            throw new SugarCrmException(responseObj.get(NAME).toString(), responseObj.get(DESCRIPTION).toString());
+        }
     }
 
     /**
@@ -289,9 +370,4 @@ public class RestUtil {
         return jsonResponse.getJSONObject(RestUtilConstants.MODULE_FIELDS);
     }
 
-    public static Object getValueFromMap(Map<String, Map<String, Object>> map, String beanId,
-                                    String key) {
-        Map<String, Object> nameValuePair = (Map<String, Object>) map.get(beanId);
-        return nameValuePair.get(key).toString();
-    }
 }
