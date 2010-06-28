@@ -25,6 +25,10 @@ public interface RestUtilConstants {
 
     public static final String GET_ENTRY_LIST = "get_entry_list";
 
+    public static final String GET_ENTRIES = "get_entries";
+
+    public static final String GET_ENTRY = "get_entry";
+
     public static final String GET_MODULE_FIELDS = "get_module_fields";
 
     // module names
@@ -62,6 +66,8 @@ public interface RestUtilConstants {
     // params for the output JSON
     public static final String ID = "id";
 
+    public static final String IDS = "ids";
+
     public static final String MODULES = "modules";
 
     public static final String MODULE_FIELDS = "module_fields";
@@ -71,5 +77,16 @@ public interface RestUtilConstants {
     public static final String RELATIONSHIP_LIST = "relationship_list";
 
     public static final String RESULT_COUNT = "result_count";
+
+    public static final String NAME = "name";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String LOGIN_FAILED = "Login Failed!";
+
+    // Exceptions
+    public static final String EXCEPTION = "Exception";
+
+    public static final String JSON_EXCEPTION = "JSONException";
 
 }
