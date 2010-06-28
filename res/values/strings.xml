@@ -2,4 +2,15 @@
 <resources>
     <string name="hello">Hello World, HomeActivity!</string>
     <string name="app_name">SugarCRM</string>
+	<string name="login_activity_username_label">Username</string>
+	<string name="login_activity_password_label">Password</string>
+	<string name="login_activity_ok_button">Sign in</string>
+	<string name="login_activity_blank_field">Please enter a valid </string>
+	<string name="ui_activity_authenticating">Authenticating\u2026</string>
+	<string name="label_contacts">Contacts</string>
+	<string name="label_accounts">Accounts</string>
+	<string name="label_leads">Leads</string>
+	<string name="label_opportunities">Opportunities</string>
+	<string name="label_accounts_activity">Accounts Activity!</string>
+	<string name="label_leads_activity">Leads Activity!</string>
 </resources>
