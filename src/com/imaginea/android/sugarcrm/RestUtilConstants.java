@@ -27,6 +27,17 @@ public interface RestUtilConstants {
 
     public static final String GET_MODULE_FIELDS = "get_module_fields";
 
+    // module names
+    public static final String ACCOUNTS_MODULE = "Accounts";
+
+    public static final String CONTACTS_MODULE = "Contacts";
+
+    public static final String LEADS_MODULE = "Leads";
+
+    public static final String OPPORTUNITIES_MODULE = "Opportunities";
+
+    public static final String MEETINGS_MODULE = "Meetings";
+
     // params for the input JSON
     public static final String USER_AUTH = "user_auth";
 
