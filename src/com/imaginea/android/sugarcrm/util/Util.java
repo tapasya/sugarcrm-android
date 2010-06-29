@@ -7,13 +7,19 @@ import java.security.NoSuchAlgorithmException;
 public class Util {
 
     // calculate the MD5 hash of a string
-    public static String MD5(String text) throws NoSuchAlgorithmException,
-                                    UnsupportedEncodingException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] md5hash = new byte[32];
-        md.update(text.getBytes("iso-8859-1"), 0, text.length());
-        md5hash = md.digest();
-        return convertToHex(md5hash);
+    public static String MD5(String text) throws SugarCrmException {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] md5hash = new byte[32];
+            md.update(text.getBytes("iso-8859-1"), 0, text.length());
+            md5hash = md.digest();
+            return convertToHex(md5hash);
+        } catch (UnsupportedEncodingException ue) {
+            throw new SugarCrmException(ue.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            throw new SugarCrmException(e.getMessage());
+        }
+
     }
 
     private static String convertToHex(byte[] data) {
