@@ -33,8 +33,8 @@ public class SBParser {
         return resultCount;
     }
 
-    public SugarBean[] getSBEntryList() throws SugarCrmException {
-        sugarBeans = new SugarBean[mEntryListJson.length()];
+    public SugarBean[] getSugarBeans() throws SugarCrmException {
+        SugarBean[] sugarBeans = new SugarBean[mEntryListJson.length()];
         for (int i = 0; i < mEntryListJson.length(); i++) {
             sugarBeans[i] = new SugarBean();
             try {
