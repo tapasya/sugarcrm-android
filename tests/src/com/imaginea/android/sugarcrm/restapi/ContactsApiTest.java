@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.util.RestUtil;
-import com.imaginea.android.sugarcrm.util.SBList;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 
 /**
@@ -47,7 +46,7 @@ public class ContactsApiTest extends RestAPITest {
         String[] linkNameToFieldsArray = new String[] {};
         int maxResults = 10, deleted = 0;
 
-        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);        
+        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
         assertTrue(sBeans.length > 0);
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
