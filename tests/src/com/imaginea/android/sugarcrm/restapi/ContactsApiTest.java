@@ -47,8 +47,7 @@ public class ContactsApiTest extends RestAPITest {
         String[] linkNameToFieldsArray = new String[] {};
         int maxResults = 10, deleted = 0;
 
-        SBList sbList = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
-        SugarBean[] sBeans = sbList.getSBEntryList();
+        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);        
         assertTrue(sBeans.length > 0);
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
