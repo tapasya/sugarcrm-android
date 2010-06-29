@@ -65,44 +65,31 @@ public class LoginActivity extends Activity {
         if (TextUtils.isEmpty(mUsername) || TextUtils.isEmpty(mPassword)) {
             mMessage.setText(getMessage());
         } else {
-            //TODO: check the progressBar
+            // TODO: check the progressBar
             showProgress();
             // Start authenticating...
             String sessionId;
+
             try {
-                try {
-                    sessionId = RestUtil.loginToSugarCRM(url, mUsername, Util.MD5(mPassword));
-                    Log.i(LOG_TAG, "SessionId - " + sessionId);
-                    mMessage.setText("");
+                sessionId = RestUtil.loginToSugarCRM(url, mUsername, Util.MD5(mPassword));
+                Log.i(LOG_TAG, "SessionId - " + sessionId);
+                mMessage.setText("");
 
-                    // save the sessionId in the application context after the succesful login
-                    SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
-                    app.setSessionId(sessionId);
-                    hideProgress();
+                // save the sessionId in the application context after the succesful login
+                SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
+                app.setSessionId(sessionId);
+                hideProgress();
 
-                    // show the Dashboard if the login is succesful
-                    Intent myIntent = new Intent(LoginActivity.this, DashboardActivity.class);
-                    LoginActivity.this.startActivity(myIntent);
+                // show the Dashboard if the login is succesful
+                Intent myIntent = new Intent(LoginActivity.this, DashboardActivity.class);
+                LoginActivity.this.startActivity(myIntent);
 
-                } catch (SugarCrmException e) {
-                    // If the login fails
-                    mMessage.setText(e.getMessage());
-                    hideProgress();
-                }
-
-            } catch (ClientProtocolException e) {
-                Log.e(LOG_TAG, "Exception: ", e);
-                e.printStackTrace();
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Exception: ", e);
-                e.printStackTrace();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Exception: ", e);
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                Log.e(LOG_TAG, "Exception: ", e);
-                e.printStackTrace();
+            } catch (SugarCrmException e) {
+                // If the login fails
+                mMessage.setText(e.getMessage());
+                hideProgress();
             }
+
         }
     }
 
