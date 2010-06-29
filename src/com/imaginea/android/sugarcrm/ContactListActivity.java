@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 
 import com.imaginea.android.sugarcrm.util.RestUtil;
-import com.imaginea.android.sugarcrm.util.SBList;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
 
@@ -108,8 +107,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
                 int maxResults = 10, deleted = 0;
 
-                SBList sbList = RestUtil.getEntryList(url, sessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
-                SugarBean[] sBeans = sbList.getSBEntryList();
+                SugarBean[] sBeans = RestUtil.getEntryList(url, sessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
                 mAdapter.setSugarBeanArray(sBeans);
 
             } catch (Exception e) {
