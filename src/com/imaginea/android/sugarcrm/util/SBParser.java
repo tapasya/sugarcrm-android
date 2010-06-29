@@ -19,8 +19,6 @@ public class SBParser {
 
     private int resultCount;
 
-    private SugarBean[] sugarBeans;
-
     public SBParser(String jsonText) throws JSONException {
         Log.i("SBParser", jsonText);
         JSONObject responseObj = new JSONObject(jsonText);
