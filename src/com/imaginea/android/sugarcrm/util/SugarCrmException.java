@@ -10,10 +10,23 @@ public class SugarCrmException extends Exception {
         mName = name;
         mDescription = desc;
     }
+    
+    public SugarCrmException(String desc) {
+       
+        mDescription = desc;
+    }
 
     @Override
-    public String getMessage() {
+    public String toString() {
         return mName + " : " + mDescription;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public String getDescription() {
+        return mDescription;
     }
 
 }
