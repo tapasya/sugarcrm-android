@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="TextAppearance" parent="android:TextAppearance">
+	</style>
+
+	<style name="edit_text_layout">
+		<item name="android:paddingLeft">6dip</item>
+		<item name="android:paddingRight">7dip</item>
+		<item name="android:paddingTop">8dip</item>
+	</style>
+	<style name="list_item_style">
+
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+		<item name="android:focusable">false</item>
+		<item name="android:height">40dip</item>
+		<item name="android:paddingLeft">2dip</item>
+		<item name="android:textAppearance">?android:attr/textAppearanceMedium
+		</item>
+		<item name="android:layout_marginLeft">3dip</item>
+		<item name="android:gravity">center_vertical|left</item>
+	</style>
+</resources>
