@@ -20,6 +20,10 @@ public class ContactsApiTest extends RestAPITest {
     String[] fields = new String[] {};
 
     String[] customFields = new String[] { "a", "b" };
+    
+    String[] selectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
+                                    ModuleFields.EMAIL1 };
+                            String[] linkNameToFieldsArray = new String[] {};
 
     public final static String LOG_TAG = "ContactsApiTest";
 
@@ -79,9 +83,7 @@ public class ContactsApiTest extends RestAPITest {
      */
     private SugarBean[] getSugarBeans(int offset, int maxResults) throws Exception {
         String query = "", orderBy = "";
-        String[] selectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
-                ModuleFields.EMAIL1 };
-        String[] linkNameToFieldsArray = new String[] {};
+       
         int deleted = 0;
 
         SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
