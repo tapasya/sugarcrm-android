@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.imaginea.android.sugarcrm.util.Util;
 
@@ -13,6 +14,8 @@ import java.util.Map;
 public class SugarCrmSettings extends PreferenceActivity {
 
     private static final Map<String, String> savedSettings = new HashMap<String, String>();
+
+    private static final String LOG_TAG = "SugarCrmSettings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,7 @@ public class SugarCrmSettings extends PreferenceActivity {
         savedSettings.put(Util.PREF_REST_URL, getSugarRestUrl(context));
         savedSettings.put(Util.PREF_USERNAME, getUsername(context));
         savedSettings.put(Util.PREF_PASSWORD, getPassword(context));
+        savedSettings.put(Util.PREF_REMEMBER_PASSWORD, isPasswordSaved(context));
     }
 
     /**
@@ -59,6 +63,10 @@ public class SugarCrmSettings extends PreferenceActivity {
                 return true;
             }
 
+            if (!isPasswordSaved(context).equals(savedSettings.get(Util.PREF_REMEMBER_PASSWORD))) {
+                return true;
+            }
+
             return false;
         } finally {
             savedSettings.clear();
@@ -68,7 +76,6 @@ public class SugarCrmSettings extends PreferenceActivity {
     // Static getters (extracting data from context)
 
     public static String getUsername(Context context) {
-
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_USERNAME, context.getString(R.string.default_username));
     }
 
@@ -76,7 +83,21 @@ public class SugarCrmSettings extends PreferenceActivity {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_PASSWORD, context.getString(R.string.default_password));
     }
 
+    public static String isPasswordSaved(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REMEMBER_PASSWORD, Boolean.toString(true));
+    }
+
     public static String getSugarRestUrl(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, context.getString(R.string.default_url));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // TODO: onChange of settings, session has to be invalidated
+        Log.i(LOG_TAG, "url - " + getSugarRestUrl(SugarCrmSettings.this));
+        Log.i(LOG_TAG, "username - " + getUsername(SugarCrmSettings.this));
+        Log.i(LOG_TAG, "password - " + getPassword(SugarCrmSettings.this));
+        Log.i(LOG_TAG, "pwdSaved - " + isPasswordSaved(SugarCrmSettings.this));
     }
 }
