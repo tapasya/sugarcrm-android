@@ -58,4 +58,10 @@
 	<string name="delete">Delete</string>
 	<string name="call">Call</string>
 	<string name="email">Email</string>
+	
+	<!-- Contacts Details -->
+	<string name="add_contact">Add Contact</string>
+	<string name="contact_details">Contact Details</string>
+	
+	<string name="not_available">Not Available</string>
 </resources>
