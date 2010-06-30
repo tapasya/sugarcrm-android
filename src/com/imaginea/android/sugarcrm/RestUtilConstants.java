@@ -89,11 +89,4 @@ public interface RestUtilConstants {
 
     public static final String JSON_EXCEPTION = "JSONException";
 
-    // settings
-    public static final String PREF_REST_URL = "pref_rest_url";
-
-    public static final String PREF_USERNAME = "pref_username";
-
-    public static final String PREF_PASSWORD = "pref_password";
-
 }
