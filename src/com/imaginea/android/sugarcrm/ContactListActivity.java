@@ -125,7 +125,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 // TODO use a constant and remove this as we start from the login screen
                 String url = pref.getString("URL", getString(R.string.default_url));
-                String userName = pref.getString("USER_NAME", getString(R.string.default_user));
+                String userName = pref.getString("USER_NAME", getString(R.string.default_username));
                 String password = pref.getString("PASSWORD", getString(R.string.default_password));
                 Log.i(LOG_TAG, url + userName + password);
                 // SugarCrmApp app =
