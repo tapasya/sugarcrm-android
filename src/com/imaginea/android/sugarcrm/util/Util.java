@@ -25,7 +25,7 @@ public class Util {
     public static final String PREF_USERNAME = "usr";
 
     public static final String PREF_PASSWORD = "pwd";
-
+    
     public static final String PREF_REMEMBER_PASSWORD = "remember_pwd";
 
     // calculate the MD5 hash of a string
