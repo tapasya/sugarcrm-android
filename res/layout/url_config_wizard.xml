@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" 
+	android:layout_height="wrap_content"
+	android:orientation="vertical">
+	
+	<TextView 
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:textStyle="bold" 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="@string/wizard_url_label" />
+	<EditText 
+		android:id="@+id/wizard_url_edit" 
+		android:singleLine="true"
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:minWidth="250dip" 
+		android:scrollHorizontally="true"
+		android:capitalize="none" 
+		android:autoText="false"
+		android:inputType="textUri"
+		android:text="@string/wizard_sample_url" />
+	<TextView 
+		android:id="@+id/wizard_url_status_message" 
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:textStyle="bold" 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="@string/wizard_sample_url" />
+		
+</LinearLayout>
