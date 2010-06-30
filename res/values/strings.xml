@@ -50,4 +50,11 @@
 	<string name="wizard_sample_url">Eg:
 		http://192.168.1.83/sugarcrm/service/v2/rest.php</string>
 
+	<!-- Details Screen Context Menu-->
+	<string name="options">options</string>
+	<string name="view">View</string>
+	<string name="edit">Edit</string>
+	<string name="delete">Delete</string>
+	<string name="call">Call</string>
+	<string name="email">Email</string>
 </resources>
