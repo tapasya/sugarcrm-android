@@ -2,10 +2,10 @@
 <resources>
 
 	<!-- Application name -->
-    <string name="app_name">SugarCRM</string>
-    
-    <string name="hello">Hello World, HomeActivity!</string>
-	
+	<string name="app_name">SugarCRM</string>
+
+	<string name="hello">Hello World, HomeActivity!</string>
+
 	<!-- Sugar CRM Settings  -->
 	<string name="username_pref_text">Username</string>
 	<string name="username_pref_summary">The username you use to log in to Sugar</string>
@@ -13,33 +13,41 @@
 	<string name="password_pref_summary">The password associated to your username</string>
 	<string name="url_pref_text">Sugar URL</string>
 	<string name="url_pref_summary">The REST URL of SugarCRM</string>
-	
+
 	<!-- default values for settings -->
-	<!--string name="default_url">http://demo.sugarcrm.com/sugarcrm/service/v2/rest.php</string-->
-	<!-- <string name="default_url">http://192.168.1.83/sugarcrm/service/v2/rest.php</string> -->
-	<string name="default_url">http://192.168.2.245/sugarcrm/service/v2/rest.php</string>
+	<!--
+		string
+		name="default_url">http://demo.sugarcrm.com/sugarcrm/service/v2/rest.php</string
+	-->
+	<!--
+		<string
+		name="default_url">http://192.168.1.83/sugarcrm/service/v2/rest.php</string>
+	-->
+	<string name="default_url">http://192.168.2.245/sugarcrm/service/v2/rest.php
+	</string>
 	<string name="default_username">will</string>
 	<string name="default_password">will</string>
-	
+
 	<!-- Modules -->
 	<string name="label_contacts">Contacts</string>
 	<string name="label_accounts">Accounts</string>
 	<string name="label_leads">Leads</string>
 	<string name="label_opportunities">Opportunities</string>
 	<string name="label_settings">Settings</string>
-	
+
 	<string name="label_accounts_activity">Accounts Activity!</string>
 	<string name="label_leads_activity">Leads Activity!</string>
-	
+
 	<!-- Login Module -->
 	<string name="login_activity_username_label">Username</string>
 	<string name="login_activity_password_label">Password</string>
 	<string name="login_activity_ok_button">Sign in</string>
 	<string name="login_activity_blank_field">Please enter a valid </string>
 	<string name="ui_activity_authenticating">Authenticating\u2026</string>
-	
+
 	<!-- Wizard -->
 	<string name="wizard_url_label">REST Url</string>
-	<string name="wizard_sample_url">Eg: http://192.168.1.83/sugarcrm/service/v2/rest.php</string>
-	
+	<string name="wizard_sample_url">Eg:
+		http://192.168.1.83/sugarcrm/service/v2/rest.php</string>
+
 </resources>
