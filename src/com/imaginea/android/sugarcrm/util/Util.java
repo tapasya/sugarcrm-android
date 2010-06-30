@@ -4,8 +4,19 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Common utilties and constants required by everyone
+ * 
+ * @author Vasavi
+ * @author chander
+ *
+ */
 public class Util {
 
+    public static final int FETCH_FAILED = 0;
+
+    public static final int REFRESH_LIST = 1;
+    
     // calculate the MD5 hash of a string
     public static String MD5(String text) throws SugarCrmException {
         try {
