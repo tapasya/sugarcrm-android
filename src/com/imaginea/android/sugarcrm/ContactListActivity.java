@@ -2,15 +2,21 @@ package com.imaginea.android.sugarcrm;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,7 +25,7 @@ import android.widget.AbsListView.OnScrollListener;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -65,8 +71,27 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         mAdapter = new ContactsAdapter(this);
 
         getListView().setOnScrollListener(this);
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+
+            }
+        });
+
+        // button code in the layout - 1.6 SDK feature to specify onClick
+        getListView().setItemsCanFocus(true);
+        registerForContextMenu(getListView());
         mTask = new LoadContactsTask();
         mTask.execute(null);
+    }
+
+    void openDetailScreen(int position) {
+        Intent detailIntent = new Intent(ContactListActivity.this, LeadsActivity.class);
+        SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
+        Log.d(LOG_TAG, "beanId:" + bean.getBeanId());
+        detailIntent.putExtra(RestUtilConstants.ID, bean.getBeanId());
+        startActivity(detailIntent);
     }
 
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
@@ -183,6 +208,61 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
             }
         }
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        menu.setHeaderTitle(R.string.options);
+        AdapterView.AdapterContextMenuInfo info;
+        try {
+            info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        } catch (ClassCastException e) {
+            Log.e(LOG_TAG, "Bad menuInfo", e);
+            return;
+        }
+
+        menu.add(1, R.string.view, 2, R.string.view);
+
+        menu.add(2, R.string.edit, 3, R.string.edit);
+        menu.add(3, R.string.delete, 4, R.string.delete);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        AdapterView.AdapterContextMenuInfo info;
+
+        try {
+            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        } catch (ClassCastException e) {
+            Log.e(LOG_TAG, "bad menuInfo", e);
+            return false;
+        }
+        // ListView listView = getListView();
+
+        int position = info.position;
+        switch (item.getItemId()) {
+        case R.string.view:
+            // Launch activity to insert a new item
+            // use the id for multiple dialog display..not used here as packed
+            // position is long and cannot be sent
+            // showDialog(R.string.addErrand);
+            // adapter.getView(position, null, null);
+            openDetailScreen(position);
+
+            return true;
+
+        case R.string.edit:
+            openDetailScreen(position);
+            return true;
+
+        case R.string.delete:
+
+            return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
