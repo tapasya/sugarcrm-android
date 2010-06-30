@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<EditTextPreference android:key="sugar_soap_url"
+		android:defaultValue="@string/default_url"
+		android:title="@string/url_pref_text" 
+		android:summary="@string/url_pref_summary" />
+		
+	<EditTextPreference android:key="username"
+		android:title="@string/username_pref_text" 
+		android:summary="@string/username_pref_summary"
+		android:defaultValue="@string/default_username" />
+		
+	<EditTextPreference android:key="password"
+		android:title="@string/password_pref_text" 
+		android:password="true"
+		android:summary="@string/password_pref_summary" 
+		android:defaultValue="@string/default_password"
+		android:dependency="">
+	</EditTextPreference>
+	
+	<CheckBoxPreference
+            android:key=""
+            android:title="WiFi" />
+	
+		
+</PreferenceScreen>
