@@ -9,16 +9,23 @@ import java.security.NoSuchAlgorithmException;
  * 
  * @author Vasavi
  * @author chander
- *
+ * 
  */
 public class Util {
 
     public static final int FETCH_FAILED = 0;
 
     public static final int REFRESH_LIST = 1;
-    
+
     public static final int FETCH_SUCCESS = 2;
-    
+
+    // constants for settings / Preferences
+    public static final String PREF_REST_URL = "rest_url";
+
+    public static final String PREF_USERNAME = "usr";
+
+    public static final String PREF_PASSWORD = "pwd";
+
     // calculate the MD5 hash of a string
     public static String MD5(String text) throws SugarCrmException {
         try {
