@@ -36,8 +36,6 @@ import com.imaginea.android.sugarcrm.RestUtilConstants;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -51,7 +49,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +137,7 @@ public class RestUtil {
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
                 Log.i(LOG_TAG, "FAILED TO CONNECT!");
-                return null;
+                throw new SugarCrmException("FAILED TO CONNECT!");
             }
             SugarBean[] beans = new SBParser(EntityUtils.toString(res.getEntity()).toString()).getSugarBeans();
             return beans;
@@ -149,7 +146,6 @@ public class RestUtil {
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
         }
-        // return null;
     }
 
     public static SugarBean[] getEntries(String url, String sessionId, String moduleName,
@@ -181,7 +177,7 @@ public class RestUtil {
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
                 Log.i(LOG_TAG, "FAILED TO CONNECT!");
-                return null;
+                throw new SugarCrmException("FAILED TO CONNECT!");
             }
             SugarBean[] beans = new SBParser(EntityUtils.toString(res.getEntity()).toString()).getSugarBeans();
             return beans;
@@ -221,11 +217,11 @@ public class RestUtil {
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
                 Log.i(LOG_TAG, "FAILED TO CONNECT!");
-                return null;
+                throw new SugarCrmException("FAILED TO CONNECT!");
             }
             return new SugarBean(EntityUtils.toString(res.getEntity()).toString());
-        } catch (Exception e) {
-            throw new SugarCrmException(e.getMessage());
+        } catch (IOException ioe) {
+            throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
         }
 
     }
@@ -279,9 +275,8 @@ public class RestUtil {
             HttpResponse resLogin = httpClient.execute(reqLogin);
 
             if (resLogin.getEntity() == null) {
-                System.out.println("FAILED TO CONNECT.");
                 Log.i(LOG_TAG, "FAILED TO CONNECT!");
-                throw new SugarCrmException("FAILED TO CONNECT!", "FAILED TO CONNECT!");
+                throw new SugarCrmException("FAILED TO CONNECT!");
             }
 
             final String response = EntityUtils.toString(resLogin.getEntity());
@@ -293,7 +288,9 @@ public class RestUtil {
             } catch (JSONException e) {
                 throw new SugarCrmException(responseObj.get(NAME).toString(), responseObj.get(DESCRIPTION).toString());
             }
-        } catch (Exception ioe) {
+        } catch (JSONException jo) {
+            throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
+        } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
         }
 
@@ -309,32 +306,38 @@ public class RestUtil {
      * @exception 'SoapFault' -- The SOAP error, if any
      */
     public static List<String> getAvailableModules(String url, String sessionId)
-                                    throws JSONException, ClientProtocolException, IOException {
-        JSONObject sessId = new JSONObject();
-        sessId.put(SESSION, sessionId);
+                                    throws SugarCrmException {
+        try {
+            JSONObject sessId = new JSONObject();
+            sessId.put(SESSION, sessionId);
 
-        HttpPost req = new HttpPost(url);
-        // Add your data
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-        nameValuePairs.add(new BasicNameValuePair(METHOD, GET_AVAILABLE_MODULES));
-        nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
-        nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
-        nameValuePairs.add(new BasicNameValuePair(REST_DATA, sessId.toString()));
-        req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpPost req = new HttpPost(url);
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair(METHOD, GET_AVAILABLE_MODULES));
+            nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(REST_DATA, sessId.toString()));
+            req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-        // Send POST request
-        HttpResponse res = httpClient.execute(req);
+            // Send POST request
+            HttpResponse res = httpClient.execute(req);
 
-        if (res.getEntity() == null) {
-            Log.i(LOG_TAG, "FAILED TO CONNECT!");
-            return Collections.emptyList();
+            if (res.getEntity() == null) {
+                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                throw new SugarCrmException("FAILED TO CONNECT!");
+            }
+
+            final String response = EntityUtils.toString(res.getEntity());
+            Log.i(LOG_TAG, "available modules : " + response);
+            JSONObject responseObj = new JSONObject(response);
+
+            return new ArrayList<String>(Arrays.asList(responseObj.get(MODULES).toString().split(",")));
+        } catch (JSONException jo) {
+            throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
+        } catch (IOException ioe) {
+            throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
         }
-
-        final String response = EntityUtils.toString(res.getEntity());
-        Log.i(LOG_TAG, "available modules : " + response);
-        JSONObject responseObj = new JSONObject(response);
-
-        return new ArrayList<String>(Arrays.asList(responseObj.get(MODULES).toString().split(",")));
     }
 
     // TODO parse the response to get module fields and change the return type
@@ -355,41 +358,45 @@ public class RestUtil {
      * @exception 'SoapFault' -- The SOAP error, if any
      */
     public static JSONObject getModuleFields(String url, String sessionId, String moduleName,
-                                    String[] fields) throws JSONException, ClientProtocolException,
-                                    IOException {
+                                    String[] fields) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
 
-        JSONArray arr = new JSONArray(Arrays.asList(fields));
-        data.put(FIELDS, arr);
+        try {
+            JSONArray arr = new JSONArray(Arrays.asList(fields));
+            data.put(FIELDS, arr);
 
-        String restData = org.json.simple.JSONValue.toJSONString(data);
+            String restData = org.json.simple.JSONValue.toJSONString(data);
 
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpPost req = new HttpPost(url);
-        // Add your data
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-        nameValuePairs.add(new BasicNameValuePair(METHOD, GET_MODULE_FIELDS));
-        nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
-        nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
-        nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData.toString()));
-        req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-        Log.i(LOG_TAG, EntityUtils.toString(req.getEntity()));
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost req = new HttpPost(url);
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair(METHOD, GET_MODULE_FIELDS));
+            nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData.toString()));
+            req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            Log.i(LOG_TAG, EntityUtils.toString(req.getEntity()));
 
-        // Send POST request
-        HttpResponse res = httpClient.execute(req);
+            // Send POST request
+            HttpResponse res = httpClient.execute(req);
 
-        if (res.getEntity() == null) {
-            Log.i(LOG_TAG, "FAILED TO CONNECT!");
-            // return (ArrayList<String>) Collections.EMPTY_LIST;
-            return null;
+            if (res.getEntity() == null) {
+                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                throw new SugarCrmException("FAILED TO CONNECT!");
+            }
+
+            final String response = EntityUtils.toString(res.getEntity());
+            Log.i(LOG_TAG, "moduleFields : " + response);
+            JSONObject jsonResponse = new JSONObject(response);
+            return jsonResponse.getJSONObject(RestUtilConstants.MODULE_FIELDS);
+        } catch (JSONException jo) {
+            throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
+        } catch (IOException ioe) {
+            throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
         }
-
-        final String response = EntityUtils.toString(res.getEntity());
-        Log.i(LOG_TAG, "moduleFields : " + response);
-        JSONObject jsonResponse = new JSONObject(response);
-        return jsonResponse.getJSONObject(RestUtilConstants.MODULE_FIELDS);
     }
 
 }
