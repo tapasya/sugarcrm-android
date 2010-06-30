@@ -17,6 +17,8 @@ public class Util {
 
     public static final int REFRESH_LIST = 1;
     
+    public static final int FETCH_SUCCESS = 2;
+    
     // calculate the MD5 hash of a string
     public static String MD5(String text) throws SugarCrmException {
         try {
