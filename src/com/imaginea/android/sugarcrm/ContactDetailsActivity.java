@@ -37,7 +37,15 @@ public class ContactDetailsActivity extends Activity {
 
     private String[] mLinkNameToFieldsArray = new String[] {};
 
-    private Button mAccountButton;
+    private String mAccountName;
+
+    private String mPhoneMobile;
+
+    private String mPhoneWork;
+
+    private String mEmail;
+
+    private TextView mAccountButton;
 
     private Button mPhoneMobileButton;
 
@@ -72,7 +80,7 @@ public class ContactDetailsActivity extends Activity {
 
     private void findViews() {
         mNameTextView = (TextView) findViewById(R.id.contact_name);
-        mAccountButton = (Button) findViewById(R.id.contact_account_button);
+        mAccountButton = (TextView) findViewById(R.id.contact_account_button);
         mPhoneMobileButton = (Button) findViewById(R.id.contact_phone_mobile_button);
         mPhoneWorkButton = (Button) findViewById(R.id.contact_phone_work_button);
         mEmailButton = (Button) findViewById(R.id.contact_email_button);
@@ -134,33 +142,33 @@ public class ContactDetailsActivity extends Activity {
         private void setContents() {
             mNameTextView.setText(mSugarBean.getFieldValue(ModuleFields.FIRST_NAME));
 
-            String accountName = mSugarBean.getFieldValue(ModuleFields.ACCOUNT_NAME);
-            if (accountName != null && !accountName.equals("")) {
-                mAccountButton.setText(accountName);
+            mAccountName = mSugarBean.getFieldValue(ModuleFields.ACCOUNT_NAME);
+            if (mAccountName != null && !mAccountName.equals("")) {
+                mAccountButton.setText(mAccountName);
             } else {
                 mAccountButton.setText(R.string.not_available);
                 mAccountButton.setClickable(false);
             }
 
-            String mobile = mSugarBean.getFieldValue(ModuleFields.PHONE_MOBILE);
-            if (mobile != null && !mobile.equals("")) {
-                mPhoneMobileButton.setText(mobile);
+            mPhoneMobile = mSugarBean.getFieldValue(ModuleFields.PHONE_MOBILE);
+            if (mPhoneMobile != null && !mPhoneMobile.equals("")) {
+                mPhoneMobileButton.setText(mPhoneMobile);
             } else {
                 mPhoneMobileButton.setText(R.string.not_available);
                 mPhoneMobileButton.setClickable(false);
             }
 
-            String workPhone = mSugarBean.getFieldValue(ModuleFields.PHONE_WORK);
-            if (workPhone != null && !workPhone.equals("")) {
-                mPhoneWorkButton.setText(workPhone);
+            mPhoneWork = mSugarBean.getFieldValue(ModuleFields.PHONE_WORK);
+            if (mPhoneWork != null && !mPhoneWork.equals("")) {
+                mPhoneWorkButton.setText(mPhoneWork);
             } else {
                 mPhoneWorkButton.setText(R.string.not_available);
                 mPhoneWorkButton.setClickable(false);
             }
 
-            String email = mSugarBean.getFieldValue(ModuleFields.EMAIL1);
-            if (email != null && !email.equals("")) {
-                mEmailButton.setText(email);
+            mEmail = mSugarBean.getFieldValue(ModuleFields.EMAIL1);
+            if (mEmail != null && !mEmail.equals("")) {
+                mEmailButton.setText(mEmail);
             } else {
                 mEmailButton.setText(R.string.not_available);
                 mEmailButton.setClickable(false);
@@ -175,7 +183,7 @@ public class ContactDetailsActivity extends Activity {
             mPhoneMobileButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // callNumber(contact.getPhoneMobile());
+                    callNumber(mPhoneMobile);
                 }
             });
         }
@@ -184,7 +192,7 @@ public class ContactDetailsActivity extends Activity {
             mPhoneWorkButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // callNumber(contact.getPhoneWork());
+                    callNumber(mPhoneWork);
                 }
             });
         }
@@ -193,7 +201,7 @@ public class ContactDetailsActivity extends Activity {
             mAccountButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // executeOnGuiThreadAuthenticatedTask(getItemDetailsTask);
+
                 }
             });
         }
@@ -202,7 +210,7 @@ public class ContactDetailsActivity extends Activity {
             mEmailButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // sendMail(contact.getEmail1());
+                    sendMail(mEmail);
                 }
             });
         }
