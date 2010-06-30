@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -25,7 +24,7 @@ import android.widget.AbsListView.OnScrollListener;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
-import java.io.File;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -50,12 +49,13 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
     private boolean mStopLoading = false;
 
+    private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
+            ModuleFields.EMAIL1 };
+
+    private String[] mLinkNameToFieldsArray = new String[] {};
+
     // we don't make this final as we may want to use the sugarCRM value dynamically
     public static int mMaxResults = 20;
-
-    public static final int FETCH_FAILED = 0;
-
-    public static final int REFRESH_LIST = 1;
 
     public final static String LOG_TAG = "ContactListActivity";
 
@@ -140,7 +140,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
     }
 
     /**
-     *
+     * LoadContactsTask
      */
     class LoadContactsTask extends AsyncTask<Object, Void, Object> {
 
@@ -166,13 +166,10 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
                 int offset = 0;
                 if (params != null)
                     offset = (Integer) params[0];
-                String[] selectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
-                        ModuleFields.EMAIL1 };
-                String[] linkNameToFieldsArray = new String[] {};
 
                 int deleted = 0;
 
-                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset, selectFields, linkNameToFieldsArray, mMaxResults, deleted);
+                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset, mSelectFields, mLinkNameToFieldsArray, mMaxResults, deleted);
                 mAdapter.setSugarBeanArray(sBeans);
                 // We can stop loading once we do not get the
                 if (sBeans.length < mMaxResults)
@@ -180,10 +177,10 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
-                return FETCH_FAILED;
+                return Util.FETCH_FAILED;
             }
 
-            return REFRESH_LIST;
+            return Util.REFRESH_LIST;
         }
 
         @Override
@@ -198,13 +195,16 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
                 return;
             int retVal = (Integer) result;
             switch (retVal) {
-            case FETCH_FAILED:
-
-            default:
+            case Util.FETCH_FAILED:
+                break;
+            case Util.REFRESH_LIST:
                 int firstPos = getListView().getFirstVisiblePosition();
                 setListAdapter(mAdapter);
                 getListView().setSelection(firstPos);
                 mAdapter.notifyDataSetChanged();
+                break;
+            default:
+
             }
         }
 
