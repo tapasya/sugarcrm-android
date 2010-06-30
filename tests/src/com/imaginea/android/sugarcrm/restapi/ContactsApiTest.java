@@ -1,5 +1,6 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
@@ -36,17 +37,10 @@ public class ContactsApiTest extends RestAPITest {
 
     @SmallTest
     public void testContactsList() throws Exception {
-
-        String[] fields = new String[] {};
-        // RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
-        String query = "", orderBy = "";
         int offset = 0;
+        int maxResults = 10;
         // String[] selectFields = new String[] {};
-        String[] selectFields = { ModuleFields.NAME, ModuleFields.EMAIL1 };
-        String[] linkNameToFieldsArray = new String[] {};
-        int maxResults = 10, deleted = 0;
-
-        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
+        SugarBean[] sBeans = getSugarBeans(offset, maxResults);
         assertTrue(sBeans.length > 0);
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
@@ -57,4 +51,41 @@ public class ContactsApiTest extends RestAPITest {
             }
         }
     }
+
+    @LargeTest
+    public void testEntireContactList() throws Exception {
+        int offset = 0;
+        int maxResults = 20;
+        // String[] selectFields = new String[] {};
+        SugarBean[] sBeans = getSugarBeans(offset, maxResults);
+        int totalRuns = 1;
+        while (sBeans.length > 0) {
+            offset += 20;
+            sBeans = getSugarBeans(offset, maxResults);
+            totalRuns++;
+        }
+        Log.d(LOG_TAG, "Total Runs:" + totalRuns);
+    }
+
+    /**
+     * demonstrates the usage of RestUtil for contacts List. ModuleFields.NAME or FULL_NAME is not
+     * returned by Sugar CRM. The fields that are not returned by SugarCRM can be automated, but not
+     * yet generated
+     * 
+     * @param offset
+     * @param maxResults
+     * @return
+     * @throws Exception
+     */
+    private SugarBean[] getSugarBeans(int offset, int maxResults) throws Exception {
+        String query = "", orderBy = "";
+        String[] selectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
+                ModuleFields.EMAIL1 };
+        String[] linkNameToFieldsArray = new String[] {};
+        int deleted = 0;
+
+        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset, selectFields, linkNameToFieldsArray, maxResults, deleted);
+        return sBeans;
+    }
+
 }
