@@ -6,7 +6,7 @@ package com.imaginea.android.sugarcrm;
  * Velocity is used to generate this file, please do not edit manually
  * 
  * @author chander
- *
+ * 
  */
 public interface ModuleFields {
 
