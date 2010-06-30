@@ -3,8 +3,6 @@ package com.imaginea.android.sugarcrm.util;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -27,14 +25,10 @@ public class ViewUtil {
      */
     public static Dialog getProgressBar(Context context, String message) {
         final ProgressDialog dialog = new ProgressDialog(context);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage(message);
-        dialog.setIndeterminate(true);
-        dialog.setCancelable(true);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            public void onCancel(DialogInterface dialog) {
-                Log.i(LOG_TAG, "dialog cancel has been invoked");
-            }
-        });
+       // dialog.setIndeterminate(true);
+        dialog.setCancelable(true);        
         return dialog;
     }
 
