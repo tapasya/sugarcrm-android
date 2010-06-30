@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<drawable name="screen_background_black">#ff000000</drawable>
+	<drawable name="translucent_background">#99000000</drawable>
+	<drawable name="transparent_background">#00000000</drawable>
+	<drawable name="android_title_bar">#999999</drawable>
+
+	<color name="white">#0106000b</color>
+	<color name="translucent_dark">#99000000</color>
+	<color name="translucenter_dark">#bf000000</color>
+	<color name="bright_foreground_dark">#ffffffff</color>
+
+</resources>
