@@ -10,9 +10,8 @@ public class SugarCrmException extends Exception {
         mName = name;
         mDescription = desc;
     }
-    
+
     public SugarCrmException(String desc) {
-       
         mDescription = desc;
     }
 
