@@ -75,7 +75,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-
+                openDetailScreen(position);
             }
         });
 
@@ -86,8 +86,13 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         mTask.execute(null);
     }
 
+    /**
+     * opens the Detail Screen
+     * 
+     * @param position
+     */
     void openDetailScreen(int position) {
-        Intent detailIntent = new Intent(ContactListActivity.this, LeadsActivity.class);
+        Intent detailIntent = new Intent(ContactListActivity.this, ContactDetailsActivity.class);
         SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
         Log.d(LOG_TAG, "beanId:" + bean.getBeanId());
         detailIntent.putExtra(RestUtilConstants.ID, bean.getBeanId());
