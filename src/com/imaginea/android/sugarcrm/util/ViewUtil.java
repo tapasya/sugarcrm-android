@@ -27,8 +27,8 @@ public class ViewUtil {
         final ProgressDialog dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage(message);
-       // dialog.setIndeterminate(true);
-        dialog.setCancelable(true);        
+        // dialog.setIndeterminate(true);
+        dialog.setCancelable(true);
         return dialog;
     }
 

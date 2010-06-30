@@ -26,6 +26,8 @@ public class Util {
 
     public static final String PREF_PASSWORD = "pwd";
 
+    public static final String PREF_REMEMBER_PASSWORD = "remember_pwd";
+
     // calculate the MD5 hash of a string
     public static String MD5(String text) throws SugarCrmException {
         try {
