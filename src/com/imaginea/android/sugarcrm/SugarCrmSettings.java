@@ -1,13 +1,11 @@
 package com.imaginea.android.sugarcrm;
 
-import static com.imaginea.android.sugarcrm.RestUtilConstants.PREF_PASSWORD;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.PREF_REST_URL;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.PREF_USERNAME;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+
+import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +27,9 @@ public class SugarCrmSettings extends PreferenceActivity {
      */
     public static void saveCurrentSettings(Context context) {
         savedSettings.clear();
-        savedSettings.put(PREF_REST_URL, getSugarRestUrl(context));
-        savedSettings.put(PREF_USERNAME, getUsername(context));
-        savedSettings.put(PREF_PASSWORD, getPassword(context));
+        savedSettings.put(Util.PREF_REST_URL, getSugarRestUrl(context));
+        savedSettings.put(Util.PREF_USERNAME, getUsername(context));
+        savedSettings.put(Util.PREF_PASSWORD, getPassword(context));
     }
 
     /**
