@@ -29,8 +29,8 @@ public class DashboardActivity extends Activity {
         dashboard.setAdapter(new AppsAdapter(this));
 
         // Activities corresponding to the items in the GridView
-        final Class[] moduleActivities = { AccountsActivity.class, AccountsActivity.class,
-                LeadsActivity.class, AccountsActivity.class };
+        final Class[] moduleActivities = { ContactListActivity.class, AccountsActivity.class,
+                LeadsActivity.class, AccountsActivity.class, SugarCrmSettings.class };
 
         dashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -68,11 +68,11 @@ public class DashboardActivity extends Activity {
 
         // references to the module images
         private Integer[] mModuleThumbIds = { R.drawable.contacts, R.drawable.accounts,
-                R.drawable.leads, R.drawable.opportunities };
+                R.drawable.leads, R.drawable.opportunities, R.drawable.settings };
 
         // reference to the module names
         private Integer[] mModuleNameIds = { R.string.label_contacts, R.string.label_accounts,
-                R.string.label_leads, R.string.label_opportunities };
+                R.string.label_leads, R.string.label_opportunities, R.string.label_settings };
 
         public final int getCount() {
             return mModuleThumbIds.length;
