@@ -47,15 +47,15 @@ public class SugarCrmSettings extends PreferenceActivity {
         }
 
         try {
-            if (!getSugarRestUrl(context).equals(savedSettings.get(PREF_REST_URL))) {
+            if (!getSugarRestUrl(context).equals(savedSettings.get(Util.PREF_REST_URL))) {
                 return true;
             }
 
-            if (!getUsername(context).equals(savedSettings.get(PREF_USERNAME))) {
+            if (!getUsername(context).equals(savedSettings.get(Util.PREF_USERNAME))) {
                 return true;
             }
 
-            if (!getPassword(context).equals(savedSettings.get(PREF_PASSWORD))) {
+            if (!getPassword(context).equals(savedSettings.get(Util.PREF_PASSWORD))) {
                 return true;
             }
 
@@ -69,14 +69,14 @@ public class SugarCrmSettings extends PreferenceActivity {
 
     public static String getUsername(Context context) {
 
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(PREF_USERNAME, context.getString(R.string.default_username));
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_USERNAME, context.getString(R.string.default_username));
     }
 
     public static String getPassword(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(PREF_PASSWORD, context.getString(R.string.default_password));
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_PASSWORD, context.getString(R.string.default_password));
     }
 
     public static String getSugarRestUrl(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(PREF_REST_URL, context.getString(R.string.default_url));
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, context.getString(R.string.default_url));
     }
 }
