@@ -12,7 +12,7 @@
         android:layout_weight="1"
         android:fastScrollEnabled= "true"
         android:drawSelectorOnTop="false"/>
-        
+    <include layout="@layout/empty_view"/>   
     <TextView android:id="@+id/status"
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content"
