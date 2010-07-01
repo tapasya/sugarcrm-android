@@ -33,7 +33,6 @@ public class SugarCrmSettings extends PreferenceActivity {
         savedSettings.put(Util.PREF_REST_URL, getSugarRestUrl(context));
         savedSettings.put(Util.PREF_USERNAME, getUsername(context));
         savedSettings.put(Util.PREF_PASSWORD, getPassword(context));
-        savedSettings.put(Util.PREF_REMEMBER_PASSWORD, isPasswordSaved(context));
     }
 
     /**
@@ -63,9 +62,10 @@ public class SugarCrmSettings extends PreferenceActivity {
                 return true;
             }
 
-            if (!isPasswordSaved(context).equals(savedSettings.get(Util.PREF_REMEMBER_PASSWORD))) {
-                return true;
-            }
+            // if (!isPasswordSaved(context).equals(savedSettings.get(Util.PREF_REMEMBER_PASSWORD)))
+            // {
+            // return true;
+            // }
 
             return false;
         } finally {
@@ -83,8 +83,8 @@ public class SugarCrmSettings extends PreferenceActivity {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_PASSWORD, context.getString(R.string.default_password));
     }
 
-    public static String isPasswordSaved(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REMEMBER_PASSWORD, Boolean.toString(true));
+    public static boolean isPasswordSaved(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Util.PREF_REMEMBER_PASSWORD, false);
     }
 
     public static String getSugarRestUrl(Context context) {
