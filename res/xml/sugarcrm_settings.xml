@@ -11,15 +11,17 @@
 		android:summary="@string/username_pref_summary"
 		android:defaultValue="@string/default_username" />
 		
+	<CheckBoxPreference android:key="remember_pwd"
+            android:title="Remember password" 
+            android:defaultValue="false"/>
+            
 	<EditTextPreference android:key="pwd"
 		android:title="@string/password_pref_text" 
 		android:password="true"
 		android:summary="@string/password_pref_summary" 
 		android:defaultValue="@string/default_password"
-		android:dependency="rememberPassword" />
+		android:dependency="remember_pwd" />
 	
-	<CheckBoxPreference android:key="rememberPassword"
-            android:title="Remember password" 
-            android:defaultValue="false"/>
+	
 		
 </PreferenceScreen>
