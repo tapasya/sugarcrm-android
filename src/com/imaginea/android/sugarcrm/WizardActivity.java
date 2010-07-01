@@ -53,6 +53,8 @@ public class WizardActivity extends Activity {
 
     private AuthenticationTask mAuthTask;
 
+    private LayoutInflater mInflater;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,54 +69,40 @@ public class WizardActivity extends Activity {
         final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardActivity.this);
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
         final String pwd = SugarCrmSettings.getPassword(WizardActivity.this).toString();
-        final boolean rememberedPwd = Boolean.valueOf(SugarCrmSettings.isPasswordSaved(WizardActivity.this).toString());
+        final boolean rememberedPwd = SugarCrmSettings.isPasswordSaved(WizardActivity.this);
         Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n pwd - " + pwd
                                         + "\n rememberedPwd - " + rememberedPwd);
-
+        mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (TextUtils.isEmpty(restUrl)) {
             Log.i(LOG_TAG, "REST URL is not available!");
             // inflate both url layout and username_password layout
-            LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
             for (int layout : STEPS) {
-                View step = inflater.inflate(layout, this.flipper, false);
+                View step = mInflater.inflate(layout, this.flipper, false);
                 this.flipper.addView(step);
             }
-            updateButtons();
+            //TODO updateButtons();
         } else if (TextUtils.isEmpty(usr)) {
             Log.i(LOG_TAG, "REST URL is available but not the username!");
             // inflate only the username_password layout
-            LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View loginView = inflater.inflate(STEPS[1], this.flipper, false);
+            View loginView = mInflater.inflate(STEPS[1], this.flipper, false);
             this.flipper.addView(loginView);
-            
-            Button loginBtn= (Button) loginView.findViewById(R.id.login_button_ok);
+
+            Button loginBtn = (Button) loginView.findViewById(R.id.login_button_ok);
             loginBtn.setVisibility(View.VISIBLE);
-            
+
         } else {
             Log.i(LOG_TAG, "REST URL and username are available!");
             // if the password is already saved
             if (rememberedPwd) {
                 Log.i(LOG_TAG, "Password is remembered!");
-                String sessionId;
-                try {
-                    sessionId = RestUtil.loginToSugarCRM(restUrl, usr, Util.MD5(pwd));
-                    // save the sessionId in the application context after the succesful login
-                    app.setSessionId(sessionId.toString());
-                    showActivity(DashboardActivity.class);
-                } catch (SugarCrmException sce) {
-                    Log.e(LOG_TAG, sce.getDescription(), sce);
-
-                    // inflate only the username_password layout
-                    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    View loginView = inflater.inflate(STEPS[1], this.flipper, false);
-                    this.flipper.addView(loginView);
-                }
+                mAuthTask = new AuthenticationTask();
+                mAuthTask.execute(usr, pwd, rememberedPwd);
 
             } else {
                 Log.i(LOG_TAG, "prompt the user for password!");
                 // show the dialog to enter password
-                LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                final View loginView = inflater.inflate(R.layout.login_activity, this.flipper, false);
+                final View loginView = mInflater.inflate(R.layout.login_activity, this.flipper, false);
                 EditText editTextUser = (EditText) loginView.findViewById(R.id.login_edit_username);
                 editTextUser.setText(usr);
                 editTextUser.setEnabled(false);
@@ -124,29 +112,9 @@ public class WizardActivity extends Activity {
                         /* User clicked OK so do some stuff */
                         EditText etPwd = ((EditText) loginView.findViewById(R.id.login_edit_password));
                         boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.login_remember_password)).isChecked();
-                        try {
-                            String sessionId = RestUtil.loginToSugarCRM(restUrl, usr, Util.MD5(etPwd.getText().toString()));
-                            // save the sessionId in the application context after the succesful
-                            // login
-                            app.setSessionId(sessionId.toString());
 
-                            // if password is asked to be remembered, save it in the preferences
-                            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(WizardActivity.this);
-                            Editor editor = sp.edit();
-                            editor.putString(Util.PREF_USERNAME, usr);
-                            if (rememberPwd) {
-                                editor.putString(Util.PREF_PASSWORD, pwd);
-                            }
-                            editor.commit();
-
-                            showActivity(DashboardActivity.class);
-                        } catch (SugarCrmException sce) {
-                            Log.e(LOG_TAG, sce.getDescription(), sce);
-                            TextView tv = (TextView) loginView.findViewById(R.id.login_message_bottom);
-                            tv.setText(sce.getDescription());
-                            // TODO: when password entered is wrong, should show the same dialog
-                            // again
-                        }
+                        mAuthTask = new AuthenticationTask();
+                        mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
 
                     }
                 }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -212,15 +180,13 @@ public class WizardActivity extends Activity {
         TextView tv = (TextView) flipper.findViewById(R.id.login_message_bottom);
         String msg = "";
         if (TextUtils.isEmpty(usr) || TextUtils.isEmpty(pwd)) {
-            msg = getString(R.string.login_activity_blank_field)
-                                            + "username and password.\n";
+            msg = getString(R.string.login_activity_blank_field) + "username and password.\n";
             tv.setText(msg);
         } else {
             mAuthTask = new AuthenticationTask();
             mAuthTask.execute(usr, pwd, rememberPwd);
         }
 
-        
     }
 
     protected void showActivity(Class _class) {
@@ -377,7 +343,7 @@ public class WizardActivity extends Activity {
             TextView tv = (TextView) flipper.findViewById(R.id.login_message_bottom);
             if (hasExceptions) {
                 // TODO: description isn't coming. have to check this!
-                tv.setText(sceDesc);
+                tv.setText(sceDesc);               
             } else {
 
                 // save the sessionId in the application context after the succesful login
@@ -388,13 +354,15 @@ public class WizardActivity extends Activity {
                 editor.putString(Util.PREF_USERNAME, usr);
                 if (rememberPwd) {
                     editor.putString(Util.PREF_PASSWORD, pwd);
+                    editor.putBoolean(Util.PREF_REMEMBER_PASSWORD, true);
                 }
                 editor.commit();
 
                 showActivity(DashboardActivity.class);
                 // user walked past end of wizard, so return okay
-                /*WizardActivity.this.setResult(Activity.RESULT_OK);
-                WizardActivity.this.finish();*/
+                /*
+                 * WizardActivity.this.setResult(Activity.RESULT_OK); WizardActivity.this.finish();
+                 */
 
             }
 
