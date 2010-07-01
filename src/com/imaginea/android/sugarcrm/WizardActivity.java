@@ -61,6 +61,8 @@ public class WizardActivity extends Activity {
         app = ((SugarCrmApp) getApplicationContext());
 
         this.flipper = (ViewFlipper) this.findViewById(R.id.wizard_flipper);
+        prev = (Button) this.findViewById(R.id.action_prev);
+        next = (Button) this.findViewById(R.id.action_next);
 
         final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardActivity.this);
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
@@ -77,12 +79,17 @@ public class WizardActivity extends Activity {
                 View step = inflater.inflate(layout, this.flipper, false);
                 this.flipper.addView(step);
             }
+            updateButtons();
         } else if (TextUtils.isEmpty(usr)) {
             Log.i(LOG_TAG, "REST URL is available but not the username!");
             // inflate only the username_password layout
             LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View loginView = inflater.inflate(STEPS[1], this.flipper, false);
             this.flipper.addView(loginView);
+            
+            Button loginBtn= (Button) loginView.findViewById(R.id.login_button_ok);
+            loginBtn.setVisibility(View.VISIBLE);
+            
         } else {
             Log.i(LOG_TAG, "REST URL and username are available!");
             // if the password is already saved
@@ -153,7 +160,6 @@ public class WizardActivity extends Activity {
             }
         }
 
-        next = (Button) this.findViewById(R.id.action_next);
         next.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
 
@@ -171,22 +177,7 @@ public class WizardActivity extends Activity {
                     }
 
                 } else if (isLastDisplayed()) {
-
-                    String usr = ((EditText) flipper.findViewById(R.id.login_edit_username)).getText().toString();
-                    String pwd = ((EditText) flipper.findViewById(R.id.login_edit_password)).getText().toString();
-                    boolean rememberPwd = ((CheckBox) flipper.findViewById(R.id.login_remember_password)).isChecked();
-
-                    TextView tv = (TextView) flipper.findViewById(R.id.login_message_bottom);
-                    String msg = "";
-                    if (TextUtils.isEmpty(usr) || TextUtils.isEmpty(pwd)) {
-                        msg = getString(R.string.login_activity_blank_field)
-                                                        + "username and password.\n";
-                        tv.setText(msg);
-                    } else {
-                        mAuthTask = new AuthenticationTask();
-                        mAuthTask.execute(usr, pwd, rememberPwd);
-                    }
-
+                    handleLogin(v);
                 } else {
                     // show next step and update buttons
                     flipper.showNext();
@@ -195,7 +186,6 @@ public class WizardActivity extends Activity {
             }
         });
 
-        prev = (Button) this.findViewById(R.id.action_prev);
         prev.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (isFirstDisplayed()) {
@@ -212,6 +202,25 @@ public class WizardActivity extends Activity {
 
         this.updateButtons();
 
+    }
+
+    public void handleLogin(View view) {
+        String usr = ((EditText) flipper.findViewById(R.id.login_edit_username)).getText().toString();
+        String pwd = ((EditText) flipper.findViewById(R.id.login_edit_password)).getText().toString();
+        boolean rememberPwd = ((CheckBox) flipper.findViewById(R.id.login_remember_password)).isChecked();
+
+        TextView tv = (TextView) flipper.findViewById(R.id.login_message_bottom);
+        String msg = "";
+        if (TextUtils.isEmpty(usr) || TextUtils.isEmpty(pwd)) {
+            msg = getString(R.string.login_activity_blank_field)
+                                            + "username and password.\n";
+            tv.setText(msg);
+        } else {
+            mAuthTask = new AuthenticationTask();
+            mAuthTask.execute(usr, pwd, rememberPwd);
+        }
+
+        
     }
 
     protected void showActivity(Class _class) {
@@ -231,6 +240,7 @@ public class WizardActivity extends Activity {
         if (isFirstDisplayed()) {
             prev.setVisibility(View.INVISIBLE);
             next.setText("Next");
+            next.setVisibility(View.VISIBLE);
         } else if (isLastDisplayed()) {
             next.setText("Finish");
             prev.setVisibility(View.VISIBLE);
@@ -381,9 +391,10 @@ public class WizardActivity extends Activity {
                 }
                 editor.commit();
 
+                showActivity(DashboardActivity.class);
                 // user walked past end of wizard, so return okay
-                WizardActivity.this.setResult(Activity.RESULT_OK);
-                WizardActivity.this.finish();
+                /*WizardActivity.this.setResult(Activity.RESULT_OK);
+                WizardActivity.this.finish();*/
 
             }
 
