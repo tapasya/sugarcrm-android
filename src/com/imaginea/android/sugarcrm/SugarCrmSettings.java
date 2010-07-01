@@ -41,7 +41,7 @@ public class SugarCrmSettings extends PreferenceActivity {
      * onKeyDown for older versions and use Override on that.
      */
     public void onBackPressed() {
-        super.onBackPressed();
+       /// super.onBackPressed();
         // TODO: onChange of settings, session has to be invalidated
         Log.i(LOG_TAG, "url - " + getSugarRestUrl(SugarCrmSettings.this));
         Log.i(LOG_TAG, "username - " + getUsername(SugarCrmSettings.this));
