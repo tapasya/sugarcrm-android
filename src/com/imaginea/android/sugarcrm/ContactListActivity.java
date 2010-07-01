@@ -68,7 +68,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         super.onCreate(savedInstanceState);
         setContentView(R.layout.common_list);
         mStatus = (TextView) findViewById(R.id.status);
-        mStatus.setText("Idle");
+        // mStatus.setText("Idle");
 
         // Use an existing ListAdapter that will map an array
         // of strings to TextViews
@@ -86,6 +86,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
         // button code in the layout - 1.6 SDK feature to specify onClick
         mListView.setItemsCanFocus(true);
+        mListView.setFocusable(true);    
         mEmpty = findViewById(R.id.empty);
         mListView.setEmptyView(mEmpty);
         registerForContextMenu(getListView());
@@ -126,6 +127,10 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
             // mStatus.setText("Fling");
             break;
         }
+        fetchMoreItemsForList();
+    }
+
+    void fetchMoreItemsForList() {
         if (mBusy && !mStopLoading) {
             // int last = view.getLastVisiblePosition();
 
@@ -234,7 +239,10 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
                 footer.setText(R.string.loadFailed);
 
                 break;
+
             case Util.REFRESH_LIST:
+                mBusy = false;
+                mStatus.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
                 int firstPos = getListView().getFirstVisiblePosition();
                 setListAdapter(mAdapter);
@@ -371,6 +379,12 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
                 text = (TextView) mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             } else {
                 text = (TextView) convertView;
+            }
+
+            if (position == getCount() - 1) {
+                Log.d(LOG_TAG, "last item:" + position);
+                mBusy = true;
+                fetchMoreItemsForList();
             }
 
             if (mBusy) {
