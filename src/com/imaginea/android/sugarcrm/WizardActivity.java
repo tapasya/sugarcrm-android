@@ -55,6 +55,8 @@ public class WizardActivity extends Activity {
 
     private LayoutInflater mInflater;
 
+    private int wizardState;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,69 +71,60 @@ public class WizardActivity extends Activity {
         final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardActivity.this);
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
         final String pwd = SugarCrmSettings.getPassword(WizardActivity.this).toString();
-        final boolean rememberedPwd = SugarCrmSettings.isPasswordSaved(WizardActivity.this);
+        final boolean isPwdRemembered = SugarCrmSettings.isPasswordSaved(WizardActivity.this);
         Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n pwd - " + pwd
-                                        + "\n rememberedPwd - " + rememberedPwd);
+                                        + "\n rememberedPwd - " + isPwdRemembered);
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         if (TextUtils.isEmpty(restUrl)) {
             Log.i(LOG_TAG, "REST URL is not available!");
+            wizardState = Util.URL_NOT_AVAILABLE;
             // inflate both url layout and username_password layout
-
             for (int layout : STEPS) {
                 View step = mInflater.inflate(layout, this.flipper, false);
                 this.flipper.addView(step);
             }
-            //TODO updateButtons();
         } else if (TextUtils.isEmpty(usr)) {
             Log.i(LOG_TAG, "REST URL is available but not the username!");
+            wizardState = Util.URL_AVAILABLE;
+            // inflate only the username_password layout
+            View loginView = mInflater.inflate(STEPS[1], this.flipper, false);
+            this.flipper.addView(loginView);
+        } else {
+            Log.i(LOG_TAG, "REST URL and username are available!");
+            wizardState = Util.URL_USER_AVAILABLE;
+
             // inflate only the username_password layout
             View loginView = mInflater.inflate(STEPS[1], this.flipper, false);
             this.flipper.addView(loginView);
 
-            Button loginBtn = (Button) loginView.findViewById(R.id.login_button_ok);
-            loginBtn.setVisibility(View.VISIBLE);
+            EditText editTextUser = (EditText) loginView.findViewById(R.id.login_edit_username);
+            editTextUser.setText(usr);
+            editTextUser.setEnabled(false);
 
-        } else {
-            Log.i(LOG_TAG, "REST URL and username are available!");
             // if the password is already saved
-            if (rememberedPwd) {
+            if (isPwdRemembered) {
                 Log.i(LOG_TAG, "Password is remembered!");
-                mAuthTask = new AuthenticationTask();
-                mAuthTask.execute(usr, pwd, rememberedPwd);
+                wizardState = Util.URL_USER_PWD_AVAILABLE;
 
-            } else {
-                Log.i(LOG_TAG, "prompt the user for password!");
-                // show the dialog to enter password
-                final View loginView = mInflater.inflate(R.layout.login_activity, this.flipper, false);
-                EditText editTextUser = (EditText) loginView.findViewById(R.id.login_edit_username);
-                editTextUser.setText(usr);
+                editTextUser = (EditText) loginView.findViewById(R.id.login_edit_password);
+                editTextUser.setText(pwd);
                 editTextUser.setEnabled(false);
 
-                final AlertDialog loginDialog = new AlertDialog.Builder(WizardActivity.this).setIcon(R.drawable.alert_dialog_icon).setTitle(R.string.login_activity_password_label).setView(loginView).setPositiveButton(R.string.signIn, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        /* User clicked OK so do some stuff */
-                        EditText etPwd = ((EditText) loginView.findViewById(R.id.login_edit_password));
-                        boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.login_remember_password)).isChecked();
+                CheckBox chkBox = (CheckBox) loginView.findViewById(R.id.login_remember_password);
+                chkBox.setChecked(isPwdRemembered);
 
-                        mAuthTask = new AuthenticationTask();
-                        mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
-
-                    }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        /* User clicked cancel so do some stuff */
-                        WizardActivity.this.finish();
-                    }
-                }).create();
-
-                loginDialog.show();
+                mAuthTask = new AuthenticationTask();
+                mAuthTask.execute(usr, pwd, isPwdRemembered);
             }
         }
 
+        final int finalState = wizardState;
         next.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
 
-                if (isFirstDisplayed()) {
+                // if (isFirstDisplayed()) {
+                if (flipper.getCurrentView().getId() == R.id.urlStep) {
 
                     String url = ((EditText) flipper.findViewById(R.id.wizard_url_edit)).getText().toString();
                     TextView tv = (TextView) flipper.findViewById(R.id.wizard_url_status_message);
@@ -144,12 +137,12 @@ public class WizardActivity extends Activity {
                         mUrlTask.execute(url);
                     }
 
-                } else if (isLastDisplayed()) {
+                } else if (flipper.getCurrentView().getId() == R.id.signInStep) {
                     handleLogin(v);
                 } else {
                     // show next step and update buttons
                     flipper.showNext();
-                    updateButtons();
+                    updateButtons(finalState);
                 }
             }
         });
@@ -163,13 +156,12 @@ public class WizardActivity extends Activity {
                 } else {
                     // show previous step and update buttons
                     flipper.showPrevious();
-                    updateButtons();
+                    updateButtons(finalState);
                 }
             }
         });
 
-        this.updateButtons();
-
+        this.updateButtons(wizardState);
     }
 
     public void handleLogin(View view) {
@@ -202,17 +194,27 @@ public class WizardActivity extends Activity {
         return (flipper.getDisplayedChild() == flipper.getChildCount() - 1);
     }
 
-    protected void updateButtons() {
-        if (isFirstDisplayed()) {
+    protected void updateButtons(int state) {
+        /*
+         * Log.i(LOG_TAG, "currentView Id : " + flipper.getCurrentView().getId()); Log.i(LOG_TAG,
+         * "urlView Id : " + R.id.urlStep); Log.i(LOG_TAG, "signInView Id : " + R.id.signInStep);
+         */
+        if (flipper.getCurrentView().getId() == R.id.urlStep) {
             prev.setVisibility(View.INVISIBLE);
             next.setText("Next");
             next.setVisibility(View.VISIBLE);
-        } else if (isLastDisplayed()) {
-            next.setText("Finish");
-            prev.setVisibility(View.VISIBLE);
-        } else {
-            prev.setVisibility(View.VISIBLE);
-            next.setText("Next");
+        } else if (flipper.getCurrentView().getId() == R.id.signInStep) {
+            if (flipper.getChildCount() == 2) {
+                prev.setVisibility(View.VISIBLE);
+                next.setText("Finish");
+            } else {
+                next.setText("Sign In");
+            }
+            next.setVisibility(View.VISIBLE);
+        }
+
+        if (state == Util.URL_USER_PWD_AVAILABLE) {
+            next.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -263,7 +265,7 @@ public class WizardActivity extends Activity {
 
                     // show next step and update buttons
                     flipper.showNext();
-                    updateButtons();
+                    updateButtons(wizardState);
                 } else {
                     tv.setText("Invalid Url : "
                                                     + "\n\n Please check the url you have entered! \n\n"
@@ -343,7 +345,7 @@ public class WizardActivity extends Activity {
             TextView tv = (TextView) flipper.findViewById(R.id.login_message_bottom);
             if (hasExceptions) {
                 // TODO: description isn't coming. have to check this!
-                tv.setText(sceDesc);               
+                tv.setText(sceDesc);
             } else {
 
                 // save the sessionId in the application context after the succesful login
@@ -358,6 +360,8 @@ public class WizardActivity extends Activity {
                 }
                 editor.commit();
 
+                tv.setText("");
+
                 showActivity(DashboardActivity.class);
                 // user walked past end of wizard, so return okay
                 /*
@@ -367,6 +371,38 @@ public class WizardActivity extends Activity {
             }
 
         }
+    }
+
+    private void showAlertDialog() {
+        final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
+
+        final View loginView = mInflater.inflate(R.layout.login_activity, this.flipper, false);
+        EditText editTextUser = (EditText) loginView.findViewById(R.id.login_edit_username);
+        editTextUser.setText(usr);
+        editTextUser.setEnabled(false);
+
+        Button loginBtn = (Button) loginView.findViewById(R.id.login_button_ok);
+        loginBtn.setVisibility(View.VISIBLE);
+
+        final AlertDialog loginDialog = new AlertDialog.Builder(WizardActivity.this).setIcon(R.drawable.alert_dialog_icon).setTitle(R.string.login_activity_password_label).setView(loginView).setPositiveButton(R.string.signIn, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                /* User clicked OK so do some stuff */
+                EditText etPwd = ((EditText) loginView.findViewById(R.id.login_edit_password));
+                boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.login_remember_password)).isChecked();
+
+                mAuthTask = new AuthenticationTask();
+                mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
+
+            }
+        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                /* User clicked cancel so do some stuff */
+                WizardActivity.this.finish();
+            }
+        }).create();
+
+        loginDialog.show();
+
     }
 
 }
