@@ -79,12 +79,12 @@ public class ContactDetailsActivity extends Activity {
     }
 
     private void findViews() {
-        mNameTextView = (TextView) findViewById(R.id.contact_name);
-        mAccountButton = (TextView) findViewById(R.id.contact_account_button);
-        mPhoneMobileButton = (Button) findViewById(R.id.contact_phone_mobile_button);
-        mPhoneWorkButton = (Button) findViewById(R.id.contact_phone_work_button);
-        mEmailButton = (Button) findViewById(R.id.contact_email_button);
-        mAddButton = (Button) findViewById(R.id.contact_add_button);
+        mNameTextView = (TextView) findViewById(R.id.contactName);
+        mAccountButton = (TextView) findViewById(R.id.contactAccountButton);
+        mPhoneMobileButton = (Button) findViewById(R.id.contactPhoneMobileButton);
+        mPhoneWorkButton = (Button) findViewById(R.id.contactPhoneWorkButton);
+        mEmailButton = (Button) findViewById(R.id.contactEmailButton);
+        mAddButton = (Button) findViewById(R.id.contactAddButton);
     }
 
     /**
@@ -97,9 +97,9 @@ public class ContactDetailsActivity extends Activity {
             try {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 // TODO use a constant and remove this as we start from the login screen
-                String url = pref.getString("URL", getString(R.string.default_url));
-                String userName = pref.getString("USER_NAME", getString(R.string.default_username));
-                String password = pref.getString("PASSWORD", getString(R.string.default_password));
+                String url = pref.getString("URL", getString(R.string.defaultUrl));
+                String userName = pref.getString("USER_NAME", getString(R.string.defaultUser));
+                String password = pref.getString("PASSWORD", getString(R.string.defaultPwd));
 
                 // SugarCrmApp app =
                 // mSessionId = ((SugarCrmApp) getApplication()).getSessionId();
@@ -146,7 +146,7 @@ public class ContactDetailsActivity extends Activity {
             if (mAccountName != null && !mAccountName.equals("")) {
                 mAccountButton.setText(mAccountName);
             } else {
-                mAccountButton.setText(R.string.not_available);
+                mAccountButton.setText(R.string.notAvailable);
                 mAccountButton.setClickable(false);
             }
 
@@ -154,7 +154,7 @@ public class ContactDetailsActivity extends Activity {
             if (mPhoneMobile != null && !mPhoneMobile.equals("")) {
                 mPhoneMobileButton.setText(mPhoneMobile);
             } else {
-                mPhoneMobileButton.setText(R.string.not_available);
+                mPhoneMobileButton.setText(R.string.notAvailable);
                 mPhoneMobileButton.setClickable(false);
             }
 
@@ -162,7 +162,7 @@ public class ContactDetailsActivity extends Activity {
             if (mPhoneWork != null && !mPhoneWork.equals("")) {
                 mPhoneWorkButton.setText(mPhoneWork);
             } else {
-                mPhoneWorkButton.setText(R.string.not_available);
+                mPhoneWorkButton.setText(R.string.notAvailable);
                 mPhoneWorkButton.setClickable(false);
             }
 
@@ -170,7 +170,7 @@ public class ContactDetailsActivity extends Activity {
             if (mEmail != null && !mEmail.equals("")) {
                 mEmailButton.setText(mEmail);
             } else {
-                mEmailButton.setText(R.string.not_available);
+                mEmailButton.setText(R.string.notAvailable);
                 mEmailButton.setClickable(false);
             }
         }

@@ -163,7 +163,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
             if (mAdapter.getCount() == 0)
                 mListView.setVisibility(View.GONE);
             mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
-            TextView tv = (TextView) (mEmpty.findViewById(R.id.main_text));
+            TextView tv = (TextView) (mEmpty.findViewById(R.id.mainText));
             tv.setVisibility(View.GONE);
             // tv.setText(R.string.loading);
 
@@ -176,9 +176,9 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
             try {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 // TODO use a constant and remove this as we start from the login screen
-                String url = pref.getString("URL", getString(R.string.default_url));
-                String userName = pref.getString("USER_NAME", getString(R.string.default_username));
-                String password = pref.getString("PASSWORD", getString(R.string.default_password));
+                String url = pref.getString("URL", getString(R.string.defaultUrl));
+                String userName = pref.getString("USER_NAME", getString(R.string.defaultUser));
+                String password = pref.getString("PASSWORD", getString(R.string.defaultPwd));
                 Log.i(LOG_TAG, url + userName + password);
                 // SugarCrmApp app =
                 // mSessionId = ((SugarCrmApp) getApplication()).getSessionId();
@@ -226,12 +226,12 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
             case Util.FETCH_FAILED:
 
                 mEmpty.findViewById(R.id.progress).setVisibility(View.GONE);
-                TextView tv = (TextView) (mEmpty.findViewById(R.id.main_text));
+                TextView tv = (TextView) (mEmpty.findViewById(R.id.mainText));
                 tv.setVisibility(View.VISIBLE);
-                tv.setText(R.string.load_failed);
+                tv.setText(R.string.loadFailed);
                 TextView footer = (TextView) findViewById(R.id.status);
                 footer.setVisibility(View.VISIBLE);
-                footer.setText(R.string.load_failed);
+                footer.setText(R.string.loadFailed);
 
                 break;
             case Util.REFRESH_LIST:

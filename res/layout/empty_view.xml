@@ -15,12 +15,12 @@
 		android:layout_centerHorizontal="true"
 		style="?android:attr/progressBarStyle" 
 		android:paddingRight="10px" />
-	<TextView android:id="@+id/main_text" 
+	<TextView android:id="@+id/mainText" 
 		style="@style/empty_textview_style" 
 		android:layout_below="@id/progress"
 		android:gravity="center" 
 		android:layout_centerHorizontal="true"
-		android:text="@string/add_contact" 
+		android:text="@string/addContact" 
 		android:contentDescription="?android:text" />
 	
 </RelativeLayout>

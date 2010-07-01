@@ -135,15 +135,15 @@ public class LoginActivity extends Activity {
      * Returns the message to be displayed at the top of the login dialog box.
      */
     private CharSequence getMessage() {
-        getString(R.string.app_name);
+        getString(R.string.appName);
         if (TextUtils.isEmpty(mUsername)) {
             // If the username is blank
-            final CharSequence msg = getText(R.string.login_activity_blank_field) + " username";
+            final CharSequence msg = getText(R.string.validFieldMsg) + " username";
             return msg;
         }
         if (TextUtils.isEmpty(mPassword)) {
             // If the password is blank
-            return getText(R.string.login_activity_blank_field) + " password";
+            return getText(R.string.validFieldMsg) + " password";
         }
         return null;
     }

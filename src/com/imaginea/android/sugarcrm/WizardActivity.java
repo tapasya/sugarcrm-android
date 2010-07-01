@@ -64,9 +64,9 @@ public class WizardActivity extends Activity {
 
         app = ((SugarCrmApp) getApplicationContext());
 
-        this.flipper = (ViewFlipper) this.findViewById(R.id.wizard_flipper);
-        prev = (Button) this.findViewById(R.id.action_prev);
-        next = (Button) this.findViewById(R.id.action_next);
+        this.flipper = (ViewFlipper) this.findViewById(R.id.wizardFlipper);
+        prev = (Button) this.findViewById(R.id.actionPrev);
+        next = (Button) this.findViewById(R.id.actionNext);
 
         final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardActivity.this);
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
@@ -98,7 +98,7 @@ public class WizardActivity extends Activity {
             View loginView = mInflater.inflate(STEPS[1], this.flipper, false);
             this.flipper.addView(loginView);
 
-            EditText editTextUser = (EditText) loginView.findViewById(R.id.login_edit_username);
+            EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
             editTextUser.setText(usr);
             editTextUser.setEnabled(false);
 
@@ -107,11 +107,11 @@ public class WizardActivity extends Activity {
                 Log.i(LOG_TAG, "Password is remembered!");
                 wizardState = Util.URL_USER_PWD_AVAILABLE;
 
-                editTextUser = (EditText) loginView.findViewById(R.id.login_edit_password);
+                editTextUser = (EditText) loginView.findViewById(R.id.loginPassword);
                 editTextUser.setText(pwd);
                 editTextUser.setEnabled(false);
 
-                CheckBox chkBox = (CheckBox) loginView.findViewById(R.id.login_remember_password);
+                CheckBox chkBox = (CheckBox) loginView.findViewById(R.id.loginRememberPwd);
                 chkBox.setChecked(isPwdRemembered);
 
                 mAuthTask = new AuthenticationTask();
@@ -126,12 +126,12 @@ public class WizardActivity extends Activity {
                 // if (isFirstDisplayed()) {
                 if (flipper.getCurrentView().getId() == R.id.urlStep) {
 
-                    String url = ((EditText) flipper.findViewById(R.id.wizard_url_edit)).getText().toString();
-                    TextView tv = (TextView) flipper.findViewById(R.id.wizard_url_status_message);
+                    String url = ((EditText) flipper.findViewById(R.id.wizardUrl)).getText().toString();
+                    TextView tv = (TextView) flipper.findViewById(R.id.wizardUrlStatus);
                     if (TextUtils.isEmpty(url)) {
-                        tv.setText(getString(R.string.login_activity_blank_field)
+                        tv.setText(getString(R.string.validFieldMsg)
                                                         + " REST url \n\n"
-                                                        + getBaseContext().getString(R.string.wizard_sample_url));
+                                                        + getBaseContext().getString(R.string.sampleRestUrl));
                     } else {
                         mUrlTask = new UrlValidationTask();
                         mUrlTask.execute(url);
@@ -165,20 +165,38 @@ public class WizardActivity extends Activity {
     }
 
     public void handleLogin(View view) {
-        String usr = ((EditText) flipper.findViewById(R.id.login_edit_username)).getText().toString();
-        String pwd = ((EditText) flipper.findViewById(R.id.login_edit_password)).getText().toString();
-        boolean rememberPwd = ((CheckBox) flipper.findViewById(R.id.login_remember_password)).isChecked();
+        String usr = ((EditText) flipper.findViewById(R.id.loginUsername)).getText().toString();
+        String pwd = ((EditText) flipper.findViewById(R.id.loginPassword)).getText().toString();
+        boolean rememberPwd = ((CheckBox) flipper.findViewById(R.id.loginRememberPwd)).isChecked();
 
-        TextView tv = (TextView) flipper.findViewById(R.id.login_message_bottom);
+        TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
         String msg = "";
         if (TextUtils.isEmpty(usr) || TextUtils.isEmpty(pwd)) {
-            msg = getString(R.string.login_activity_blank_field) + "username and password.\n";
+            msg = getString(R.string.validFieldMsg) + "username and password.\n";
             tv.setText(msg);
         } else {
             mAuthTask = new AuthenticationTask();
             mAuthTask.execute(usr, pwd, rememberPwd);
         }
 
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.i(LOG_TAG, "onNewIntent");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(LOG_TAG, "onPause");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(LOG_TAG, "onResume");
     }
 
     protected void showActivity(Class _class) {
@@ -248,13 +266,13 @@ public class WizardActivity extends Activity {
             if (isCancelled())
                 return;
 
-            TextView tv = (TextView) flipper.findViewById(R.id.wizard_url_status_message);
+            TextView tv = (TextView) flipper.findViewById(R.id.wizardUrlStatus);
 
             if (hasExceptions) {
                 tv.setText("Invalid Url : "
                                                 + sceDesc
                                                 + "\n\n Please check the url you have entered! \n\n"
-                                                + getBaseContext().getString(R.string.wizard_sample_url));
+                                                + getBaseContext().getString(R.string.sampleRestUrl));
             } else {
                 if (isValidUrl) {
                     tv.setText("VALID URL");
@@ -269,7 +287,7 @@ public class WizardActivity extends Activity {
                 } else {
                     tv.setText("Invalid Url : "
                                                     + "\n\n Please check the url you have entered! \n\n"
-                                                    + getBaseContext().getString(R.string.wizard_sample_url));
+                                                    + getBaseContext().getString(R.string.sampleRestUrl));
                 }
             }
 
@@ -342,7 +360,7 @@ public class WizardActivity extends Activity {
             if (isCancelled())
                 return;
 
-            TextView tv = (TextView) flipper.findViewById(R.id.login_message_bottom);
+            TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
             if (hasExceptions) {
                 // TODO: description isn't coming. have to check this!
                 tv.setText(sceDesc);
@@ -373,22 +391,23 @@ public class WizardActivity extends Activity {
         }
     }
 
+    // Not using this anywhere
     private void showAlertDialog() {
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
 
         final View loginView = mInflater.inflate(R.layout.login_activity, this.flipper, false);
-        EditText editTextUser = (EditText) loginView.findViewById(R.id.login_edit_username);
+        EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
         editTextUser.setText(usr);
         editTextUser.setEnabled(false);
 
-        Button loginBtn = (Button) loginView.findViewById(R.id.login_button_ok);
+        Button loginBtn = (Button) loginView.findViewById(R.id.loginOk);
         loginBtn.setVisibility(View.VISIBLE);
 
-        final AlertDialog loginDialog = new AlertDialog.Builder(WizardActivity.this).setIcon(R.drawable.alert_dialog_icon).setTitle(R.string.login_activity_password_label).setView(loginView).setPositiveButton(R.string.signIn, new DialogInterface.OnClickListener() {
+        final AlertDialog loginDialog = new AlertDialog.Builder(WizardActivity.this).setTitle(R.string.password).setView(loginView).setPositiveButton(R.string.signIn, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 /* User clicked OK so do some stuff */
-                EditText etPwd = ((EditText) loginView.findViewById(R.id.login_edit_password));
-                boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.login_remember_password)).isChecked();
+                EditText etPwd = ((EditText) loginView.findViewById(R.id.loginPassword));
+                boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.loginRememberPwd)).isChecked();
 
                 mAuthTask = new AuthenticationTask();
                 mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);

@@ -20,11 +20,11 @@ public class SugarCrmSettings extends PreferenceActivity {
 
     // Static getters (extracting data from context)
     public static String getUsername(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_USERNAME, context.getString(R.string.default_username));
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_USERNAME, context.getString(R.string.defaultUser));
     }
 
     public static String getPassword(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_PASSWORD, context.getString(R.string.default_password));
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_PASSWORD, context.getString(R.string.defaultPwd));
     }
 
     public static boolean isPasswordSaved(Context context) {
@@ -32,7 +32,7 @@ public class SugarCrmSettings extends PreferenceActivity {
     }
 
     public static String getSugarRestUrl(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, context.getString(R.string.default_url));
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
     }
 
     /**

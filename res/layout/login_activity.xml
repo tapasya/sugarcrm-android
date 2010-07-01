@@ -11,9 +11,9 @@
         android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login_activity_username_label" />
+        android:text="@string/username" />
     <EditText
-        android:id="@+id/login_edit_username"
+        android:id="@+id/loginUsername"
         android:singleLine="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -29,9 +29,9 @@
         android:layout_marginTop="2dip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login_activity_password_label" />
+        android:text="@string/password" />
     <EditText
-        android:id="@+id/login_edit_password"
+        android:id="@+id/loginPassword"
         android:singleLine="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -42,24 +42,24 @@
         android:password="true"
         android:inputType="textPassword" />
 	<CheckBox
-		android:id="@+id/login_remember_password"
+		android:id="@+id/loginRememberPwd"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:checked="false"
-		android:text="Remember password" />
+		android:text="@string/rememberPassword" />
 	<TextView
-	    android:id="@+id/login_message_bottom"
+	    android:id="@+id/loginStatusMsg"
 	    android:textAppearance="?android:attr/textAppearanceSmall"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_marginBottom="5dip" />
 	<Button
-           android:id="@+id/login_button_ok"
+           android:id="@+id/loginOk"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:layout_gravity="center_horizontal"
            android:minWidth="100dip"
-           android:text="@string/login_activity_ok_button"
+           android:text="@string/signIn"
            android:onClick="handleLogin" 
            android:visibility="gone"/>
      

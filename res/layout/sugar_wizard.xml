@@ -23,7 +23,7 @@
 	android:layout_height="fill_parent">
 
 	<ViewFlipper
-		android:id="@+id/wizard_flipper"
+		android:id="@+id/wizardFlipper"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_weight="1">
@@ -37,7 +37,7 @@
 		android:padding="5dip">
 		
 		<Button
-			android:id="@+id/action_prev"
+			android:id="@+id/actionPrev"
 			android:layout_width="120dip"
 			android:layout_height="wrap_content"
 			android:text="Back"
@@ -45,7 +45,7 @@
 			android:visibility="invisible" />
 	
 		<Button
-			android:id="@+id/action_next"
+			android:id="@+id/actionNext"
 			android:layout_width="120dip"
 			android:layout_height="wrap_content"
 			android:text="Next"

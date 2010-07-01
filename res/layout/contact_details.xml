@@ -9,7 +9,7 @@
 	android:orientation="vertical">
    
 
-	<TextView android:id="@+id/contact_name"
+	<TextView android:id="@+id/contactName"
 		android:layout_height="wrap_content" 
 		android:layout_width="wrap_content"
 		android:layout_gravity="center" 
@@ -24,7 +24,7 @@
 			android:maxHeight="40dip" 
 			android:adjustViewBounds="true" />
 
-		<TextView android:id="@+id/contact_account_button"
+		<TextView android:id="@+id/contactAccountButton"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" />
 	</TableRow>
@@ -36,7 +36,7 @@
 			android:src="@android:drawable/ic_dialog_dialer"  
 			android:maxHeight="40dip" 
 			android:adjustViewBounds="true" />
-		<Button android:id="@+id/contact_phone_mobile_button"
+		<Button android:id="@+id/contactPhoneMobileButton"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" />
 	</TableRow>
@@ -47,7 +47,7 @@
 			android:src="@android:drawable/ic_btn_speak_now" 
 			android:maxHeight="40dip" 
 			android:adjustViewBounds="true" />
-		<Button android:id="@+id/contact_phone_work_button"
+		<Button android:id="@+id/contactPhoneWorkButton"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" />
 	</TableRow>
@@ -59,7 +59,7 @@
 			android:src="@android:drawable/ic_dialog_email"  
 			android:maxHeight="40dip" 
 			android:adjustViewBounds="true" />
-		<Button android:id="@+id/contact_email_button"
+		<Button android:id="@+id/contactEmailButton"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" />
 	</TableRow>
@@ -68,11 +68,11 @@
 		<ImageView android:layout_width="wrap_content"
 			android:layout_gravity="center" 
 			android:layout_height="wrap_content"
-			android:src="@drawable/contacts"  
+			android:src="@drawable/contact"  
 			android:maxHeight="40dip" 
 			android:adjustViewBounds="true" />
-		<Button android:id="@+id/contact_add_button" 
-			android:text = "@string/add_contact"
+		<Button android:id="@+id/contactAddButton" 
+			android:text = "@string/addContact"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" />
 	</TableRow>
