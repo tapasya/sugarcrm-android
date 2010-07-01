@@ -2,8 +2,6 @@ package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,18 +13,20 @@ import android.widget.TextView;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
+import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 public class LoginActivity extends Activity {
 
     public final static String LOG_TAG = "LoginActivity";
 
+    private boolean isSessionIdAvailable = false;
+
     private TextView mMessage; // to display any message in the login screen
+
+    // TODO : Remove the url from here
+    private String mUrl = "http://192.168.1.83/sugarcrm/service/v2/rest.php";
+
+    private EditText mUrlEdit;
 
     private String mUsername; // to get the username value entered in the EditText
 
@@ -36,19 +36,51 @@ public class LoginActivity extends Activity {
 
     private EditText mPasswordEdit;
 
-    // TODO : Remove the url from here
-    private final String url = "http://192.168.1.83/sugarcrm/service/v2/rest.php";
+    private SugarCrmApp app;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.login_activity);
+        app = ((SugarCrmApp) getApplicationContext());
 
-        mMessage = (TextView) findViewById(R.id.message);
-        mUsernameEdit = (EditText) findViewById(R.id.username_edit);
-        mPasswordEdit = (EditText) findViewById(R.id.password_edit);
+        /*
+         * setContentView(R.layout.login_activity); mMessage = (TextView)
+         * findViewById(R.id.login_message_bottom); mUrlEdit = (EditText)
+         * findViewById(R.id.wizard_url_edit); mUsernameEdit = (EditText)
+         * findViewById(R.id.login_edit_username); mPasswordEdit = (EditText)
+         * findViewById(R.id.login_edit_password);
+         */
+
+        startActivity(WizardActivity.class);
+        /*
+         * String str = SugarCrmSettings.getSugarRestUrl(LoginActivity.this); str =
+         * SugarCrmSettings.getUsername(LoginActivity.this).toString(); str =
+         * SugarCrmSettings.getPassword(LoginActivity.this).toString();
+         */
+
+        /*
+         * if (str != null && !str.equals("")) { Log.i(LOG_TAG, "SugarRestUrl - " + str); } else {
+         * startActivity(WizardActivity.class); }
+         */
+
+        /*
+         * if (str != null) { // mUsernameEdit.setVisibility(View.GONE); mUsernameEdit.setText(str);
+         * mUsernameEdit.setEnabled(false); }
+         */
+
+        /*
+         * if (isSessionIdAvailable) { // If sessionId is available, show the Dashboard
+         * showDashboard();
+         * 
+         * } else { // check sugarCrmSettings mUrl =
+         * SugarCrmSettings.getSugarRestUrl(LoginActivity.this); mUsername =
+         * SugarCrmSettings.getUsername(LoginActivity.this); mPassword =
+         * SugarCrmSettings.getPassword(LoginActivity.this); try { login(mUrl, mUsername,
+         * mPassword); // show the Dashboard if the login is succesful showDashboard(); } catch
+         * (SugarCrmException sce) { // If the login fails showSugarCrmSetting(); } }
+         */
     }
 
     /**
@@ -66,31 +98,37 @@ public class LoginActivity extends Activity {
             mMessage.setText(getMessage());
         } else {
             // TODO: check the progressBar
-            showProgress();
+            Dialog dialog = showProgress("Authenticating");
+
             // Start authenticating...
-            String sessionId;
-
             try {
-                sessionId = RestUtil.loginToSugarCRM(url, mUsername, Util.MD5(mPassword));
-                Log.i(LOG_TAG, "SessionId - " + sessionId);
-                mMessage.setText("");
+                login(mUrl, mUsername, mPassword);
 
-                // save the sessionId in the application context after the succesful login
-                SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
-                app.setSessionId(sessionId);
-                hideProgress();
+                dialog.dismiss();
+                // show the Dashboard if the login is successful
+                startActivity(DashboardActivity.class);
 
-                // show the Dashboard if the login is succesful
-                Intent myIntent = new Intent(LoginActivity.this, DashboardActivity.class);
-                LoginActivity.this.startActivity(myIntent);
-
-            } catch (SugarCrmException e) {
+            } catch (SugarCrmException sce) {
                 // If the login fails
-                mMessage.setText(e.getMessage());
-                hideProgress();
+                mMessage.setText(sce.getMessage());
+                dialog.dismiss();
             }
-
         }
+    }
+
+    private void login(String url, String username, String password) throws SugarCrmException {
+
+        String sessionId = RestUtil.loginToSugarCRM(url, username, Util.MD5(password));
+        Log.i(LOG_TAG, "SessionId - " + sessionId);
+
+        // save the sessionId in the application context after the succesful login
+        app.setSessionId(sessionId);
+
+    }
+
+    private void startActivity(Class _class) {
+        Intent myIntent = new Intent(LoginActivity.this, _class);
+        LoginActivity.this.startActivity(myIntent);
     }
 
     /**
@@ -110,34 +148,11 @@ public class LoginActivity extends Activity {
         return null;
     }
 
-    /*
-     * {@inheritDoc}
-     */
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage(getText(R.string.ui_activity_authenticating));
-        dialog.setIndeterminate(true);
-        dialog.setCancelable(true);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            public void onCancel(DialogInterface dialog) {
-                Log.i(LOG_TAG, "dialog cancel has been invoked");
-            }
-        });
-        return dialog;
-    }
-
     /**
      * Shows the progress UI for a lengthy operation.
      */
-    protected void showProgress() {
-        showDialog(0);
+    protected Dialog showProgress(String message) {
+        return ViewUtil.getProgressBar(LoginActivity.this, message);
     }
 
-    /**
-     * Hides the progress UI for a lengthy operation.
-     */
-    protected void hideProgress() {
-        dismissDialog(0);
-    }
 }
