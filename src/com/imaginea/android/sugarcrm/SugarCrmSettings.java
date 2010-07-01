@@ -20,7 +20,7 @@ public class SugarCrmSettings extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.layout.sugarcrm_settings);
+        addPreferencesFromResource(R.xml.sugarcrm_settings);
     }
 
     /**
