@@ -19,13 +19,22 @@ public class Util {
 
     public static final int FETCH_SUCCESS = 2;
 
+    // WIZARD: states
+    public static final int URL_NOT_AVAILABLE = 0;
+
+    public static final int URL_AVAILABLE = 1;
+
+    public static final int URL_USER_AVAILABLE = 2;
+
+    public static final int URL_USER_PWD_AVAILABLE = 3;
+
     // constants for settings / Preferences
     public static final String PREF_REST_URL = "rest_url";
 
     public static final String PREF_USERNAME = "usr";
 
     public static final String PREF_PASSWORD = "pwd";
-    
+
     public static final String PREF_REMEMBER_PASSWORD = "remember_pwd";
 
     // calculate the MD5 hash of a string
