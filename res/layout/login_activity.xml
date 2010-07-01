@@ -7,44 +7,38 @@
     android:layout_height="fill_parent">
             
     <TextView
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
+    	style="@style/text_label"
+    	android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/username" />
     <EditText
         android:id="@+id/loginUsername"
+        style="@style/edit_text_layout"
         android:singleLine="true"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:minWidth="250dip"
+        android:layout_height="wrap_content"  
+        android:inputType="text"      
         android:scrollHorizontally="true"
-        android:capitalize="none"
-        android:autoText="false"
-        android:inputType="textEmailAddress" />
+        />
     <TextView
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textStyle="bold"
-        android:singleLine="true"
-        android:layout_marginTop="2dip"
+        style="@style/text_label"        
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/password" />
     <EditText
         android:id="@+id/loginPassword"
+        style="@style/edit_text_layout"
         android:singleLine="true"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:minWidth="250dip"
-        android:scrollHorizontally="true"
-        android:capitalize="none"
-        android:autoText="false"
+        android:layout_height="wrap_content"        
+        android:scrollHorizontally="true"        
         android:password="true"
         android:inputType="textPassword" />
 	<CheckBox
 		android:id="@+id/loginRememberPwd"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:layout_marginLeft="10dip"
 		android:checked="false"
 		android:text="@string/rememberPassword" />
 	<TextView
