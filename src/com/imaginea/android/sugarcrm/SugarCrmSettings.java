@@ -35,7 +35,11 @@ public class SugarCrmSettings extends PreferenceActivity {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, context.getString(R.string.default_url));
     }
 
-    @Override
+    /**
+     * new method for back presses in android 2.0, instead of the standard mechanism defined in the
+     * docs to handle legacy applications we use version code to handle back button... implement
+     * onKeyDown for older versions and use Override on that.
+     */
     public void onBackPressed() {
         super.onBackPressed();
         // TODO: onChange of settings, session has to be invalidated
