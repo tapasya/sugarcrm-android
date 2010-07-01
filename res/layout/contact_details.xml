@@ -24,7 +24,7 @@
 			android:maxHeight="40dip" 
 			android:adjustViewBounds="true" />
 
-		<Button android:id="@+id/contact_account_button"
+		<TextView android:id="@+id/contact_account_button"
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content" />
 	</TableRow>
