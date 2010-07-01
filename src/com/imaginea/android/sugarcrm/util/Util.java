@@ -29,13 +29,13 @@ public class Util {
     public static final int URL_USER_PWD_AVAILABLE = 3;
 
     // constants for settings / Preferences
-    public static final String PREF_REST_URL = "rest_url";
+    public static final String PREF_REST_URL = "restUrl";
 
     public static final String PREF_USERNAME = "usr";
 
     public static final String PREF_PASSWORD = "pwd";
 
-    public static final String PREF_REMEMBER_PASSWORD = "remember_pwd";
+    public static final String PREF_REMEMBER_PASSWORD = "rememberPwd";
 
     // calculate the MD5 hash of a string
     public static String MD5(String text) throws SugarCrmException {

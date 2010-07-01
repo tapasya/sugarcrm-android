@@ -11,9 +11,9 @@
 		android:textStyle="bold" 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
-		android:text="@string/wizard_url_label" />
+		android:text="@string/restUrl" />
 	<EditText 
-		android:id="@+id/wizard_url_edit" 
+		android:id="@+id/wizardUrl" 
 		android:singleLine="true"
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
@@ -22,13 +22,13 @@
 		android:capitalize="none" 
 		android:autoText="false"
 		android:inputType="textUri"
-		android:text="@string/wizard_sample_url" />
+		android:text="@string/sampleRestUrl" />
 	<TextView 
-		android:id="@+id/wizard_url_status_message" 
+		android:id="@+id/wizardUrlStatus" 
 		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:textStyle="bold" 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
-		android:text="@string/wizard_sample_url" />
+		android:text="@string/sampleRestUrl" />
 		
 </LinearLayout>
