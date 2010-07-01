@@ -37,6 +37,10 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
     private ContactsAdapter mAdapter;
 
+    private ListView mListView;
+
+    private View mEmpty;
+
     private TextView mStatus;
 
     private boolean mBusy = false;
@@ -69,9 +73,10 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         // Use an existing ListAdapter that will map an array
         // of strings to TextViews
         mAdapter = new ContactsAdapter(this);
+        mListView = getListView();
 
-        getListView().setOnScrollListener(this);
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnScrollListener(this);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
@@ -80,7 +85,9 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         });
 
         // button code in the layout - 1.6 SDK feature to specify onClick
-        getListView().setItemsCanFocus(true);
+        mListView.setItemsCanFocus(true);
+        mEmpty = findViewById(R.id.empty);
+        mListView.setEmptyView(mEmpty);
         registerForContextMenu(getListView());
         mTask = new LoadContactsTask();
         mTask.execute(null);
@@ -150,6 +157,21 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
     class LoadContactsTask extends AsyncTask<Object, Void, Object> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (mAdapter.getCount() == 0)
+                mListView.setVisibility(View.GONE);
+            mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
+            TextView tv = (TextView) (mEmpty.findViewById(R.id.main_text));
+            tv.setVisibility(View.GONE);
+            // tv.setText(R.string.loading);
+
+            // we are reusing - so remove the other views
+
+        }
+
+        @Override
         protected Object doInBackground(Object... params) {
             try {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -199,10 +221,21 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
             if (isCancelled())
                 return;
             int retVal = (Integer) result;
+
             switch (retVal) {
             case Util.FETCH_FAILED:
+
+                mEmpty.findViewById(R.id.progress).setVisibility(View.GONE);
+                TextView tv = (TextView) (mEmpty.findViewById(R.id.main_text));
+                tv.setVisibility(View.VISIBLE);
+                tv.setText(R.string.load_failed);
+                TextView footer = (TextView) findViewById(R.id.status);
+                footer.setVisibility(View.VISIBLE);
+                footer.setText(R.string.load_failed);
+
                 break;
             case Util.REFRESH_LIST:
+                mListView.setVisibility(View.VISIBLE);
                 int firstPos = getListView().getFirstVisiblePosition();
                 setListAdapter(mAdapter);
                 getListView().setSelection(firstPos);
