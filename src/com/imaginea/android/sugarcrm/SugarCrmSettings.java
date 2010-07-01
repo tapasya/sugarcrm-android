@@ -47,5 +47,6 @@ public class SugarCrmSettings extends PreferenceActivity {
         Log.i(LOG_TAG, "username - " + getUsername(SugarCrmSettings.this));
         Log.i(LOG_TAG, "password - " + getPassword(SugarCrmSettings.this));
         Log.i(LOG_TAG, "pwdSaved - " + isPasswordSaved(SugarCrmSettings.this));
+        finish();
     }
 }
