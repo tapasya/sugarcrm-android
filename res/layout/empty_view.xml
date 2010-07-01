@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<!-- Here is the view to show if the list is emtpy -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/empty" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" 
+	android:gravity="center"
+	android:visibility="gone">
+	<ProgressBar android:id="@+id/progress"
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content"
+		android:layout_marginTop="20dip" 
+		android:visibility="invisible"
+		android:gravity="center" 
+		android:layout_centerHorizontal="true"
+		style="?android:attr/progressBarStyle" 
+		android:paddingRight="10px" />
+	<TextView android:id="@+id/main_text" 
+		style="@style/empty_textview_style" 
+		android:layout_below="@id/progress"
+		android:gravity="center" 
+		android:layout_centerHorizontal="true"
+		android:text="@string/add_contact" 
+		android:contentDescription="?android:text" />
+	
+</RelativeLayout>
+
