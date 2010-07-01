@@ -4,10 +4,24 @@
 	<style name="TextAppearance" parent="android:TextAppearance">
 	</style>
 
-	<style name="edit_text_layout">
+
+	<style name="text_label">	              
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:textStyle">bold</item>               
+		<item name="android:layout_marginLeft">10dip</item>
+		<item name="android:layout_marginRight">5dip</item>
+		<item name="android:layout_marginTop">10dip</item>
 		<item name="android:paddingLeft">6dip</item>
 		<item name="android:paddingRight">7dip</item>
 		<item name="android:paddingTop">8dip</item>
+	</style>
+	
+	<style name="edit_text_layout">	
+		<item name="android:minWidth">250dip</item>
+		<item name="android:layout_marginLeft">10dip</item>
+		<item name="android:layout_marginRight">5dip</item>	
+		<item name="android:capitalize">none</item>
+		<item name="android:autoText">false</item>       
 	</style>
 	<style name="list_item_style">
 
