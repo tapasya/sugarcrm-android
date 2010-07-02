@@ -15,6 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * DashboardActivity
+ * 
+ * @author Vasavi
+ */
 public class DashboardActivity extends Activity {
 
     GridView dashboard;
@@ -23,7 +28,8 @@ public class DashboardActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        startActivityForResult(new Intent(this, WizardActivity.class), 0);
+        
         setContentView(R.layout.dashboard_activity);
         dashboard = (GridView) findViewById(R.id.dashboard);
         dashboard.setAdapter(new AppsAdapter(this));
@@ -40,6 +46,13 @@ public class DashboardActivity extends Activity {
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {        
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_CANCELED)
+            finish();
     }
 
     public class AppsAdapter extends BaseAdapter {
