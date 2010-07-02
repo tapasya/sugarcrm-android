@@ -109,23 +109,27 @@ public class AccountDetailsActivity extends Activity {
         private void setContents() {
 
             mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
+            TextView textView = (TextView) findViewById(R.id.accountName);
+            textView.setText(mSugarBean.getFieldValue(ModuleFields.NAME));
             for (String fieldName : mSelectFields) {
-                TextView textViewForLabel = new TextView(AccountDetailsActivity.this);
-                textViewForLabel.setText(fieldName);
-                TextView textViewForValue = new TextView(AccountDetailsActivity.this);
+                if (!fieldName.equals(ModuleFields.NAME)) {
+                    TextView textViewForLabel = new TextView(AccountDetailsActivity.this);
+                    textViewForLabel.setText(fieldName);
+                    TextView textViewForValue = new TextView(AccountDetailsActivity.this);
 
-                String value = mSugarBean.getFieldValue(fieldName);
-                if (value != null && !value.equals("")) {
-                    textViewForValue.setText(value);
-                } else {
-                    textViewForValue.setText(R.string.notAvailable);
+                    String value = mSugarBean.getFieldValue(fieldName);
+                    if (value != null && !value.equals("")) {
+                        textViewForValue.setText(value);
+                    } else {
+                        textViewForValue.setText(R.string.notAvailable);
+                    }
+
+                    TableRow tableRow = new TableRow(AccountDetailsActivity.this);
+                    tableRow.addView(textViewForLabel);
+                    tableRow.addView(textViewForValue);
+
+                    mDetailsTable.addView(tableRow);
                 }
-
-                TableRow tableRow = new TableRow(AccountDetailsActivity.this);
-                tableRow.addView(textViewForLabel);
-                tableRow.addView(textViewForValue);
-
-                mDetailsTable.addView(tableRow);
             }
         }
 
