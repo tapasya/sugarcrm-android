@@ -30,13 +30,13 @@
 			</intent-filter>
 		</activity>
 		
-		<activity android:name=".AccountListActivity" android:label="@string/appName">
+		<activity android:name=".AccountListActivity" android:label="@string/accounts">
             <intent-filter>
                 <action android:name="com.imaginea.android.sugarcrm.DEFAULT" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".SugarCrmSettings" android:label="@string/appName">
+        <activity android:name=".SugarCrmSettings" android:label="@string/settings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.PREFERENCE" />
