@@ -15,6 +15,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -59,6 +62,8 @@ public class WizardActivity extends Activity {
     private LayoutInflater mInflater;
 
     private int wizardState;
+    
+    private Menu mMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -458,4 +463,28 @@ public class WizardActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Hold on to this
+        mMenu = menu;
+
+        // Inflate the currently selected menu XML resource.
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.settings:
+            Intent myIntent = new Intent(WizardActivity.this, SugarCrmSettings.class);
+            WizardActivity.this.startActivity(myIntent);
+            return true;
+
+        }
+        return false;
+    }
+    
 }
