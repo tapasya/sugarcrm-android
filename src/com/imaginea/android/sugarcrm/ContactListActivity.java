@@ -167,7 +167,7 @@ public class ContactListActivity extends ListActivity {
                 // SugarCrmApp app =
                 // mSessionId = ((SugarCrmApp) getApplication()).getSessionId();
                 if (mSessionId == null) {
-                    mSessionId = RestUtil.loginToSugarCRM(url, userName, Util.MD5(password));
+                    mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
                 }
 
                 String[] fields = new String[] {};

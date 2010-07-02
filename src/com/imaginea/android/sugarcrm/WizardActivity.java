@@ -342,7 +342,7 @@ public class WizardActivity extends Activity {
             String sessionId = null;
 
             try {
-                sessionId = RestUtil.loginToSugarCRM(url, usr, Util.MD5(pwd));
+                sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
