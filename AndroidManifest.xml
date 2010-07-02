@@ -43,6 +43,12 @@
             </intent-filter>
         </activity>
         
+        <activity android:name=".AccountDetailsActivity" android:label="@string/contactDetails">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        
         <activity android:name=".ContactDetailsActivity" android:label="@string/contactDetails">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
