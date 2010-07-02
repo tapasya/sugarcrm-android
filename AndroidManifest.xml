@@ -19,7 +19,8 @@
         
         <activity android:name=".DashboardActivity" android:label="@string/appName" android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="com.imaginea.android.sugarcrm.DEFAULT" />
+                <action android:name="android.intent.action.MAIN" /> 
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
@@ -54,11 +55,7 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".WizardActivity" android:label="@string/appName" android:clearTaskOnLaunch="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".WizardActivity" android:label="@string/appName" android:clearTaskOnLaunch="true">           
         </activity>
         
     </application>
