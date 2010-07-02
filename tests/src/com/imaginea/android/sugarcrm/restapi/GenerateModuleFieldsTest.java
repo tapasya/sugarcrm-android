@@ -1,22 +1,25 @@
 package com.imaginea.android.sugarcrm.restapi;
 
-import android.test.suitebuilder.annotation.LargeTest;
-import android.util.Log;
-
-import com.imaginea.android.sugarcrm.util.RestUtil;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Properties;
+import android.test.suitebuilder.annotation.LargeTest;
+import android.util.Log;
+
+import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.RestUtil;
 
 /**
  * Do not run this, exclude this from the test suite
@@ -33,6 +36,8 @@ public class GenerateModuleFieldsTest extends RestAPITest {
     String[] customFields = new String[] { "a", "b" };
 
     LinkedHashSet<String> moduleFields = new LinkedHashSet<String>();
+    
+    List<String> moduleFieldList = new ArrayList<String>();
 
     public final static String LOG_TAG = "ModuleFieldTest";
 
@@ -45,24 +50,23 @@ public class GenerateModuleFieldsTest extends RestAPITest {
     @LargeTest
     public void testGetAllModuleFields() throws Exception {
 
-        Iterator keys = RestUtil.getModuleFields(url, mSessionId, "Accounts", fields).keys();
-        assertNotNull(keys);
-        // assertTrue(keys.)
-        addToModFields(keys);
-        keys = RestUtil.getModuleFields(url, mSessionId, "Contacts", fields).keys();
+        List<ModuleField> moduleFields = RestUtil.getModuleFields(url, mSessionId, "Accounts", fields);
+        assertNotNull(moduleFields);
+        addToModuleFieldList(moduleFields);
+        
+        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Contacts", fields);
+        addToModuleFieldList(moduleFields);
+        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Opportunities", fields);
+        addToModuleFieldList(moduleFields);
+        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Leads", fields);
+        addToModuleFieldList(moduleFields);
+        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Campaigns", fields);
+        addToModuleFieldList(moduleFields);
+        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Meetings", fields);
+        addToModuleFieldList(moduleFields);
 
-        addToModFields(keys);
-        keys = RestUtil.getModuleFields(url, mSessionId, "Opportunities", fields).keys();
-        addToModFields(keys);
-        keys = RestUtil.getModuleFields(url, mSessionId, "Leads", fields).keys();
-        addToModFields(keys);
-        keys = RestUtil.getModuleFields(url, mSessionId, "Campaigns", fields).keys();
-        addToModFields(keys);
-        keys = RestUtil.getModuleFields(url, mSessionId, "Meetings", fields).keys();
-        addToModFields(keys);
-
-        keys = RestUtil.getModuleFields(url, mSessionId, "Cases", fields).keys();
-        addToModFields(keys);
+        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Cases", fields);
+        addToModuleFieldList(moduleFields);
 
         for (Iterator iterator = moduleFields.iterator(); iterator.hasNext();) {
             String field = (String) iterator.next();
@@ -72,6 +76,12 @@ public class GenerateModuleFieldsTest extends RestAPITest {
         // Log.i("ModuleFields:"+ moduleName.)
     }
 
+    private void addToModuleFieldList(List<ModuleField> moduleFields){
+    	for(ModuleField moduleField : moduleFields){
+    		moduleFieldList.add(moduleField.getName());
+    	}
+    }
+    
     private void addToModFields(Iterator keys) {
         for (Iterator iterator = keys; iterator.hasNext();) {
             String object = (String) iterator.next();
@@ -84,7 +94,7 @@ public class GenerateModuleFieldsTest extends RestAPITest {
      * This class is a generate Class file using the Velocity Template Engine
      */
 
-    public void generateClass(HashSet set) {
+    public void generateClass(List set) {
         /* first, we init the runtime engine. Defaults are not fine in android. */
 
         try {
