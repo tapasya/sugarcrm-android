@@ -30,15 +30,9 @@
 			</intent-filter>
 		</activity>
 		
-		<activity android:name=".AccountsActivity" android:label="@string/appName">
+		<activity android:name=".AccountListActivity" android:label="@string/appName">
             <intent-filter>
                 <action android:name="com.imaginea.android.sugarcrm.DEFAULT" />
-            </intent-filter>
-        </activity>
-        
-        <activity android:name=".LeadsActivity" android:label="@string/appName">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         
