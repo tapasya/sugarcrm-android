@@ -35,8 +35,8 @@ public class DashboardActivity extends Activity {
         dashboard.setAdapter(new AppsAdapter(this));
 
         // Activities corresponding to the items in the GridView
-        final Class[] moduleActivities = { AccountsActivity.class, ContactListActivity.class,
-                LeadsActivity.class, AccountsActivity.class, SugarCrmSettings.class };
+        final Class[] moduleActivities = { AccountListActivity.class, ContactListActivity.class,
+                AccountListActivity.class, AccountListActivity.class, SugarCrmSettings.class };
 
         dashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
