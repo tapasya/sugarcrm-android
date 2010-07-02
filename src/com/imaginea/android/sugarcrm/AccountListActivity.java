@@ -2,6 +2,7 @@ package com.imaginea.android.sugarcrm;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,7 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -28,7 +29,7 @@ import java.util.Arrays;
  * 
  * @author vasavi
  */
-public class AccountListActivity extends ListActivity implements ListView.OnScrollListener {
+public class AccountListActivity extends ListActivity {
 
     public final static String LOG_TAG = "AccounttListActivity";
 
@@ -56,13 +57,14 @@ public class AccountListActivity extends ListActivity implements ListView.OnScro
 
     // we don't make this final as we may want to use the sugarCRM value dynamically
     public static int mMaxResults = 20;
-    
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
-        
+        TextView tv = (TextView) findViewById(R.id.headerText);
+        tv.setText(RestUtilConstants.ACCOUNTS_MODULE);
         mStatus = (TextView) findViewById(R.id.status);
         // mStatus.setText("Idle");
 
@@ -71,49 +73,38 @@ public class AccountListActivity extends ListActivity implements ListView.OnScro
         mAdapter = new AccountsAdapter(this);
         mListView = getListView();
 
-        mListView.setOnScrollListener(this);
+        // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-                //openDetailScreen(position);
+                // openDetailScreen(position);
                 Log.i(LOG_TAG, "item " + position + " clicked!");
+                openDetailScreen(position);
             }
         });
 
         // button code in the layout - 1.6 SDK feature to specify onClick
         mListView.setItemsCanFocus(true);
-        mListView.setFocusable(true);    
+        mListView.setFocusable(true);
         mEmpty = findViewById(R.id.empty);
         mListView.setEmptyView(mEmpty);
-        //registerForContextMenu(getListView());
+        // registerForContextMenu(getListView());
         mTask = new LoadAccountsTask();
         mTask.execute(null);
     }
 
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                                    int totalItemCount) {
-
-    }
-
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        /*switch (scrollState) {
-        case OnScrollListener.SCROLL_STATE_IDLE:
-            mBusy = false;
-            mStatus.setVisibility(View.GONE);
-            break;
-        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-            mBusy = true;
-            // mStatus.setText("Touch scroll");
-            break;
-        case OnScrollListener.SCROLL_STATE_FLING:
-            mBusy = true;
-            // mStatus.setText("Fling");
-            break;
-        }
-        fetchMoreItemsForList();*/
+    /**
+     * opens the Detail Screen
+     * 
+     * @param position
+     */
+    void openDetailScreen(int position) {
+        Intent detailIntent = new Intent(AccountListActivity.this, AccountDetailsActivity.class);
+        SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
+        Log.d(LOG_TAG, "beanId:" + bean.getBeanId());
+        detailIntent.putExtra(RestUtilConstants.ID, bean.getBeanId());
+        startActivity(detailIntent);
     }
 
     @Override
@@ -164,7 +155,7 @@ public class AccountListActivity extends ListActivity implements ListView.OnScro
             try {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 // TODO use a constant and remove this as we start from the login screen
-                
+
                 String url = pref.getString("URL", getString(R.string.defaultUrl));
                 String userName = pref.getString("USER_NAME", getString(R.string.defaultUser));
                 String password = pref.getString("PASSWORD", getString(R.string.defaultPwd));
