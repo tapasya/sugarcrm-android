@@ -1,11 +1,12 @@
 package com.imaginea.android.sugarcrm.restapi;
 
-import junit.framework.TestCase;
+import java.util.List;
 
+import junit.framework.TestCase;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.imaginea.android.sugarcrm.util.RestUtil;
-import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * 
@@ -35,9 +36,15 @@ public class RestAPITest extends AndroidTestCase {
 	}
 
 	public void authenticate() throws Exception {
-		
+
 		mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
 		assertNotNull(mSessionId);
 	}
-	
+
+	/*
+	 * @SmallTest public void testGetModules() throws Exception{ List<String>
+	 * modules = RestUtil.getAvailableModules(url, mSessionId); for(String
+	 * module : modules){ System.out.print("\t" + module); } }
+	 */
+
 }
