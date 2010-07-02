@@ -32,8 +32,6 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_NAME;
 
 import android.util.Log;
 
-import com.imaginea.android.sugarcrm.RestUtilConstants;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -250,6 +248,7 @@ public class RestUtil {
         JSONObject credentials = new JSONObject();
         try {
             credentials.put(USER_NAME, username);
+            password = Util.MD5(password);
             credentials.put(PASSWORD, password);
 
             JSONArray jsonArray = new JSONArray();
@@ -281,7 +280,7 @@ public class RestUtil {
 
             final String response = EntityUtils.toString(resLogin.getEntity());
             JSONObject responseObj = new JSONObject(response);
-            Log.i(LOG_TAG, response);
+            Log.i(LOG_TAG, "loginResponse : " + response);
             try {
                 String sessionId = responseObj.get(ID).toString();
                 return sessionId;
@@ -331,8 +330,14 @@ public class RestUtil {
             final String response = EntityUtils.toString(res.getEntity());
             Log.i(LOG_TAG, "available modules : " + response);
             JSONObject responseObj = new JSONObject(response);
+            JSONArray modulesArray = responseObj.getJSONArray(MODULES);
+            List<String> modules = new ArrayList<String>();
+            for (int i = 0; i < modulesArray.length(); i++) {
+                String module = modulesArray.getString(i).toString();
+                modules.add(module);
+            }
 
-            return new ArrayList<String>(Arrays.asList(responseObj.get(MODULES).toString().split(",")));
+            return modules;
         } catch (JSONException jo) {
             throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
         } catch (IOException ioe) {
@@ -357,8 +362,8 @@ public class RestUtil {
      *         'link_fields' -- Array - The vardef information on the link fields
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static JSONObject getModuleFields(String url, String sessionId, String moduleName,
-                                    String[] fields) throws SugarCrmException {
+    public static List<ModuleField> getModuleFields(String url, String sessionId,
+                                    String moduleName, String[] fields) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
@@ -371,6 +376,7 @@ public class RestUtil {
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
+
             // Add your data
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new BasicNameValuePair(METHOD, GET_MODULE_FIELDS));
@@ -390,8 +396,8 @@ public class RestUtil {
 
             final String response = EntityUtils.toString(res.getEntity());
             Log.i(LOG_TAG, "moduleFields : " + response);
-            JSONObject jsonResponse = new JSONObject(response);
-            return jsonResponse.getJSONObject(RestUtilConstants.MODULE_FIELDS);
+            return new ModuleFieldsParser(response).getModuleFields();
+
         } catch (JSONException jo) {
             throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
         } catch (IOException ioe) {
