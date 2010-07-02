@@ -36,11 +36,8 @@ public class RestAPITest extends AndroidTestCase {
 
 	public void authenticate() throws Exception {
 		
-		String md5Password;
-
-		md5Password = Util.MD5(password);
-
-		mSessionId = RestUtil.loginToSugarCRM(url, userName, md5Password);
+		mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
 		assertNotNull(mSessionId);
 	}
+	
 }
