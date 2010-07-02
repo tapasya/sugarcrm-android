@@ -29,141 +29,154 @@ import com.imaginea.android.sugarcrm.util.RestUtil;
  */
 public class GenerateModuleFieldsTest extends RestAPITest {
 
-    String moduleName = "Accounts";
+	String moduleName = "Accounts";
 
-    String[] fields = new String[] {};
+	String[] fields = new String[] {};
 
-    String[] customFields = new String[] { "a", "b" };
+	String[] customFields = new String[] { "a", "b" };
 
-    LinkedHashSet<String> moduleFields = new LinkedHashSet<String>();
-    
-    List<String> moduleFieldList = new ArrayList<String>();
+	LinkedHashSet<String> moduleFields = new LinkedHashSet<String>();
 
-    public final static String LOG_TAG = "ModuleFieldTest";
+	List<String> moduleFieldList = new ArrayList<String>();
 
-    /**
-     * the values are stored in a linked hashset so order is preserved. Add new modules at the end,
-     * so you know the new elements for which constants have to be created
-     * 
-     * @throws Exception
-     */
-    @LargeTest
-    public void testGetAllModuleFields() throws Exception {
+	public final static String LOG_TAG = "ModuleFieldTest";
 
-        List<ModuleField> moduleFields = RestUtil.getModuleFields(url, mSessionId, "Accounts", fields);
-        assertNotNull(moduleFields);
-        addToModuleFieldList(moduleFields);
-        
-        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Contacts", fields);
-        addToModuleFieldList(moduleFields);
-        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Opportunities", fields);
-        addToModuleFieldList(moduleFields);
-        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Leads", fields);
-        addToModuleFieldList(moduleFields);
-        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Campaigns", fields);
-        addToModuleFieldList(moduleFields);
-        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Meetings", fields);
-        addToModuleFieldList(moduleFields);
+	/**
+	 * the values are stored in a linked hashset so order is preserved. Add new
+	 * modules at the end, so you know the new elements for which constants have
+	 * to be created
+	 * 
+	 * @throws Exception
+	 */
+	@LargeTest
+	public void testGetAllModuleFields() throws Exception {
 
-        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Cases", fields);
-        addToModuleFieldList(moduleFields);
+		List<ModuleField> moduleFields = RestUtil.getModuleFields(url,
+				mSessionId, "Accounts", fields);
+		assertNotNull(moduleFields);
+		addToModuleFieldList(moduleFields);
 
-        for (Iterator iterator = moduleFields.iterator(); iterator.hasNext();) {
-            String field = (String) iterator.next();
-            Log.i("ModuleFields:", field);
-        }
-        generateClass(moduleFields);
-        // Log.i("ModuleFields:"+ moduleName.)
-    }
+		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Contacts",
+				fields);
+		addToModuleFieldList(moduleFields);
+		moduleFields = RestUtil.getModuleFields(url, mSessionId,
+				"Opportunities", fields);
+		addToModuleFieldList(moduleFields);
+		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Leads",
+				fields);
+		addToModuleFieldList(moduleFields);
+		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Campaigns",
+				fields);
+		addToModuleFieldList(moduleFields);
+		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Meetings",
+				fields);
+		addToModuleFieldList(moduleFields);
 
-    private void addToModuleFieldList(List<ModuleField> moduleFields){
-    	for(ModuleField moduleField : moduleFields){
-    		moduleFieldList.add(moduleField.getName());
-    	}
-    }
-    
-    private void addToModFields(Iterator keys) {
-        for (Iterator iterator = keys; iterator.hasNext();) {
-            String object = (String) iterator.next();
-            moduleFields.add(object);
+		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Cases",
+				fields);
+		addToModuleFieldList(moduleFields);
 
-        }
-    }
+		for (Iterator iterator = moduleFields.iterator(); iterator.hasNext();) {
+			String field = (String) iterator.next();
+			Log.i("ModuleFields:", field);
+		}
+		generateClass(moduleFields);
+		// Log.i("ModuleFields:"+ moduleName.)
+	}
 
-    /**
-     * This class is a generate Class file using the Velocity Template Engine
-     */
+	private void addToModuleFieldList(List<ModuleField> moduleFields) {
+		for (ModuleField moduleField : moduleFields) {
+			moduleFieldList.add(moduleField.getName());
+		}
+	}
 
-    public void generateClass(List set) {
-        /* first, we init the runtime engine. Defaults are not fine in android. */
+	private void addToModFields(Iterator keys) {
+		for (Iterator iterator = keys; iterator.hasNext();) {
+			String object = (String) iterator.next();
+			moduleFields.add(object);
 
-        try {
-            Properties prop = new Properties();
-            prop.put("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
-            Velocity.init(prop);
-            // Velocity.addProperty("runtime.log.logsystem.class",
-            // "org.apache.velocity.runtime.log.NullLogSystem");
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Problem initializing Velocity : " + e);
-            return;
-        }
+		}
+	}
 
-        /* lets make a Context and put data into it */
+	/**
+	 * This class is a generate Class file using the Velocity Template Engine
+	 */
 
-        VelocityContext context = new VelocityContext();
-        context.put("fields", set);
+	public void generateClass(List set) {
+		/* first, we init the runtime engine. Defaults are not fine in android. */
 
-        /* lets render a template */
+		try {
+			Properties prop = new Properties();
+			prop.put("runtime.log.logsystem.class",
+					"org.apache.velocity.runtime.log.NullLogSystem");
+			Velocity.init(prop);
+			// Velocity.addProperty("runtime.log.logsystem.class",
+			// "org.apache.velocity.runtime.log.NullLogSystem");
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Problem initializing Velocity : " + e);
+			return;
+		}
 
-        StringWriter w = new StringWriter();
-        /*
-         * lets dynamically 'create' our template and use the evaluate() method to render it. Its
-         * currently in assets folder of test package, but to generate it we need it in the main
-         * project, but do not check-in this file. This is really a tool and can be kept outside of
-         * our android project, but what the heck, we want everything in one place
-         */
-        String s = "";
-        try {
-            InputStream is = super.getContext().getAssets().open("classFile.vm");
-            // InputStream is = super.getContext().getAssets().open("fields.vm");
+		/* lets make a Context and put data into it */
 
-            // We guarantee that the available method returns the total
-            // size of the asset... of course, this does mean that a single
-            // asset can't be more than 2 gigs.
-            int size = is.available();
+		VelocityContext context = new VelocityContext();
+		context.put("fields", set);
 
-            // Read the entire asset into a local byte buffer.
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
+		/* lets render a template */
 
-            // Convert the buffer into a string.
-            s = new String(buffer);
-        } catch (IOException e) {
-            // Should never happen!
-            throw new RuntimeException(e);
-        }
+		StringWriter w = new StringWriter();
+		/*
+		 * lets dynamically 'create' our template and use the evaluate() method
+		 * to render it. Its currently in assets folder of test package, but to
+		 * generate it we need it in the main project, but do not check-in this
+		 * file. This is really a tool and can be kept outside of our android
+		 * project, but what the heck, we want everything in one place
+		 */
+		String s = "";
+		try {
+			InputStream is = super.getContext().getAssets()
+					.open("classFile.vm");
+			// InputStream is =
+			// super.getContext().getAssets().open("fields.vm");
 
-        w = new StringWriter();
+			// We guarantee that the available method returns the total
+			// size of the asset... of course, this does mean that a single
+			// asset can't be more than 2 gigs.
+			int size = is.available();
 
-        try {
-            Velocity.evaluate(context, w, "mystring", s);
-        } catch (ParseErrorException pee) {
-            /*
-             * thrown if something is wrong with the syntax of our template string
-             */
-            Log.e(LOG_TAG, "ParseErrorException : " + pee);
-        } catch (MethodInvocationException mee) {
-            /*
-             * thrown if a method of a reference called by the template throws an exception. That
-             * won't happen here as we aren't calling any methods in this example, but we have to
-             * catch them anyway
-             */
-            Log.e(LOG_TAG, "MethodInvocationException : " + mee);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Exception : " + e);
-        }
+			// Read the entire asset into a local byte buffer.
+			byte[] buffer = new byte[size];
+			is.read(buffer);
+			is.close();
 
-        Log.d(LOG_TAG, " string : " + w);
-    }
+			// Convert the buffer into a string.
+			s = new String(buffer);
+		} catch (IOException e) {
+			// Should never happen!
+			throw new RuntimeException(e);
+		}
+
+		w = new StringWriter();
+
+		try {
+			Velocity.evaluate(context, w, "mystring", s);
+		} catch (ParseErrorException pee) {
+			/*
+			 * thrown if something is wrong with the syntax of our template
+			 * string
+			 */
+			Log.e(LOG_TAG, "ParseErrorException : " + pee);
+		} catch (MethodInvocationException mee) {
+			/*
+			 * thrown if a method of a reference called by the template throws
+			 * an exception. That won't happen here as we aren't calling any
+			 * methods in this example, but we have to catch them anyway
+			 */
+			Log.e(LOG_TAG, "MethodInvocationException : " + mee);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Exception : " + e);
+		}
+
+		Log.d(LOG_TAG, " string : " + w);
+	}
 }
