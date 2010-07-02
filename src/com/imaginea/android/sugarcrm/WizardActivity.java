@@ -8,12 +8,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -60,10 +63,16 @@ public class WizardActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sugar_wizard);
 
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         app = ((SugarCrmApp) getApplicationContext());
+        if (app.getSessionId() != null) {
+            setResult(RESULT_OK);
+            finish();
+        }
 
+        // showing splash than the actual wizard is a good idea
+        setContentView(R.layout.sugar_wizard);
         this.flipper = (ViewFlipper) this.findViewById(R.id.wizardFlipper);
         prev = (Button) this.findViewById(R.id.actionPrev);
         next = (Button) this.findViewById(R.id.actionNext);
@@ -197,11 +206,6 @@ public class WizardActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Log.i(LOG_TAG, "onResume");
-    }
-
-    protected void showActivity(Class _class) {
-        Intent myIntent = new Intent(WizardActivity.this, _class);
-        WizardActivity.this.startActivity(myIntent);
     }
 
     protected boolean isFirstDisplayed() {
@@ -380,7 +384,9 @@ public class WizardActivity extends Activity {
 
                 tv.setText("");
 
-                showActivity(DashboardActivity.class);
+                // showActivity(DashboardActivity.class);
+                setResult(RESULT_OK);
+                finish();
                 // user walked past end of wizard, so return okay
                 /*
                  * WizardActivity.this.setResult(Activity.RESULT_OK); WizardActivity.this.finish();
@@ -422,6 +428,34 @@ public class WizardActivity extends Activity {
 
         loginDialog.show();
 
+    }
+
+    /**
+     * new method for back presses in android 2.0, instead of the standard mechanism defined in the
+     * docs to handle legacy applications we use version code to handle back button... implement
+     * onKeyDown for older versions and use Override on that.
+     */
+    public void onBackPressed() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    /*
+     * @Override
+     */
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+        case KeyEvent.KEYCODE_BACK:
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, "OnBackButton: onKeyDown " + Build.VERSION.SDK_INT);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ECLAIR) {
+
+                setResult(RESULT_CANCELED);
+                finish();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }
