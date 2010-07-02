@@ -13,13 +13,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AbsListView.OnScrollListener;
 
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
@@ -33,7 +32,7 @@ import java.util.Arrays;
  * 
  * @author chander
  */
-public class ContactListActivity extends ListActivity implements ListView.OnScrollListener {
+public class ContactListActivity extends ListActivity {
 
     private ContactsAdapter mAdapter;
 
@@ -66,7 +65,10 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
+        TextView tv = (TextView) findViewById(R.id.headerText);
+        tv.setText(RestUtilConstants.CONTACTS_MODULE);
         mStatus = (TextView) findViewById(R.id.status);
         // mStatus.setText("Idle");
 
@@ -75,7 +77,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         mAdapter = new ContactsAdapter(this);
         mListView = getListView();
 
-        mListView.setOnScrollListener(this);
+        // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -86,7 +88,7 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
         // button code in the layout - 1.6 SDK feature to specify onClick
         mListView.setItemsCanFocus(true);
-        mListView.setFocusable(true);    
+        mListView.setFocusable(true);
         mEmpty = findViewById(R.id.empty);
         mListView.setEmptyView(mEmpty);
         registerForContextMenu(getListView());
@@ -105,29 +107,6 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         Log.d(LOG_TAG, "beanId:" + bean.getBeanId());
         detailIntent.putExtra(RestUtilConstants.ID, bean.getBeanId());
         startActivity(detailIntent);
-    }
-
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                                    int totalItemCount) {
-
-    }
-
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        switch (scrollState) {
-        case OnScrollListener.SCROLL_STATE_IDLE:
-            mBusy = false;
-            mStatus.setVisibility(View.GONE);
-            break;
-        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-            mBusy = true;
-            // mStatus.setText("Touch scroll");
-            break;
-        case OnScrollListener.SCROLL_STATE_FLING:
-            mBusy = true;
-            // mStatus.setText("Fling");
-            break;
-        }
-        fetchMoreItemsForList();
     }
 
     void fetchMoreItemsForList() {
