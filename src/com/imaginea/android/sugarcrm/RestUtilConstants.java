@@ -80,6 +80,12 @@ public interface RestUtilConstants {
 
     public static final String NAME = "name";
 
+    public static final String TYPE = "type";
+
+    public static final String LABEL = "label";
+
+    public static final String REQUIRED = "required";
+
     public static final String DESCRIPTION = "description";
 
     public static final String LOGIN_FAILED = "Login Failed!";
