@@ -29,7 +29,7 @@ public class DashboardActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startActivityForResult(new Intent(this, WizardActivity.class), 0);
-        
+
         setContentView(R.layout.dashboard_activity);
         dashboard = (GridView) findViewById(R.id.dashboard);
         dashboard.setAdapter(new AppsAdapter(this));
@@ -49,9 +49,9 @@ public class DashboardActivity extends Activity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {        
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_CANCELED)
+        if (resultCode == RESULT_CANCELED)
             finish();
     }
 
