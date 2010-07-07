@@ -130,6 +130,10 @@ public interface RestUtilConstants {
     public static final String LABEL = "label";
 
     public static final String REQUIRED = "required";
+    
+    public static final String CREATED = "created";
+    
+    public static final String FAILED = "failed";
 
     public static final String DESCRIPTION = "description";
 
