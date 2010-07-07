@@ -38,10 +38,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static void createAccountsTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + SugarBeans._ID
-                                        + " INTEGER PRIMARY KEY," + SugarBeans.BEAN + " TEXT,"
-                                        + SugarBeans.CREATED_DATE + " INTEGER,"
-                                        + SugarBeans.MODIFIED_DATE + " INTEGER" + ");");
+//        db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + SugarBeans._ID
+//                                        + " INTEGER PRIMARY KEY," + SugarBeans.BEAN + " TEXT,"
+//                                        + SugarBeans.CREATED_DATE + " INTEGER,"
+//                                        + SugarBeans.MODIFIED_DATE + " INTEGER" + ");");
     }
 
 }
