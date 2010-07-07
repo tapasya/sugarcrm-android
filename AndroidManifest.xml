@@ -58,6 +58,9 @@
         <activity android:name=".WizardActivity" android:label="@string/appName" android:clearTaskOnLaunch="true">           
         </activity>
         
+         <!-- provider android:name=".provider.SugarCRMProvider"
+            android:authorities="com.imaginea.android.sugarcrm"
+        /-->
     </application>
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
