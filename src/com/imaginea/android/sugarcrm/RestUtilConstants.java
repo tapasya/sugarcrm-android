@@ -14,6 +14,8 @@ public interface RestUtilConstants {
     public static final String APPLICATION = "application";
 
     public static final String NAME_VALUE_LIST = "name_value_list";
+    
+    public static final String NAME_VALUE_LISTS = "name_value_lists";
 
     // input and response types for the request and response
     public static final String JSON = "json";
@@ -32,6 +34,20 @@ public interface RestUtilConstants {
     public static final String GET_MODULE_FIELDS = "get_module_fields";
     
     public static final String SET_ENTRY = "set_entry";
+    
+    public static final String SET_ENTRIES = "set_entries";
+    
+    public static final String GET_RELATIONSHIPS = "get_relationships";
+    
+    public static final String SET_RELATIONSHIP = "set_relationship";
+    
+    public static final String SET_RELATIONSHIPS = "set_relationships";
+    
+    public static final String SEARCH_BY_MODULE = "search_by_module";
+    
+    public static final String GET_SERVER_INFO = "get_server_info";
+    
+    public static final String GET_USER_ID = "get_user_id";
 
     // module names
     public static final String ACCOUNTS_MODULE = "Accounts";
@@ -54,6 +70,12 @@ public interface RestUtilConstants {
     public static final String SESSION = "session";
 
     public static final String MODULE_NAME = "module_name";
+    
+    public static final String MODULE_NAMES = "module_names";
+    
+    public static final String BEAN_ID = "module_id";
+    
+    public static final String BEAN_IDS = "module_ids";
 
     public static final String QUERY = "query";
 
@@ -62,8 +84,29 @@ public interface RestUtilConstants {
     public static final String OFFSET = "offset";
 
     public static final String SELECT_FIELDS = "select_fields";
+    
+    public static final String LINK_NAME_TO_FIELDS_ARRAY = "link_name_to_fields_array";
+    
+    public static final String LINK_FIELD_NAME = "link_field_name";
+    
+    public static final String LINK_FIELD_NAMES = "link_field_names";
+    
+    public static final String RELATED_MODULE_QUERY = "related_module_query";
+    
+    public static final String RELATED_IDS = "related_ids";
+    
+    public static final String RELATED_FIELDS = "related_fields";
+    
+    public static final String RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY = "related_module_link_name_to_fields_array";
+    
+    public static final String MAX_RESULTS = "max_results";
+    
+    public static final String DELETED = "deleted";
 
     public static final String FIELDS = "fields";
+    
+    public static final String SEARCH_STRING = "search_string";
+    
 
     // params for the output JSON
     public static final String ID = "id";
