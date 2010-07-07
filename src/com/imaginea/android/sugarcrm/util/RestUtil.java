@@ -12,6 +12,7 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY_LIST;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_MODULE_FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_RELATIONSHIPS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_SERVER_INFO;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.ID;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.IDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.INPUT_TYPE;
@@ -830,17 +831,16 @@ public class RestUtil {
      *         GMT.
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static void getServerInfo(String url) throws SugarCrmException {
+    public static String getServerInfo(String url) throws SugarCrmException {
 
         try {
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
             // Add your data
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            nameValuePairs.add(new BasicNameValuePair(METHOD, SET_ENTRY));
+            nameValuePairs.add(new BasicNameValuePair(METHOD, GET_SERVER_INFO));
             nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
             nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
-            // nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData));
             req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             // Send POST request
@@ -853,6 +853,7 @@ public class RestUtil {
             JSONObject jsonResponse = new JSONObject(response);
 
             // TODO: have to parse the response
+            return response;
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage());
         } catch (JSONException jsone) {
