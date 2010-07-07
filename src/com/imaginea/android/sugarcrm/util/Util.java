@@ -37,6 +37,8 @@ public class Util {
 
     public static final String PREF_REMEMBER_PASSWORD = "rememberPwd";
 
+    private static int mRequestId = 0;
+
     // calculate the MD5 hash of a string
     public static String MD5(String text) throws SugarCrmException {
         try {
@@ -67,5 +69,16 @@ public class Util {
             } while (two_halfs++ < 1);
         }
         return buf.toString();
+    }
+
+    /**
+     * changed from private to public so that anyone requiring unique requestIds for Pending Intents
+     * can get it
+     * 
+     * @return
+     */
+    public static synchronized int getId() {
+        mRequestId += 1;
+        return mRequestId;
     }
 }
