@@ -4,6 +4,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,8 +19,12 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -92,8 +97,23 @@ public class ContactListActivity extends ListActivity {
         mEmpty = findViewById(R.id.empty);
         mListView.setEmptyView(mEmpty);
         registerForContextMenu(getListView());
-        mTask = new LoadContactsTask();
-        mTask.execute(null);
+
+        // Perform a managed query. The Activity will handle closing and requerying the cursor
+        // when needed.
+        Intent intent = getIntent();
+        if (intent.getData() == null) {
+            intent.setData(Contacts.CONTENT_URI);
+        }
+        Cursor cursor = managedQuery(getIntent().getData(), Contacts.LIST_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
+       // CRMContentObserver observer = new CRMContentObserver();
+       // cursor.registerContentObserver(observer);
+       // cursor.
+        // Used to map notes entries from the database to views
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.listitem, cursor,  new String[]{"first_name", "last_name"} , new int[] { android.R.id.text1 });
+        setListAdapter(adapter);
+
+        // mTask = new LoadContactsTask();
+        // mTask.execute(null);
     }
 
     /**
