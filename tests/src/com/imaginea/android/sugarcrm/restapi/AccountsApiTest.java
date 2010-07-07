@@ -1,9 +1,9 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.json.JSONObject;
 
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
@@ -73,9 +73,23 @@ public class AccountsApiTest extends RestAPITest {
 		nameValuePairs.put(ModuleFields.ID, beanId);
 		nameValuePairs.put(ModuleFields.NAME, "R R Advertising Inc.");
 		//nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
-		String response = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
-		JSONObject jsonResponse = new JSONObject(response);
-		assertNotNull(jsonResponse.get(ModuleFields.ID).toString());
+		String _beanId = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
+		System.out.println("setEntry response : " + _beanId);
+		assertNotNull(_beanId);
+	}
+	
+	@SmallTest
+	public void testSetEntries() throws Exception{
+		List<Map<String, String>> beanNameValuePairs = new ArrayList<Map<String, String>>();
+		
+		String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+		Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
+		nameValuePairs.put(ModuleFields.ID, beanId);
+		nameValuePairs.put(ModuleFields.NAME, "R Advertising Inc.");
+		//nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+		
+		beanNameValuePairs.add(nameValuePairs);
+		RestUtil.setEntries(url, mSessionId, moduleName, beanNameValuePairs);
 	}
 
 	/*
