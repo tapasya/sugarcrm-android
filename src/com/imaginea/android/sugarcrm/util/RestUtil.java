@@ -221,8 +221,62 @@ public class RestUtil {
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
         }
-
     }
+    
+    /**
+     * Update or create a single SugarBean.
+     *
+     * @param String $session -- Session ID returned by a previous call to login.
+     * @param String $module_name -- The name of the module to return records from.  This name should be the name the module was developed under (changing a tab name is studio does not affect the name that should be passed into this method)..
+     * @param Array $name_value_list -- The keys of the array are the SugarBean attributes, the values of the array are the values the attributes should have.
+     * @return Array    'id' -- the ID of the bean that was written to (-1 on error)
+     * @exception 'SoapFault' -- The SOAP error, if any
+    */
+    public static String setEntry(String url, String sessionId, String moduleName, Map<String, String> nameValueList) throws SugarCrmException{
+        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        data.put(SESSION, sessionId);
+        data.put(MODULE_NAME, moduleName);
+
+        try {
+            JSONArray nameValueArray = new JSONArray();
+            /*for(Entry<String, String> entry : nameValueList.entrySet()){
+                JSONObject nameValue = new JSONObject();
+                nameValue.put("name", entry.getKey());
+                nameValue.put("value", entry.getValue());
+                nameValueArray.put(nameValue);
+            }*/
+            
+            data.put(NAME_VALUE_LIST, nameValueArray);
+            
+            String restData = org.json.simple.JSONValue.toJSONString(data);
+            Log.i(LOG_TAG, "restData : " + restData);
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost req = new HttpPost(url);
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair(METHOD, GET_ENTRY));
+            nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData));
+            req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Send POST request
+            HttpResponse res = httpClient.execute(req);
+            if (res.getEntity() == null) {
+                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                throw new SugarCrmException("FAILED TO CONNECT!");
+            }
+            String str =  EntityUtils.toString(res.getEntity()).toString();
+            JSONObject jsonObject = new JSONObject(str);
+            return str;
+        } catch (IOException ioe) {
+            throw new SugarCrmException(ioe.getMessage());
+        } catch (JSONException jsone) {
+            throw new SugarCrmException(jsone.getMessage());
+        }
+    }
+    
 
     /**
      * Log the user into the application
