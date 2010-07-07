@@ -89,7 +89,10 @@ public class AccountsApiTest extends RestAPITest {
 		//nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
 		
 		beanNameValuePairs.add(nameValuePairs);
-		RestUtil.setEntries(url, mSessionId, moduleName, beanNameValuePairs);
+		List<String> beanIds = RestUtil.setEntries(url, mSessionId, moduleName, beanNameValuePairs);
+		for(String _beanId : beanIds){
+			System.out.println(_beanId);
+		}
 	}
 
 	/*
