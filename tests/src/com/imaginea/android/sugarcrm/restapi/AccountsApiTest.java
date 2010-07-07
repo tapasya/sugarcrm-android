@@ -1,12 +1,14 @@
 package com.imaginea.android.sugarcrm.restapi;
 
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.json.JSONObject;
 
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
-import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 
@@ -19,7 +21,7 @@ public class AccountsApiTest extends RestAPITest {
 
 	String[] selectFields = { ModuleFields.NAME, ModuleFields.PARENT_NAME,
 			ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX,
-			ModuleFields.EMAIL1 };
+			ModuleFields.EMAIL1, ModuleFields.DELETED };
 
 	String[] linkNameToFieldsArray = new String[] {};
 
@@ -60,6 +62,20 @@ public class AccountsApiTest extends RestAPITest {
 				beanId, selectFields, linkNameToFieldsArray);
 		System.out.println("Account Name : " + sBean.getFieldValue("name"));
 		System.out.println("Account email : " + sBean.getFieldValue("email1"));
+		System.out.println("Phone office : " + sBean.getFieldValue(ModuleFields.PHONE_OFFICE));
+		System.out.println("Account deleted ? " + sBean.getFieldValue(ModuleFields.DELETED));
+	}
+	
+	@SmallTest
+	public void testSetEntry() throws Exception{
+		String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+		Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
+		nameValuePairs.put(ModuleFields.ID, beanId);
+		nameValuePairs.put(ModuleFields.NAME, "R R Advertising Inc.");
+		//nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+		String response = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
+		JSONObject jsonResponse = new JSONObject(response);
+		assertNotNull(jsonResponse.get(ModuleFields.ID).toString());
 	}
 
 	/*
@@ -74,6 +90,7 @@ public class AccountsApiTest extends RestAPITest {
 	 * System.out.println(sBean.getBeanId()); } }
 	 */
 
+	/*
 	public void testGetModuleFields() throws Exception {
 		List<ModuleField> moduleFields = RestUtil.getModuleFields(url,
 				mSessionId, moduleName, selectFields);
@@ -83,7 +100,7 @@ public class AccountsApiTest extends RestAPITest {
 			System.out.println("type :" + moduleField.getName());
 			System.out.println("isReuired :" + moduleField.ismIsRequired());
 		}
-	}
+	}*/
 
 	/**
 	 * demonstrates the usage of RestUtil for contacts List. ModuleFields.NAME
