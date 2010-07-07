@@ -57,12 +57,15 @@
         
         <activity android:name=".WizardActivity" android:label="@string/appName" android:clearTaskOnLaunch="true">           
         </activity>
+        <service android:name=".SugarService" />
         
-         <!-- provider android:name=".provider.SugarCRMProvider"
-            android:authorities="com.imaginea.android.sugarcrm"
-        /-->
+         <provider android:name=".provider.SugarCRMProvider"
+            android:authorities="com.imaginea.sugarcrm.provider"
+        />
     </application>
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 
 </manifest> 
