@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
+
 /**
  * This class helps open, create, and upgrade the database file.
  */
@@ -16,6 +18,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
+    public static final String CONTACTS_TABLE_NAME = "contacts";
+
     private static final String TAG = "DatabaseHelper";
 
     DatabaseHelper(Context context) {
@@ -25,7 +29,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         createAccountsTable(db);
+        // TODO remove the drop statements
+        dropContactsTable(db);
+        createContactsTable(db);
 
+    }
+
+    void dropContactsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_TABLE_NAME);
     }
 
     @Override
@@ -38,10 +49,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static void createAccountsTable(SQLiteDatabase db) {
 
-//        db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + SugarBeans._ID
-//                                        + " INTEGER PRIMARY KEY," + SugarBeans.BEAN + " TEXT,"
-//                                        + SugarBeans.CREATED_DATE + " INTEGER,"
-//                                        + SugarBeans.MODIFIED_DATE + " INTEGER" + ");");
+        // db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + SugarBeans._ID
+        // + " INTEGER PRIMARY KEY," + SugarBeans.BEAN + " TEXT,"
+        // + SugarBeans.CREATED_DATE + " INTEGER,"
+        // + SugarBeans.MODIFIED_DATE + " INTEGER" + ");");
+    }
+
+    private static void createContactsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + CONTACTS_TABLE_NAME + " (" + ContactsColumns.ID
+                                        + " INTEGER PRIMARY KEY," + ContactsColumns.BEAN_ID
+                                        + " TEXT," + ContactsColumns.FIRST_NAME + " TEXT,"
+                                        + ContactsColumns.LAST_NAME + " TEXT,"
+                                        + ContactsColumns.EMAIL1 + " TEXT,"
+                                        + ContactsColumns.CREATED_BY + " TEXT,"
+                                        + ContactsColumns.MODIFIED_BY_NAME + " TEXT," + " UNIQUE("
+                                        + ContactsColumns.BEAN_ID + ")" + ");");
     }
 
 }
