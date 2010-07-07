@@ -71,8 +71,8 @@ public class WizardActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.splash);
+        
         app = ((SugarCrmApp) getApplicationContext());
         if (app.getSessionId() != null) {
             setResult(RESULT_OK);
@@ -91,8 +91,6 @@ public class WizardActivity extends Activity {
         if (isPwdRemembered) {
             Log.i(LOG_TAG, "Password is remembered!");
             wizardState = Util.URL_USER_PWD_AVAILABLE;
-
-            setContentView(R.layout.splash);
 
             mAuthTask = new AuthenticationTask();
             mAuthTask.execute(usr, pwd, isPwdRemembered);
