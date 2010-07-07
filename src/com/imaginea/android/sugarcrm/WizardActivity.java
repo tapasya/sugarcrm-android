@@ -2,6 +2,7 @@ package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -62,8 +63,10 @@ public class WizardActivity extends Activity {
     private LayoutInflater mInflater;
 
     private int wizardState;
-    
+
     private Menu mMenu;
+    
+    private ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,12 +79,6 @@ public class WizardActivity extends Activity {
             finish();
         }
 
-        // showing splash than the actual wizard is a good idea
-        setContentView(R.layout.sugar_wizard);
-        this.flipper = (ViewFlipper) this.findViewById(R.id.wizardFlipper);
-        prev = (Button) this.findViewById(R.id.actionPrev);
-        next = (Button) this.findViewById(R.id.actionNext);
-
         final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardActivity.this);
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
         final String pwd = SugarCrmSettings.getPassword(WizardActivity.this).toString();
@@ -90,92 +87,93 @@ public class WizardActivity extends Activity {
                                         + "\n rememberedPwd - " + isPwdRemembered);
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if (TextUtils.isEmpty(restUrl)) {
-            Log.i(LOG_TAG, "REST URL is not available!");
-            wizardState = Util.URL_NOT_AVAILABLE;
-            // inflate both url layout and username_password layout
-            for (int layout : STEPS) {
-                View step = mInflater.inflate(layout, this.flipper, false);
-                this.flipper.addView(step);
-            }
-        } else if (TextUtils.isEmpty(usr)) {
-            Log.i(LOG_TAG, "REST URL is available but not the username!");
-            wizardState = Util.URL_AVAILABLE;
-            // inflate only the username_password layout
-            View loginView = mInflater.inflate(STEPS[1], this.flipper, false);
-            this.flipper.addView(loginView);
+        // if the password is already saved
+        if (isPwdRemembered) {
+            Log.i(LOG_TAG, "Password is remembered!");
+            wizardState = Util.URL_USER_PWD_AVAILABLE;
+
+            setContentView(R.layout.splash);
+
+            mAuthTask = new AuthenticationTask();
+            mAuthTask.execute(usr, pwd, isPwdRemembered);
         } else {
-            Log.i(LOG_TAG, "REST URL and username are available!");
-            wizardState = Util.URL_USER_AVAILABLE;
+            setContentView(R.layout.sugar_wizard);
+            this.flipper = (ViewFlipper) this.findViewById(R.id.wizardFlipper);
+            prev = (Button) this.findViewById(R.id.actionPrev);
+            next = (Button) this.findViewById(R.id.actionNext);
 
-            // inflate only the username_password layout
-            View loginView = mInflater.inflate(STEPS[1], this.flipper, false);
-            this.flipper.addView(loginView);
+            // if the REST url is not available
+            if (TextUtils.isEmpty(restUrl)) {
+                Log.i(LOG_TAG, "REST URL is not available!");
+                wizardState = Util.URL_NOT_AVAILABLE;
+                // inflate both url layout and username_password layout
+                for (int layout : STEPS) {
+                    View step = mInflater.inflate(layout, this.flipper, false);
+                    this.flipper.addView(step);
+                }
+            } else {
+                // inflate only the username_password layout
+                View loginView = mInflater.inflate(STEPS[1], this.flipper, false);
+                this.flipper.addView(loginView);
 
-            EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
-            editTextUser.setText(usr);
-            editTextUser.setEnabled(false);
+                // if the username is not available
+                if (TextUtils.isEmpty(usr)) {
+                    Log.i(LOG_TAG, "REST URL is available but not the username!");
+                    wizardState = Util.URL_AVAILABLE;
+                } else {
+                    Log.i(LOG_TAG, "REST URL and username are available!");
+                    wizardState = Util.URL_USER_AVAILABLE;
 
-            // if the password is already saved
-            if (isPwdRemembered) {
-                Log.i(LOG_TAG, "Password is remembered!");
-                wizardState = Util.URL_USER_PWD_AVAILABLE;
-
-                editTextUser = (EditText) loginView.findViewById(R.id.loginPassword);
-                editTextUser.setText(pwd);
-                editTextUser.setEnabled(false);
-
-                CheckBox chkBox = (CheckBox) loginView.findViewById(R.id.loginRememberPwd);
-                chkBox.setChecked(isPwdRemembered);
-
-                mAuthTask = new AuthenticationTask();
-                mAuthTask.execute(usr, pwd, isPwdRemembered);
+                    EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
+                    editTextUser.setText(usr);
+                }
             }
+
+            final int finalState = wizardState;
+            next.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+
+                    // if (isFirstDisplayed()) {
+                    if (flipper.getCurrentView().getId() == R.id.urlStep) {
+
+                        String url = ((EditText) flipper.findViewById(R.id.wizardUrl)).getText().toString();
+                        TextView tv = (TextView) flipper.findViewById(R.id.wizardUrlStatus);
+                        if (TextUtils.isEmpty(url)) {
+                            tv.setText(getString(R.string.validFieldMsg)
+                                                            + " REST url \n\n"
+                                                            + getBaseContext().getString(R.string.sampleRestUrl));
+                        } else {
+                            mUrlTask = new UrlValidationTask();
+                            mUrlTask.execute(url);
+                        }
+
+                    } else if (flipper.getCurrentView().getId() == R.id.signInStep) {
+                        handleLogin(v);
+                    } else {
+                        // show next step and update buttons
+                        flipper.showNext();
+                        updateButtons(finalState);
+                    }
+                }
+            });
+
+            prev.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    if (isFirstDisplayed()) {
+                        // user walked past beginning of wizard, so return that they cancelled
+                        WizardActivity.this.setResult(Activity.RESULT_CANCELED);
+                        WizardActivity.this.finish();
+                    } else {
+                        // show previous step and update buttons
+                        flipper.showPrevious();
+                        updateButtons(finalState);
+                    }
+                }
+            });
+
+            this.updateButtons(wizardState);
         }
 
-        final int finalState = wizardState;
-        next.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-
-                // if (isFirstDisplayed()) {
-                if (flipper.getCurrentView().getId() == R.id.urlStep) {
-
-                    String url = ((EditText) flipper.findViewById(R.id.wizardUrl)).getText().toString();
-                    TextView tv = (TextView) flipper.findViewById(R.id.wizardUrlStatus);
-                    if (TextUtils.isEmpty(url)) {
-                        tv.setText(getString(R.string.validFieldMsg)
-                                                        + " REST url \n\n"
-                                                        + getBaseContext().getString(R.string.sampleRestUrl));
-                    } else {
-                        mUrlTask = new UrlValidationTask();
-                        mUrlTask.execute(url);
-                    }
-
-                } else if (flipper.getCurrentView().getId() == R.id.signInStep) {
-                    handleLogin(v);
-                } else {
-                    // show next step and update buttons
-                    flipper.showNext();
-                    updateButtons(finalState);
-                }
-            }
-        });
-
-        prev.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (isFirstDisplayed()) {
-                    // user walked past beginning of wizard, so return that they cancelled
-                    WizardActivity.this.setResult(Activity.RESULT_CANCELED);
-                    WizardActivity.this.finish();
-                } else {
-                    // show previous step and update buttons
-                    flipper.showPrevious();
-                    updateButtons(finalState);
-                }
-            }
-        });
-
-        this.updateButtons(wizardState);
     }
 
     public void handleLogin(View view) {
@@ -364,15 +362,24 @@ public class WizardActivity extends Activity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(WizardActivity.this, "Sugar CRM", "Processing", true, false);
+        }
+
+        @Override
         protected void onPostExecute(Object sessionId) {
             super.onPostExecute(sessionId);
             if (isCancelled())
                 return;
 
-            TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
             if (hasExceptions) {
-                // TODO: description isn't coming. have to check this!
-                tv.setText(sceDesc);
+                if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
+                    TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
+                    // TODO: description isn't coming. have to check this!
+                    tv.setText(sceDesc);
+                }
+                progressDialog.cancel();
             } else {
 
                 // save the sessionId in the application context after the succesful login
@@ -381,22 +388,17 @@ public class WizardActivity extends Activity {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(WizardActivity.this);
                 Editor editor = sp.edit();
                 editor.putString(Util.PREF_USERNAME, usr);
-                if (rememberPwd) {
+                if ((wizardState == Util.URL_AVAILABLE || wizardState == Util.URL_USER_AVAILABLE)
+                                                && rememberPwd) {
                     editor.putString(Util.PREF_PASSWORD, pwd);
                     editor.putBoolean(Util.PREF_REMEMBER_PASSWORD, true);
                 }
                 editor.commit();
 
-                tv.setText("");
+                progressDialog.cancel();
 
-                // showActivity(DashboardActivity.class);
                 setResult(RESULT_OK);
                 finish();
-                // user walked past end of wizard, so return okay
-                /*
-                 * WizardActivity.this.setResult(Activity.RESULT_OK); WizardActivity.this.finish();
-                 */
-
             }
 
         }
@@ -486,5 +488,5 @@ public class WizardActivity extends Activity {
         }
         return false;
     }
-    
+
 }
