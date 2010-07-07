@@ -30,6 +30,8 @@ public interface RestUtilConstants {
     public static final String GET_ENTRY = "get_entry";
 
     public static final String GET_MODULE_FIELDS = "get_module_fields";
+    
+    public static final String SET_ENTRY = "set_entry";
 
     // module names
     public static final String ACCOUNTS_MODULE = "Accounts";
