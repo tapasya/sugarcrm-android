@@ -17,8 +17,9 @@ import java.util.HashMap;
  * SugarCRMProvider Provides access to a database of sugar beans. Each bean has a id, the bean
  * itself, a creation date and a modified data.
  */
-public class SugarCRMProvider extends ContentProvider {
+public class SugarCRMProvider { //extends ContentProvider {
 
+    /*
     public static final String AUTHORITY = "com.imaginea.sugarcrm.provider";
 
     private static HashMap<String, String> sSugarBeansProjectionMap;
@@ -174,5 +175,5 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans", SUGAR_BEANS);
         sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans/#", SUGAR_BEAN_ID);
 
-    }
+    }*/
 }
