@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class RestUtil {
 
@@ -239,13 +240,12 @@ public class RestUtil {
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            /*for(Entry<String, String> entry : nameValueList.entrySet()){
+            for(Entry<String, String> entry : nameValueList.entrySet()){
                 JSONObject nameValue = new JSONObject();
                 nameValue.put("name", entry.getKey());
                 nameValue.put("value", entry.getValue());
                 nameValueArray.put(nameValue);
-            }*/
-            
+            }
             data.put(NAME_VALUE_LIST, nameValueArray);
             
             String restData = org.json.simple.JSONValue.toJSONString(data);
