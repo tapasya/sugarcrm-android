@@ -7,26 +7,48 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
-import java.util.HashMap;
+import com.imaginea.android.sugarcrm.ServiceHelper;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 
 /**
- * SugarCRMProvider Provides access to a database of sugar beans. Each bean has a id, the bean
- * itself, a creation date and a modified data.
+ * SugarCRMProvider Provides access to a database of sugar modules, their data and relationships.
  */
-public class SugarCRMProvider { //extends ContentProvider {
+public class SugarCRMProvider extends ContentProvider {
 
-    /*
     public static final String AUTHORITY = "com.imaginea.sugarcrm.provider";
 
-    private static HashMap<String, String> sSugarBeansProjectionMap;
+    private static final int ACCOUNT = 0;
 
-    private static final int SUGAR_BEANS = 1;
+    private static final int ACCOUNT_ID = 1;
 
-    private static final int SUGAR_BEAN_ID = 2;
+    private static final int CONTACT = 2;
+
+    private static final int CONTACT_ID = 3;
+
+    private static final int LEAD = 4;
+
+    private static final int LEAD_ID = 5;
+
+    private static final int OPPORTUNITY = 6;
+
+    private static final int OPPORTUNITY_ID = 7;
+
+    private static final int MEETING = 8;
+
+    private static final int MEETING_ID = 9;
+
+    private static final int CASE = 10;
+
+    private static final int CASE_ID = 11;
+
+    private static final int CALL = 12;
+
+    private static final int CALL_ID = 13;
 
     private static final UriMatcher sUriMatcher;
 
@@ -43,34 +65,36 @@ public class SugarCRMProvider { //extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                                     String sortOrder) {
-        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(DatabaseHelper.ACCOUNTS_TABLE_NAME);
+
+        ServiceHelper.startService(getContext(), uri);
+
+        Cursor c = null;
+        // SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+
+        // Get the database and run the query
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 
         switch (sUriMatcher.match(uri)) {
-        case SUGAR_BEANS:
-
+        case ACCOUNT:
+            c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
             break;
 
-        case SUGAR_BEAN_ID:
+        case CONTACT:
+            Log.d(TAG, "Querying Contacts");
+            Log.d(TAG, "Uri:->" + uri.toString());
+            int size = uri.getPathSegments().size();
+            String maxResultsLimit = null;
+            if (size == 3)
+                maxResultsLimit = uri.getPathSegments().get(2);
+            // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
+            Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+            c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder, maxResultsLimit);
 
             break;
 
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
-
-        // If no sort order is specified use the default
-        String orderBy;
-        if (TextUtils.isEmpty(sortOrder)) {
-            orderBy = SugarBeans.DEFAULT_SORT_ORDER;
-        } else {
-            orderBy = sortOrder;
-        }
-
-        // Get the database and run the query
-        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
-
         // Tell the cursor what uri to watch, so it knows when its source data changes
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
@@ -79,10 +103,10 @@ public class SugarCRMProvider { //extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (sUriMatcher.match(uri)) {
-        case SUGAR_BEANS:
-
-        case SUGAR_BEAN_ID:
-            return SugarBeans.CONTENT_ITEM_TYPE;
+        case ACCOUNT:
+            return "vnd.android.cursor.dir/accounts";
+        case CONTACT:
+            return "vnd.android.cursor.dir/contacts";
 
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
@@ -91,11 +115,6 @@ public class SugarCRMProvider { //extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues initialValues) {
-        // Validate the requested uri
-        if (sUriMatcher.match(uri) != SUGAR_BEANS) {
-            throw new IllegalArgumentException("Unknown URI " + uri);
-        }
-
         ContentValues values;
         if (initialValues != null) {
             values = new ContentValues(initialValues);
@@ -104,15 +123,34 @@ public class SugarCRMProvider { //extends ContentProvider {
         }
 
         Long now = Long.valueOf(System.currentTimeMillis());
-
         // Make sure that the fields are all set
 
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        long rowId = db.insert(DatabaseHelper.ACCOUNTS_TABLE_NAME, SugarBeans.BEAN, values);
-        if (rowId > 0) {
-            Uri noteUri = ContentUris.withAppendedId(SugarBeans.CONTENT_URI, rowId);
-            getContext().getContentResolver().notifyChange(noteUri, null);
-            return noteUri;
+        // Validate the requested uri
+        // if (sUriMatcher.match(uri) != CONTACT) {
+        // throw new IllegalArgumentException("Unknown URI " + uri);
+        // }
+        switch (sUriMatcher.match(uri)) {
+        case ACCOUNT:
+            long rowId = db.insert(DatabaseHelper.ACCOUNTS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri noteUri = ContentUris.withAppendedId(SugarCRMContent.Contacts.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(noteUri, null);
+                return noteUri;
+            }
+            break;
+
+        case CONTACT:
+            rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri noteUri = ContentUris.withAppendedId(SugarCRMContent.Contacts.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(noteUri, null);
+                return noteUri;
+            }
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+
         }
 
         throw new SQLException("Failed to insert row into " + uri);
@@ -121,17 +159,30 @@ public class SugarCRMProvider { //extends ContentProvider {
     @Override
     public int delete(Uri uri, String where, String[] whereArgs) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        int count;
+        int count = 0;
         switch (sUriMatcher.match(uri)) {
-        case SUGAR_BEANS:
+        case ACCOUNT:
             count = db.delete(DatabaseHelper.ACCOUNTS_TABLE_NAME, where, whereArgs);
             break;
 
-        case SUGAR_BEAN_ID:
-            String noteId = uri.getPathSegments().get(1);
-            count = db.delete(DatabaseHelper.ACCOUNTS_TABLE_NAME, SugarBeans._ID
+        case ACCOUNT_ID:
+            String accountId = uri.getPathSegments().get(1);
+            count = db.delete(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.ID
                                             + "="
-                                            + noteId
+                                            + accountId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case CONTACT:
+            count = db.delete(DatabaseHelper.CONTACTS_TABLE_NAME, where, whereArgs);
+            break;
+
+        case CONTACT_ID:
+            String contactId = uri.getPathSegments().get(1);
+            count = db.delete(DatabaseHelper.CONTACTS_TABLE_NAME, Contacts.ID
+                                            + "="
+                                            + contactId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
@@ -149,15 +200,15 @@ public class SugarCRMProvider { //extends ContentProvider {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count;
         switch (sUriMatcher.match(uri)) {
-        case SUGAR_BEANS:
+        case ACCOUNT:
             count = db.update(DatabaseHelper.ACCOUNTS_TABLE_NAME, values, where, whereArgs);
             break;
 
-        case SUGAR_BEAN_ID:
-            String noteId = uri.getPathSegments().get(1);
-            count = db.update(DatabaseHelper.ACCOUNTS_TABLE_NAME, values, SugarBeans._ID
+        case ACCOUNT_ID:
+            String accountId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.ACCOUNTS_TABLE_NAME, values, Accounts.ID
                                             + "="
-                                            + noteId
+                                            + accountId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
@@ -172,8 +223,12 @@ public class SugarCRMProvider { //extends ContentProvider {
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans", SUGAR_BEANS);
-        sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans/#", SUGAR_BEAN_ID);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account", ACCOUNT);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/#", ACCOUNT);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#", ACCOUNT_ID);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact", CONTACT);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#", CONTACT_ID);
+        // sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans/#", SUGAR_BEAN_ID);
 
-    }*/
+    }
 }
