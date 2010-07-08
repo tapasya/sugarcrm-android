@@ -26,20 +26,20 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
 
     private String[] fields = new String[] {};
 
-    private String[] mSelectFields = Contacts.LIST_PROJECTION;
+    private String[] mSelectFields = Contacts.REST_LIST_PROJECTION;
 
     private String[] mLinkNameToFieldsArray;
 
-    private int mMaxResults;
+    private String mMaxResults;
 
     Uri mUri;
 
     // RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
     private String query = "", orderBy = ModuleFields.FIRST_NAME;
 
-    private int offset = 0;
+    private String offset = "0";
 
-    private int deleted = 0;
+    private String deleted = "0";
 
     public static final String LOG_TAG = "EntryListTask";
 
@@ -48,6 +48,11 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
         mContext = context;
 
         mUri = intent.getData();
+        int count = mUri.getPathSegments().size();
+        if(count ==3)
+        {
+            offset = mUri.getPathSegments().get(1);
+        }
 
     }
 
@@ -81,7 +86,8 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
                     Log.i(LOG_TAG, "FieldName:|Field value " + mSelectFields[i] + ":" + fieldValue);
                     values.put(mSelectFields[i], fieldValue);
                 }
-                mContext.getContentResolver().insert(mUri, values);
+               mContext.getContentResolver().insert(mUri, values);
+               // mContext.getContentResolver().update(mUri, values, null, null);
             }
 
         } catch (Exception e) {
