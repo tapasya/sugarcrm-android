@@ -13,6 +13,8 @@ import java.util.Map;
 public class SugarBean {
 
     private String beanId;
+    
+    private String moduleName;
 
     private Map<String, String> entryList = new HashMap<String, String>();
 
@@ -29,7 +31,8 @@ public class SugarBean {
 
             JSONObject jsonObject = (JSONObject) entryListJson.get(0);
             setBeanId(jsonObject.get("id").toString());
-            setEntryList(SBParseHelper.getNameValuePairs(jsonObject));
+            String nameValueList = jsonObject.get("name_value_list").toString();
+            setEntryList(SBParseHelper.getNameValuePairs(nameValueList));
         } catch (JSONException e) {
             throw new SugarCrmException(JSON_EXCEPTION, e.getMessage());
         }
@@ -41,6 +44,14 @@ public class SugarBean {
 
     public void setBeanId(String beanId) {
         this.beanId = beanId;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
     }
 
     public Map<String, String> getEntryList() {
