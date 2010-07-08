@@ -2,7 +2,6 @@ package com.imaginea.android.sugarcrm.util;
 
 import static com.imaginea.android.sugarcrm.RestUtilConstants.ENTRY_LIST;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.JSON_EXCEPTION;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.RESULT_COUNT;
 
 import android.util.Log;
 
@@ -17,18 +16,10 @@ public class SBParser {
     // TODO: realtionship_list also has to be looked at
     // private JSONArray mRelationshipListJson;
 
-    private int resultCount;
-
     public SBParser(String jsonText) throws JSONException {
         Log.i("SBParser", jsonText);
         JSONObject responseObj = new JSONObject(jsonText);
-        this.resultCount = responseObj.getInt(RESULT_COUNT);
         this.mEntryListJson = responseObj.getJSONArray(ENTRY_LIST);
-        // this.mRelationshipListJson = responseObj.getJSONArray(RELATIONSHIP_LIST);
-    }
-
-    public int getSize() {
-        return resultCount;
     }
 
     public SugarBean[] getSugarBeans() throws SugarCrmException {
@@ -38,7 +29,9 @@ public class SBParser {
             try {
                 JSONObject jsonObject = (JSONObject) mEntryListJson.get(i);
                 sugarBeans[i].setBeanId(jsonObject.get("id").toString());
-                sugarBeans[i].setEntryList(SBParseHelper.getNameValuePairs(jsonObject));
+                sugarBeans[i].setModuleName(jsonObject.getString("module_name").toString());
+                String nameValueList = jsonObject.get("name_value_list").toString();
+                sugarBeans[i].setEntryList(SBParseHelper.getNameValuePairs(nameValueList));
             } catch (JSONException e) {
                 throw new SugarCrmException(JSON_EXCEPTION, e.getMessage());
             }
