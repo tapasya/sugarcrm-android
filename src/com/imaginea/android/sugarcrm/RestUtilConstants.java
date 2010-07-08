@@ -37,6 +37,8 @@ public interface RestUtilConstants {
     
     public static final String SET_ENTRIES = "set_entries";
     
+    public static final String GET_ENTRIES_COUNT = "get_entries_count";
+    
     public static final String GET_RELATIONSHIPS = "get_relationships";
     
     public static final String SET_RELATIONSHIP = "set_relationship";
