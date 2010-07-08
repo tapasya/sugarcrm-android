@@ -1,9 +1,12 @@
 package com.imaginea.android.sugarcrm.restapi;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.JSONObject;
 
@@ -12,6 +15,7 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.RestUtilConstants;
+import com.imaginea.android.sugarcrm.util.RelationshipStatus;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 
@@ -43,7 +47,7 @@ public class AccountsApiTest extends RestAPITest {
 			System.out.println(sBean.getFieldValue(ModuleFields.NAME));
 		}
 	}
-
+	
 	@SmallTest
 	public void testEntireGetAccountsList() throws Exception {
 		int offset = 0;
@@ -117,7 +121,8 @@ public class AccountsApiTest extends RestAPITest {
 		String linkFieldName = "Contacts";
 		String relatedModuleQuery = "";
 		String[] relatedFields = { "name" };
-		String[] relatedModuleLinkNameToFieldsArray = { "id", "name", "email1" };
+		Map<String, List<String>> relatedModuleLinkNameToFieldsArray = new HashMap<String, List<String>>();
+		relatedModuleLinkNameToFieldsArray.put("email_addresses",Arrays.asList(new String[]{ "id", "first_name", "email1" }));
 		int deleted = 0;
 		String response = RestUtil.getRelationships(url, mSessionId,
 				moduleName, beanId, linkFieldName, relatedModuleQuery,
@@ -132,16 +137,16 @@ public class AccountsApiTest extends RestAPITest {
 	public void testSetRelationship() throws Exception {
 		String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
 		String linkFieldName = "Contacts";
-		String[] relatedIds = {};
+		String[] relatedIds = {"c2503633-fdb7-2cee-d8ad-4c1f265a9ffd"};
 		Map<String, String> nameValueList = new LinkedHashMap<String, String>();
 		nameValueList.put(ModuleFields.ID, beanId);
 		int delete = 0;
-		String response = RestUtil.setRelationship(url, mSessionId, moduleName,
+		RelationshipStatus response = RestUtil.setRelationship(url, mSessionId, moduleName,
 				beanId, linkFieldName, relatedIds, nameValueList, delete);
-		JSONObject jsonResponse = new JSONObject(response);
-		assertNotNull(jsonResponse.get(RestUtilConstants.CREATED).toString());
-		assertNotNull(jsonResponse.get(RestUtilConstants.FAILED).toString());
-		assertNotNull(jsonResponse.get(RestUtilConstants.DELETED).toString());
+		System.out.println("setRelationship : " + response.getCreatedCount() + "-" + response.getFailedCount() + "-" + response.getDeletedCount());
+		assertNotNull(response.getCreatedCount());
+		assertNotNull(response.getFailedCount());
+		assertNotNull(response.getDeletedCount());
 	}
 
 	@SmallTest
@@ -150,8 +155,8 @@ public class AccountsApiTest extends RestAPITest {
 
 		String[] moduleNames = { "Contacts" };
 		String[] beanIds = { "1e9d5cb4-1972-28a4-7b36-4c1f261afd48" };
-		String[] linkFieldNames = { "" };
-		String[] relatedIds = {};
+		String[] linkFieldNames = { "Contacts" };
+		String[] relatedIds = {"c2503633-fdb7-2cee-d8ad-4c1f265a9ffd"};
 
 		Map<String, String> nameValueList = new LinkedHashMap<String, String>();
 		nameValueList.put(ModuleFields.ID, beanIds[0]);
@@ -159,13 +164,12 @@ public class AccountsApiTest extends RestAPITest {
 		int deleted = 0;
 
 		nameValueLists.add(nameValueList);
-		String response = RestUtil.setRelationships(url, mSessionId,
+		RelationshipStatus response = RestUtil.setRelationships(url, mSessionId,
 				moduleNames, beanIds, linkFieldNames, relatedIds,
 				nameValueLists, deleted);
-		JSONObject jsonResponse = new JSONObject(response);
-		assertNotNull(jsonResponse.get(RestUtilConstants.CREATED).toString());
-		assertNotNull(jsonResponse.get(RestUtilConstants.FAILED).toString());
-		assertNotNull(jsonResponse.get(RestUtilConstants.DELETED).toString());
+		assertNotNull(response.getCreatedCount());
+		assertNotNull(response.getFailedCount());
+		assertNotNull(response.getDeletedCount());
 	}
 
 	/*
@@ -192,11 +196,23 @@ public class AccountsApiTest extends RestAPITest {
 	
 	@SmallTest
 	public void testSearchByModule() throws Exception{
-		String searchString = "Group";
+		String searchString = "beans.the.vegan";
 		String[] modules = {"Accounts"};
 		int offset = 0;
 		int maxResults = 20;
-		RestUtil.searchByModule(url, mSessionId, searchString, modules, offset, maxResults);
+		Map<String, SugarBean[]> searchResults = RestUtil.searchByModule(url, mSessionId, searchString, modules, offset, maxResults);
+		for(Entry<String, SugarBean[]> entry : searchResults.entrySet()){
+			System.out.println("Module Name : " + entry.getKey());
+			SugarBean[] sugarBeans = entry.getValue();
+			for(int i=0; i<sugarBeans.length; i++){
+				System.out.println("ID : " + sugarBeans[i].getFieldValue(ModuleFields.ID));
+				System.out.println("NAME : " + sugarBeans[i].getFieldValue(ModuleFields.NAME));
+				System.out.println("Billing address city : " + sugarBeans[i].getFieldValue(ModuleFields.BILLING_ADDRESS_CITY));
+				System.out.println("Phone office : " + sugarBeans[i].getFieldValue(ModuleFields.PHONE_OFFICE));
+				System.out.println("Assigned user name : " + sugarBeans[i].getFieldValue(ModuleFields.ASSIGNED_USER_NAME));
+			}
+		}
+		
 	}
 
 	/**
@@ -214,8 +230,8 @@ public class AccountsApiTest extends RestAPITest {
 		String query = "", orderBy = "";
 		int deleted = 0;
 		SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName,
-				query, orderBy, offset +"", selectFields, linkNameToFieldsArray,
-				maxResults +"", deleted +"");
+				query, orderBy, offset+"", selectFields, linkNameToFieldsArray,
+				maxResults+"", deleted+"");
 		return sBeans;
 	}
 }
