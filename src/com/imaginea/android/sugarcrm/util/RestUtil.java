@@ -8,6 +8,7 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.DESCRIPTION;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_AVAILABLE_MODULES;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES_COUNT;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY_LIST;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_MODULE_FIELDS;
@@ -40,6 +41,7 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_MODULE_LIN
 import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_MODULE_QUERY;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.RESPONSE_TYPE;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.REST_DATA;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RESULT_COUNT;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.SELECT_FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.SESSION;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_ENTRIES;
@@ -218,7 +220,7 @@ public class RestUtil {
         data.put(MODULE_NAME, moduleName);
         data.put(ID, id);
         data.put(SELECT_FIELDS, new JSONArray(Arrays.asList(selectFields)));
-        data.put("link_name_to_fields_array", linkNameToFieldsArray);
+        data.put(LINK_NAME_TO_FIELDS_ARRAY, linkNameToFieldsArray);
 
         try {
             String restData = org.json.simple.JSONValue.toJSONString(data);
@@ -243,6 +245,58 @@ public class RestUtil {
             return new SugarBean(EntityUtils.toString(res.getEntity()).toString());
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
+        }
+    }
+
+    /**
+     * Retrieve number of records in a given module
+     * 
+     * @param String
+     *            session -- Session ID returned by a previous call to login.
+     * @param String
+     *            module_name -- module to retrieve number of records from
+     * @param String
+     *            query -- allows webservice user to provide a WHERE clause
+     * @param int deleted -- specify whether or not to include deleted records
+     * 
+     * @return Array result_count - integer - Total number of records for a given module and query
+     * @exception 'SoapFault' -- The SOAP error, if any
+     */
+    public static int getEntriesCount(String url, String sessionId, String moduleName,
+                                    String query, int deleted) throws SugarCrmException {
+        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        data.put(SESSION, sessionId);
+        data.put(MODULE_NAME, moduleName);
+        data.put(QUERY, query);
+        data.put(DELETED, deleted);
+
+        try {
+            String restData = org.json.simple.JSONValue.toJSONString(data);
+            Log.i(LOG_TAG, "restData : " + restData);
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost req = new HttpPost(url);
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair(METHOD, GET_ENTRIES_COUNT));
+            nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData));
+            req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Send POST request
+            HttpResponse res = httpClient.execute(req);
+            if (res.getEntity() == null) {
+                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                throw new SugarCrmException("FAILED TO CONNECT!");
+            }
+            String response = EntityUtils.toString(res.getEntity()).toString();
+            JSONObject jsonResponse = new JSONObject(response);
+            return jsonResponse.getInt(RESULT_COUNT);
+        } catch (JSONException jsone) {
+            throw new SugarCrmException(jsone.getMessage());
+        } catch (IOException ioe) {
+            throw new SugarCrmException(ioe.getMessage());
         }
     }
 
