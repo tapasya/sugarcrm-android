@@ -1,10 +1,12 @@
 package com.imaginea.android.sugarcrm.util;
 
-import static com.imaginea.android.sugarcrm.RestUtilConstants.*;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.APPLICATION;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_ID;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_IDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.CREATED;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.DELETED;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.DESCRIPTION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.FAILED;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_AVAILABLE_MODULES;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES;
@@ -42,6 +44,8 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_MODULE_QUE
 import static com.imaginea.android.sugarcrm.RestUtilConstants.RESPONSE_TYPE;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.REST_DATA;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.RESULT_COUNT;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SEARCH_BY_MODULE;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SEARCH_STRING;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.SELECT_FIELDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.SESSION;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_ENTRIES;
@@ -483,8 +487,8 @@ public class RestUtil {
     public static String getRelationships(String url, String sessionId, String moduleName,
                                     String beanId, String linkFieldName, String relatedModuleQuery,
                                     String[] relatedFields,
-                                    String[] relatedModuleLinkNameToFieldsArray, int deleted)
-                                    throws SugarCrmException {
+                                    Map<String, List<String>> relatedModuleLinkNameToFieldsArray,
+                                    int deleted) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
@@ -492,10 +496,16 @@ public class RestUtil {
         data.put(LINK_FIELD_NAME, linkFieldName);
         data.put(RELATED_MODULE_QUERY, relatedModuleQuery);
         data.put(RELATED_FIELDS, new JSONArray(Arrays.asList(relatedFields)));
-        data.put(RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY, new JSONArray(Arrays.asList(relatedModuleLinkNameToFieldsArray)));
-        data.put(DELETED, deleted);
 
         try {
+            JSONObject linkNametoFieldJson = new JSONObject();
+            for (Entry<String, List<String>> entry : relatedModuleLinkNameToFieldsArray.entrySet()) {
+                JSONArray jsonArray = new JSONArray((List<String>) entry.getValue());
+                linkNametoFieldJson.put(entry.getKey().toString(), jsonArray);
+            }
+            data.put(RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY, linkNametoFieldJson);
+            data.put(DELETED, deleted);
+
             String restData = org.json.simple.JSONValue.toJSONString(data);
             Log.i(LOG_TAG, "getRelationships restData : " + restData);
 
@@ -558,8 +568,9 @@ public class RestUtil {
      * 
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static String setRelationships(String url, String sessionId, String[] moduleNames,
-                                    String[] beanIds, String[] linkFieldNames, String[] relatedIds,
+    public static RelationshipStatus setRelationships(String url, String sessionId,
+                                    String[] moduleNames, String[] beanIds,
+                                    String[] linkFieldNames, String[] relatedIds,
                                     List<Map<String, String>> nameValueLists, int deleted)
                                     throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
@@ -605,8 +616,7 @@ public class RestUtil {
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
             JSONObject jsonResponse = new JSONObject(response);
-            // TODO: parse the JSON response
-            return response;
+            return new RelationshipStatus(jsonResponse.getInt(CREATED), jsonResponse.getInt(FAILED), jsonResponse.getInt(DELETED));
         } catch (JSONException jo) {
             throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
         } catch (IOException ioe) {
@@ -643,10 +653,10 @@ public class RestUtil {
      *         relationships were deleted
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static String setRelationship(String url, String sessionId, String moduleName,
-                                    String beanId, String linkFieldName, String[] relatedIds,
-                                    Map<String, String> nameValueList, int delete)
-                                    throws SugarCrmException {
+    public static RelationshipStatus setRelationship(String url, String sessionId,
+                                    String moduleName, String beanId, String linkFieldName,
+                                    String[] relatedIds, Map<String, String> nameValueList,
+                                    int delete) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
@@ -686,8 +696,7 @@ public class RestUtil {
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
             JSONObject jsonResponse = new JSONObject(response);
-            // TODO: parse the JSON response
-            return response;
+            return new RelationshipStatus(jsonResponse.getInt(CREATED), jsonResponse.getInt(FAILED), jsonResponse.getInt(DELETED));
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage());
         } catch (JSONException jsone) {
@@ -712,10 +721,10 @@ public class RestUtil {
      *         'value' => 'John', 'name' => 'last_name', 'value' => 'Do')))
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static String searchByModule(String url, String sessionId, String searchString,
-                                    String[] modules, int offset, int maxResults)
-                                    throws SugarCrmException {
-        
+    public static Map<String, SugarBean[]> searchByModule(String url, String sessionId,
+                                    String searchString, String[] modules, int offset,
+                                    int maxResults) throws SugarCrmException {
+
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(SEARCH_STRING, searchString);
@@ -744,12 +753,8 @@ public class RestUtil {
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
-            JSONObject jsonResponse = new JSONObject(response);
             Log.i(LOG_TAG, "search response : " + response);
-            //TODO: need to parse the response
-            return response;
-        } catch (JSONException jsone) {
-            throw new SugarCrmException(jsone.getMessage());
+            return new SearchResultParser(response).getSearchResults();
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage());
         }
