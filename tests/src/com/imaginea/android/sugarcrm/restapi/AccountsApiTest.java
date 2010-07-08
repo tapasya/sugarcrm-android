@@ -189,6 +189,15 @@ public class AccountsApiTest extends RestAPITest {
 	 * System.out.println("type :" + moduleField.getName());
 	 * System.out.println("isReuired :" + moduleField.ismIsRequired()); } }
 	 */
+	
+	@SmallTest
+	public void testSearchByModule() throws Exception{
+		String searchString = "Group";
+		String[] modules = {"Accounts"};
+		int offset = 0;
+		int maxResults = 20;
+		RestUtil.searchByModule(url, mSessionId, searchString, modules, offset, maxResults);
+	}
 
 	/**
 	 * demonstrates the usage of RestUtil for contacts List. ModuleFields.NAME
