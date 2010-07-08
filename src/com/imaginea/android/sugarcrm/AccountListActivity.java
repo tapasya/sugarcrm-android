@@ -176,7 +176,7 @@ public class AccountListActivity extends ListActivity {
 
                 int deleted = 0;
 
-                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.ACCOUNTS_MODULE, query, orderBy, offset, mSelectFields, mLinkNameToFieldsArray, mMaxResults, deleted);
+                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.ACCOUNTS_MODULE, query, orderBy, offset+"", mSelectFields, mLinkNameToFieldsArray, mMaxResults+"", deleted+"");
                 mAdapter.setSugarBeanArray(sBeans);
                 // We can stop loading once we do not get the
                 if (sBeans.length < mMaxResults)
