@@ -61,6 +61,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " INTEGER PRIMARY KEY," + ContactsColumns.BEAN_ID
                                         + " TEXT," + ContactsColumns.FIRST_NAME + " TEXT,"
                                         + ContactsColumns.LAST_NAME + " TEXT,"
+                                        + ContactsColumns.ACCOUNT_NAME + " TEXT,"
+                                        + ContactsColumns.PHONE_MOBILE + " TEXT,"
+                                        + ContactsColumns.PHONE_WORK + " TEXT,"
                                         + ContactsColumns.EMAIL1 + " TEXT,"
                                         + ContactsColumns.CREATED_BY + " TEXT,"
                                         + ContactsColumns.MODIFIED_BY_NAME + " TEXT," + " UNIQUE("
