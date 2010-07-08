@@ -26,9 +26,9 @@ public class AccountsApiTest extends RestAPITest {
 			ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX,
 			ModuleFields.EMAIL1, ModuleFields.DELETED };
 
-	String[] linkNameToFieldsArray = new String[] {};
+	String[] linkNameToFieldsArray = {"Contacts"};
 
-	public final static String LOG_TAG = "ContactsApiTest";
+	public final static String LOG_TAG = "AccountsApiTest";
 
 	@SmallTest
 	public void testGetAccountsList() throws Exception {
@@ -69,6 +69,15 @@ public class AccountsApiTest extends RestAPITest {
 				+ sBean.getFieldValue(ModuleFields.PHONE_OFFICE));
 		System.out.println("Account deleted ? "
 				+ sBean.getFieldValue(ModuleFields.DELETED));
+	}
+	
+	@SmallTest
+	public void testGetEntriesCount() throws Exception {
+		String query = "";
+		int deleted = 0;
+		int entriesCount = RestUtil.getEntriesCount(url, mSessionId, moduleName, query, deleted);
+		System.out.println("entriesCount = " + entriesCount);
+		assertNotNull(entriesCount);
 	}
 
 	@SmallTest
