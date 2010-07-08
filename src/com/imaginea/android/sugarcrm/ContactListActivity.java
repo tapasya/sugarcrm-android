@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -16,12 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
+import android.widget.AbsListView.OnScrollListener;
 
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
@@ -37,7 +42,7 @@ import java.util.Arrays;
  * 
  * @author chander
  */
-public class ContactListActivity extends ListActivity {
+public class ContactListActivity extends ListActivity implements ListView.OnScrollListener {
 
     private ContactsAdapter mAdapter;
 
@@ -57,8 +62,7 @@ public class ContactListActivity extends ListActivity {
 
     private boolean mStopLoading = false;
 
-    private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
-            ModuleFields.EMAIL1 };
+    private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME };
 
     private String[] mLinkNameToFieldsArray = new String[] {};
 
@@ -75,6 +79,7 @@ public class ContactListActivity extends ListActivity {
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(RestUtilConstants.CONTACTS_MODULE);
         mStatus = (TextView) findViewById(R.id.status);
+        // footer = (TextView) findViewById(R.id.status);
         // mStatus.setText("Idle");
 
         // Use an existing ListAdapter that will map an array
@@ -104,16 +109,89 @@ public class ContactListActivity extends ListActivity {
         if (intent.getData() == null) {
             intent.setData(Contacts.CONTENT_URI);
         }
-        Cursor cursor = managedQuery(getIntent().getData(), Contacts.LIST_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
-       // CRMContentObserver observer = new CRMContentObserver();
-       // cursor.registerContentObserver(observer);
-       // cursor.
-        // Used to map notes entries from the database to views
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.listitem, cursor,  new String[]{"first_name", "last_name"} , new int[] { android.R.id.text1 });
+        //TODO - optimize this, if we sync up a dataset, then no need to run detail projectio nhere, just do a list projection
+        Cursor cursor = managedQuery(getIntent().getData(), Contacts.DETAILS_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
+        // CRMContentObserver observer = new CRMContentObserver();
+        // cursor.registerContentObserver(observer);
+
+        GenericCursorAdapter adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, mSelectFields, new int[] {
+                android.R.id.text1, android.R.id.text2 });
         setListAdapter(adapter);
 
         // mTask = new LoadContactsTask();
         // mTask.execute(null);
+    }
+
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                                    int totalItemCount) {
+
+    }
+
+    private final class GenericCursorAdapter extends SimpleCursorAdapter {
+
+        private int realoffset = 0;
+
+        private int limit = 20;
+
+        public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
+            super(context, layout, c, from, to);
+
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View v = super.getView(position, convertView, parent);
+            int count = getCursor().getCount();
+            Log.d(LOG_TAG, "Get Item" + getItemId(position));
+            if (!mBusy && position != 0 && position == count - 1) {
+                mBusy = true;
+                realoffset += count;
+                Uri uri = getIntent().getData();
+                Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset + "/" + limit);
+                Log.d(LOG_TAG, "Changing cursor:" + newUri.toString());
+                final Cursor cursor = managedQuery(newUri, Contacts.LIST_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
+                CRMContentObserver observer = new CRMContentObserver(new Handler() {
+
+                    @Override
+                    public void handleMessage(Message msg) {
+                        super.handleMessage(msg);
+                        Log.d(LOG_TAG, "Changing cursor: in handler");
+                        if (cursor.getCount() < mMaxResults)
+                            mStopLoading = true;
+                        changeCursor(cursor);
+                        mStatus.setVisibility(View.VISIBLE);
+                        mBusy = false;
+                    }
+                });
+                cursor.registerContentObserver(observer);
+            }
+            if (mBusy) {
+                mStatus.setVisibility(View.VISIBLE);
+                mStatus.setText("Loading...");
+                // Non-null tag means the view still needs to load it's data
+                // text.setTag(this);
+            }
+            return v;
+        }
+    }
+
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        switch (scrollState) {
+        case OnScrollListener.SCROLL_STATE_IDLE:
+            mBusy = false;
+            mStatus.setVisibility(View.GONE);
+            break;
+        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+            mBusy = true;
+            // mStatus.setText("Touch scroll");
+            break;
+        case OnScrollListener.SCROLL_STATE_FLING:
+            mBusy = true;
+            // mStatus.setText("Fling");
+            break;
+        }
+        fetchMoreItemsForList();
     }
 
     /**
@@ -123,9 +201,16 @@ public class ContactListActivity extends ListActivity {
      */
     void openDetailScreen(int position) {
         Intent detailIntent = new Intent(ContactListActivity.this, ContactDetailsActivity.class);
-        SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
-        Log.d(LOG_TAG, "beanId:" + bean.getBeanId());
-        detailIntent.putExtra(RestUtilConstants.ID, bean.getBeanId());
+
+        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+        if (cursor == null) {
+            // For some reason the requested item isn't available, do nothing
+            return;
+        }
+        // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
+        // TODO
+        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
         startActivity(detailIntent);
     }
 
@@ -200,7 +285,9 @@ public class ContactListActivity extends ListActivity {
 
                 int deleted = 0;
 
-                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset, mSelectFields, mLinkNameToFieldsArray, mMaxResults, deleted);
+                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset
+                                                + "", mSelectFields, mLinkNameToFieldsArray, mMaxResults
+                                                + "", deleted + "");
                 mAdapter.setSugarBeanArray(sBeans);
                 // We can stop loading once we do not get the
                 if (sBeans.length < mMaxResults)
