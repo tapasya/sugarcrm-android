@@ -1,6 +1,6 @@
 package com.imaginea.android.sugarcrm.util;
 
-import static com.imaginea.android.sugarcrm.RestUtilConstants.APPLICATION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.*;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_ID;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_IDS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.DELETED;
@@ -693,6 +693,67 @@ public class RestUtil {
         } catch (JSONException jsone) {
             throw new SugarCrmException(jsone.getMessage());
         }
+    }
+
+    /**
+     * Given a list of modules to search and a search string, return the id, module_name, along with
+     * the fields We will support Accounts, Bug Tracker, Cases, Contacts, Leads, Opportunities,
+     * Project, ProjectTask, Quotes
+     * 
+     * @param string
+     *            $session - Session ID returned by a previous call to login.
+     * @param string
+     *            $search_string - string to search
+     * @param string
+     *            [] $modules - array of modules to query
+     * @param int $offset - a specified offset in the query
+     * @param int $max_results - max number of records to return
+     * @return Array return_search_result - Array('Accounts' => array(array('name' => 'first_name',
+     *         'value' => 'John', 'name' => 'last_name', 'value' => 'Do')))
+     * @exception 'SoapFault' -- The SOAP error, if any
+     */
+    public static String searchByModule(String url, String sessionId, String searchString,
+                                    String[] modules, int offset, int maxResults)
+                                    throws SugarCrmException {
+        
+        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        data.put(SESSION, sessionId);
+        data.put(SEARCH_STRING, searchString);
+        data.put(MODULES, new JSONArray(Arrays.asList(modules)));
+        data.put(OFFSET, offset);
+        data.put(MAX_RESULTS, maxResults);
+
+        try {
+            String restData = org.json.simple.JSONValue.toJSONString(data);
+            Log.i(LOG_TAG, "restData : " + restData);
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost req = new HttpPost(url);
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair(METHOD, SEARCH_BY_MODULE));
+            nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
+            nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData));
+            req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Send POST request
+            HttpResponse res = httpClient.execute(req);
+            if (res.getEntity() == null) {
+                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                throw new SugarCrmException("FAILED TO CONNECT!");
+            }
+            String response = EntityUtils.toString(res.getEntity()).toString();
+            JSONObject jsonResponse = new JSONObject(response);
+            Log.i(LOG_TAG, "search response : " + response);
+            //TODO: need to parse the response
+            return response;
+        } catch (JSONException jsone) {
+            throw new SugarCrmException(jsone.getMessage());
+        } catch (IOException ioe) {
+            throw new SugarCrmException(ioe.getMessage());
+        }
+
     }
 
     /**
