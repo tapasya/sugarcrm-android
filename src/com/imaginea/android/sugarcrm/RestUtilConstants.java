@@ -140,6 +140,10 @@ public interface RestUtilConstants {
     public static final String DESCRIPTION = "description";
 
     public static final String LOGIN_FAILED = "Login Failed!";
+    
+    public static final String RECORDS = "records";
+    
+    public static final String VALUE = "value";
 
     // Exceptions
     public static final String EXCEPTION = "Exception";
