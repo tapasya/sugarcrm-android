@@ -3,6 +3,7 @@ package com.imaginea.android.sugarcrm;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -25,11 +28,13 @@ import com.imaginea.android.sugarcrm.util.Util;
  */
 public class ContactDetailsActivity extends Activity {
 
-    private String mContactSugarBeanId;
+    private String mContactId;
 
     private SugarBean mSugarBean;
 
     private String mSessionId;
+
+    private Cursor mCursor;
 
     private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
             ModuleFields.ACCOUNT_NAME, ModuleFields.PHONE_MOBILE, ModuleFields.PHONE_WORK,
@@ -69,14 +74,49 @@ public class ContactDetailsActivity extends Activity {
 
         setContentView(R.layout.contact_details);
 
-        mContactSugarBeanId = (String) getIntent().getStringExtra(RestUtilConstants.ID);
+        mContactId = (String) getIntent().getStringExtra(RestUtilConstants.ID);
 
         findViews();
         setListeners();
-        mTask = new ContactDetailsTask();
-        mTask.execute(null);
+        Intent intent = getIntent();
+        if (intent.getData() == null) {
+            intent.setData(Uri.withAppendedPath(Contacts.CONTENT_URI, mContactId));
+        }
+        mCursor = getContentResolver().query(getIntent().getData(), Contacts.DETAILS_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
+        // startManagingCursor(mCursor);
+        setContents();
+        // mCursor.registerContentObserver(new ChangeObserver());
+
+        // mTask = new ContactDetailsTask();
+        // mTask.execute(null);
 
     }
+
+    // @Override
+    // public void onContentChanged() {
+    // super.onContentChanged();
+    // Log.d(LOG_TAG, ":" + "onContentChanged");
+    // if (mCursor != null && !mCursor.isClosed()) {
+    // mCursor.requery();
+    // setContents();
+    // }
+    // }
+    //
+    // private class ChangeObserver extends ContentObserver {
+    // public ChangeObserver() {
+    // super(new Handler());
+    // }
+    //
+    // @Override
+    // public boolean deliverSelfNotifications() {
+    // return true;
+    // }
+    //
+    // @Override
+    // public void onChange(boolean selfChange) {
+    // onContentChanged();
+    // }
+    // }
 
     private void findViews() {
         mNameTextView = (TextView) findViewById(R.id.contactName);
@@ -107,7 +147,9 @@ public class ContactDetailsActivity extends Activity {
                     mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
                 }
 
-                mSugarBean = RestUtil.getEntry(url, mSessionId, RestUtilConstants.CONTACTS_MODULE, mContactSugarBeanId, mSelectFields, mLinkNameToFieldsArray);
+                // mSugarBean = RestUtil.getEntry(url, mSessionId,
+                // RestUtilConstants.CONTACTS_MODULE, mContactSugarBeanId, mSelectFields,
+                // mLinkNameToFieldsArray);
 
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -139,42 +181,45 @@ public class ContactDetailsActivity extends Activity {
             }
         }
 
-        private void setContents() {
-            mNameTextView.setText(mSugarBean.getFieldValue(ModuleFields.FIRST_NAME));
+    }
 
-            mAccountName = mSugarBean.getFieldValue(ModuleFields.ACCOUNT_NAME);
-            if (mAccountName != null && !mAccountName.equals("")) {
-                mAccountButton.setText(mAccountName);
-            } else {
-                mAccountButton.setText(R.string.notAvailable);
-                mAccountButton.setClickable(false);
-            }
+    private void setContents() {
+        int columnIndex = mCursor.getColumnIndex(ContactsColumns.FIRST_NAME);
+        Log.d(LOG_TAG, "Col:" + columnIndex);
+        mCursor.moveToFirst();
+        mNameTextView.setText(mCursor.getString(columnIndex));
 
-            mPhoneMobile = mSugarBean.getFieldValue(ModuleFields.PHONE_MOBILE);
-            if (mPhoneMobile != null && !mPhoneMobile.equals("")) {
-                mPhoneMobileButton.setText(mPhoneMobile);
-            } else {
-                mPhoneMobileButton.setText(R.string.notAvailable);
-                mPhoneMobileButton.setClickable(false);
-            }
-
-            mPhoneWork = mSugarBean.getFieldValue(ModuleFields.PHONE_WORK);
-            if (mPhoneWork != null && !mPhoneWork.equals("")) {
-                mPhoneWorkButton.setText(mPhoneWork);
-            } else {
-                mPhoneWorkButton.setText(R.string.notAvailable);
-                mPhoneWorkButton.setClickable(false);
-            }
-
-            mEmail = mSugarBean.getFieldValue(ModuleFields.EMAIL1);
-            if (mEmail != null && !mEmail.equals("")) {
-                mEmailButton.setText(mEmail);
-            } else {
-                mEmailButton.setText(R.string.notAvailable);
-                mEmailButton.setClickable(false);
-            }
-        }
-
+        // mAccountName = mSugarBean.getFieldValue(ModuleFields.ACCOUNT_NAME);
+        // if (mAccountName != null && !mAccountName.equals("")) {
+        // mAccountButton.setText(mAccountName);
+        // } else {
+        // mAccountButton.setText(R.string.notAvailable);
+        // mAccountButton.setClickable(false);
+        // }
+        //
+        // mPhoneMobile = mSugarBean.getFieldValue(ModuleFields.PHONE_MOBILE);
+        // if (mPhoneMobile != null && !mPhoneMobile.equals("")) {
+        // mPhoneMobileButton.setText(mPhoneMobile);
+        // } else {
+        // mPhoneMobileButton.setText(R.string.notAvailable);
+        // mPhoneMobileButton.setClickable(false);
+        // }
+        //
+        // mPhoneWork = mSugarBean.getFieldValue(ModuleFields.PHONE_WORK);
+        // if (mPhoneWork != null && !mPhoneWork.equals("")) {
+        // mPhoneWorkButton.setText(mPhoneWork);
+        // } else {
+        // mPhoneWorkButton.setText(R.string.notAvailable);
+        // mPhoneWorkButton.setClickable(false);
+        // }
+        //
+        // mEmail = mSugarBean.getFieldValue(ModuleFields.EMAIL1);
+        // if (mEmail != null && !mEmail.equals("")) {
+        // mEmailButton.setText(mEmail);
+        // } else {
+        // mEmailButton.setText(R.string.notAvailable);
+        // mEmailButton.setClickable(false);
+        // }
     }
 
     private void setListeners() {
