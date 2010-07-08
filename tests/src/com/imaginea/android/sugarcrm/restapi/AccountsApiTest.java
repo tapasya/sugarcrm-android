@@ -214,8 +214,8 @@ public class AccountsApiTest extends RestAPITest {
 		String query = "", orderBy = "";
 		int deleted = 0;
 		SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName,
-				query, orderBy, offset, selectFields, linkNameToFieldsArray,
-				maxResults, deleted);
+				query, orderBy, offset +"", selectFields, linkNameToFieldsArray,
+				maxResults +"", deleted +"");
 		return sBeans;
 	}
 }

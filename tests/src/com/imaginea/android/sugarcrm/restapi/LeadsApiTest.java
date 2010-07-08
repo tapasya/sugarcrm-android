@@ -67,8 +67,8 @@ public class LeadsApiTest extends RestAPITest {
 			throws Exception {
 
 		SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName,
-				query, orderBy, offset, selectFields, linkNameToFieldsArray,
-				maxResults, deleted);
+				query, orderBy, offset +"", selectFields, linkNameToFieldsArray,
+				maxResults+"", deleted+"");
 		return sBeans;
 	}
 
