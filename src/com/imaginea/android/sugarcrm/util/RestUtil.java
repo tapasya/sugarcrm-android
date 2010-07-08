@@ -131,9 +131,9 @@ public class RestUtil {
      * @exception 'SoapFault' -- The SOAP error, if any
      */
     public static SugarBean[] getEntryList(String url, String sessionId, String moduleName,
-                                    String query, String orderBy, int offset,
+                                    String query, String orderBy, String offset,
                                     String[] selectFields, String[] linkNameToFieldsArray,
-                                    int maxResults, int deleted) throws SugarCrmException {
+                                    String maxResults, String deleted) throws SugarCrmException {
 
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
