@@ -133,7 +133,7 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, FIRST_NAME, LAST_NAME,
-                PARENT_NAME, PHONE_OFFICE, PHONE_FAX, EMAIL1 };
+                PHONE_WORK, PHONE_FAX, EMAIL1 };
 
     }
 
@@ -148,9 +148,7 @@ public final class SugarCRMContent {
 
         public String EMAIL1 = ModuleFields.EMAIL1;
 
-        public String PARENT_NAME = ModuleFields.PARENT_NAME;
-
-        public String PHONE_OFFICE = ModuleFields.PHONE_OFFICE;
+        public String PHONE_WORK = ModuleFields.PHONE_WORK;
 
         public String PHONE_FAX = ModuleFields.PHONE_FAX;
 
