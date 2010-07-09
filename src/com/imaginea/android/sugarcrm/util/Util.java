@@ -37,6 +37,10 @@ public class Util {
 
     public static final String PREF_REMEMBER_PASSWORD = "rememberPwd";
 
+    public static final String PROJECTION = "select";
+
+    public static final String SORT_ORDER = "orderby";
+
     private static int mRequestId = 0;
 
     // calculate the MD5 hash of a string
