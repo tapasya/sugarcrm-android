@@ -3,47 +3,32 @@ package com.imaginea.android.sugarcrm;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.AbsListView.OnScrollListener;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
-import com.imaginea.android.sugarcrm.util.RestUtil;
-import com.imaginea.android.sugarcrm.util.SugarBean;
-import com.imaginea.android.sugarcrm.util.Util;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * ContactListActivity
  * 
  * @author chander
  */
-public class ContactListActivity extends ListActivity {// implements ListView.OnScrollListener
-
-    private ContactsAdapter mAdapter;
+public class ContactListActivity extends ListActivity {
 
     private ListView mListView;
 
@@ -53,11 +38,7 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
 
     private boolean mBusy = false;
 
-    private LoadContactsTask mTask;
-
     private int mCurrentOffset = 0;
-
-    private String mSessionId;
 
     private String mModuleName;
 
@@ -87,17 +68,10 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(mModuleName);
         mStatus = (TextView) findViewById(R.id.status);
-        // footer = (TextView) findViewById(R.id.status);
-        // mStatus.setText("Idle");
 
-        // Use an existing ListAdapter that will map an array
-        // of strings to TextViews
-        mAdapter = new ContactsAdapter(this);
         mListView = getListView();
-
         // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
                 openDetailScreen(position);
@@ -132,13 +106,11 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
             adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] { android.R.id.text1 });
         setListAdapter(adapter);
 
-        // mTask = new LoadContactsTask();
-        // mTask.execute(null);
-    }
-
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                                    int totalItemCount) {
-
+        if (adapter.getCount() == 0)
+            mListView.setVisibility(View.GONE);
+        mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
+        TextView tv1 = (TextView) (mEmpty.findViewById(R.id.mainText));
+        tv1.setVisibility(View.GONE);
     }
 
     private final class GenericCursorAdapter extends SimpleCursorAdapter {
@@ -188,50 +160,6 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
             }
             return v;
         }
-
-        // @Override
-        // public void onContentChanged() {
-        // super.onContentChanged();
-        // Log.d(LOG_TAG, ":" + "onContentChanged");
-        // if (mCursor != null && !mCursor.isClosed()) {
-        // mCursor.requery();
-        // setContents();
-        // }
-        // }
-        //
-        // private class ChangeObserver extends ContentObserver {
-        // public ChangeObserver() {
-        // super(new Handler());
-        // }
-        //
-        // @Override
-        // public boolean deliverSelfNotifications() {
-        // return true;
-        // }
-        //
-        // @Override
-        // public void onChange(boolean selfChange) {
-        // onContentChanged();
-        // }
-        // }
-    }
-
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        switch (scrollState) {
-        case OnScrollListener.SCROLL_STATE_IDLE:
-            mBusy = false;
-            mStatus.setVisibility(View.GONE);
-            break;
-        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-            mBusy = true;
-            // mStatus.setText("Touch scroll");
-            break;
-        case OnScrollListener.SCROLL_STATE_FLING:
-            mBusy = true;
-            // mStatus.setText("Fling");
-            break;
-        }
-        fetchMoreItemsForList();
     }
 
     /**
@@ -255,133 +183,47 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
         startActivity(detailIntent);
     }
 
-    void fetchMoreItemsForList() {
-        if (mBusy && !mStopLoading) {
-            // int last = view.getLastVisiblePosition();
-
-            /*
-             * do not load the contacts again till the previous call has not finished, this ensures
-             * that we have the sorting order in place as the tasks are asynchronous
-             */
-            if (mTask == null || (mTask != null && mTask.getStatus() == AsyncTask.Status.FINISHED)) {
-                mTask = new LoadContactsTask();
-                mCurrentOffset = mCurrentOffset + mMaxResults;
-                mTask.execute(mCurrentOffset);
-            }
-        }
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
-
-        // cancel the task if we are running
-        if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
-            mTask.cancel(true);
-        }
     }
 
-    /**
-     * LoadContactsTask
-     */
-    class LoadContactsTask extends AsyncTask<Object, Void, Object> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            if (mAdapter.getCount() == 0)
-                mListView.setVisibility(View.GONE);
-            mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
-            TextView tv = (TextView) (mEmpty.findViewById(R.id.mainText));
-            tv.setVisibility(View.GONE);
-            // tv.setText(R.string.loading);
-
-            // we are reusing - so remove the other views
-
-        }
-
-        @Override
-        protected Object doInBackground(Object... params) {
-            try {
-                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                // TODO use a constant and remove this as we start from the login screen
-                String url = pref.getString("URL", getString(R.string.defaultUrl));
-                String userName = pref.getString("USER_NAME", getString(R.string.defaultUser));
-                String password = pref.getString("PASSWORD", getString(R.string.defaultPwd));
-                Log.i(LOG_TAG, url + userName + password);
-                // SugarCrmApp app =
-                // mSessionId = ((SugarCrmApp) getApplication()).getSessionId();
-                if (mSessionId == null) {
-                    mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
-                }
-
-                String[] fields = new String[] {};
-                // RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
-                String query = "", orderBy = ModuleFields.FIRST_NAME;
-
-                int offset = 0;
-                if (params != null)
-                    offset = (Integer) params[0];
-
-                int deleted = 0;
-
-                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset
-                                                + "", mSelectFields, mLinkNameToFieldsArray, mMaxResults
-                                                + "", deleted + "");
-                mAdapter.setSugarBeanArray(sBeans);
-                // We can stop loading once we do not get the
-                if (sBeans.length < mMaxResults)
-                    mStopLoading = true;
-
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                return Util.FETCH_FAILED;
-            }
-
-            return Util.REFRESH_LIST;
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-
-        @Override
-        protected void onPostExecute(Object result) {
-            super.onPostExecute(result);
-            if (isCancelled())
-                return;
-            int retVal = (Integer) result;
-
-            switch (retVal) {
-            case Util.FETCH_FAILED:
-
-                mEmpty.findViewById(R.id.progress).setVisibility(View.GONE);
-                TextView tv = (TextView) (mEmpty.findViewById(R.id.mainText));
-                tv.setVisibility(View.VISIBLE);
-                tv.setText(R.string.loadFailed);
-                TextView footer = (TextView) findViewById(R.id.status);
-                footer.setVisibility(View.VISIBLE);
-                footer.setText(R.string.loadFailed);
-
-                break;
-
-            case Util.REFRESH_LIST:
-                mBusy = false;
-                mStatus.setVisibility(View.GONE);
-                mListView.setVisibility(View.VISIBLE);
-                int firstPos = getListView().getFirstVisiblePosition();
-                setListAdapter(mAdapter);
-                getListView().setSelection(firstPos);
-                mAdapter.notifyDataSetChanged();
-                break;
-            default:
-
-            }
-        }
-
-    }
+    // We can stop loading once we do not get the
+    // if (sBeans.length < mMaxResults)
+    // mStopLoading = true;
+    // @Override
+    // protected void onPostExecute(Object result) {
+    // super.onPostExecute(result);
+    // if (isCancelled())
+    // return;
+    // int retVal = (Integer) result;
+    //
+    // switch (retVal) {
+    // case Util.FETCH_FAILED:
+    //
+    // mEmpty.findViewById(R.id.progress).setVisibility(View.GONE);
+    // TextView tv = (TextView) (mEmpty.findViewById(R.id.mainText));
+    // tv.setVisibility(View.VISIBLE);
+    // tv.setText(R.string.loadFailed);
+    // TextView footer = (TextView) findViewById(R.id.status);
+    // footer.setVisibility(View.VISIBLE);
+    // footer.setText(R.string.loadFailed);
+    //
+    // break;
+    //
+    // case Util.REFRESH_LIST:
+    // mBusy = false;
+    // mStatus.setVisibility(View.GONE);
+    // mListView.setVisibility(View.VISIBLE);
+    // int firstPos = getListView().getFirstVisiblePosition();
+    // setListAdapter(mAdapter);
+    // getListView().setSelection(firstPos);
+    // mAdapter.notifyDataSetChanged();
+    // break;
+    // default:
+    //
+    // }
+    // }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -416,13 +258,7 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
         int position = info.position;
         switch (item.getItemId()) {
         case R.string.view:
-            // Launch activity to insert a new item
-            // use the id for multiple dialog display..not used here as packed
-            // position is long and cannot be sent
-            // showDialog(R.string.addErrand);
-            // adapter.getView(position, null, null);
             openDetailScreen(position);
-
             return true;
 
         case R.string.edit:
@@ -434,97 +270,6 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
             return true;
 
         }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Will not bind views while the list is scrolling
-     * 
-     */
-    private class ContactsAdapter extends BaseAdapter {
-
-        /**
-         * Remember our context so we can use it when constructing views.
-         */
-        private Context mContext;
-
-        private ArrayList<SugarBean> sugarBeanList = new ArrayList<SugarBean>();
-
-        private LayoutInflater mInflater;
-
-        private TextView footer;
-
-        public ContactsAdapter(Context context) {
-            mContext = context;
-            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            footer = (TextView) findViewById(R.id.status);
-        }
-
-        /**
-         * The number of items in the list is determined by the number of speeches in our array.
-         * 
-         * @see android.widget.ListAdapter#getCount()
-         */
-        public int getCount() {
-            return sugarBeanList.size();
-        }
-
-        public void setSugarBeanArray(SugarBean[] sbArray) {
-            sugarBeanList.addAll(Arrays.asList(sbArray));
-        }
-
-        /**
-         * Since the data comes from an array, just returning the index is sufficient to get at the
-         * data. If we were using a more complex data structure, we would return whatever object
-         * represents one row in the list.
-         * 
-         * @see android.widget.ListAdapter#getItem(int)
-         */
-        public SugarBean getItem(int position) {
-            return sugarBeanList.get(position);
-        }
-
-        /**
-         * Use the array index as a unique id.
-         * 
-         * @see android.widget.ListAdapter#getItemId(int)
-         */
-        public long getItemId(int position) {
-            return position;
-        }
-
-        /**
-         * Make a view to hold each row.
-         * 
-         * @see android.widget.ListAdapter#getView(int, android.view.View, android.view.ViewGroup)
-         */
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView text;
-
-            if (convertView == null) {
-                text = (TextView) mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-            } else {
-                text = (TextView) convertView;
-            }
-
-            if (position == getCount() - 1) {
-                Log.d(LOG_TAG, "last item:" + position);
-                mBusy = true;
-                fetchMoreItemsForList();
-            }
-
-            if (mBusy) {
-                footer.setVisibility(View.VISIBLE);
-                footer.setText("Loading...");
-                // Non-null tag means the view still needs to load it's data
-                // text.setTag(this);
-            }
-            SugarBean bean = sugarBeanList.get(position);
-            String firstName = bean.getFieldValue(ModuleFields.FIRST_NAME);
-            String lastName = bean.getFieldValue(ModuleFields.LAST_NAME);
-            text.setText(firstName + " " + lastName);
-            return text;
-        }
     }
 }
