@@ -17,45 +17,54 @@
     <application android:icon="@drawable/icon" android:label="@string/appName" 
 	    android:name="SugarCrmApp">
         
-        <activity android:name=".DashboardActivity" android:label="@string/appName" android:launchMode="singleTask">
+        <activity android:name=".DashboardActivity"    
+        	android:label="@string/appName" android:theme="@android:style/Theme.Black.NoTitleBar"  
+        	android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" /> 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
-		<activity android:name=".ContactListActivity" android:label="@string/appName">
+		<activity android:name=".ContactListActivity" 
+			   android:label="@string/appName" android:theme="@android:style/Theme.Black.NoTitleBar"    >
 			<intent-filter>
 				<action android:name="com.imaginea.android.sugarcrm.DEFAULT" />
 			</intent-filter>
 		</activity>
 		
-		<activity android:name=".AccountListActivity" android:label="@string/accounts">
+		<activity android:name=".AccountListActivity" android:label="@string/accounts" 
+			android:theme="@android:style/Theme.Black.NoTitleBar">
             <intent-filter>
                 <action android:name="com.imaginea.android.sugarcrm.DEFAULT" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".SugarCrmSettings" android:label="@string/settings">
+        <activity android:name=".SugarCrmSettings" android:label="@string/settings"
+        	 >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".AccountDetailsActivity" android:label="@string/contactDetails">
+        <activity android:name=".AccountDetailsActivity" android:label="@string/contactDetails"
+       	 android:theme="@android:style/Theme.Black.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".ContactDetailsActivity" android:label="@string/contactDetails">
+        <activity android:name=".ContactDetailsActivity" android:label="@string/contactDetails"
+        	android:theme="@android:style/Theme.Black.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".WizardActivity" android:label="@string/appName" android:clearTaskOnLaunch="true">           
+        <activity android:name=".WizardActivity" android:label="@string/appName" 
+        	android:theme="@android:style/Theme.Black.NoTitleBar" 
+        	android:clearTaskOnLaunch="true">           
         </activity>
         <service android:name=".SugarService" />
         
