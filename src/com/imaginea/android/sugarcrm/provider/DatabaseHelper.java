@@ -24,7 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "sugar_crm.db";
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -85,9 +85,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        createAccountsTable(db);
-        // TODO remove the drop statements
-        dropContactsTable(db);
+        createAccountsTable(db);           
         createContactsTable(db);
         createLeadsTable(db);
         createOpportunitiesTable(db);
@@ -114,7 +112,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
                                         + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_TABLE_NAME);
+        dropAccountsTable(db);
+        dropContactsTable(db);
+        dropLeadsTable(db);
+        dropOpportunitiesTable(db);
         onCreate(db);
     }
 
@@ -149,7 +150,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE " + LEADS_TABLE_NAME + " (" + LeadsColumns.ID
                                         + " INTEGER PRIMARY KEY," + LeadsColumns.BEAN_ID + " TEXT,"
-                                        + LeadsColumns.NAME + " TEXT," + LeadsColumns.EMAIL1
+                                        + LeadsColumns.FIRST_NAME + " TEXT,"
+                                        + LeadsColumns.LAST_NAME + " TEXT," + LeadsColumns.EMAIL1
                                         + " TEXT," + LeadsColumns.PARENT_NAME + " TEXT,"
                                         + LeadsColumns.PHONE_OFFICE + " TEXT,"
                                         + LeadsColumns.PHONE_FAX + " TEXT," + " UNIQUE("
