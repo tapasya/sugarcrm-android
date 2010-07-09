@@ -26,14 +26,12 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID,
-                NAME, EMAIL1 };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, EMAIL1 };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME,
-                PARENT_NAME, PHONE_OFFICE, PHONE_FAX,
-                EMAIL1 };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME, PARENT_NAME,
+                PHONE_OFFICE, PHONE_FAX, EMAIL1 };
 
     }
 
@@ -84,18 +82,16 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = FIRST_NAME + " ASC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID,
-                FIRST_NAME, LAST_NAME, EMAIL1 };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
+                EMAIL1 };
 
-        public static final String[] REST_LIST_PROJECTION = { ModuleFields.ID,
-                FIRST_NAME, LAST_NAME, EMAIL1 };
-
-        public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME,
+        public static final String[] REST_LIST_PROJECTION = { ModuleFields.ID, FIRST_NAME,
                 LAST_NAME, EMAIL1 };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, FIRST_NAME,
-                LAST_NAME, ACCOUNT_NAME, PHONE_MOBILE,
-                PHONE_WORK, EMAIL1 };
+        public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME, EMAIL1 };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, FIRST_NAME, LAST_NAME,
+                ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1 };
 
     }
 
@@ -132,15 +128,12 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID,
-                NAME };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME };
 
-        public static final String[] LIST_VIEW_PROJECTION = { RECORD_ID, ID,
-                NAME };
+        public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME,
-                PARENT_NAME, PHONE_OFFICE, PHONE_FAX,
-                EMAIL1 };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, FIRST_NAME, LAST_NAME,
+                PARENT_NAME, PHONE_OFFICE, PHONE_FAX, EMAIL1 };
 
     }
 
@@ -149,7 +142,9 @@ public final class SugarCRMContent {
 
         public String BEAN_ID = ModuleFields.ID;
 
-        public String NAME = ModuleFields.NAME;
+        public String FIRST_NAME = ModuleFields.FIRST_NAME;
+
+        public String LAST_NAME = ModuleFields.LAST_NAME;
 
         public String EMAIL1 = ModuleFields.EMAIL1;
 
