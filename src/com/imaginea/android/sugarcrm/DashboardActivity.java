@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
@@ -22,26 +23,38 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 public class DashboardActivity extends Activity {
 
-    GridView dashboard;
+    private GridView mDashboard;
+
+    // references to the module images
+    private Integer[] mModuleThumbIds = { R.drawable.account, R.drawable.contact, R.drawable.lead,
+            R.drawable.opportunity, R.drawable.setting };
+
+    // reference to the module names
+    private Integer[] mModuleNameIds = { R.string.accounts, R.string.contacts, R.string.leads,
+            R.string.opportunities, R.string.settings };
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         startActivityForResult(new Intent(this, WizardActivity.class), 0);
 
         setContentView(R.layout.dashboard_activity);
-        dashboard = (GridView) findViewById(R.id.dashboard);
-        dashboard.setAdapter(new AppsAdapter(this));
+        TextView tv = (TextView) findViewById(R.id.headerText);
+        tv.setText(R.string.home);
+        mDashboard = (GridView) findViewById(R.id.dashboard);
+        mDashboard.setAdapter(new AppsAdapter(this));
 
         // Activities corresponding to the items in the GridView
-        final Class[] moduleActivities = { AccountListActivity.class, ContactListActivity.class,
-                AccountListActivity.class, AccountListActivity.class, SugarCrmSettings.class };
+        final Class[] moduleActivities = { ContactListActivity.class, ContactListActivity.class,
+                AccountListActivity.class, ContactListActivity.class, SugarCrmSettings.class };
 
-        dashboard.setOnItemClickListener(new OnItemClickListener() {
+        mDashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 // invoke the corresponding activity when the item in the GridView is clicked
                 Intent myIntent = new Intent(DashboardActivity.this, moduleActivities[position]);
+                myIntent.putExtra(RestUtilConstants.MODULE_NAME, getString(mModuleNameIds[position]));
                 DashboardActivity.this.startActivity(myIntent);
             }
         });
@@ -78,14 +91,6 @@ public class DashboardActivity extends Activity {
 
             return view;
         }
-
-        // references to the module images
-        private Integer[] mModuleThumbIds = { R.drawable.account, R.drawable.contact,
-                R.drawable.lead, R.drawable.opportunity, R.drawable.setting };
-
-        // reference to the module names
-        private Integer[] mModuleNameIds = { R.string.accounts, R.string.contacts, R.string.leads,
-                R.string.opportunities, R.string.settings };
 
         public final int getCount() {
             return mModuleThumbIds.length;
