@@ -62,13 +62,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleProjections.put("Accounts", Accounts.DETAILS_PROJECTION);
         moduleProjections.put("Contacts", Contacts.DETAILS_PROJECTION);
         moduleProjections.put("Leads", Leads.DETAILS_PROJECTION);
-        moduleProjections.put("Opportunites", Opportunites.DETAILS_PROJECTION);
+        moduleProjections.put("Opportunities", Opportunites.DETAILS_PROJECTION);
         // moduleProjections.put(4, Meetings.DETAILS_PROJECTION );
 
         moduleListSelections.put("Accounts", Accounts.LIST_VIEW_PROJECTION);
         moduleListSelections.put("Contacts", Contacts.LIST_VIEW_PROJECTION);
         moduleListSelections.put("Leads", Leads.LIST_VIEW_PROJECTION);
-        moduleListSelections.put("Opportunites", Opportunites.LIST_VIEW_PROJECTION);
+        moduleListSelections.put("Opportunities", Opportunites.LIST_VIEW_PROJECTION);
 
         moduleSortOrder.put("Accounts", Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put("Contacts", Contacts.DEFAULT_SORT_ORDER);
