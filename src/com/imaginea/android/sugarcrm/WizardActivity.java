@@ -403,7 +403,7 @@ public class WizardActivity extends Activity {
                     editTextUser.setText(usr);
 
                     TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
-                    tv.setText("Login failed!");
+                    tv.setText(sceDesc);
                 }
 
             } else {
