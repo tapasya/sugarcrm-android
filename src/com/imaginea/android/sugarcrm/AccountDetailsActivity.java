@@ -13,9 +13,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -27,16 +26,15 @@ import com.imaginea.android.sugarcrm.util.Util;
  */
 public class AccountDetailsActivity extends Activity {
 
+    private String mAccountSugarBeanId;
+
     private Cursor mCursor;
-    
-    private String mAccountId;
 
     private SugarBean mSugarBean;
 
     private String mSessionId;
 
-    private String[] mSelectFields = { ModuleFields.NAME, ModuleFields.PARENT_NAME,
-            ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX, ModuleFields.EMAIL1 };
+    private String[] mSelectFields;
 
     private String[] mLinkNameToFieldsArray = new String[] {};
 
@@ -54,50 +52,24 @@ public class AccountDetailsActivity extends Activity {
 
         setContentView(R.layout.account_details);
 
-        mAccountId = (String) getIntent().getStringExtra(RestUtilConstants.ID);
-
+        mAccountSugarBeanId = (String) getIntent().getStringExtra(RestUtilConstants.ID);
         Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        String moduleName = "Contacts";
+        if (extras != null)
+            moduleName = extras.getString(RestUtilConstants.MODULE_NAME);
+
         if (intent.getData() == null) {
-            intent.setData(Uri.withAppendedPath(Contacts.CONTENT_URI, mAccountId));
+            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), mAccountSugarBeanId));
         }
-        mCursor = getContentResolver().query(getIntent().getData(), Contacts.DETAILS_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
+        mSelectFields = DatabaseHelper.getModuleProjections(moduleName);
+        mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(moduleName));
+        // startManagingCursor(mCursor);
         setContents();
-        
-        /*mTask = new AccountDetailsTask();
-        mTask.execute(null);*/
 
-    }
+        // mTask = new AccountDetailsTask();
+        // mTask.execute(null);
 
-    private void setContents() {
-        
-        String[] detailsProjection = SugarCRMContent.Contacts.DETAILS_PROJECTION;
-        
-        mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
-        
-        mCursor.moveToFirst();
-        for(int i=1; i<detailsProjection.length; i++){
-            String fieldName = detailsProjection[i];
-            int columnIndex = mCursor.getColumnIndex(fieldName);
-            Log.d(LOG_TAG, "Col:" + columnIndex);
-            
-            TextView textViewForLabel = new TextView(AccountDetailsActivity.this);
-            textViewForLabel.setText(fieldName);
-            TextView textViewForValue = new TextView(AccountDetailsActivity.this);
-            String value = mCursor.getString(columnIndex);
-
-            if (value != null && !value.equals("")) {
-                textViewForValue.setText(value);
-            } else {
-                textViewForValue.setText(R.string.notAvailable);
-            }
-            
-            TableRow tableRow = new TableRow(AccountDetailsActivity.this);
-            tableRow.addView(textViewForLabel);
-            tableRow.addView(textViewForValue);
-
-            mDetailsTable.addView(tableRow);
-        }
-        
     }
 
     /**
@@ -120,7 +92,7 @@ public class AccountDetailsActivity extends Activity {
                     mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
                 }
 
-                mSugarBean = RestUtil.getEntry(url, mSessionId, RestUtilConstants.ACCOUNTS_MODULE, mAccountId, mSelectFields, mLinkNameToFieldsArray);
+                mSugarBean = RestUtil.getEntry(url, mSessionId, RestUtilConstants.ACCOUNTS_MODULE, mAccountSugarBeanId, mSelectFields, mLinkNameToFieldsArray);
 
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -153,32 +125,36 @@ public class AccountDetailsActivity extends Activity {
             }
         }
 
-        private void setContents() {
+    }
 
-            mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
-            TextView textView = (TextView) findViewById(R.id.accountName);
-            textView.setText(mSugarBean.getFieldValue(ModuleFields.NAME));
-            for (String fieldName : mSelectFields) {
-                if (!fieldName.equals(ModuleFields.NAME)) {
-                    TextView textViewForLabel = new TextView(AccountDetailsActivity.this);
-                    textViewForLabel.setText(fieldName);
-                    TextView textViewForValue = new TextView(AccountDetailsActivity.this);
+    private void setContents() {
 
-                    String value = mSugarBean.getFieldValue(fieldName);
-                    if (value != null && !value.equals("")) {
-                        textViewForValue.setText(value);
-                    } else {
-                        textViewForValue.setText(R.string.notAvailable);
-                    }
+        String[] detailsProjection = mSelectFields;
 
-                    TableRow tableRow = new TableRow(AccountDetailsActivity.this);
-                    tableRow.addView(textViewForLabel);
-                    tableRow.addView(textViewForValue);
+        mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
 
-                    mDetailsTable.addView(tableRow);
-                }
+        mCursor.moveToFirst();
+        for (int i = 1; i < detailsProjection.length; i++) {
+            String fieldName = detailsProjection[i];
+            int columnIndex = mCursor.getColumnIndex(fieldName);
+            Log.d(LOG_TAG, "Col:" + columnIndex);
+
+            TextView textViewForLabel = new TextView(AccountDetailsActivity.this);
+            textViewForLabel.setText(fieldName);
+            TextView textViewForValue = new TextView(AccountDetailsActivity.this);
+            String value = mCursor.getString(columnIndex);
+
+            if (value != null && !value.equals("")) {
+                textViewForValue.setText(value);
+            } else {
+                textViewForValue.setText(R.string.notAvailable);
             }
-        }
 
+            TableRow tableRow = new TableRow(AccountDetailsActivity.this);
+            tableRow.addView(textViewForLabel);
+            tableRow.addView(textViewForValue);
+
+            mDetailsTable.addView(tableRow);
+        }
     }
 }
