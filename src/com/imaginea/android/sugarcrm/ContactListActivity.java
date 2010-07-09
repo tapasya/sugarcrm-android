@@ -22,13 +22,12 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
+import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
@@ -42,7 +41,7 @@ import java.util.Arrays;
  * 
  * @author chander
  */
-public class ContactListActivity extends ListActivity implements ListView.OnScrollListener {
+public class ContactListActivity extends ListActivity {// implements ListView.OnScrollListener
 
     private ContactsAdapter mAdapter;
 
@@ -76,8 +75,15 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
+
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        String moduleName = "Contacts";
+        if (extras != null)
+            moduleName = extras.getString(RestUtilConstants.MODULE_NAME);
+
         TextView tv = (TextView) findViewById(R.id.headerText);
-        tv.setText(RestUtilConstants.CONTACTS_MODULE);
+        tv.setText(moduleName);
         mStatus = (TextView) findViewById(R.id.status);
         // footer = (TextView) findViewById(R.id.status);
         // mStatus.setText("Idle");
@@ -105,17 +111,23 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
 
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.
-        Intent intent = getIntent();
-        if (intent.getData() == null) {
-            intent.setData(Contacts.CONTENT_URI);
-        }
-        //TODO - optimize this, if we sync up a dataset, then no need to run detail projectio nhere, just do a list projection
-        Cursor cursor = managedQuery(getIntent().getData(), Contacts.DETAILS_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
-        // CRMContentObserver observer = new CRMContentObserver();
-        // cursor.registerContentObserver(observer);
 
-        GenericCursorAdapter adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, mSelectFields, new int[] {
-                android.R.id.text1, android.R.id.text2 });
+        Log.d(LOG_TAG, "ModuleName" + moduleName);
+        if (intent.getData() == null) {
+            intent.setData(DatabaseHelper.getModuleUri(moduleName));
+        }
+        // TODO - optimize this, if we sync up a dataset, then no need to run detail projectio
+        // nhere, just do a list projection
+        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(moduleName), null, null, DatabaseHelper.getModuleSortOrder(moduleName));
+        // CRMContentObserver observer = new CRMContentObserver()
+        // cursor.registerContentObserver(observer);
+        GenericCursorAdapter adapter;
+        String[] moduleSel = DatabaseHelper.getModuleListSelections(moduleName);
+        if (moduleSel.length >= 2)
+            adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] {
+                    android.R.id.text1, android.R.id.text2 });
+        else
+            adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] { android.R.id.text1 });
         setListAdapter(adapter);
 
         // mTask = new LoadContactsTask();
@@ -174,6 +186,32 @@ public class ContactListActivity extends ListActivity implements ListView.OnScro
             }
             return v;
         }
+
+        // @Override
+        // public void onContentChanged() {
+        // super.onContentChanged();
+        // Log.d(LOG_TAG, ":" + "onContentChanged");
+        // if (mCursor != null && !mCursor.isClosed()) {
+        // mCursor.requery();
+        // setContents();
+        // }
+        // }
+        //
+        // private class ChangeObserver extends ContentObserver {
+        // public ChangeObserver() {
+        // super(new Handler());
+        // }
+        //
+        // @Override
+        // public boolean deliverSelfNotifications() {
+        // return true;
+        // }
+        //
+        // @Override
+        // public void onChange(boolean selfChange) {
+        // onContentChanged();
+        // }
+        // }
     }
 
     public void onScrollStateChanged(AbsListView view, int scrollState) {

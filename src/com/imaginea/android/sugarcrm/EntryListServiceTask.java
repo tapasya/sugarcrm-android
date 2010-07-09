@@ -5,12 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
+import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * EntryListServiceTask
@@ -22,24 +23,27 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
 
     private Context mContext;
 
+    // TODO - remove this
     private String mSessionId;
+
+    private String mModuleName;
 
     private String[] fields = new String[] {};
 
-    private String[] mSelectFields = Contacts.REST_LIST_PROJECTION;
+    private String[] mSelectFields;
 
     private String[] mLinkNameToFieldsArray;
 
     private String mMaxResults;
 
-    Uri mUri;
+    private Uri mUri;
 
     // RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
-    private String query = "", orderBy = ModuleFields.FIRST_NAME;
+    private String mQuery = "", mOrderBy = "";
 
-    private String offset = "0";
+    private String mOffset = "0";
 
-    private String deleted = "0";
+    private String mDeleted = "0";
 
     public static final String LOG_TAG = "EntryListTask";
 
@@ -47,13 +51,16 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
         super(context);
         mContext = context;
 
+        Bundle extras = intent.getExtras();
         mUri = intent.getData();
         int count = mUri.getPathSegments().size();
-        if(count ==3)
-        {
-            offset = mUri.getPathSegments().get(1);
+        if (count == 3) {
+            mOffset = mUri.getPathSegments().get(1);
         }
-
+        mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
+        ;
+        mSelectFields = extras.getStringArray(Util.PROJECTION);
+        mOrderBy = extras.getString(Util.SORT_ORDER);
     }
 
     @Override
@@ -71,7 +78,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
                 mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
             }
 
-            SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.CONTACTS_MODULE, query, orderBy, offset, mSelectFields, mLinkNameToFieldsArray, mMaxResults, deleted);
+            SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, mModuleName, mQuery, mOrderBy, mOffset, mSelectFields, mLinkNameToFieldsArray, mMaxResults, mDeleted);
             // mAdapter.setSugarBeanArray(sBeans);
             // We can stop loading once we do not get the
             // if (sBeans.length < mMaxResults)
@@ -86,8 +93,8 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
                     Log.i(LOG_TAG, "FieldName:|Field value " + mSelectFields[i] + ":" + fieldValue);
                     values.put(mSelectFields[i], fieldValue);
                 }
-               mContext.getContentResolver().insert(mUri, values);
-               // mContext.getContentResolver().update(mUri, values, null, null);
+                mContext.getContentResolver().insert(mUri, values);
+                // mContext.getContentResolver().update(mUri, values, null, null);
             }
 
         } catch (Exception e) {
