@@ -29,6 +29,8 @@ public final class SugarCRMContent {
         public static final String[] LIST_PROJECTION = { RECORD_ID, ModuleFields.ID,
                 ModuleFields.NAME, ModuleFields.EMAIL1 };
 
+        public static final String[] LIST_VIEW_PROJECTION = { ModuleFields.NAME };
+
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.NAME,
                 ModuleFields.PARENT_NAME, ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX,
                 ModuleFields.EMAIL1 };
@@ -43,6 +45,12 @@ public final class SugarCRMContent {
         public String NAME = ModuleFields.NAME;
 
         public String EMAIL1 = ModuleFields.EMAIL1;
+
+        public String PARENT_NAME = ModuleFields.PARENT_NAME;
+
+        public String PHONE_OFFICE = ModuleFields.PHONE_OFFICE;
+
+        public String PHONE_FAX = ModuleFields.PHONE_FAX;
 
     }
 
@@ -82,6 +90,9 @@ public final class SugarCRMContent {
         public static final String[] REST_LIST_PROJECTION = { ModuleFields.ID,
                 ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME, ModuleFields.EMAIL1 };
 
+        public static final String[] LIST_VIEW_PROJECTION = { ModuleFields.FIRST_NAME,
+                ModuleFields.LAST_NAME, ModuleFields.EMAIL1 };
+
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.FIRST_NAME,
                 ModuleFields.LAST_NAME, ModuleFields.ACCOUNT_NAME, ModuleFields.PHONE_MOBILE,
                 ModuleFields.PHONE_WORK, ModuleFields.EMAIL1 };
@@ -110,4 +121,121 @@ public final class SugarCRMContent {
         public String MODIFIED_BY_NAME = ModuleFields.MODIFIED_BY_NAME;
 
     }
+
+    public static final class Leads implements LeadsColumns {
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+                                        + "/lead");
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
+
+        public static final String[] LIST_PROJECTION = { RECORD_ID, ModuleFields.ID,
+                ModuleFields.NAME };
+
+        public static final String[] LIST_VIEW_PROJECTION = { RECORD_ID, ModuleFields.ID,
+                ModuleFields.NAME };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.NAME,
+                ModuleFields.PARENT_NAME, ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX,
+                ModuleFields.EMAIL1 };
+
+    }
+
+    public interface LeadsColumns {
+        public String ID = RECORD_ID;
+
+        public String BEAN_ID = ModuleFields.ID;
+
+        public String NAME = ModuleFields.NAME;
+
+        public String EMAIL1 = ModuleFields.EMAIL1;
+
+        public String PARENT_NAME = ModuleFields.PARENT_NAME;
+
+        public String PHONE_OFFICE = ModuleFields.PHONE_OFFICE;
+
+        public String PHONE_FAX = ModuleFields.PHONE_FAX;
+
+    }
+
+    public static final class Opportunites implements OpportunitesColumns {
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+                                        + "/opportunity");
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
+
+        public static final String[] LIST_PROJECTION = { RECORD_ID, ModuleFields.ID,
+                ModuleFields.NAME, ModuleFields.OPPORTUNITY_TYPE };
+
+        public static final String[] LIST_VIEW_PROJECTION = { ModuleFields.NAME,
+                ModuleFields.OPPORTUNITY_TYPE };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.NAME,
+                ModuleFields.ACCOUNT_NAME, ModuleFields.OPPORTUNITY_AMOUNT,
+                ModuleFields.OPPORTUNITY_TYPE, ModuleFields.SALES_STAGE };
+
+    }
+
+    public interface OpportunitesColumns {
+        public String ID = RECORD_ID;
+
+        public String BEAN_ID = ModuleFields.ID;
+
+        public String NAME = ModuleFields.NAME;
+
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String MODIFIED_USER_ID = ModuleFields.MODIFIED_USER_ID;
+
+        public String MODIFIED_BY_NAME = ModuleFields.MODIFIED_BY_NAME;
+
+        public String CREATED_BY = ModuleFields.CREATED_BY;
+
+        public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
+
+        public String DESCRIPTION = ModuleFields.DESCRIPTION;
+
+        public String ASSIGNED_USER_ID = ModuleFields.ASSIGNED_USER_ID;
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
+
+        // public String CREATED_BY_NAME = ModuleFields.T;
+        //
+        public String OPPORTUNITY_TYPE = ModuleFields.OPPORTUNITY_TYPE;
+
+        public String ACCOUNT_NAME = ModuleFields.ACCOUNT_NAME;
+
+        public String CAMPAIGN_NAME = ModuleFields.CAMPAIGN_NAME;
+
+        public String LEAD_SOURCE = ModuleFields.LEAD_SOURCE;
+
+        public String AMOUNT = ModuleFields.AMOUNT;
+
+        public String AMOUNT_USDOLLAR = ModuleFields.AMOUNT_USDOLLAR;
+
+        public String CURRENCY_ID = ModuleFields.CURRENCY_ID;
+
+        public String CURRENCY_NAME = ModuleFields.CURRENCY_NAME;
+
+        public String CURRENCY_SYMBOL = ModuleFields.CURRENCY_SYMBOL;
+
+        public String DATE_CLOSED = ModuleFields.DATE_CLOSED;
+
+        public String NEXT_STEP = ModuleFields.NEXT_STEP;
+
+        public String SALES_STAGE = ModuleFields.SALES_STAGE;
+
+        public String PROBABILITY = ModuleFields.PROBABILITY;
+
+    }
+
 }
