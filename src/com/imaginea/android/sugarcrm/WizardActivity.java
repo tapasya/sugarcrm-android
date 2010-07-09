@@ -27,6 +27,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -38,6 +40,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WizardActivity extends Activity {
 
@@ -343,6 +348,10 @@ public class WizardActivity extends Activity {
 
         private String sceDesc;
 
+        //TODO: remove this moduleNames from here and use the one from DB
+     // reference to the module names
+        private String[] moduleNames = { "Accounts", "Contacts", "Leads", "Opportunities" };
+        
         @Override
         protected Object doInBackground(Object... args) {
             /*
@@ -359,6 +368,19 @@ public class WizardActivity extends Activity {
             try {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
+                
+                HashMap<String,HashMap<String, ModuleField>> moduleNameVsFields = new HashMap<String,HashMap<String, ModuleField>>(); 
+                for(String moduleName : moduleNames){
+                    String[] fields = {};
+                    List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields );
+                    HashMap<String, ModuleField> nameVsModuleField = new HashMap<String, ModuleField>(); 
+                    for(int i=0; i<moduleFields.size(); i++){
+                        nameVsModuleField.put(moduleFields.get(i).getName(), moduleFields.get(i));
+                    }
+                    moduleNameVsFields.put(moduleName, nameVsModuleField);
+                }
+                DatabaseHelper.moduleFields = moduleNameVsFields;
+                
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
