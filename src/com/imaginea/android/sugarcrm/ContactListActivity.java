@@ -59,6 +59,8 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
 
     private String mSessionId;
 
+    private String mModuleName;
+
     private boolean mStopLoading = false;
 
     private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME };
@@ -78,12 +80,12 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
-        String moduleName = "Contacts";
+        mModuleName = "Contacts";
         if (extras != null)
-            moduleName = extras.getString(RestUtilConstants.MODULE_NAME);
+            mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
 
         TextView tv = (TextView) findViewById(R.id.headerText);
-        tv.setText(moduleName);
+        tv.setText(mModuleName);
         mStatus = (TextView) findViewById(R.id.status);
         // footer = (TextView) findViewById(R.id.status);
         // mStatus.setText("Idle");
@@ -112,17 +114,17 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.
 
-        Log.d(LOG_TAG, "ModuleName" + moduleName);
+        Log.d(LOG_TAG, "ModuleName" + mModuleName);
         if (intent.getData() == null) {
-            intent.setData(DatabaseHelper.getModuleUri(moduleName));
+            intent.setData(DatabaseHelper.getModuleUri(mModuleName));
         }
         // TODO - optimize this, if we sync up a dataset, then no need to run detail projectio
         // nhere, just do a list projection
-        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(moduleName), null, null, DatabaseHelper.getModuleSortOrder(moduleName));
+        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
         GenericCursorAdapter adapter;
-        String[] moduleSel = DatabaseHelper.getModuleListSelections(moduleName);
+        String[] moduleSel = DatabaseHelper.getModuleListSelections(mModuleName);
         if (moduleSel.length >= 2)
             adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] {
                     android.R.id.text1, android.R.id.text2 });
@@ -238,7 +240,7 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
      * @param position
      */
     void openDetailScreen(int position) {
-        Intent detailIntent = new Intent(ContactListActivity.this, ContactDetailsActivity.class);
+        Intent detailIntent = new Intent(ContactListActivity.this, AccountDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
@@ -249,6 +251,7 @@ public class ContactListActivity extends ListActivity {// implements ListView.On
         // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
+        detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
     }
 
