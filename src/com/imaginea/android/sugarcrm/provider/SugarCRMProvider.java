@@ -88,6 +88,14 @@ public class SugarCRMProvider extends ContentProvider {
             c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
             break;
 
+        case ACCOUNT_ID:
+            module = RestUtilConstants.ACCOUNTS_MODULE;
+            // db.setProjectionMap(sNotesProjectionMap);
+            selection = SugarCRMContent.RECORD_ID + " = ?";
+            c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            // qb.appendWhere(Notes._ID + "=" + uri.getPathSegments().get(1));
+            break;
+
         case CONTACT:
             module = RestUtilConstants.CONTACTS_MODULE;
             Log.d(TAG, "Querying Contacts");
@@ -108,7 +116,7 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case CONTACT_ID:
-            module = RestUtilConstants.ACCOUNTS_MODULE;
+            module = RestUtilConstants.CONTACTS_MODULE;
             // db.setProjectionMap(sNotesProjectionMap);
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
