@@ -2,22 +2,16 @@ package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
-import com.imaginea.android.sugarcrm.util.RestUtil;
-import com.imaginea.android.sugarcrm.util.SugarBean;
-import com.imaginea.android.sugarcrm.util.Util;
+import com.imaginea.android.sugarcrm.util.ModuleField;
 
 /**
  * AccountDetailsActivity
@@ -28,21 +22,13 @@ public class AccountDetailsActivity extends Activity {
 
     private String mAccountSugarBeanId;
 
-    private Cursor mCursor;
-
-    private SugarBean mSugarBean;
-
-    private String mSessionId;
+    private Cursor mCursor;    
 
     private String[] mSelectFields;
-
-    private String[] mLinkNameToFieldsArray = new String[] {};
 
     private final String LOG_TAG = "AccountDetailsActivity";
 
     private TableLayout mDetailsTable;
-
-    private AccountDetailsTask mTask;
 
     /** Called when the activity is first created. */
     @Override
@@ -65,69 +51,19 @@ public class AccountDetailsActivity extends Activity {
         mSelectFields = DatabaseHelper.getModuleProjections(moduleName);
         mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(moduleName));
         // startManagingCursor(mCursor);
-        setContents();
-
-        // mTask = new AccountDetailsTask();
-        // mTask.execute(null);
-
+        setContents(moduleName);
     }
 
-    /**
-     * LoadAccountDetailsTask
-     */
-    class AccountDetailsTask extends AsyncTask<Object, Void, Object> {
-
-        @Override
-        protected Object doInBackground(Object... arg0) {
-            try {
-                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                // TODO use a constant and remove this as we start from the login screen
-                String url = pref.getString("URL", getString(R.string.defaultUrl));
-                String userName = pref.getString("USER_NAME", getString(R.string.defaultUser));
-                String password = pref.getString("PASSWORD", getString(R.string.defaultPwd));
-
-                // SugarCrmApp app =
-                // mSessionId = ((SugarCrmApp) getApplication()).getSessionId();
-                if (mSessionId == null) {
-                    mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
-                }
-
-                mSugarBean = RestUtil.getEntry(url, mSessionId, RestUtilConstants.ACCOUNTS_MODULE, mAccountSugarBeanId, mSelectFields, mLinkNameToFieldsArray);
-
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                return Util.FETCH_FAILED;
-            }
-
-            return Util.FETCH_SUCCESS;
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-
-        @Override
-        protected void onPostExecute(Object result) {
-            super.onPostExecute(result);
-            super.onPostExecute(result);
-            if (isCancelled())
-                return;
-            int retVal = (Integer) result;
-            switch (retVal) {
-            case Util.FETCH_FAILED:
-                break;
-            case Util.FETCH_SUCCESS:
-                setContents();
-                break;
-            default:
-
-            }
-        }
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        
+        if(mCursor != null && !mCursor.isClosed())
+            mCursor.close();
+        
     }
 
-    private void setContents() {
+    private void setContents(String moduleName) {
 
         String[] detailsProjection = mSelectFields;
 
@@ -137,10 +73,14 @@ public class AccountDetailsActivity extends Activity {
         for (int i = 1; i < detailsProjection.length; i++) {
             String fieldName = detailsProjection[i];
             int columnIndex = mCursor.getColumnIndex(fieldName);
-            Log.d(LOG_TAG, "Col:" + columnIndex);
-
+            Log.d(LOG_TAG, "Col:" + columnIndex + " moduleName : " + moduleName + " fieldName : " + fieldName );
+            
+            //TODO: get the attributes of the moduleField
+            ModuleField moduleField = DatabaseHelper.getModuleField(moduleName, fieldName);
+            
             TextView textViewForLabel = new TextView(AccountDetailsActivity.this);
-            textViewForLabel.setText(fieldName);
+            textViewForLabel.setText(moduleField.getLabel());
+            
             TextView textViewForValue = new TextView(AccountDetailsActivity.this);
             String value = mCursor.getString(columnIndex);
 
