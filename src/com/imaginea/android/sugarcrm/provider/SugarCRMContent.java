@@ -24,16 +24,16 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
+        public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, ModuleFields.ID,
-                ModuleFields.NAME, ModuleFields.EMAIL1 };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID,
+                NAME, EMAIL1 };
 
-        public static final String[] LIST_VIEW_PROJECTION = { ModuleFields.NAME };
+        public static final String[] LIST_VIEW_PROJECTION = { NAME };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.NAME,
-                ModuleFields.PARENT_NAME, ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX,
-                ModuleFields.EMAIL1 };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME,
+                PARENT_NAME, PHONE_OFFICE, PHONE_FAX,
+                EMAIL1 };
 
     }
 
@@ -82,20 +82,20 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = ModuleFields.FIRST_NAME + " ASC";
+        public static final String DEFAULT_SORT_ORDER = FIRST_NAME + " ASC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, ModuleFields.ID,
-                ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME, ModuleFields.EMAIL1 };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID,
+                FIRST_NAME, LAST_NAME, EMAIL1 };
 
         public static final String[] REST_LIST_PROJECTION = { ModuleFields.ID,
-                ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME, ModuleFields.EMAIL1 };
+                FIRST_NAME, LAST_NAME, EMAIL1 };
 
-        public static final String[] LIST_VIEW_PROJECTION = { ModuleFields.FIRST_NAME,
-                ModuleFields.LAST_NAME, ModuleFields.EMAIL1 };
+        public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME,
+                LAST_NAME, EMAIL1 };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.FIRST_NAME,
-                ModuleFields.LAST_NAME, ModuleFields.ACCOUNT_NAME, ModuleFields.PHONE_MOBILE,
-                ModuleFields.PHONE_WORK, ModuleFields.EMAIL1 };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, FIRST_NAME,
+                LAST_NAME, ACCOUNT_NAME, PHONE_MOBILE,
+                PHONE_WORK, EMAIL1 };
 
     }
 
@@ -132,15 +132,15 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, ModuleFields.ID,
-                ModuleFields.NAME };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID,
+                NAME };
 
-        public static final String[] LIST_VIEW_PROJECTION = { RECORD_ID, ModuleFields.ID,
-                ModuleFields.NAME };
+        public static final String[] LIST_VIEW_PROJECTION = { RECORD_ID, ID,
+                NAME };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.NAME,
-                ModuleFields.PARENT_NAME, ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX,
-                ModuleFields.EMAIL1 };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME,
+                PARENT_NAME, PHONE_OFFICE, PHONE_FAX,
+                EMAIL1 };
 
     }
 
@@ -169,17 +169,14 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
+        public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, ModuleFields.ID,
-                ModuleFields.NAME, ModuleFields.OPPORTUNITY_TYPE };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, OPPORTUNITY_TYPE };
 
-        public static final String[] LIST_VIEW_PROJECTION = { ModuleFields.NAME,
-                ModuleFields.OPPORTUNITY_TYPE };
+        public static final String[] LIST_VIEW_PROJECTION = { NAME, OPPORTUNITY_TYPE };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ModuleFields.NAME,
-                ModuleFields.ACCOUNT_NAME, ModuleFields.OPPORTUNITY_AMOUNT,
-                ModuleFields.OPPORTUNITY_TYPE, ModuleFields.SALES_STAGE };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME, ACCOUNT_NAME,
+                OPPORTUNITY_TYPE, SALES_STAGE };
 
     }
 
