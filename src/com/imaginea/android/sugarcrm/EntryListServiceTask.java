@@ -57,8 +57,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
         if (count == 3) {
             mOffset = mUri.getPathSegments().get(1);
         }
-        mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
-        ;
+        mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);        
         mSelectFields = extras.getStringArray(Util.PROJECTION);
         mOrderBy = extras.getString(Util.SORT_ORDER);
     }
@@ -66,17 +65,13 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
     @Override
     protected Object doInBackground(Object... params) {
         try {
+            
+            if (mSessionId == null) {                             
+                mSessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();               
+            }
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
             // TODO use a constant and remove this as we start from the login screen
             String url = pref.getString("URL", mContext.getString(R.string.defaultUrl));
-            String userName = pref.getString("USER_NAME", mContext.getString(R.string.defaultUser));
-            String password = pref.getString("PASSWORD", mContext.getString(R.string.defaultPwd));
-            Log.i(LOG_TAG, url + userName + password);
-            // SugarCrmApp app =
-            // mSessionId = ((SugarCrmApp) getApplication()).getSessionId();
-            if (mSessionId == null) {
-                mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
-            }
 
             SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, mModuleName, mQuery, mOrderBy, mOffset, mSelectFields, mLinkNameToFieldsArray, mMaxResults, mDeleted);
             // mAdapter.setSugarBeanArray(sBeans);
