@@ -48,7 +48,7 @@ public class DashboardActivity extends Activity {
 
         // Activities corresponding to the items in the GridView
         final Class[] moduleActivities = { ContactListActivity.class, ContactListActivity.class,
-                AccountListActivity.class, ContactListActivity.class, SugarCrmSettings.class };
+                ContactListActivity.class, ContactListActivity.class, SugarCrmSettings.class };
 
         mDashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
