@@ -14,6 +14,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunites;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitesColumns;
+import com.imaginea.android.sugarcrm.util.ModuleField;
 
 import java.util.HashMap;
 
@@ -50,6 +51,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final HashMap<String, String> moduleSortOrder = new HashMap<String, String>();
 
     public static final HashMap<String, Uri> moduleUris = new HashMap<String, Uri>();
+    
+    public static HashMap<String, HashMap<String, ModuleField>> moduleFields = new HashMap<String, HashMap<String,ModuleField>>();
 
     static {
         // modules.put(0, "Accounts");
@@ -203,6 +206,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static Uri getModuleUri(String moduleName) {
         return moduleUris.get(moduleName);
+    }
+
+    public static ModuleField getModuleField(String moduleName, String fieldName) {
+        return moduleFields.get(moduleName).get(fieldName);
     }
 
 }
