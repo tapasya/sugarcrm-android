@@ -4,7 +4,7 @@
 	<!-- Application name -->
 	<string name="appName">SugarCRM</string>
 
-	<string name="hello">Hello World, HomeActivity!</string>
+	<string name="home">Home</string>
 
 	<!-- Sugar CRM Settings  -->
 	<string name="userSummary">The username you use to log in to Sugar</string>
