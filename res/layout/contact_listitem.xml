@@ -9,5 +9,5 @@
    	 	style="@style/list_item_style"/>
 	<TextView  
 		android:id="@android:id/text2"
-    	style="@style/list_item_style"/>
+    	style="@style/list_item_2_style"/>
 </LinearLayout>
