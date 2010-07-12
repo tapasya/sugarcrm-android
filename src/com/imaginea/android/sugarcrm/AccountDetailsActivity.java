@@ -23,6 +23,8 @@ import com.imaginea.android.sugarcrm.util.ModuleField;
 public class AccountDetailsActivity extends Activity {
 
     private String mAccountSugarBeanId;
+    
+    private String mModuleName;
 
     private Cursor mCursor;    
 
@@ -43,17 +45,17 @@ public class AccountDetailsActivity extends Activity {
         mAccountSugarBeanId = (String) getIntent().getStringExtra(RestUtilConstants.ID);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
-        String moduleName = "Contacts";
+        mModuleName = "Contacts";
         if (extras != null)
-            moduleName = extras.getString(RestUtilConstants.MODULE_NAME);
+            mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
 
         if (intent.getData() == null) {
-            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), mAccountSugarBeanId));
+            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mAccountSugarBeanId));
         }
-        mSelectFields = DatabaseHelper.getModuleProjections(moduleName);
-        mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(moduleName));
+        mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
+        mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
         // startManagingCursor(mCursor);
-        setContents(moduleName);
+        setContents(mModuleName);
     }
 
     @Override
@@ -75,8 +77,7 @@ public class AccountDetailsActivity extends Activity {
         
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         
-        
-        for (int i = 1; i < detailsProjection.length; i++) {
+        for (int i = 2; i < detailsProjection.length; i++) {
             String fieldName = detailsProjection[i];
             int columnIndex = mCursor.getColumnIndex(fieldName);
             Log.d(LOG_TAG, "Col:" + columnIndex + " moduleName : " + moduleName + " fieldName : " + fieldName );
@@ -101,4 +102,5 @@ public class AccountDetailsActivity extends Activity {
 
         }
     }
+    
 }
