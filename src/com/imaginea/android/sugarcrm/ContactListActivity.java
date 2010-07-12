@@ -21,6 +21,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 
 /**
@@ -41,6 +42,8 @@ public class ContactListActivity extends ListActivity {
     private int mCurrentOffset = 0;
 
     private String mModuleName;
+
+    private Uri mModuleUri;
 
     private boolean mStopLoading = false;
 
@@ -87,10 +90,12 @@ public class ContactListActivity extends ListActivity {
 
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.
-
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+            Log.d(LOG_TAG, "Instance count:" + getInstanceCount());
         Log.d(LOG_TAG, "ModuleName" + mModuleName);
+        mModuleUri = DatabaseHelper.getModuleUri(mModuleName);
         if (intent.getData() == null) {
-            intent.setData(DatabaseHelper.getModuleUri(mModuleName));
+            intent.setData(mModuleUri);
         }
         // TODO - optimize this, if we sync up a dataset, then no need to run detail projectio
         // nhere, just do a list projection
@@ -113,6 +118,9 @@ public class ContactListActivity extends ListActivity {
         tv1.setVisibility(View.GONE);
     }
 
+    /**
+     * GenericCursorAdapter     
+     */
     private final class GenericCursorAdapter extends SimpleCursorAdapter {
 
         private int realoffset = 0;
@@ -181,6 +189,28 @@ public class ContactListActivity extends ListActivity {
         detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
+    }
+
+    /**
+     * deletes an item
+     * 
+     * @param position
+     */
+    void deleteItem(int position) {
+        Intent detailIntent = new Intent(ContactListActivity.this, AccountDetailsActivity.class);
+
+        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+        if (cursor == null) {
+            // For some reason the requested item isn't available, do nothing
+            return;
+        }
+        // TODO
+        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        mModuleUri = DatabaseHelper.getModuleUri(mModuleName);
+        //getContentResolver().delete(mModuleUri, SugarCRMContent.RECORD_ID, new String[] { cursor.getString(0) });
+        // detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
+        // detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
+        // startActivity(detailIntent);
     }
 
     @Override
@@ -266,9 +296,8 @@ public class ContactListActivity extends ListActivity {
             return true;
 
         case R.string.delete:
-
+            deleteItem(position);
             return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
