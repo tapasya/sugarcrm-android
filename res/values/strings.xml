@@ -16,10 +16,7 @@
 		string
 		name="default_url">http://demo.sugarcrm.com/sugarcrm/service/v2/rest.php</string
 	-->
-	<!--
-		<string
-		name="default_url">http://192.168.1.83/sugarcrm/service/v2/rest.php</string>
-	-->
+
 	<string name="defaultUrl">http://192.168.2.245/sugarcrm/service/v2/rest.php
 	</string>
 	<string name="defaultUser">will</string>
@@ -59,6 +56,11 @@
 	<string name="addContact">Add Contact</string>
 	<string name="contactDetails">Contact Details</string>
 	
+	<string name="editDetails">Edit details</string>
+	
 	<string name="notAvailable">Not Available</string>
 	<string name="loadFailed">Load failed</string>
+	
+	<!-- Search -->
+	<string name="searchHint">Search SugarCRM</string>
 </resources>
