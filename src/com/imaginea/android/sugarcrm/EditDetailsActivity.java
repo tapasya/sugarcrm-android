@@ -1,11 +1,13 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -69,6 +71,8 @@ public class EditDetailsActivity extends Activity {
         mSugarBeanId = mCursor.getString(mCursor.getColumnIndex(AccountsColumns.BEAN_ID));
         Log.i(TAG, "mSugarBeanId - " + mSugarBeanId);
 
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        
         for (int i = 2; i < detailsProjection.length; i++) {
             String fieldName = detailsProjection[i];
             int columnIndex = mCursor.getColumnIndex(fieldName);
@@ -76,25 +80,23 @@ public class EditDetailsActivity extends Activity {
 
             // TODO: get the attributes of the moduleField
             ModuleField moduleField = DatabaseHelper.getModuleField(moduleName, fieldName);
+            
+            View tableRow = inflater.inflate(R.layout.edit_table_row, null);
+            TextView textViewForLabel = (TextView)tableRow.findViewById(R.id.editRowLabel);
+            EditText editTextForValue = (EditText)tableRow.findViewById(R.id.editRowValue);
 
-            TextView textViewForLabel = new TextView(EditDetailsActivity.this);
             if (moduleField.isRequired()) {
                 textViewForLabel.setText(moduleField.getLabel() + " *");
             } else {
                 textViewForLabel.setText(moduleField.getLabel());
             }
 
-            EditText editTextForValue = new EditText(EditDetailsActivity.this);
             editTextForValue.setId(i);
             String value = mCursor.getString(columnIndex);
 
             if (value != null && !value.equals("")) {
                 editTextForValue.setText(value);
             }
-
-            TableRow tableRow = new TableRow(EditDetailsActivity.this);
-            tableRow.addView(textViewForLabel);
-            tableRow.addView(editTextForValue);
 
             mDetailsTable.addView(tableRow);
         }
