@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent" 
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg">
     <include layout="@layout/header"/>
     <TextView android:id="@+id/accountName"
 		android:layout_height="wrap_content" 
@@ -16,6 +17,6 @@
 		android:stretchColumns="1"
 		android:padding="5dip"
 		android:orientation="vertical"
-		android:background="@drawable/bg">   			
+		>   			
 	</TableLayout>
 </LinearLayout>
