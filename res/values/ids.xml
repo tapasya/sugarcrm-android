@@ -1,3 +1,4 @@
 <resources>
-  <item type="id" name="rest_api" />
+  <item type="id" name="get" />
+   <item type="id" name="update" />
 </resources>
