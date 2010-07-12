@@ -1,13 +1,15 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -70,6 +72,10 @@ public class AccountDetailsActivity extends Activity {
         mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
 
         mCursor.moveToFirst();
+        
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        
+        
         for (int i = 1; i < detailsProjection.length; i++) {
             String fieldName = detailsProjection[i];
             int columnIndex = mCursor.getColumnIndex(fieldName);
@@ -77,11 +83,12 @@ public class AccountDetailsActivity extends Activity {
             
             //TODO: get the attributes of the moduleField
             ModuleField moduleField = DatabaseHelper.getModuleField(moduleName, fieldName);
+        
+            View tableRow = inflater.inflate(R.layout.table_row, null);
+            TextView textViewForLabel = (TextView)tableRow.findViewById(R.id.detailRowLabel);
+            TextView textViewForValue = (TextView)tableRow.findViewById(R.id.detailRowValue);
             
-            TextView textViewForLabel = new TextView(AccountDetailsActivity.this);
             textViewForLabel.setText(moduleField.getLabel());
-            
-            TextView textViewForValue = new TextView(AccountDetailsActivity.this);
             String value = mCursor.getString(columnIndex);
 
             if (value != null && !value.equals("")) {
@@ -89,12 +96,9 @@ public class AccountDetailsActivity extends Activity {
             } else {
                 textViewForValue.setText(R.string.notAvailable);
             }
-
-            TableRow tableRow = new TableRow(AccountDetailsActivity.this);
-            tableRow.addView(textViewForLabel);
-            tableRow.addView(textViewForValue);
-
+            
             mDetailsTable.addView(tableRow);
+
         }
     }
 }
