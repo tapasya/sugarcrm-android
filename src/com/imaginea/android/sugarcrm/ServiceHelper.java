@@ -36,7 +36,7 @@ public class ServiceHelper {
         nameValuePairs.put(ModuleFields.ID, beanId);
         nameValuePairs.put(ModuleFields.DELETED, "1");
 
-        serviceIntent.putExtra(Util.COMMAND, R.id.update);
+        serviceIntent.putExtra(Util.COMMAND, R.id.delete);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, module);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValuePairs);
         context.startService(serviceIntent);
@@ -48,6 +48,7 @@ public class ServiceHelper {
         serviceIntent.setData(uri);
 
         serviceIntent.putExtra(Util.COMMAND, R.id.update);
+        serviceIntent.putExtra(ModuleFields.ID, beanId);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, module);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValueList);
         context.startService(serviceIntent);
