@@ -9,20 +9,20 @@
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
         <item name="android:textStyle">bold</item>               
 		<item name="android:layout_marginLeft">10dip</item>
-		<item name="android:layout_marginRight">5dip</item>
+		<item name="android:layout_marginRight">1dip</item>
 		<item name="android:layout_marginTop">10dip</item>
-		<item name="android:paddingLeft">6dip</item>
-		<item name="android:paddingRight">7dip</item>
+		<item name="android:paddingLeft">1dip</item>
+		<item name="android:paddingRight">1dip</item>
 		<item name="android:paddingTop">8dip</item>
 		<item name="android:textColor">@android:color/black</item>
 	</style>
 	<style name="text_row_value">	              
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
         <item name="android:textStyle">normal</item>               
-		<item name="android:layout_marginLeft">10dip</item>
-		<item name="android:layout_marginRight">5dip</item>
+		<item name="android:layout_marginLeft">5dip</item>
+		<item name="android:layout_marginRight">10dip</item>
 		<item name="android:layout_marginTop">10dip</item>
-		<item name="android:paddingLeft">6dip</item>
+		<item name="android:paddingLeft">4dip</item>
 		<item name="android:paddingRight">7dip</item>
 		<item name="android:paddingTop">8dip</item>
 		<item name="android:textColor">@color/blue</item>
