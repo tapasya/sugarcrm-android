@@ -45,7 +45,7 @@
 	<string name="cancel">cancel</string>
 
 	<!-- Details Screen Context Menu-->
-	<string name="options">options</string>
+	<string name="options">Options</string>
 	<string name="view">View</string>
 	<string name="edit">Edit</string>
 	<string name="delete">Delete</string>
