@@ -3,6 +3,7 @@ package com.imaginea.android.sugarcrm;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 
 /**
@@ -119,7 +119,7 @@ public class ContactListActivity extends ListActivity {
     }
 
     /**
-     * GenericCursorAdapter     
+     * GenericCursorAdapter
      */
     private final class GenericCursorAdapter extends SimpleCursorAdapter {
 
@@ -197,8 +197,6 @@ public class ContactListActivity extends ListActivity {
      * @param position
      */
     void deleteItem(int position) {
-        Intent detailIntent = new Intent(ContactListActivity.this, AccountDetailsActivity.class);
-
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
             // For some reason the requested item isn't available, do nothing
@@ -207,10 +205,32 @@ public class ContactListActivity extends ListActivity {
         // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         mModuleUri = DatabaseHelper.getModuleUri(mModuleName);
-        //getContentResolver().delete(mModuleUri, SugarCRMContent.RECORD_ID, new String[] { cursor.getString(0) });
+        Uri deleteUri = Uri.withAppendedPath(mModuleUri, cursor.getString(0));
+        getContentResolver().registerContentObserver(deleteUri, false, new DeleteContentObserver(new Handler()));
+        ServiceHelper.startServiceForDelete(getBaseContext(), deleteUri, mModuleName, cursor.getString(1));
+        // getContentResolver().delete(mModuleUri, SugarCRMContent.RECORD_ID, new String[] {
+        // cursor.getString(0) });
         // detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
         // detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         // startActivity(detailIntent);
+    }
+
+    private class DeleteContentObserver extends ContentObserver {
+
+        public DeleteContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return super.deliverSelfNotifications();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            Log.d(LOG_TAG, "Received onCHange");
+        }
     }
 
     @Override
