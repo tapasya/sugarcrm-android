@@ -206,6 +206,12 @@ public class SugarService extends Service {
                 mTaskMap.put(Util.getId(), updateServiceTask);
                 updateServiceTask.execute(null);
 
+            case R.id.delete:
+                if (Log.isLoggable(TAG, Log.VERBOSE))
+                    Log.i(TAG, "REST API -Delete received:");
+                updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);
+                mTaskMap.put(Util.getId(), updateServiceTask);
+                updateServiceTask.execute(null);
             default:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
                     Log.i(TAG, "Unknown REST API received:");
