@@ -76,7 +76,10 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
                     serverUpdated = true;
 
+                } else{
+                    serverUpdated = false;
                 }
+                //TODO: If the update fails when the network is ON, display the message
             }
 
             if (mCommand == R.id.update) {
