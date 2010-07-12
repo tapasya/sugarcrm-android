@@ -1,5 +1,10 @@
 package com.imaginea.android.sugarcrm.util;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -40,10 +45,12 @@ public class Util {
     public static final String PROJECTION = "select";
 
     public static final String SORT_ORDER = "orderby";
-    
+
     public static final String COMMAND = "cmd";
 
     private static int mRequestId = 0;
+
+    private static final String LOG_TAG = Util.class.getSimpleName();
 
     // calculate the MD5 hash of a string
     public static String MD5(String text) throws SugarCrmException {
@@ -87,4 +94,29 @@ public class Util {
         mRequestId += 1;
         return mRequestId;
     }
+
+    /**
+     * is Network On
+     * 
+     * @param context
+     * @return
+     */
+    public static boolean isNetworkOn(Context context) {
+        boolean networkOn = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null) {
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                Log.d(LOG_TAG, "network state name:" + networkInfo.getState().name());
+                Log.d(LOG_TAG, "NetworkInfo.State.CONNECTED name:"
+                                                + NetworkInfo.State.CONNECTED.name());
+            }
+            if (networkInfo.getState().name().equals(NetworkInfo.State.CONNECTED.name())) {
+                networkOn = true;
+            }
+        }
+        return networkOn;
+    }
+
 }
