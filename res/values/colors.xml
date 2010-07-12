@@ -9,5 +9,5 @@
 	<color name="translucent_dark">#99000000</color>
 	<color name="translucenter_dark">#bf000000</color>
 	<color name="bright_foreground_dark">#ffffffff</color>
-
+	<color name="blue">#1e90ff</color>
 </resources>
