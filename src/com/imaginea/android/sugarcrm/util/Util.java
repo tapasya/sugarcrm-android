@@ -40,6 +40,8 @@ public class Util {
     public static final String PROJECTION = "select";
 
     public static final String SORT_ORDER = "orderby";
+    
+    public static final String COMMAND = "cmd";
 
     private static int mRequestId = 0;
 
