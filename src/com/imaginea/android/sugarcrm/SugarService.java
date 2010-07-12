@@ -70,7 +70,7 @@ public class SugarService extends Service {
 
     // constants for syncing
     // public static final String SERVICECMD = "com.imaginea.android.synccommand";
-    
+
     public static final String ACTION_START = "com.imaginea.action.ACTION_START";
 
     private static final String TAG = SugarService.class.getSimpleName();
@@ -187,24 +187,29 @@ public class SugarService extends Service {
             Intent intent = (Intent) msg.obj;
             if (Log.isLoggable(TAG, Log.VERBOSE))
                 Log.v(TAG, "Message: " + msg + ", ");
-            //TODO
+            // TODO
             mStatus = 1;
 
             switch (msg.what) {
-//TODO cleanup the commands
-            case R.id.rest_api:
+            // TODO cleanup the commands
+            case R.id.get:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
-                    Log.i(TAG, "REST API received:");
+                    Log.i(TAG, "REST API -GET received:");
                 EntryListServiceTask entryListServiceTask = new EntryListServiceTask(getBaseContext(), intent);
                 mTaskMap.put(Util.getId(), entryListServiceTask);
                 entryListServiceTask.execute(null);
                 break;
+            case R.id.update:
+                if (Log.isLoggable(TAG, Log.VERBOSE))
+                    Log.i(TAG, "REST API -Update/Delete received:");
+                UpdateServiceTask updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);
+                mTaskMap.put(Util.getId(), updateServiceTask);
+                updateServiceTask.execute(null);
+
             default:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
-                    Log.i(TAG, "REST API received:");
-                entryListServiceTask = new EntryListServiceTask(getBaseContext(), intent);
-                mTaskMap.put(Util.getId(), entryListServiceTask);
-                entryListServiceTask.execute(null);
+                    Log.i(TAG, "Unknown REST API received:");
+
                 break;
             }
 
@@ -280,9 +285,9 @@ public class SugarService extends Service {
         Message msg = mServiceHandler.obtainMessage();
         Bundle extras = intent.getExtras();
 
-        // int command = extras.getInt(Util.COMMAND);
+        int command = extras.getInt(Util.COMMAND);
 
-        // msg.what = command;
+        msg.what = command;
         msg.arg1 = startId;
         msg.obj = intent;
         mServiceHandler.sendMessage(msg);
