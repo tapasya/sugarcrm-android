@@ -33,6 +33,12 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
     private Uri mUri;
 
+    /*
+     * represents either delete or update, for local database operations, is always an update on the
+     * remote server side
+     */
+    private int mCommand;
+
     public static final String LOG_TAG = "UpdateServiceTask";
 
     @SuppressWarnings("unchecked")
@@ -45,6 +51,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
         mBeanId = extras.getString(RestUtilConstants.ID);
         mUpdateNameValueMap = (Map<String, String>) extras.getSerializable(RestUtilConstants.NAME_VALUE_LIST);
+        mCommand = extras.getInt(Util.COMMAND);
     }
 
     @Override
@@ -72,19 +79,23 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 }
             }
 
-            for (String key : mUpdateNameValueMap.keySet()) {
-                values.put(key, mUpdateNameValueMap.get(key));
+            if (mCommand == R.id.update) {
+                for (String key : mUpdateNameValueMap.keySet()) {
+                    values.put(key, mUpdateNameValueMap.get(key));
+                }
+                updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
             }
-            updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
+            else if (mCommand == R.id.delete) {
+                updatedRows = mContext.getContentResolver().delete(mUri, null, null);
+            }
             // pass the success/failure msg to activity
             if (updatedRows > 0) {
                 Log.v(LOG_TAG, "update successful");
             } else {
                 Log.v(LOG_TAG, "update failed");
             }
-            
-            if(!serverUpdated)
-            {
+
+            if (!serverUpdated) {
                 // update the sync table
             }
 
