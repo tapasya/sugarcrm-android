@@ -43,8 +43,8 @@ public class AccountsApiTest extends RestAPITest {
 		assertTrue(sBeans.length > 0);
 
 		for (SugarBean sBean : sBeans) {
-			System.out.println(sBean.getBeanId());
-			System.out.println(sBean.getFieldValue(ModuleFields.NAME));
+		    Log.d(LOG_TAG,sBean.getBeanId());
+		    Log.d(LOG_TAG,sBean.getFieldValue(ModuleFields.NAME));
 		}
 	}
 	
@@ -67,11 +67,11 @@ public class AccountsApiTest extends RestAPITest {
 		String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
 		SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName,
 				beanId, selectFields, linkNameToFieldsArray);
-		System.out.println("Account Name : " + sBean.getFieldValue("name"));
-		System.out.println("Account email : " + sBean.getFieldValue("email1"));
-		System.out.println("Phone office : "
+		Log.d(LOG_TAG,"Account Name : " + sBean.getFieldValue("name"));
+		Log.d(LOG_TAG,"Account email : " + sBean.getFieldValue("email1"));
+		Log.d(LOG_TAG,"Phone office : "
 				+ sBean.getFieldValue(ModuleFields.PHONE_OFFICE));
-		System.out.println("Account deleted ? "
+		Log.d(LOG_TAG,"Account deleted ? "
 				+ sBean.getFieldValue(ModuleFields.DELETED));
 	}
 	
@@ -80,7 +80,7 @@ public class AccountsApiTest extends RestAPITest {
 		String query = "";
 		int deleted = 0;
 		int entriesCount = RestUtil.getEntriesCount(url, mSessionId, moduleName, query, deleted);
-		System.out.println("entriesCount = " + entriesCount);
+		Log.d(LOG_TAG,"entriesCount = " + entriesCount);
 		assertNotNull(entriesCount);
 	}
 
@@ -93,8 +93,10 @@ public class AccountsApiTest extends RestAPITest {
 		// nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
 		String _beanId = RestUtil.setEntry(url, mSessionId, moduleName,
 				nameValuePairs);
-		System.out.println("setEntry response : " + _beanId);
+		Log.d(LOG_TAG,"setEntry response : " + _beanId);
 		assertNotNull(_beanId);
+		// if update is successful we get the same beanId returned
+		assertEquals(beanId, _beanId);
 	}
 
 	@SmallTest
@@ -111,9 +113,28 @@ public class AccountsApiTest extends RestAPITest {
 		List<String> beanIds = RestUtil.setEntries(url, mSessionId, moduleName,
 				beanNameValuePairs);
 		for (String _beanId : beanIds) {
-			System.out.println(_beanId);
+		    Log.d(LOG_TAG,_beanId);
 		}
 	}
+	
+	@SmallTest
+    public void testDeleteEntry() throws Exception {
+       
+
+        String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+        Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
+        nameValuePairs.put(ModuleFields.ID, beanId);
+        nameValuePairs.put(ModuleFields.DELETED, "1");
+        // nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String _beanId = RestUtil.setEntry(url, mSessionId, moduleName,
+                nameValuePairs);
+        Log.d(LOG_TAG,"setEntry response : " + _beanId);
+        assertNotNull(_beanId);
+        assertEquals(beanId, _beanId);
+       // SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName,
+         //                               beanId, selectFields, linkNameToFieldsArray);
+       // Log.d(LOG_TAG, "Deleted:" +  sBean.getFieldValue(ModuleFields.DELETED));
+    }
 
 	@SmallTest
 	public void testGetRelationships() throws Exception {
