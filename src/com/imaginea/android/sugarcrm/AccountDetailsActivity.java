@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -91,9 +92,10 @@ public class AccountDetailsActivity extends Activity {
             
             textViewForLabel.setText(moduleField.getLabel());
             String value = mCursor.getString(columnIndex);
-
+            if(moduleField.getType().equals("phone"))
+                textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
             if (value != null && !value.equals("")) {
-                textViewForValue.setText(value);
+                textViewForValue.setText(value);             
             } else {
                 textViewForValue.setText(R.string.notAvailable);
             }
