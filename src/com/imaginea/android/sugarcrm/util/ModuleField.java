@@ -32,7 +32,7 @@ public class ModuleField {
         return mLabel;
     }
 
-    public boolean ismIsRequired() {
+    public boolean isRequired() {
         return mIsRequired;
     }
 
