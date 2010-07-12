@@ -1,0 +1,16 @@
+#copy this file to /data/local.prop and add your LOG_TAG's and
+# the log levels you want to see while developing
+# see http://developer.android.com/reference/android/util/Log.html#isLoggable%28java.lang.String,%20int%29
+log.tag.AccountDetailsActivity=VERBOSE
+log.tag.EntryListServiceTask=VERBOSE
+log.tag.ContactListActivity=VERBOSE
+log.tag.SugarService=VERBOSE
+log.tag.UpdateServiceTask=VERBOSE
+
+
+
+
+
+
+
+
