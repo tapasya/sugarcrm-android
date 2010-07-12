@@ -192,6 +192,27 @@ public class ContactListActivity extends ListActivity {
     }
 
     /**
+     * opens the Edit Screen
+     * 
+     * @param position
+     */
+    private void openEditScreen(int position) {
+        Intent detailIntent = new Intent(ContactListActivity.this, EditDetailsActivity.class);
+
+        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+        if (cursor == null) {
+            // For some reason the requested item isn't available, do nothing
+            return;
+        }
+        // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
+        // TODO
+        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
+        detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
+        startActivity(detailIntent);
+    }
+    
+    /**
      * deletes an item
      * 
      * @param position
@@ -312,7 +333,7 @@ public class ContactListActivity extends ListActivity {
             return true;
 
         case R.string.edit:
-            openDetailScreen(position);
+            openEditScreen(position);
             return true;
 
         case R.string.delete:
