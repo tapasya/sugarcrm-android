@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,11 @@ public class ContactListActivity extends ListActivity {
 
     private View mEmpty;
 
-    private TextView mStatus;
+    private View mListFooterView;
+
+    private TextView mListFooterText;
+
+    private View mListFooterProgress;
 
     private boolean mBusy = false;
 
@@ -70,7 +75,6 @@ public class ContactListActivity extends ListActivity {
 
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(mModuleName);
-        mStatus = (TextView) findViewById(R.id.status);
 
         mListView = getListView();
         // mListView.setOnScrollListener(this);
@@ -116,6 +120,13 @@ public class ContactListActivity extends ListActivity {
         mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
         TextView tv1 = (TextView) (mEmpty.findViewById(R.id.mainText));
         tv1.setVisibility(View.GONE);
+
+        mListFooterView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_footer, mListView, false);
+        getListView().addFooterView(mListFooterView);
+        mListFooterText = (TextView) findViewById(R.id.status);
+        // setListAdapter();
+
+        mListFooterProgress = mListFooterView.findViewById(R.id.progress);
     }
 
     /**
@@ -154,15 +165,17 @@ public class ContactListActivity extends ListActivity {
                         if (cursor.getCount() < mMaxResults)
                             mStopLoading = true;
                         changeCursor(cursor);
-                        mStatus.setVisibility(View.VISIBLE);
+                        mListFooterText.setVisibility(View.GONE);
+                        mListFooterProgress.setVisibility(View.GONE);
                         mBusy = false;
                     }
                 });
                 cursor.registerContentObserver(observer);
             }
             if (mBusy) {
-                mStatus.setVisibility(View.VISIBLE);
-                mStatus.setText("Loading...");
+                mListFooterProgress.setVisibility(View.VISIBLE);
+                mListFooterText.setVisibility(View.VISIBLE);
+                mListFooterText.setText("Loading...");
                 // Non-null tag means the view still needs to load it's data
                 // text.setTag(this);
             }
@@ -211,7 +224,7 @@ public class ContactListActivity extends ListActivity {
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
     }
-    
+
     /**
      * deletes an item
      * 
@@ -311,6 +324,11 @@ public class ContactListActivity extends ListActivity {
 
         menu.add(2, R.string.edit, 3, R.string.edit);
         menu.add(3, R.string.delete, 4, R.string.delete);
+        if (DatabaseHelper.getModuleField(mModuleName, ModuleFields.PHONE_WORK) != null)
+            menu.add(4, R.string.call, 4, R.string.call);
+        if (DatabaseHelper.getModuleField(mModuleName, ModuleFields.EMAIL1) != null)
+            menu.add(5, R.string.email, 4, R.string.email);
+
     }
 
     @Override
@@ -339,7 +357,44 @@ public class ContactListActivity extends ListActivity {
         case R.string.delete:
             deleteItem(position);
             return true;
+
+        case R.string.call:
+            callNumber(position);
+            return true;
+
+        case R.string.email:
+            sendMail(position);
+            return true;
+
         }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    public void callNumber(int position) {
+        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+        if (cursor == null) {
+            // For some reason the requested item isn't available, do nothing
+            return;
+        }
+        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        int index = cursor.getColumnIndex(ModuleFields.PHONE_WORK);
+        String number = cursor.getString(index);
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
+        startActivity(intent);
+    }
+
+    public void sendMail(int position) {
+        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+        if (cursor == null) {
+            // For some reason the requested item isn't available, do nothing
+            return;
+        }
+        // emailAddress
+        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        int index = cursor.getColumnIndex(ModuleFields.EMAIL1);
+        String emailAddress = cursor.getString(index);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + emailAddress));
+        startActivity(intent);
     }
 }
