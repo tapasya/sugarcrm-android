@@ -14,6 +14,7 @@
 		<item name="android:paddingLeft">6dip</item>
 		<item name="android:paddingRight">7dip</item>
 		<item name="android:paddingTop">8dip</item>
+		<item name="android:textColor">@android:color/black</item>
 	</style>
 	<style name="text_row_value">	              
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
@@ -24,6 +25,7 @@
 		<item name="android:paddingLeft">6dip</item>
 		<item name="android:paddingRight">7dip</item>
 		<item name="android:paddingTop">8dip</item>
+		<item name="android:textColor">@color/blue</item>
 	</style>
 	
 	<style name="edit_text_layout">	
