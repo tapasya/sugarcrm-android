@@ -43,7 +43,7 @@ public class ServiceHelper {
     }
 
     public static void startServiceForUpdate(Context context, Uri uri, String module,
-                                    String beanId, Map nameValueList) {
+                                    String beanId, Map<String, String> nameValueList) {
         Intent serviceIntent = new Intent(context, SugarService.class);
         serviceIntent.setData(uri);
 
