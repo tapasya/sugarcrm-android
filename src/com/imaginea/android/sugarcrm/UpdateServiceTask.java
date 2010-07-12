@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.util.RestUtil;
+import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.Map;
 
@@ -55,25 +56,36 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
             }
 
             String url = SugarCrmSettings.getSugarRestUrl(mContext);
-
-            // nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
-            String updatedBeanId = RestUtil.setEntry(url, mSessionId, mModuleName, mUpdateNameValueMap);
-
+            // Check network is on
+            String updatedBeanId = null;
+            ContentValues values = new ContentValues();
             int updatedRows = 0;
-            if (updatedBeanId.equals(mBeanId)) {
-                Log.v(LOG_TAG, "updated server successful");
-                ContentValues values = new ContentValues();
-                for (String key : mUpdateNameValueMap.keySet()) {
-                    values.put(key, mUpdateNameValueMap.get(key));
-                }
-                updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
+            boolean serverUpdated = false;
+            if (Util.isNetworkOn(mContext)) {
+                updatedBeanId = RestUtil.setEntry(url, mSessionId, mModuleName, mUpdateNameValueMap);
 
+                if (mBeanId.equals(updatedBeanId)) {
+                    Log.v(LOG_TAG, "updated server successful");
+
+                    serverUpdated = true;
+
+                }
             }
+
+            for (String key : mUpdateNameValueMap.keySet()) {
+                values.put(key, mUpdateNameValueMap.get(key));
+            }
+            updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
             // pass the success/failure msg to activity
             if (updatedRows > 0) {
                 Log.v(LOG_TAG, "update successful");
             } else {
                 Log.v(LOG_TAG, "update failed");
+            }
+            
+            if(!serverUpdated)
+            {
+                // update the sync table
             }
 
         } catch (Exception e) {
