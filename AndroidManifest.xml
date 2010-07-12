@@ -62,6 +62,13 @@
             </intent-filter>
         </activity>
         
+        <activity android:name=".EditDetailsActivity" android:label="@string/editDetails"
+       	 android:theme="@android:style/Theme.Black.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+               
         <activity android:name=".WizardActivity" android:label="@string/appName" 
         	android:theme="@android:style/Theme.Black.NoTitleBar" 
         	android:clearTaskOnLaunch="true">           
