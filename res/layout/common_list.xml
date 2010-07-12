@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent" 
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg">
     <include layout="@layout/header"/>
     <ListView android:id="@android:id/list"
         android:layout_width="fill_parent" 
@@ -10,10 +11,5 @@
         android:layout_weight="1"
         android:fastScrollEnabled="true"
         android:drawSelectorOnTop="false"/>
-    <include layout="@layout/empty_view"/>   
-    <TextView android:id="@+id/status"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content"
-        android:paddingLeft="8dip"
-        android:paddingRight="8dip"/>
+    <include layout="@layout/empty_view"/>    
 </LinearLayout>
