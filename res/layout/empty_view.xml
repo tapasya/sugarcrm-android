@@ -20,7 +20,7 @@
 		android:layout_below="@id/progress"
 		android:gravity="center" 
 		android:layout_centerHorizontal="true"
-		android:text="@string/addContact" 
+		android:text="@string/noReults" 
 		android:contentDescription="?android:text" />
 	
 </RelativeLayout>
