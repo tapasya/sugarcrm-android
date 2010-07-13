@@ -38,7 +38,8 @@ public class DashboardActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        startActivityForResult(new Intent(this, WizardActivity.class), 0);
+        Class wizardActivity = WizardDetector.getClass(getBaseContext()) ;
+        startActivityForResult(new Intent(this, wizardActivity), 0);
 
         setContentView(R.layout.dashboard_activity);
         TextView tv = (TextView) findViewById(R.id.headerText);
