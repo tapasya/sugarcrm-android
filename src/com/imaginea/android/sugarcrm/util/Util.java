@@ -18,6 +18,16 @@ import java.security.NoSuchAlgorithmException;
  */
 public class Util {
 
+    /**
+     * Account type string.
+     */
+    public static final String ACCOUNT_TYPE = "com.imaginea.android.sugarcrm";
+
+    /**
+     * Authtoken type string.
+     */
+    public static final String AUTHTOKEN_TYPE = "com.imaginea.android.sugarcrm";
+
     public static final int FETCH_FAILED = 0;
 
     public static final int REFRESH_LIST = 1;
