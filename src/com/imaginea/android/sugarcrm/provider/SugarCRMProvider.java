@@ -185,8 +185,8 @@ public class SugarCRMProvider extends ContentProvider {
         c.setNotificationUri(getContext().getContentResolver(), uri);
 
         // database cache miss, start a rest api call , package the params appropriately
-        if (c.getCount() == 0)
-            ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
+        /*if (c.getCount() == 0)
+            ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);*/
         return c;
     }
 
