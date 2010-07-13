@@ -271,6 +271,19 @@ public class ContactListActivity extends ListActivity {
     protected void onPause() {
         super.onPause();
     }
+    
+    @Override
+    public boolean onSearchRequested() {
+         Bundle appData = new Bundle();
+         String[] modules = {mModuleName};
+         appData.putString(RestUtilConstants.MODULE_NAME, mModuleName);
+         appData.putStringArray(RestUtilConstants.MODULES, modules);
+         appData.putInt(RestUtilConstants.OFFSET, 0);
+         appData.putInt(RestUtilConstants.MAX_RESULTS, 20);
+         
+         startSearch(null, false, appData, false);
+         return true;
+     }
 
     // We can stop loading once we do not get the
     // if (sBeans.length < mMaxResults)
