@@ -63,4 +63,5 @@
 	
 	<!-- Search -->
 	<string name="searchHint">Search SugarCRM</string>
+	<string name="noReults">No results found</string>
 </resources>
