@@ -68,7 +68,7 @@
 		<ImageView android:layout_width="wrap_content"
 			android:layout_gravity="center" 
 			android:layout_height="wrap_content"
-			android:src="@drawable/contact"  
+			android:src="@drawable/contacts"  
 			android:maxHeight="40dip" 
 			android:adjustViewBounds="true" />
 		<Button android:id="@+id/contactAddButton" 
