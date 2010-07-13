@@ -12,6 +12,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,8 @@ public class ContactListActivity extends ListActivity {
     private TextView mListFooterText;
 
     private View mListFooterProgress;
+    
+    private Menu mMenu;
 
     private boolean mBusy = false;
 
@@ -321,6 +325,31 @@ public class ContactListActivity extends ListActivity {
     //
     // }
     // }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Hold on to this
+        mMenu = menu;
+
+        // Inflate the currently selected menu XML resource.
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.list_activity_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.searchActivity:
+            onSearchRequested();
+            /*Intent myIntent = new Intent(ContactListActivity.this, SearchActivity.class);
+            ContactListActivity.this.startActivity(myIntent);*/
+            return true;
+
+        }
+        return false;
+    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
