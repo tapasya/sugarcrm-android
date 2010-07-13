@@ -14,7 +14,7 @@
 				android:id="@+id/moduleName" 
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
-				android:textSize="12sp"
+				style="@style/text_label"				
 				android:gravity="center">
 	</TextView>	
 </LinearLayout>
