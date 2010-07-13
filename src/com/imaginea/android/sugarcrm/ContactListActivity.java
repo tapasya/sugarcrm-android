@@ -327,6 +327,13 @@ public class ContactListActivity extends ListActivity {
     // }
     
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuHelper.onPrepareOptionsMenu(this, menu, mModuleName);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Hold on to this
         mMenu = menu;
@@ -341,7 +348,7 @@ public class ContactListActivity extends ListActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.searchActivity:
+        case R.id.search:
             onSearchRequested();
             /*Intent myIntent = new Intent(ContactListActivity.this, SearchActivity.class);
             ContactListActivity.this.startActivity(myIntent);*/
