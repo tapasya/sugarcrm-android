@@ -78,21 +78,59 @@
 	        <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
 	    </activity>
                
-        <activity android:name=".WizardActivity" android:label="@string/appName" 
-        	android:theme="@android:style/Theme.Black.NoTitleBar" 
-        	android:clearTaskOnLaunch="true">           
-        </activity>
+        <activity android:name=".WizardActivity" 
+			android:label="@string/appName"
+			android:theme="@android:style/Theme.Black.NoTitleBar"
+			android:clearTaskOnLaunch="true" 
+			android:excludeFromRecents="true">
+			<!--
+				No intent-filter here! This activity is only ever launched by
+				someone who explicitly knows the class name
+			-->
+		</activity>
+		<activity android:name=".WizardAuthActivity" 
+			android:label="@string/appName"
+			android:theme="@android:style/Theme.Black.NoTitleBar"
+			android:clearTaskOnLaunch="true" 
+			android:excludeFromRecents="true">			
+		</activity>
         <service android:name=".SugarService" />
-        
-         <provider android:name=".provider.SugarCRMProvider"
-            android:authorities="com.imaginea.sugarcrm.provider"
-        />
+        <!-- The authenticator service -->
+		<service android:name=".auth.AuthenticationService"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.accounts.AccountAuthenticator" />
+			</intent-filter>
+			<meta-data android:name="android.accounts.AccountAuthenticator"
+				android:resource="@xml/authenticator" />
+		</service>
+
+		<service android:name=".sync.SyncService" android:exported="true">
+			<intent-filter>
+				<action android:name="android.content.SyncAdapter" />
+			</intent-filter>
+			<meta-data android:name="android.content.SyncAdapter"
+				android:resource="@xml/syncadapter" />
+
+		</service>
+		<provider android:name=".provider.SugarCRMProvider"
+			android:authorities="com.imaginea.sugarcrm.provider" />
     </application>
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK" />    
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+   <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+	<uses-permission android:name="android.permission.USE_CREDENTIALS" />
+	<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
+	<uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />    
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     
 
 </manifest> 
+
