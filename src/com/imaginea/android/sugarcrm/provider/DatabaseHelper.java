@@ -25,8 +25,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "sugar_crm.db";
 
-    //TODO:
-    private static final int DATABASE_VERSION = 5;
+    // TODO:
+    private static final int DATABASE_VERSION = 7;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -52,8 +52,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final HashMap<String, String> moduleSortOrder = new HashMap<String, String>();
 
     public static final HashMap<String, Uri> moduleUris = new HashMap<String, Uri>();
-    
-    public static HashMap<String, HashMap<String, ModuleField>> moduleFields = new HashMap<String, HashMap<String,ModuleField>>();
+
+    public static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
+
+    public static HashMap<String, HashMap<String, ModuleField>> moduleFields = new HashMap<String, HashMap<String, ModuleField>>();
 
     static {
         // modules.put(0, "Accounts");
@@ -89,7 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        createAccountsTable(db);           
+        createAccountsTable(db);
         createContactsTable(db);
         createLeadsTable(db);
         createOpportunitiesTable(db);
@@ -125,9 +127,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static void createAccountsTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + AccountsColumns.ID
-                                        + " INTEGER PRIMARY KEY," + AccountsColumns.BEAN_ID
-                                        + " TEXT," + AccountsColumns.NAME + " TEXT,"
+        db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" 
+                                        + AccountsColumns.ID + " INTEGER PRIMARY KEY," 
+                                        + AccountsColumns.BEAN_ID + " TEXT," 
+                                        + AccountsColumns.NAME + " TEXT,"
                                         + AccountsColumns.EMAIL1 + " TEXT,"
                                         + AccountsColumns.PARENT_NAME + " TEXT,"
                                         + AccountsColumns.PHONE_OFFICE + " TEXT,"
@@ -137,9 +140,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static void createContactsTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + CONTACTS_TABLE_NAME + " (" + ContactsColumns.ID
-                                        + " INTEGER PRIMARY KEY," + ContactsColumns.BEAN_ID
-                                        + " TEXT," + ContactsColumns.FIRST_NAME + " TEXT,"
+        db.execSQL("CREATE TABLE " + CONTACTS_TABLE_NAME + " (" 
+                                        + ContactsColumns.ID + " INTEGER PRIMARY KEY," 
+                                        + ContactsColumns.BEAN_ID + " TEXT," 
+                                        + ContactsColumns.FIRST_NAME + " TEXT,"
                                         + ContactsColumns.LAST_NAME + " TEXT,"
                                         + ContactsColumns.ACCOUNT_NAME + " TEXT,"
                                         + ContactsColumns.PHONE_MOBILE + " TEXT,"
@@ -152,11 +156,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static void createLeadsTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + LEADS_TABLE_NAME + " (" + LeadsColumns.ID
-                                        + " INTEGER PRIMARY KEY," + LeadsColumns.BEAN_ID + " TEXT,"
+        db.execSQL("CREATE TABLE " + LEADS_TABLE_NAME + " (" 
+                                        + LeadsColumns.ID + " INTEGER PRIMARY KEY," 
+                                        + LeadsColumns.BEAN_ID + " TEXT,"
                                         + LeadsColumns.FIRST_NAME + " TEXT,"
                                         + LeadsColumns.LAST_NAME + " TEXT," 
-                                        + LeadsColumns.EMAIL1 + " TEXT,"
+                                        + LeadsColumns.EMAIL1 + " TEXT," 
                                         + LeadsColumns.PHONE_WORK + " TEXT,"
                                         + LeadsColumns.PHONE_FAX + " TEXT," + " UNIQUE("
                                         + LeadsColumns.BEAN_ID + ")" + ");");
@@ -164,9 +169,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static void createOpportunitiesTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + OPPORTUNITIES_TABLE_NAME + " (" + OpportunitesColumns.ID
-                                        + " INTEGER PRIMARY KEY," + OpportunitesColumns.BEAN_ID
-                                        + " TEXT," + OpportunitesColumns.NAME + " TEXT,"
+        db.execSQL("CREATE TABLE " + OPPORTUNITIES_TABLE_NAME + " (" 
+                                        + OpportunitesColumns.ID + " INTEGER PRIMARY KEY," 
+                                        + OpportunitesColumns.BEAN_ID + " TEXT," 
+                                        + OpportunitesColumns.NAME + " TEXT,"
                                         + OpportunitesColumns.ACCOUNT_NAME + " TEXT,"
                                         + OpportunitesColumns.AMOUNT + " TEXT,"
                                         + OpportunitesColumns.AMOUNT_USDOLLAR + " TEXT,"
@@ -211,6 +217,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static ModuleField getModuleField(String moduleName, String fieldName) {
         return moduleFields.get(moduleName).get(fieldName);
+    }
+
+    public static String getModuleSelection(String moduleName, String searchString) {
+        if (moduleName.equals("Accounts")) {
+            return AccountsColumns.NAME + " LIKE '%" + searchString + "%'";
+        } else if (moduleName.equals("Contacts")) {
+            return "(" + ContactsColumns.FIRST_NAME + " LIKE '%" + searchString + "%' OR "
+                                            + ContactsColumns.LAST_NAME + " LIKE '%" + searchString
+                                            + "%'" + ")";
+        }
+        return "";
     }
 
 }
