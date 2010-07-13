@@ -26,8 +26,8 @@ public class DashboardActivity extends Activity {
     private GridView mDashboard;
 
     // references to the module images
-    private Integer[] mModuleThumbIds = { R.drawable.account, R.drawable.contact, R.drawable.lead,
-            R.drawable.opportunity, R.drawable.setting };
+    private Integer[] mModuleThumbIds = { R.drawable.account, R.drawable.contacts, R.drawable.leads,
+            R.drawable.opportunity, R.drawable.settings };
 
     // reference to the module names
     private Integer[] mModuleNameIds = { R.string.accounts, R.string.contacts, R.string.leads,
