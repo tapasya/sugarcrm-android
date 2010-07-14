@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * ContactListActivity
@@ -203,7 +204,8 @@ public class ContactListActivity extends ListActivity {
         // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
         // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
-        detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
+        detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
+        detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
     }
@@ -224,7 +226,8 @@ public class ContactListActivity extends ListActivity {
         // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
         // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
-        detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
+        detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
+        detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
     }
