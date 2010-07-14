@@ -16,7 +16,7 @@ import com.imaginea.android.sugarcrm.ServiceHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunites;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 
 /**
  * SugarCRMProvider Provides access to a database of sugar modules, their data and relationships.
@@ -52,6 +52,8 @@ public class SugarCRMProvider extends ContentProvider {
     private static final int CALL = 12;
 
     private static final int CALL_ID = 13;
+    
+    private static final int ACCOUNT_CONTACT = 14;
 
     private static final UriMatcher sUriMatcher;
 
@@ -185,8 +187,8 @@ public class SugarCRMProvider extends ContentProvider {
         c.setNotificationUri(getContext().getContentResolver(), uri);
 
         // database cache miss, start a rest api call , package the params appropriately
-        /*if (c.getCount() == 0)
-            ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);*/
+        if (c.getCount() == 0)
+            ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
         return c;
     }
 
@@ -229,7 +231,18 @@ public class SugarCRMProvider extends ContentProvider {
                 return accountUri;
             }
             break;
-
+        
+        case ACCOUNT_CONTACT:
+            //String accountId = uri.getPathSegments().get(1);            
+            Log.i(TAG, uri.getPathSegments().get(0) + "  " + uri.getPathSegments().get(1));
+            rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri accountUri = ContentUris.withAppendedId(Accounts.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(accountUri, null);
+                return accountUri;
+            }
+            break;
+            
         case CONTACT:
             rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -238,7 +251,7 @@ public class SugarCRMProvider extends ContentProvider {
                 return contactUri;
             }
             break;
-
+            
         case LEAD:
             rowId = db.insert(DatabaseHelper.LEADS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -251,7 +264,7 @@ public class SugarCRMProvider extends ContentProvider {
         case OPPORTUNITY:
             rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
             if (rowId > 0) {
-                Uri oppUri = ContentUris.withAppendedId(Opportunites.CONTENT_URI, rowId);
+                Uri oppUri = ContentUris.withAppendedId(Opportunities.CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(oppUri, null);
                 return oppUri;
             }
@@ -311,7 +324,7 @@ public class SugarCRMProvider extends ContentProvider {
 
         case OPPORTUNITY_ID:
             String oppId = uri.getPathSegments().get(1);
-            count = db.delete(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, Opportunites.ID
+            count = db.delete(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, Opportunities.ID
                                             + "="
                                             + oppId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
@@ -369,7 +382,8 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account", ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/#", ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#", ACCOUNT_ID);
-
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/contact", ACCOUNT_CONTACT);
+        
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact", CONTACT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#", CONTACT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#/#", CONTACT);
