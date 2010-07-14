@@ -9,12 +9,16 @@ import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * AccountDetailsActivity
@@ -23,7 +27,11 @@ import com.imaginea.android.sugarcrm.util.ModuleField;
  */
 public class AccountDetailsActivity extends Activity {
 
-    private String mAccountSugarBeanId;
+    private Menu mMenu;
+    
+    private String mRowId;
+    
+    private String mSugarBeanId;
     
     private String mModuleName;
 
@@ -43,15 +51,16 @@ public class AccountDetailsActivity extends Activity {
 
         setContentView(R.layout.account_details);
 
-        mAccountSugarBeanId = (String) getIntent().getStringExtra(RestUtilConstants.ID);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
+        mRowId = (String) intent.getStringExtra(Util.ROW_ID);
+        mSugarBeanId = (String) intent.getStringExtra(RestUtilConstants.BEAN_ID);
         mModuleName = "Contacts";
         if (extras != null)
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
 
         if (intent.getData() == null) {
-            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mAccountSugarBeanId));
+            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId));
         }
         mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
         mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
@@ -67,6 +76,42 @@ public class AccountDetailsActivity extends Activity {
             mCursor.close();
         
     }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuHelper.onPrepareOptionsMenu(this, menu, mModuleName);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Hold on to this
+        mMenu = menu;
+
+        // Inflate the currently selected menu XML resource.
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.list_activity_menu, menu);
+        
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.addItem:
+            Intent myIntent = new Intent(AccountDetailsActivity.this, EditDetailsActivity.class);
+            myIntent.putExtra(Util.ROW_ID, mRowId);
+            myIntent.putExtra(RestUtilConstants.BEAN_ID, mSugarBeanId);
+            myIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME, "contacts");
+            myIntent.putExtra(RestUtilConstants.MODULE_NAME, "Contacts");
+            myIntent.putExtra(RestUtilConstants.PARENT_MODULE_NAME, "Accounts");
+            AccountDetailsActivity.this.startActivity(myIntent);
+            return true;
+
+        }
+        return false;
+    }
 
     private void setContents(String moduleName) {
 
@@ -78,7 +123,7 @@ public class AccountDetailsActivity extends Activity {
         
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         
-        for (int i = 2; i < detailsProjection.length; i++) {
+        for (int i = 2; i < detailsProjection.length-1; i++) {
             String fieldName = detailsProjection[i];
             int columnIndex = mCursor.getColumnIndex(fieldName);
             Log.d(LOG_TAG, "Col:" + columnIndex + " moduleName : " + moduleName + " fieldName : " + fieldName );
