@@ -12,11 +12,13 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunites;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class helps open, create, and upgrade the database file.
@@ -26,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO:
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -56,6 +58,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
 
     public static HashMap<String, HashMap<String, ModuleField>> moduleFields = new HashMap<String, HashMap<String, ModuleField>>();
+    
+    public static final HashMap<String, List<String>> moduleMenuItems = new HashMap<String, List<String>>();
 
     static {
         // modules.put(0, "Accounts");
@@ -68,13 +72,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleProjections.put("Accounts", Accounts.DETAILS_PROJECTION);
         moduleProjections.put("Contacts", Contacts.DETAILS_PROJECTION);
         moduleProjections.put("Leads", Leads.DETAILS_PROJECTION);
-        moduleProjections.put("Opportunities", Opportunites.DETAILS_PROJECTION);
+        moduleProjections.put("Opportunities", Opportunities.DETAILS_PROJECTION);
         // moduleProjections.put(4, Meetings.DETAILS_PROJECTION );
 
         moduleListSelections.put("Accounts", Accounts.LIST_VIEW_PROJECTION);
         moduleListSelections.put("Contacts", Contacts.LIST_VIEW_PROJECTION);
         moduleListSelections.put("Leads", Leads.LIST_VIEW_PROJECTION);
-        moduleListSelections.put("Opportunities", Opportunites.LIST_VIEW_PROJECTION);
+        moduleListSelections.put("Opportunities", Opportunities.LIST_VIEW_PROJECTION);
 
         moduleSortOrder.put("Accounts", Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put("Contacts", Contacts.DEFAULT_SORT_ORDER);
@@ -82,7 +86,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put("Accounts", Accounts.CONTENT_URI);
         moduleUris.put("Contacts", Contacts.CONTENT_URI);
         moduleUris.put("Leads", Leads.CONTENT_URI);
-        moduleUris.put("Opportunities", Opportunites.CONTENT_URI);
+        moduleUris.put("Opportunities", Opportunities.CONTENT_URI);
+        
+        moduleMenuItems.put("Accounts", Arrays.asList(new String[]{"Contacts", "Leads", "Opportunities"}));
+        moduleMenuItems.put("Contacts", Arrays.asList(new String[]{"Leads", "Opportunities"}));
+        moduleMenuItems.put("Leads", Arrays.asList(new String[]{"Opportunities", "Contacts"}));
+        moduleMenuItems.put("Opportunities", Arrays.asList(new String[]{"Leads", "Opportunities"}));
     }
 
     DatabaseHelper(Context context) {
@@ -134,8 +143,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsColumns.EMAIL1 + " TEXT,"
                                         + AccountsColumns.PARENT_NAME + " TEXT,"
                                         + AccountsColumns.PHONE_OFFICE + " TEXT,"
-                                        + AccountsColumns.PHONE_FAX + " TEXT," + " UNIQUE("
-                                        + AccountsColumns.BEAN_ID + ")" + ");");
+                                        + AccountsColumns.PHONE_FAX + " TEXT," 
+                                        + " UNIQUE(" + AccountsColumns.BEAN_ID + ")" + ");");
     }
 
     private static void createContactsTable(SQLiteDatabase db) {
@@ -150,8 +159,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsColumns.PHONE_WORK + " TEXT,"
                                         + ContactsColumns.EMAIL1 + " TEXT,"
                                         + ContactsColumns.CREATED_BY + " TEXT,"
-                                        + ContactsColumns.MODIFIED_BY_NAME + " TEXT," + " UNIQUE("
-                                        + ContactsColumns.BEAN_ID + ")" + ");");
+                                        + ContactsColumns.MODIFIED_BY_NAME + " TEXT," 
+                                        + ContactsColumns.ACCOUNT_ID + " Text,"
+                                        + " UNIQUE(" + ContactsColumns.BEAN_ID + ")" + ");");
     }
 
     private static void createLeadsTable(SQLiteDatabase db) {
@@ -163,40 +173,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + LeadsColumns.LAST_NAME + " TEXT," 
                                         + LeadsColumns.EMAIL1 + " TEXT," 
                                         + LeadsColumns.PHONE_WORK + " TEXT,"
-                                        + LeadsColumns.PHONE_FAX + " TEXT," + " UNIQUE("
-                                        + LeadsColumns.BEAN_ID + ")" + ");");
+                                        + LeadsColumns.PHONE_FAX + " TEXT," 
+                                        + LeadsColumns.ACCOUNT_ID + " Text,"
+                                        + " UNIQUE(" + LeadsColumns.BEAN_ID + ")" + ");");
     }
 
     private static void createOpportunitiesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + OPPORTUNITIES_TABLE_NAME + " (" 
-                                        + OpportunitesColumns.ID + " INTEGER PRIMARY KEY," 
-                                        + OpportunitesColumns.BEAN_ID + " TEXT," 
-                                        + OpportunitesColumns.NAME + " TEXT,"
-                                        + OpportunitesColumns.ACCOUNT_NAME + " TEXT,"
-                                        + OpportunitesColumns.AMOUNT + " TEXT,"
-                                        + OpportunitesColumns.AMOUNT_USDOLLAR + " TEXT,"
-                                        + OpportunitesColumns.ASSIGNED_USER_ID + " TEXT,"
-                                        + OpportunitesColumns.ASSIGNED_USER_NAME + " TEXT,"
-                                        + OpportunitesColumns.CAMPAIGN_NAME + " TEXT,"
-                                        + OpportunitesColumns.CREATED_BY + " TEXT,"
-                                        + OpportunitesColumns.CREATED_BY_NAME + " TEXT,"
-                                        + OpportunitesColumns.CURRENCY_ID + " TEXT,"
-                                        + OpportunitesColumns.CURRENCY_NAME + " TEXT,"
-                                        + OpportunitesColumns.CURRENCY_SYMBOL + " TEXT,"
-                                        + OpportunitesColumns.DATE_CLOSED + " TEXT,"
-                                        + OpportunitesColumns.DATE_ENTERED + " TEXT,"
-                                        + OpportunitesColumns.DATE_MODIFIED + " TEXT,"
-                                        + OpportunitesColumns.DESCRIPTION + " TEXT,"
-                                        + OpportunitesColumns.LEAD_SOURCE + " TEXT,"
-                                        + OpportunitesColumns.MODIFIED_BY_NAME + " TEXT,"
-                                        + OpportunitesColumns.MODIFIED_USER_ID + " TEXT,"
-                                        + OpportunitesColumns.NEXT_STEP + " TEXT,"
-                                        + OpportunitesColumns.OPPORTUNITY_TYPE + " TEXT,"
-                                        + OpportunitesColumns.PROBABILITY + " TEXT,"
-                                        + OpportunitesColumns.SALES_STAGE + " TEXT,"
-
-                                        + " UNIQUE(" + OpportunitesColumns.BEAN_ID + ")" + ");");
+                                        + OpportunitiesColumns.ID + " INTEGER PRIMARY KEY," 
+                                        + OpportunitiesColumns.BEAN_ID + " TEXT," 
+                                        + OpportunitiesColumns.NAME + " TEXT,"
+                                        + OpportunitiesColumns.ACCOUNT_NAME + " TEXT,"
+                                        + OpportunitiesColumns.AMOUNT + " TEXT,"
+                                        + OpportunitiesColumns.AMOUNT_USDOLLAR + " TEXT,"
+                                        + OpportunitiesColumns.ASSIGNED_USER_ID + " TEXT,"
+                                        + OpportunitiesColumns.ASSIGNED_USER_NAME + " TEXT,"
+                                        + OpportunitiesColumns.CAMPAIGN_NAME + " TEXT,"
+                                        + OpportunitiesColumns.CREATED_BY + " TEXT,"
+                                        + OpportunitiesColumns.CREATED_BY_NAME + " TEXT,"
+                                        + OpportunitiesColumns.CURRENCY_ID + " TEXT,"
+                                        + OpportunitiesColumns.CURRENCY_NAME + " TEXT,"
+                                        + OpportunitiesColumns.CURRENCY_SYMBOL + " TEXT,"
+                                        + OpportunitiesColumns.DATE_CLOSED + " TEXT,"
+                                        + OpportunitiesColumns.DATE_ENTERED + " TEXT,"
+                                        + OpportunitiesColumns.DATE_MODIFIED + " TEXT,"
+                                        + OpportunitiesColumns.DESCRIPTION + " TEXT,"
+                                        + OpportunitiesColumns.LEAD_SOURCE + " TEXT,"
+                                        + OpportunitiesColumns.MODIFIED_BY_NAME + " TEXT,"
+                                        + OpportunitiesColumns.MODIFIED_USER_ID + " TEXT,"
+                                        + OpportunitiesColumns.NEXT_STEP + " TEXT,"
+                                        + OpportunitiesColumns.OPPORTUNITY_TYPE + " TEXT,"
+                                        + OpportunitiesColumns.PROBABILITY + " TEXT,"
+                                        + OpportunitiesColumns.SALES_STAGE + " TEXT,"
+                                        + OpportunitiesColumns.ACCOUNT_ID + " Text,"
+                                        + " UNIQUE(" + OpportunitiesColumns.BEAN_ID + ")" + ");");
     }
 
     public static String[] getModuleProjections(String moduleName) {
@@ -228,6 +239,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                             + "%'" + ")";
         }
         return "";
+    }
+    
+    public static List<String> getModuleMenuItems(String moduleName){
+        return moduleMenuItems.get(moduleName);
     }
 
 }
