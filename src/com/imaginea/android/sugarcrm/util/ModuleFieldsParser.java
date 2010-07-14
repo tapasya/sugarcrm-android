@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ModuleFieldsParser {
 
-    private final String LOG_TAG = "ModuleFieldsParser";
+    private final String LOG_TAG = ModuleFieldsParser.class.getSimpleName();
 
     private List<ModuleField> moduleFields;
 
@@ -32,7 +32,8 @@ public class ModuleFieldsParser {
         Iterator iterator = moduleFieldsJSON.keys();
         while (iterator.hasNext()) {
             String key = (String) iterator.next();
-            Log.i(LOG_TAG, key);
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, key);
             JSONObject nameValuePairsJson = (JSONObject) moduleFieldsJSON.get(key);
             moduleFields.add(getModuleField(nameValuePairsJson));
         }
