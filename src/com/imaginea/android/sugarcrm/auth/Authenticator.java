@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.SyncStateContract.Constants;
+import android.util.Log;
 
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.SugarCrmSettings;
@@ -23,6 +24,8 @@ import com.imaginea.android.sugarcrm.util.Util;
 class Authenticator extends AbstractAccountAuthenticator {
     // Authentication Service context
     private final Context mContext;
+    
+    private static final String LOG_TAG = Authenticator.class.getSimpleName();
 
     public Authenticator(Context context) {
         super(context);
@@ -35,6 +38,8 @@ class Authenticator extends AbstractAccountAuthenticator {
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType,
                                     String authTokenType, String[] requiredFeatures, Bundle options) {
+        if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, "addAccount");
         final Intent intent = new Intent(mContext, WizardAuthActivity.class);
         intent.putExtra(WizardAuthActivity.PARAM_AUTHTOKEN_TYPE, authTokenType);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
@@ -50,6 +55,8 @@ class Authenticator extends AbstractAccountAuthenticator {
     public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account,
                                     Bundle options) {
         if (options != null && options.containsKey(AccountManager.KEY_PASSWORD)) {
+            if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, "confirmCredentials: contains Password");
             final String password = options.getString(AccountManager.KEY_PASSWORD);
             final boolean verified = onlineConfirmPassword(account.name, password);
             final Bundle result = new Bundle();
@@ -88,6 +95,8 @@ class Authenticator extends AbstractAccountAuthenticator {
         final AccountManager am = AccountManager.get(mContext);
         final String password = am.getPassword(account);
         if (password != null) {
+            if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, "getAuthToken: Password is not null");
             final boolean verified = onlineConfirmPassword(account.name, password);
             if (verified) {
                 final Bundle result = new Bundle();
@@ -99,6 +108,8 @@ class Authenticator extends AbstractAccountAuthenticator {
         }
         // the password was missing or incorrect, return an Intent to an
         // Activity that will prompt the user for the password.
+        if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, "getAuthToken: Password is missing or incorrect");
         final Intent intent = new Intent(mContext, WizardAuthActivity.class);
         intent.putExtra(Util.PREF_USERNAME, account.name);
         intent.putExtra(WizardAuthActivity.PARAM_AUTHTOKEN_TYPE, authTokenType);
