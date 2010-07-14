@@ -17,7 +17,7 @@
     <application android:icon="@drawable/icon" 
     	android:label="@string/appName" 
 	    android:name="SugarCrmApp"
-	    android:debuggable="false">
+	    android:debuggable="true">
         
         <activity android:name=".DashboardActivity"    
         	android:label="@string/appName" android:theme="@android:style/Theme.Black.NoTitleBar"  
@@ -45,7 +45,7 @@
         </activity>
         
         <activity android:name=".SugarCrmSettings" android:label="@string/settings"
-        	 >
+        	 android:theme="@android:style/Theme.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.PREFERENCE" />
@@ -83,7 +83,7 @@
         <activity android:name=".WizardActivity" 
 			android:label="@string/appName"
 			android:theme="@android:style/Theme.Black.NoTitleBar"
-			android:clearTaskOnLaunch="true" 
+			android:clearTaskOnLaunch="true"
 			android:excludeFromRecents="true">
 			<!--
 				No intent-filter here! This activity is only ever launched by
@@ -115,8 +115,16 @@
 				android:resource="@xml/syncadapter" />
 
 		</service>
+		<!-- TODO : permissions, grantUri and export flags need to be set appropriately, 
+		we want to share our provider only with apps signed by our certificate or running with the same UID -->
+		<!-- permission android:name="com.imaginea.android.sugarcrm.permission.ACCESS_SUGAR_CRM_PROVIDER" 
+			android:label="@string/perm_access_sugarCrm" android:description="@string/sugarProviderDesc" 
+			android:protectionLevel="signature"/--> 
+			<!-- add provider permission android:permission="com.imaginea.android.sugarcrm.permission.ACCESS_SUGAR_CRM_PROVIDER" -->
 		<provider android:name=".provider.SugarCRMProvider"
-			android:authorities="com.imaginea.sugarcrm.provider" />
+			android:authorities="com.imaginea.sugarcrm.provider" android:label="@string/appName"
+			android:description="@string/appProviderDesc"
+			android:syncable="true" />
     </application>
    	<uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
 	<uses-permission android:name="android.permission.INTERNET" />
