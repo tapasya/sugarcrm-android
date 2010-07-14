@@ -14,8 +14,10 @@
           android:smallScreens="true"                   
           android:anyDensity="true" />
           
-    <application android:icon="@drawable/icon" android:label="@string/appName" 
-	    android:name="SugarCrmApp">
+    <application android:icon="@drawable/icon" 
+    	android:label="@string/appName" 
+	    android:name="SugarCrmApp"
+	    android:debuggable="false">
         
         <activity android:name=".DashboardActivity"    
         	android:label="@string/appName" android:theme="@android:style/Theme.Black.NoTitleBar"  
@@ -116,7 +118,7 @@
 		<provider android:name=".provider.SugarCRMProvider"
 			android:authorities="com.imaginea.sugarcrm.provider" />
     </application>
-   <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
+   	<uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -130,7 +132,4 @@
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-    
-
-</manifest> 
-
+</manifest>
