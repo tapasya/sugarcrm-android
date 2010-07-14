@@ -4,6 +4,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,6 +24,8 @@ import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * AccountListActivity
@@ -52,8 +55,8 @@ public class AccountListActivity extends ListActivity {
     private int mCurrentOffset = 0;
 
     private String[] mSelectFields = { ModuleFields.NAME, ModuleFields.EMAIL1 };
-
-    private String[] mLinkNameToFieldsArray = new String[] {};
+    
+    private HashMap<String, List<String>> mLinkNameToFieldsArray = new HashMap<String, List<String>>();
 
     // we don't make this final as we may want to use the sugarCRM value dynamically
     public static int mMaxResults = 20;
@@ -63,6 +66,13 @@ public class AccountListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
+        
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        String moduleName = "Contacts";
+        if (extras != null)
+            moduleName = extras.getString(RestUtilConstants.MODULE_NAME);
+        
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(RestUtilConstants.ACCOUNTS_MODULE);
         mStatus = (TextView) findViewById(R.id.status);
@@ -101,9 +111,16 @@ public class AccountListActivity extends ListActivity {
      */
     void openDetailScreen(int position) {
         Intent detailIntent = new Intent(AccountListActivity.this, AccountDetailsActivity.class);
-        SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
-        Log.d(LOG_TAG, "beanId:" + bean.getBeanId());
-        detailIntent.putExtra(RestUtilConstants.ID, bean.getBeanId());
+
+        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+        if (cursor == null) {
+            // For some reason the requested item isn't available, do nothing
+            return;
+        }
+        // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
+        // TODO
+        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
         startActivity(detailIntent);
     }
 
