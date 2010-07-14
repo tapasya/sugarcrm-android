@@ -42,6 +42,8 @@ public class AccountDetailsActivity extends Activity {
     private final String LOG_TAG = "AccountDetailsActivity";
 
     private TableLayout mDetailsTable;
+    
+    private String mAccountName = "";
 
     /** Called when the activity is first created. */
     @Override
@@ -66,6 +68,7 @@ public class AccountDetailsActivity extends Activity {
         mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
         // startManagingCursor(mCursor);
         setContents(mModuleName);
+        
     }
 
     @Override
@@ -106,6 +109,7 @@ public class AccountDetailsActivity extends Activity {
             myIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME, "contacts");
             myIntent.putExtra(RestUtilConstants.MODULE_NAME, "Contacts");
             myIntent.putExtra(RestUtilConstants.PARENT_MODULE_NAME, "Accounts");
+            myIntent.putExtra(ModuleFields.ACCOUNT_NAME, mAccountName);
             AccountDetailsActivity.this.startActivity(myIntent);
             return true;
 
@@ -123,7 +127,7 @@ public class AccountDetailsActivity extends Activity {
         
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         
-        for (int i = 2; i < detailsProjection.length-1; i++) {
+        for (int i = 2; i < detailsProjection.length-2; i++) {
             String fieldName = detailsProjection[i];
             int columnIndex = mCursor.getColumnIndex(fieldName);
             Log.d(LOG_TAG, "Col:" + columnIndex + " moduleName : " + moduleName + " fieldName : " + fieldName );
@@ -137,6 +141,11 @@ public class AccountDetailsActivity extends Activity {
             
             textViewForLabel.setText(moduleField.getLabel());
             String value = mCursor.getString(columnIndex);
+            
+            if(ModuleFields.ACCOUNT_NAME.equals(fieldName)){
+                mAccountName = value;
+            }
+            
             if(moduleField.getType().equals("phone"))
                 textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
             if (value != null && !value.equals("")) {
