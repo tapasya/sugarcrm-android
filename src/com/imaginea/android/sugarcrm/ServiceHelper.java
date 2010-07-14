@@ -33,7 +33,7 @@ public class ServiceHelper {
         Intent serviceIntent = new Intent(context, SugarService.class);
         serviceIntent.setData(uri);
         Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
-        nameValuePairs.put(ModuleFields.ID, beanId);
+        nameValuePairs.put(RestUtilConstants.BEAN_ID, beanId);
         nameValuePairs.put(ModuleFields.DELETED, "1");
 
         serviceIntent.putExtra(Util.COMMAND, R.id.delete);
@@ -48,8 +48,22 @@ public class ServiceHelper {
         serviceIntent.setData(uri);
 
         serviceIntent.putExtra(Util.COMMAND, R.id.update);
-        serviceIntent.putExtra(ModuleFields.ID, beanId);
+        serviceIntent.putExtra(RestUtilConstants.BEAN_ID, beanId);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, module);
+        serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValueList);
+        context.startService(serviceIntent);
+    }
+    
+    public static void startServiceForInsert(Context context, Uri uri, String parentModule, String parentBeanId, String moduleName, String linkFieldName, 
+                                    Map<String, String> nameValueList) {
+        Intent serviceIntent = new Intent(context, SugarService.class);
+        serviceIntent.setData(uri);
+
+        serviceIntent.putExtra(Util.COMMAND, R.id.insert);
+        serviceIntent.putExtra(RestUtilConstants.PARENT_MODULE_NAME, parentModule);
+        serviceIntent.putExtra(RestUtilConstants.BEAN_ID, parentBeanId);
+        serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, moduleName);
+        serviceIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME, linkFieldName);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValueList);
         context.startService(serviceIntent);
     }
