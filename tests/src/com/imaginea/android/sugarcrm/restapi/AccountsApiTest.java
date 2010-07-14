@@ -139,7 +139,7 @@ public class AccountsApiTest extends RestAPITest {
 	@SmallTest
 	public void testGetRelationships() throws Exception {
 		String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
-		String linkFieldName = "Contacts";
+		String linkFieldName = "contacts";
 		String relatedModuleQuery = "";
 		String[] relatedFields = { "name" };
 		Map<String, List<String>> relatedModuleLinkNameToFieldsArray = new HashMap<String, List<String>>();
@@ -156,18 +156,20 @@ public class AccountsApiTest extends RestAPITest {
 
 	@SmallTest
 	public void testSetRelationship() throws Exception {
-		String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
-		String linkFieldName = "Contacts";
-		String[] relatedIds = {"c2503633-fdb7-2cee-d8ad-4c1f265a9ffd"};
+		String beanId = "63f10b82-7aa0-5105-1038-4c1f268ae69b";
+		String linkFieldName = "contacts";
+		String[] relatedIds = {"8ed461ad-808b-fa49-cf48-4c3c5a14bad6"};
 		Map<String, String> nameValueList = new LinkedHashMap<String, String>();
-		nameValueList.put(ModuleFields.ID, beanId);
+		nameValueList.put(ModuleFields.ID, relatedIds[0]);
+		nameValueList.put(ModuleFields.FIRST_NAME, "Nekkanti");
+		nameValueList.put(ModuleFields.LAST_NAME, "Vasu");
+		nameValueList.put(ModuleFields.EMAIL1, "vasu1705@gmail.com");
+		
 		int delete = 0;
 		RelationshipStatus response = RestUtil.setRelationship(url, mSessionId, moduleName,
-				beanId, linkFieldName, relatedIds, nameValueList, delete);
+				beanId, linkFieldName, relatedIds, null, delete);
 		System.out.println("setRelationship : " + response.getCreatedCount() + "-" + response.getFailedCount() + "-" + response.getDeletedCount());
-		assertNotNull(response.getCreatedCount());
-		assertNotNull(response.getFailedCount());
-		assertNotNull(response.getDeletedCount());
+		assertEquals(response.getCreatedCount(), 1);
 	}
 
 	@SmallTest
@@ -233,7 +235,6 @@ public class AccountsApiTest extends RestAPITest {
 				System.out.println("Assigned user name : " + sugarBeans[i].getFieldValue(ModuleFields.ASSIGNED_USER_NAME));
 			}
 		}
-		
 	}
 
 	/**
