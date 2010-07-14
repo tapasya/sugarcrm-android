@@ -13,6 +13,9 @@ import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * EntryListServiceTask
  * 
@@ -32,9 +35,9 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
 
     private String[] mSelectFields;
 
-    private String[] mLinkNameToFieldsArray;
+    private HashMap<String, List<String>> mLinkNameToFieldsArray = new HashMap<String, List<String>>();
 
-    private String mMaxResults;
+    private String mMaxResults = "0";
 
     private Uri mUri;
 
@@ -71,7 +74,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
             }
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
             // TODO use a constant and remove this as we start from the login screen
-            String url = pref.getString("URL", mContext.getString(R.string.defaultUrl));
+            String url = pref.getString(Util.PREF_REST_URL, mContext.getString(R.string.defaultUrl));
 
             SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, mModuleName, mQuery, mOrderBy, mOffset, mSelectFields, mLinkNameToFieldsArray, mMaxResults, mDeleted);
             // mAdapter.setSugarBeanArray(sBeans);
