@@ -91,7 +91,7 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME, EMAIL1 };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
-                ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1 };
+                ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, ACCOUNT_ID };
 
     }
 
@@ -115,6 +115,9 @@ public final class SugarCRMContent {
         public String CREATED_BY = ModuleFields.CREATED_BY;
 
         public String MODIFIED_BY_NAME = ModuleFields.MODIFIED_BY_NAME;
+        
+        //TODO: may move out to separate table having the contact beanId and accountId
+        public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
 
     }
 
@@ -133,7 +136,7 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
-                PHONE_WORK, PHONE_FAX, EMAIL1 };
+                PHONE_WORK, PHONE_FAX, EMAIL1, ACCOUNT_ID };
 
     }
 
@@ -151,10 +154,12 @@ public final class SugarCRMContent {
         public String PHONE_WORK = ModuleFields.PHONE_WORK;
 
         public String PHONE_FAX = ModuleFields.PHONE_FAX;
+        
+        public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
 
     }
 
-    public static final class Opportunites implements OpportunitesColumns {
+    public static final class Opportunities implements OpportunitiesColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
                                         + "/opportunity");
@@ -169,11 +174,11 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { NAME, OPPORTUNITY_TYPE };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
-                OPPORTUNITY_TYPE, SALES_STAGE };
+                OPPORTUNITY_TYPE, SALES_STAGE, ACCOUNT_ID };
 
     }
 
-    public interface OpportunitesColumns {
+    public interface OpportunitiesColumns {
         public String ID = RECORD_ID;
 
         public String BEAN_ID = ModuleFields.ID;
@@ -225,6 +230,8 @@ public final class SugarCRMContent {
         public String SALES_STAGE = ModuleFields.SALES_STAGE;
 
         public String PROBABILITY = ModuleFields.PROBABILITY;
+        
+        public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
 
     }
 
