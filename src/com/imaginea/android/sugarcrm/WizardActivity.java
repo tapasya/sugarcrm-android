@@ -114,9 +114,7 @@ public class WizardActivity extends Activity {
                     View step = mInflater.inflate(layout, this.flipper, false);
                     this.flipper.addView(step);
                 }
-            } else {
-
-                mHeaderTextView.setText(R.string.login);
+            } else {              
                 // if the username is not available
                 if (TextUtils.isEmpty(usr)) {
                     Log.i(LOG_TAG, "REST URL is available but not the username!");
@@ -135,6 +133,7 @@ public class WizardActivity extends Activity {
                     EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
                     editTextUser.setText(usr);
                 }
+                mHeaderTextView.setText(R.string.login);
             }
             this.updateButtons(wizardState);
         }
