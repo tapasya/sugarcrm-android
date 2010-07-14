@@ -105,7 +105,9 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     private ProgressDialog progressDialog;
 
-    private static final String LOG_TAG = "WizardActivity";
+    private TextView mHeaderTextView;
+
+    private static final String LOG_TAG = "WizardAuthActivity";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -136,7 +138,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // if the password is already saved
-        if (isPwdRemembered) {
+        if (isPwdRemembered && !TextUtils.isEmpty(restUrl)) {
             Log.i(LOG_TAG, "Password is remembered!");
             wizardState = Util.URL_USER_PWD_AVAILABLE;
 
@@ -150,13 +152,14 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 wizardState = Util.URL_NOT_AVAILABLE;
 
                 setFlipper();
-
+                mHeaderTextView.setText(R.string.sugarCrmUrlHeader);
                 // inflate both url layout and username_password layout
                 for (int layout : STEPS) {
                     View step = mInflater.inflate(layout, this.flipper, false);
                     this.flipper.addView(step);
                 }
             } else {
+                mHeaderTextView.setText(R.string.login);
                 // if the username is not available
                 if (TextUtils.isEmpty(usr)) {
                     Log.i(LOG_TAG, "REST URL is available but not the username!");
@@ -190,6 +193,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     private void setFlipper() {
         setContentView(R.layout.sugar_wizard);
+        mHeaderTextView = (TextView) findViewById(R.id.headerText);
         this.flipper = (ViewFlipper) this.findViewById(R.id.wizardFlipper);
         prev = (Button) this.findViewById(R.id.actionPrev);
         next = (Button) this.findViewById(R.id.actionNext);
@@ -200,7 +204,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
                 // if (isFirstDisplayed()) {
                 if (flipper.getCurrentView().getId() == R.id.urlStep) {
-
                     String url = ((EditText) flipper.findViewById(R.id.wizardUrl)).getText().toString();
                     TextView tv = (TextView) flipper.findViewById(R.id.wizardUrlStatus);
                     if (TextUtils.isEmpty(url)) {

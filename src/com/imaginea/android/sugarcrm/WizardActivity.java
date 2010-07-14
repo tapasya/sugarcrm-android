@@ -72,6 +72,8 @@ public class WizardActivity extends Activity {
 
     private ProgressDialog progressDialog;
 
+    private TextView mHeaderTextView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +94,7 @@ public class WizardActivity extends Activity {
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // if the password is already saved
-        if (isPwdRemembered) {
+        if (isPwdRemembered && !TextUtils.isEmpty(restUrl)) {
             Log.i(LOG_TAG, "Password is remembered!");
             wizardState = Util.URL_USER_PWD_AVAILABLE;
 
@@ -106,13 +108,15 @@ public class WizardActivity extends Activity {
                 wizardState = Util.URL_NOT_AVAILABLE;
 
                 setFlipper();
-
+                mHeaderTextView.setText(R.string.sugarCrmUrlHeader);
                 // inflate both url layout and username_password layout
                 for (int layout : STEPS) {
                     View step = mInflater.inflate(layout, this.flipper, false);
                     this.flipper.addView(step);
                 }
             } else {
+
+                mHeaderTextView.setText(R.string.login);
                 // if the username is not available
                 if (TextUtils.isEmpty(usr)) {
                     Log.i(LOG_TAG, "REST URL is available but not the username!");
@@ -146,6 +150,7 @@ public class WizardActivity extends Activity {
 
     private void setFlipper() {
         setContentView(R.layout.sugar_wizard);
+        mHeaderTextView = (TextView) findViewById(R.id.headerText);
         this.flipper = (ViewFlipper) this.findViewById(R.id.wizardFlipper);
         prev = (Button) this.findViewById(R.id.actionPrev);
         next = (Button) this.findViewById(R.id.actionNext);
@@ -156,7 +161,6 @@ public class WizardActivity extends Activity {
 
                 // if (isFirstDisplayed()) {
                 if (flipper.getCurrentView().getId() == R.id.urlStep) {
-
                     String url = ((EditText) flipper.findViewById(R.id.wizardUrl)).getText().toString();
                     TextView tv = (TextView) flipper.findViewById(R.id.wizardUrlStatus);
                     if (TextUtils.isEmpty(url)) {
@@ -348,10 +352,10 @@ public class WizardActivity extends Activity {
 
         private String sceDesc;
 
-        //TODO: remove this moduleNames from here and use the one from DB
-     // reference to the module names
+        // TODO: remove this moduleNames from here and use the one from DB
+        // reference to the module names
         private String[] moduleNames = { "Accounts", "Contacts", "Leads", "Opportunities" };
-        
+
         @Override
         protected Object doInBackground(Object... args) {
             /*
@@ -368,19 +372,19 @@ public class WizardActivity extends Activity {
             try {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
-                
-                HashMap<String,HashMap<String, ModuleField>> moduleNameVsFields = new HashMap<String,HashMap<String, ModuleField>>(); 
-                for(String moduleName : moduleNames){
+
+                HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
+                for (String moduleName : moduleNames) {
                     String[] fields = {};
-                    List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields );
-                    HashMap<String, ModuleField> nameVsModuleField = new HashMap<String, ModuleField>(); 
-                    for(int i=0; i<moduleFields.size(); i++){
+                    List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
+                    HashMap<String, ModuleField> nameVsModuleField = new HashMap<String, ModuleField>();
+                    for (int i = 0; i < moduleFields.size(); i++) {
                         nameVsModuleField.put(moduleFields.get(i).getName(), moduleFields.get(i));
                     }
                     moduleNameVsFields.put(moduleName, nameVsModuleField);
                 }
                 DatabaseHelper.moduleFields = moduleNameVsFields;
-                
+
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
