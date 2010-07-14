@@ -1,6 +1,8 @@
 package com.imaginea.android.sugarcrm;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -16,7 +18,7 @@ public class SugarCrmSettings extends PreferenceActivity {
     private static final String LOG_TAG = "SugarCrmSettings";
 
     private static final Map<String, String> savedSettings = new HashMap<String, String>();
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,13 +38,30 @@ public class SugarCrmSettings extends PreferenceActivity {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Util.PREF_REMEMBER_PASSWORD, false);
     }
 
+    /**
+     * gets SugarCRM RestUrl, on production it returns empty url, if debuggable is set to "false" in
+     * the manifest file.
+     * 
+     * // TODO - optimize once loaded instead of calling package manager everytime
+     * 
+     * @param context
+     * @return
+     */
     public static String getSugarRestUrl(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
+        PackageManager pm = context.getPackageManager();
+        try {
+            ApplicationInfo appInfo = pm.getApplicationInfo("com.imaginea.android.sugarcrm", ApplicationInfo.FLAG_DEBUGGABLE);
+            if ((ApplicationInfo.FLAG_DEBUGGABLE & appInfo.flags) == ApplicationInfo.FLAG_DEBUGGABLE)
+                return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_REST_URL, "");
     }
 
     /**
-     * This methods saves the current settings, to be able to check later if
-     * settings changed
+     * This methods saves the current settings, to be able to check later if settings changed
      */
     public static void saveCurrentSettings(Context context) {
         savedSettings.clear();
@@ -50,7 +69,7 @@ public class SugarCrmSettings extends PreferenceActivity {
         savedSettings.put(Util.PREF_USERNAME, getUsername(context));
         savedSettings.put(Util.PREF_PASSWORD, getPassword(context));
     }
-    
+
     /**
      * This methods tells if the settings have changed.
      */
@@ -64,7 +83,7 @@ public class SugarCrmSettings extends PreferenceActivity {
             if (!getSugarRestUrl(context).equals(savedSettings.get(Util.PREF_REST_URL))) {
                 return true;
             }
-            
+
             if (!getUsername(context).equals(savedSettings.get(Util.PREF_USERNAME))) {
                 return true;
             }
@@ -85,19 +104,19 @@ public class SugarCrmSettings extends PreferenceActivity {
      * onKeyDown for older versions and use Override on that.
      */
     public void onBackPressed() {
-       /// super.onBackPressed();
+        // / super.onBackPressed();
         // TODO: onChange of settings, session has to be invalidated
         Log.i(LOG_TAG, "url - " + getSugarRestUrl(SugarCrmSettings.this));
         Log.i(LOG_TAG, "username - " + getUsername(SugarCrmSettings.this));
         Log.i(LOG_TAG, "password - " + getPassword(SugarCrmSettings.this));
         Log.i(LOG_TAG, "pwdSaved - " + isPasswordSaved(SugarCrmSettings.this));
-        
+
         // invalidate the session if the current settings changes
-        if(currentSettingsChanged(SugarCrmSettings.this)){
+        if (currentSettingsChanged(SugarCrmSettings.this)) {
             SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
             app.setSessionId(null);
         }
-        
+
         finish();
     }
 }
