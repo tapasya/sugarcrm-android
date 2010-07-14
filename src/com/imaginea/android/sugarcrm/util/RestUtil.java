@@ -163,7 +163,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             SugarBean[] beans = new SBParser(EntityUtils.toString(res.getEntity()).toString()).getSugarBeans();
@@ -203,7 +203,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             SugarBean[] beans = new SBParser(EntityUtils.toString(res.getEntity()).toString()).getSugarBeans();
@@ -243,7 +243,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             return new SugarBean(EntityUtils.toString(res.getEntity()).toString());
@@ -291,7 +291,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
@@ -351,7 +351,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
@@ -419,7 +419,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
@@ -526,7 +526,7 @@ public class RestUtil {
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
-            Log.i(LOG_TAG, "getRelationships response : " + response);
+            Log.e(LOG_TAG, "getRelationships response : " + response);
             JSONObject jsonResponse = new JSONObject(response);
             // TODO: parse the JSON response
             return response;
@@ -611,7 +611,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
@@ -691,7 +691,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
@@ -749,7 +749,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
@@ -812,7 +812,7 @@ public class RestUtil {
             HttpResponse resLogin = httpClient.execute(reqLogin);
 
             if (resLogin.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
 
@@ -861,12 +861,13 @@ public class RestUtil {
             HttpResponse res = httpClient.execute(req);
 
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
 
             final String response = EntityUtils.toString(res.getEntity());
-            Log.i(LOG_TAG, "available modules : " + response);
+            if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.i(LOG_TAG, "available modules : " + response);
             JSONObject responseObj = new JSONObject(response);
             JSONArray modulesArray = responseObj.getJSONArray(MODULES);
             List<String> modules = new ArrayList<String>();
@@ -921,18 +922,20 @@ public class RestUtil {
             nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
             nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData.toString()));
             req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            Log.i(LOG_TAG, EntityUtils.toString(req.getEntity()));
+            if(Log.isLoggable(LOG_TAG, Log.DEBUG))
+                Log.d(LOG_TAG, EntityUtils.toString(req.getEntity()));
 
             // Send POST request
             HttpResponse res = httpClient.execute(req);
 
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
 
             final String response = EntityUtils.toString(res.getEntity());
-            Log.i(LOG_TAG, "moduleFields : " + response);
+            if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, "moduleFields : " + response);
             return new ModuleFieldsParser(response).getModuleFields();
 
         } catch (JSONException jo) {
@@ -966,7 +969,7 @@ public class RestUtil {
             // Send POST request
             HttpResponse res = httpClient.execute(req);
             if (res.getEntity() == null) {
-                Log.i(LOG_TAG, "FAILED TO CONNECT!");
+                Log.e(LOG_TAG, "FAILED TO CONNECT!");
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
