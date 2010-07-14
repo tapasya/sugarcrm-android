@@ -52,6 +52,9 @@ import java.util.List;
  * WizardAuthActivity, same as Wizard Activity, but with account manager integration works only with
  * android 2.0 and above-minSdkVersion>=5
  * 
+ * //TODO - as password is saved in Account Manager with Settings credential storage, we donot have
+ * to store the password anymore and change the settings screen accordigly
+ * 
  * @author Vasavi
  * @author chander
  * 
@@ -159,7 +162,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     this.flipper.addView(step);
                 }
             } else {
-                mHeaderTextView.setText(R.string.login);
                 // if the username is not available
                 if (TextUtils.isEmpty(usr)) {
                     Log.i(LOG_TAG, "REST URL is available but not the username!");
@@ -178,6 +180,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
                     editTextUser.setText(mUsername);
                 }
+                mHeaderTextView.setText(R.string.login);
             }
             this.updateButtons(wizardState);
         }
@@ -406,8 +409,10 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
              * rememberPassword
              */
             usr = args[0].toString();
+            // TODO this settings are important - make it cleaner later to use the same variables
             mUsername = usr;
             pwd = args[1].toString();
+            mPassword = pwd;
             rememberPwd = Boolean.valueOf(args[2].toString());
             String url = SugarCrmSettings.getSugarRestUrl(getBaseContext());
 
