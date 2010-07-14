@@ -46,6 +46,8 @@ public class EditDetailsActivity extends Activity {
     private String[] mSelectFields;
 
     private String mLinkFieldName;
+    
+    private String mAccountName;
 
     /** Called when the activity is first created. */
     @Override
@@ -71,6 +73,7 @@ public class EditDetailsActivity extends Activity {
                 mLinkFieldName = extras.getString(RestUtilConstants.LINK_FIELD_NAME);
                 mParentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
                 mParentId = extras.getString(RestUtilConstants.BEAN_ID);
+                mAccountName = extras.getString(ModuleFields.ACCOUNT_NAME);
             }
         } else {
             MODE = Util.EDIT_MODE;
@@ -103,7 +106,7 @@ public class EditDetailsActivity extends Activity {
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        for (int i = 2; i < detailsProjection.length-1; i++) {
+        for (int i = 2; i < detailsProjection.length-2; i++) {
             String fieldName = detailsProjection[i];
 
             // TODO: get the attributes of the moduleField
@@ -150,9 +153,11 @@ public class EditDetailsActivity extends Activity {
                 if (MODE == Util.EDIT_MODE)
                     modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
 
-                for (int i = 2; i < detailsProjection.length-1; i++) {
-                    if(ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
+                for (int i = 2; i < detailsProjection.length-2; i++) {
+                    if(ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i])){
+                        modifiedValues.put(detailsProjection[i], mAccountName);
                         continue;
+                    }
                     
                     EditText editText = (EditText) mDetailsTable.findViewById(i);
                     Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
