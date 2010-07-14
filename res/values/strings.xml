@@ -3,6 +3,7 @@
 
 	<!-- Application name -->
 	<string name="appName">iCRM- Android</string>
+	<string name="appProviderDesc">Provider for Accounts, Contacts, Leads, Oppurtunities and other modules of Sugar CRM</string>
 
 	<string name="home">Home</string>	
 
