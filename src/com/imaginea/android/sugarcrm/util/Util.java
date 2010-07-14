@@ -42,6 +42,12 @@ public class Util {
     public static final int URL_USER_AVAILABLE = 2;
 
     public static final int URL_USER_PWD_AVAILABLE = 3;
+    
+    // View modes : EDIT / NEW
+    
+    public static final int EDIT_MODE = 0;
+    
+    public static final int NEW_MODE = 1; 
 
     // constants for settings / Preferences
     public static final String PREF_REST_URL = "restUrl";
@@ -59,6 +65,8 @@ public class Util {
     public static final String COMMAND = "cmd";
 
     private static int mRequestId = 0;
+    
+    public static final String ROW_ID = "row_id";
 
     private static final String LOG_TAG = Util.class.getSimpleName();
 
