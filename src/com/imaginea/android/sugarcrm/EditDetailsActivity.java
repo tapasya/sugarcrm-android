@@ -13,12 +13,12 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,15 +27,25 @@ public class EditDetailsActivity extends Activity {
 
     private final String TAG = "EditDetailsActivity";
 
+    private int MODE = -1;
+
     private TableLayout mDetailsTable;
 
     private Cursor mCursor;
-    
+
     private String mSugarBeanId;
+    
+    private String mModuleName;
+    
+    private String mParentModuleName;
+    
+    private String mParentId;
 
     private String mRowId;
 
     private String[] mSelectFields;
+
+    private String mLinkFieldName;
 
     /** Called when the activity is first created. */
     @Override
@@ -45,20 +55,40 @@ public class EditDetailsActivity extends Activity {
 
         setContentView(R.layout.account_details);
 
-        mRowId = (String) getIntent().getStringExtra(RestUtilConstants.ID);
         Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        String moduleName = "Contacts";
-        if (extras != null)
-            moduleName = extras.getString(RestUtilConstants.MODULE_NAME);
+        Bundle extras = intent.getExtras();        
 
-        if (intent.getData() == null) {
-            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), mRowId));
+        mModuleName = "Contacts";
+        if (extras != null){
+            mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
+            mRowId = (String) intent.getStringExtra(Util.ROW_ID);
+            mLinkFieldName = extras.getString(RestUtilConstants.LINK_FIELD_NAME);
         }
-        mSelectFields = DatabaseHelper.getModuleProjections(moduleName);
-        mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(moduleName));
+
+        if (mLinkFieldName != null) {
+            MODE = Util.NEW_MODE;
+            if (extras != null){
+                mLinkFieldName = extras.getString(RestUtilConstants.LINK_FIELD_NAME);
+                mParentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
+                mParentId = extras.getString(RestUtilConstants.BEAN_ID);
+            }
+        } else {
+            MODE = Util.EDIT_MODE;
+        }
+
+        if (intent.getData() == null && MODE != Util.NEW_MODE) {
+            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId));
+        } else if (intent.getData() == null && MODE == Util.EDIT_MODE) {
+            intent.setData(DatabaseHelper.getModuleUri(mModuleName));
+        }
+
+        mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
+
+        if (MODE == Util.EDIT_MODE) {
+            mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
+        }
         // startManagingCursor(mCursor);
-        setContents(moduleName);
+        setContents(mModuleName);
     }
 
     private void setContents(final String moduleName) {
@@ -67,23 +97,23 @@ public class EditDetailsActivity extends Activity {
 
         mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
 
-        mCursor.moveToFirst();
-        mSugarBeanId = mCursor.getString(mCursor.getColumnIndex(AccountsColumns.BEAN_ID));
-        Log.i(TAG, "mSugarBeanId - " + mSugarBeanId);
+        if (MODE == Util.EDIT_MODE) {
+            mCursor.moveToFirst();
+        }
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        
-        for (int i = 2; i < detailsProjection.length; i++) {
+
+        for (int i = 2; i < detailsProjection.length-1; i++) {
             String fieldName = detailsProjection[i];
-            int columnIndex = mCursor.getColumnIndex(fieldName);
-            Log.d(TAG, "Col:" + columnIndex);
 
             // TODO: get the attributes of the moduleField
             ModuleField moduleField = DatabaseHelper.getModuleField(moduleName, fieldName);
-            
+
+            if(ModuleFields.ACCOUNT_NAME.equals(fieldName))
+                continue;
             View tableRow = inflater.inflate(R.layout.edit_table_row, null);
-            TextView textViewForLabel = (TextView)tableRow.findViewById(R.id.editRowLabel);
-            EditText editTextForValue = (EditText)tableRow.findViewById(R.id.editRowValue);
+            TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.editRowLabel);
+            EditText editTextForValue = (EditText) tableRow.findViewById(R.id.editRowValue);
 
             if (moduleField.isRequired()) {
                 textViewForLabel.setText(moduleField.getLabel() + " *");
@@ -92,12 +122,20 @@ public class EditDetailsActivity extends Activity {
             }
 
             editTextForValue.setId(i);
-            String value = mCursor.getString(columnIndex);
+            int columnIndex;
+            if (MODE == Util.EDIT_MODE) {
+                columnIndex = mCursor.getColumnIndex(fieldName);
+                Log.d(TAG, "Col:" + columnIndex);
 
-            if (value != null && !value.equals("")) {
-                editTextForValue.setText(value);
-            }
+                mSugarBeanId = mCursor.getString(mCursor.getColumnIndex(AccountsColumns.BEAN_ID));
+                
+                Log.i(TAG, "mSugarBeanId - " + mSugarBeanId);
+                String value = mCursor.getString(columnIndex);
 
+                if (value != null && !value.equals("")) {
+                    editTextForValue.setText(value);
+                }
+            } 
             mDetailsTable.addView(tableRow);
         }
 
@@ -109,13 +147,15 @@ public class EditDetailsActivity extends Activity {
                 String[] detailsProjection = mSelectFields;
 
                 Map<String, String> modifiedValues = new LinkedHashMap<String, String>();
-                modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
-                
-                for (int i = 2; i < detailsProjection.length; i++) {
+                if (MODE == Util.EDIT_MODE)
+                    modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
+
+                for (int i = 2; i < detailsProjection.length-1; i++) {
+                    if(ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
+                        continue;
+                    
                     EditText editText = (EditText) mDetailsTable.findViewById(i);
                     Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
-
-                    // what all fields can be updated ?
 
                     // TODO: validation
 
@@ -124,13 +164,19 @@ public class EditDetailsActivity extends Activity {
                 }
 
                 // save the changes in the DB
-                /*getContentResolver().update(Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), 
-                                                mSugarBeanId), modifiedValues, null, null);*/
+                /*
+                 * getContentResolver().update(Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName
+                 * ), mSugarBeanId), modifiedValues, null, null);
+                 */
 
-                //TODO: REST call : update();
-                
-                ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), 
-                                                mRowId), moduleName, mSugarBeanId, modifiedValues);
+                // TODO: REST call : update();
+
+                if (MODE == Util.EDIT_MODE) {
+                    ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), mRowId), moduleName, mSugarBeanId, modifiedValues);
+                } else if(MODE == Util.NEW_MODE){
+                    ServiceHelper.startServiceForInsert(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(mParentModuleName), mRowId), mParentModuleName, mParentId, mModuleName, mLinkFieldName, modifiedValues);
+                }
+
                 finish();
             }
         });
