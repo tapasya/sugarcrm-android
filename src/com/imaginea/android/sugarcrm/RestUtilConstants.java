@@ -71,6 +71,8 @@ public interface RestUtilConstants {
 
     public static final String SESSION = "session";
 
+    public static final String PARENT_MODULE_NAME = "parent_module_name";
+    
     public static final String MODULE_NAME = "module_name";
     
     public static final String MODULE_NAMES = "module_names";
