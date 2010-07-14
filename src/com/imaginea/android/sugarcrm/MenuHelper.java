@@ -25,8 +25,26 @@ public class MenuHelper {
                 menuItem.setEnabled(false);
                 menuItem.setVisible(false);
             }
-        } else {
-
+        } else if(activity instanceof AccountDetailsActivity){
+            if (moduleName.equals(activity.getString(R.string.accounts))) {
+                menuItem = menu.findItem(R.id.addItem);
+                menuItem.setEnabled(true);
+                menuItem.setVisible(true);
+                
+                menuItem = menu.findItem(R.id.search);
+                menuItem.setEnabled(false);
+                menuItem.setVisible(false);
+            } else{
+                menuItem = menu.findItem(R.id.addItem);
+                menuItem.setEnabled(false);
+                menuItem.setVisible(false);
+                
+                menuItem = menu.findItem(R.id.search);
+                menuItem.setEnabled(false);
+                menuItem.setVisible(false);
+            }
+        } else{
+            
         }
 
     }
