@@ -2,9 +2,9 @@
 <resources>
 
 	<!-- Application name -->
-	<string name="appName">SugarCRM</string>
+	<string name="appName">iCRM- Android</string>
 
-	<string name="home">Home</string>
+	<string name="home">Home</string>	
 
 	<!-- Sugar CRM Settings  -->
 	<string name="userSummary">The username you use to log in to Sugar</string>
@@ -30,6 +30,8 @@
 	<string name="settings">Settings</string>
 
 	<!-- Login Module -->
+	<string name="sugarCrmUrlHeader">Sugar CRM REST URL</string>
+	<string name="login">Login</string>
 	<string name="username">Username</string>
 	<string name="password">Password</string>
 	<string name="rememberPassword">Remember Password</string>
