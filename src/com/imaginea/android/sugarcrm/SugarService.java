@@ -201,21 +201,28 @@ public class SugarService extends Service {
                 break;
             case R.id.update:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
-                    Log.i(TAG, "REST API -Update/Delete received:");
+                    Log.i(TAG, "REST API -Update received:");
                 UpdateServiceTask updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);
                 mTaskMap.put(Util.getId(), updateServiceTask);
                 updateServiceTask.execute(null);
-
+                break;
             case R.id.delete:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
                     Log.i(TAG, "REST API -Delete received:");
                 updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);
                 mTaskMap.put(Util.getId(), updateServiceTask);
                 updateServiceTask.execute(null);
+                break;
+            case R.id.insert:
+                if (Log.isLoggable(TAG, Log.VERBOSE))
+                    Log.i(TAG, "REST API -Insert received:");
+                updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);
+                mTaskMap.put(Util.getId(), updateServiceTask);
+                updateServiceTask.execute(null);
+                break;
             default:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
                     Log.i(TAG, "Unknown REST API received:");
-
                 break;
             }
 
