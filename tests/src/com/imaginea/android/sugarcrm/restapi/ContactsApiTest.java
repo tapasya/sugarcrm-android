@@ -1,5 +1,8 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import java.util.HashMap;
+import java.util.List;
+
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
@@ -23,7 +26,8 @@ public class ContactsApiTest extends RestAPITest {
 
 	String[] selectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
 			ModuleFields.EMAIL1 };
-	String[] linkNameToFieldsArray = new String[] {};
+	
+	HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
 
 	public final static String LOG_TAG = "ContactsApiTest";
 

@@ -30,7 +30,7 @@ public class AccountsApiTest extends RestAPITest {
 			ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX,
 			ModuleFields.EMAIL1, ModuleFields.DELETED };
 
-	String[] linkNameToFieldsArray = {"Contacts"};
+	HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
 
 	public final static String LOG_TAG = "AccountsApiTest";
 
@@ -65,6 +65,7 @@ public class AccountsApiTest extends RestAPITest {
 	@SmallTest
 	public void testGetEntry() throws Exception {
 		String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+		linkNameToFieldsArray.put("contacts", Arrays.asList(new String[]{"first_name", "last_name"}));
 		SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName,
 				beanId, selectFields, linkNameToFieldsArray);
 		Log.d(LOG_TAG,"Account Name : " + sBean.getFieldValue("name"));
@@ -253,7 +254,7 @@ public class AccountsApiTest extends RestAPITest {
 		int deleted = 0;
 		SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName,
 				query, orderBy, offset+"", selectFields, linkNameToFieldsArray,
-				maxResults+"", deleted+"");
+				maxResults+"", "");
 		return sBeans;
 	}
 }
