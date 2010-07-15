@@ -259,4 +259,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return pathForRelationship.get(moduleName);
     }
 
+    public static List<String> getModuleList(){
+        return  modulesList;
+    }
 }
