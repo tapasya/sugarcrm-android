@@ -15,6 +15,8 @@ public final class SugarCRMContent {
     public static final String AUTHORITY = SugarCRMProvider.AUTHORITY;
 
     public static final String RECORD_ID = "_id";
+    
+    public static final String SUGAR_BEAN_ID = ModuleFields.ID;
 
     public static final class Accounts implements AccountsColumns {
 
@@ -38,7 +40,7 @@ public final class SugarCRMContent {
     public interface AccountsColumns {
         public String ID = RECORD_ID;
 
-        public String BEAN_ID = ModuleFields.ID;
+        public String BEAN_ID = SUGAR_BEAN_ID;
 
         public String NAME = ModuleFields.NAME;
 
@@ -100,7 +102,7 @@ public final class SugarCRMContent {
     public interface ContactsColumns {
         public String ID = RECORD_ID;
 
-        public String BEAN_ID = ModuleFields.ID;
+        public String BEAN_ID = SUGAR_BEAN_ID;
 
         public String FIRST_NAME = ModuleFields.FIRST_NAME;
 
@@ -146,7 +148,7 @@ public final class SugarCRMContent {
     public interface LeadsColumns {
         public String ID = RECORD_ID;
 
-        public String BEAN_ID = ModuleFields.ID;
+        public String BEAN_ID = SUGAR_BEAN_ID;
 
         public String FIRST_NAME = ModuleFields.FIRST_NAME;
 
@@ -185,7 +187,7 @@ public final class SugarCRMContent {
     public interface OpportunitiesColumns {
         public String ID = RECORD_ID;
 
-        public String BEAN_ID = ModuleFields.ID;
+        public String BEAN_ID = SUGAR_BEAN_ID;
 
         public String NAME = ModuleFields.NAME;
 
