@@ -15,6 +15,7 @@ import com.imaginea.android.sugarcrm.RestUtilConstants;
 import com.imaginea.android.sugarcrm.ServiceHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 
@@ -96,6 +97,12 @@ public class SugarCRMProvider extends ContentProvider {
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             // qb.appendWhere(Notes._ID + "=" + uri.getPathSegments().get(1));
+            break;
+            
+        case ACCOUNT_CONTACT:
+            module = RestUtilConstants.CONTACTS_MODULE;
+            selection = ContactsColumns.ACCOUNT_ID + " = ?";
+            c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
         case CONTACT:
