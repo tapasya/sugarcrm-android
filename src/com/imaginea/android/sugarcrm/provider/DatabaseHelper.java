@@ -16,7 +16,6 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO:
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 8;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -60,7 +59,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static HashMap<String, HashMap<String, ModuleField>> moduleFields ;// new HashMap<String, HashMap<String, ModuleField>>();
     
-    public static final HashMap<String, List<String>> moduleMenuItems = new HashMap<String, List<String>>();
+    public static final HashMap<String, String[]> moduleMenuItems = new HashMap<String, String[]>();
+    
+    public static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
 
     static {
         // modules.put(0, "Accounts");
@@ -89,10 +90,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put("Leads", Leads.CONTENT_URI);
         moduleUris.put("Opportunities", Opportunities.CONTENT_URI);
         
-        moduleMenuItems.put("Accounts", Arrays.asList(new String[]{"Contacts", "Leads", "Opportunities"}));
-        moduleMenuItems.put("Contacts", Arrays.asList(new String[]{"Leads", "Opportunities"}));
-        moduleMenuItems.put("Leads", Arrays.asList(new String[]{"Opportunities", "Contacts"}));
-        moduleMenuItems.put("Opportunities", Arrays.asList(new String[]{"Leads", "Opportunities"}));
+        moduleMenuItems.put("Accounts", new String[]{"Contacts", "Leads", "Opportunities"});
+        moduleMenuItems.put("Contacts", new String[]{"Leads", "Opportunities"});
+        moduleMenuItems.put("Leads", new String[]{"Opportunities", "Contacts"});
+        moduleMenuItems.put("Opportunities", new String[]{"Leads", "Opportunities"});
+        
+        pathForRelationship.put("Contacts", "contact");
+        pathForRelationship.put("Leads", "lead");
+        pathForRelationship.put("Opportunities", "opportunity");
     }
 
     DatabaseHelper(Context context) {
@@ -144,7 +149,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsColumns.EMAIL1 + " TEXT,"
                                         + AccountsColumns.PARENT_NAME + " TEXT,"
                                         + AccountsColumns.PHONE_OFFICE + " TEXT,"
-                                        + AccountsColumns.PHONE_FAX + " TEXT," 
+                                        + AccountsColumns.PHONE_FAX + " TEXT,"
                                         + AccountsColumns.DELETED + " INTEGER," 
                                         + " UNIQUE(" + AccountsColumns.BEAN_ID + ")" + ");");
     }
@@ -162,8 +167,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsColumns.EMAIL1 + " TEXT,"
                                         + ContactsColumns.CREATED_BY + " TEXT,"
                                         + ContactsColumns.MODIFIED_BY_NAME + " TEXT," 
-                                        + ContactsColumns.ACCOUNT_ID + " Text,"
                                         + ContactsColumns.DELETED + " INTEGER,"
+                                        + ContactsColumns.ACCOUNT_ID + " INTEGER,"
                                         + " UNIQUE(" + ContactsColumns.BEAN_ID + ")" + ");");
     }
 
@@ -176,9 +181,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + LeadsColumns.LAST_NAME + " TEXT," 
                                         + LeadsColumns.EMAIL1 + " TEXT," 
                                         + LeadsColumns.PHONE_WORK + " TEXT,"
-                                        + LeadsColumns.PHONE_FAX + " TEXT," 
-                                        + LeadsColumns.ACCOUNT_ID + " Text,"
-                                        + LeadsColumns.DELETED + " INTEGER,"
+                                        + LeadsColumns.PHONE_FAX + " TEXT,"
+                                        + LeadsColumns.DELETED + " INTEGER," 
+                                        + LeadsColumns.ACCOUNT_ID + " INTEGER,"
                                         + " UNIQUE(" + LeadsColumns.BEAN_ID + ")" + ");");
     }
 
@@ -210,14 +215,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + OpportunitiesColumns.OPPORTUNITY_TYPE + " TEXT,"
                                         + OpportunitiesColumns.PROBABILITY + " TEXT,"
                                         + OpportunitiesColumns.SALES_STAGE + " TEXT,"
-                                        + OpportunitiesColumns.ACCOUNT_ID + " Text,"
                                         + OpportunitiesColumns.DELETED + " INTEGER,"
+                                        + OpportunitiesColumns.ACCOUNT_ID + " INTEGER,"
                                         + " UNIQUE(" + OpportunitiesColumns.BEAN_ID + ")" + ");");
     }
 
-    public static List<String> getModuleList(){
-        return  modulesList;
-    }
     public static String[] getModuleProjections(String moduleName) {
         return moduleProjections.get(moduleName);
     }
@@ -249,8 +251,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return "";
     }
     
-    public static List<String> getModuleMenuItems(String moduleName){
+    public static String[] getModuleMenuItems(String moduleName){
         return moduleMenuItems.get(moduleName);
+    }
+
+    public static String getPathForRelationship(String moduleName) {
+        return pathForRelationship.get(moduleName);
     }
 
 }
