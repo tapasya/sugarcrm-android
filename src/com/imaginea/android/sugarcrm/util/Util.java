@@ -67,7 +67,9 @@ public class Util {
     private static int mRequestId = 0;
     
     public static final String ROW_ID = "row_id";
-
+    
+    public static final String DELETED_ITEM = "1";
+    
     private static final String LOG_TAG = Util.class.getSimpleName();
 
     // calculate the MD5 hash of a string
