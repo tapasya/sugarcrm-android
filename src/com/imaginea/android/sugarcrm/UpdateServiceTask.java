@@ -82,7 +82,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
             ContentValues values = new ContentValues();
             int updatedRows = 0;
             boolean serverUpdated = false;
-            //if (Util.isNetworkOn(mContext)) {
+            if (Util.isNetworkOn(mContext)) {
                 Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
                 if(mLinkFieldName != null){
                     updatedBeanId = RestUtil.setEntry(url, mSessionId, mModuleName, mUpdateNameValueMap);
@@ -106,7 +106,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     }
                     //TODO: If the update fails when the network is ON, display the message
                 }
-            //}
+            }
 
             if(mCommand == R.id.insert){
                 for (String key : mUpdateNameValueMap.keySet()) {
