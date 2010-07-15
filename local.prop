@@ -5,11 +5,14 @@
 # add the entries in alphabetical order to make it easy
 
 log.tag.AccountDetailsActivity=VERBOSE
+log.tag.Authenticator=VERBOSE
 log.tag.ContactListActivity=VERBOSE
 log.tag.EntryListServiceTask=VERBOSE
 log.tag.ModuleFieldsParser=INFO
 log.tag.RestUtil=INFO
+log.tag.SBParser=INFO
 log.tag.SugarService=VERBOSE
+log.tag.SugarSyncManager=VERBOSE
 log.tag.SyncAdapter=VERBOSE
 log.tag.UpdateServiceTask=VERBOSE
 log.tag.WizardActivity=VERBOSE
