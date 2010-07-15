@@ -509,7 +509,7 @@ public class RestUtil {
      *         0 ) ) ) ) )
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static String getRelationships(String url, String sessionId, String moduleName,
+    public static SugarBean[] getRelationships(String url, String sessionId, String moduleName,
                                     String beanId, String linkFieldName, String relatedModuleQuery,
                                     String[] relatedFields,
                                     Map<String, List<String>> relatedModuleLinkNameToFieldsArray,
@@ -523,11 +523,14 @@ public class RestUtil {
         data.put(RELATED_FIELDS, new JSONArray(Arrays.asList(relatedFields)));
 
         try {
-            JSONObject linkNametoFieldJson = new JSONObject();
+            JSONArray linkNametoFieldJson = new JSONArray();
             for (Entry<String, List<String>> entry : relatedModuleLinkNameToFieldsArray.entrySet()) {
-                JSONArray jsonArray = new JSONArray((List<String>) entry.getValue());
-                linkNametoFieldJson.put(entry.getKey().toString(), jsonArray);
+                JSONObject nameValue = new JSONObject();
+                nameValue.put("name", entry.getKey());
+                nameValue.put("value", new JSONArray(entry.getValue()));
+                linkNametoFieldJson.put(nameValue);
             }
+            
             data.put(RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY, linkNametoFieldJson);
             data.put(DELETED, deleted);
 
@@ -552,9 +555,8 @@ public class RestUtil {
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
             Log.e(LOG_TAG, "getRelationships response : " + response);
-            JSONObject jsonResponse = new JSONObject(response);
-            // TODO: parse the JSON response
-            return response;
+            SugarBean[] beans = new SBParser(response).getSugarBeans();
+            return beans;
         } catch (JSONException jo) {
             throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
         } catch (IOException ioe) {
