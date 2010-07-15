@@ -41,30 +41,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CALLS_TABLE_NAME = "calls";
 
-    private static final String TAG = "DatabaseHelper";
+    private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     // TODO - replace with database calls - dynamic module generation
-    public static List<String> modulesList ;
+    private static List<String> modulesList ;
     
-    public static final HashMap<String, String> modules = new HashMap<String, String>();
+    private static final HashMap<String, String> modules = new HashMap<String, String>();
 
-    public static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
+    private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
 
-    public static final HashMap<String, String[]> moduleListSelections = new HashMap<String, String[]>();
+    private static final HashMap<String, String[]> moduleListSelections = new HashMap<String, String[]>();
 
-    public static final HashMap<String, String> moduleSortOrder = new HashMap<String, String>();
+    private static final HashMap<String, String> moduleSortOrder = new HashMap<String, String>();
 
-    public static final HashMap<String, Uri> moduleUris = new HashMap<String, Uri>();
+    private static final HashMap<String, Uri> moduleUris = new HashMap<String, Uri>();
 
-    public static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
+    private static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
 
-    public static HashMap<String, HashMap<String, ModuleField>> moduleFields ;// new HashMap<String, HashMap<String, ModuleField>>();
+    private static HashMap<String, HashMap<String, ModuleField>> moduleFields ;// new HashMap<String, HashMap<String, ModuleField>>();
     
-    public static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
+    private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
     
-    public static final HashMap<String, String> relationshipNames = new HashMap<String, String>();
+    private static final HashMap<String, String> relationshipNames = new HashMap<String, String>();
     
-    public static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
+    private static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
 
     static {
         // modules.put(0, "Accounts");
@@ -246,6 +246,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static ModuleField getModuleField(String moduleName, String fieldName) {
         return moduleFields.get(moduleName).get(fieldName);
     }
+    
+    public static HashMap<String, HashMap<String, ModuleField>> getModuleFields() {
+        return moduleFields;
+    }
+
+    public static void setModuleFields(HashMap<String, HashMap<String, ModuleField>> moduleFields) {
+        DatabaseHelper.moduleFields = moduleFields;
+    }
 
     public static String getModuleSelection(String moduleName, String searchString) {
         if (moduleName.equals("Accounts")) {
@@ -271,6 +279,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return  modulesList;
     }
     
+    public static void setModulesList(List<String> modulesList) {
+        DatabaseHelper.modulesList = modulesList;
+    }
+
     public static String getRelationshipName(String moduleName){
         return relationshipNames.get(moduleName);
     }
