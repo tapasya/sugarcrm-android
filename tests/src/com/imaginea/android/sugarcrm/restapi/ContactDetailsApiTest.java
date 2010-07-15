@@ -7,6 +7,9 @@ import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * ContactsApiTest, tests the rest api calls
  * 
@@ -26,7 +29,7 @@ public class ContactDetailsApiTest extends RestAPITest {
 			ModuleFields.PHONE_MOBILE, ModuleFields.PHONE_WORK,
 			ModuleFields.EMAIL1 };
 
-	private String[] mLinkNameToFieldsArray = new String[] {};
+	HashMap<String, List<String>> mLinkNameToFieldsArray = new HashMap<String, List<String>>();
 
 	public final static String LOG_TAG = "ContactDetailsTest";
 
