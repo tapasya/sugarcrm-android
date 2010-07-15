@@ -27,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO:
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -45,6 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // TODO - replace with database calls - dynamic module generation
     public static List<String> modulesList ;
+    
     public static final HashMap<String, String> modules = new HashMap<String, String>();
 
     public static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
@@ -59,7 +60,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static HashMap<String, HashMap<String, ModuleField>> moduleFields ;// new HashMap<String, HashMap<String, ModuleField>>();
     
-    public static final HashMap<String, String[]> moduleMenuItems = new HashMap<String, String[]>();
+    public static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
+    
+    public static final HashMap<String, String> relationshipNames = new HashMap<String, String>();
     
     public static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
 
@@ -90,14 +93,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put("Leads", Leads.CONTENT_URI);
         moduleUris.put("Opportunities", Opportunities.CONTENT_URI);
         
-        moduleMenuItems.put("Accounts", new String[]{"Contacts", "Leads", "Opportunities"});
-        moduleMenuItems.put("Contacts", new String[]{"Leads", "Opportunities"});
-        moduleMenuItems.put("Leads", new String[]{"Opportunities", "Contacts"});
-        moduleMenuItems.put("Opportunities", new String[]{"Leads", "Opportunities"});
+        moduleRelationshipItems.put("Accounts", new String[]{"Contacts", "Leads", "Opportunities"});
+        moduleRelationshipItems.put("Contacts", new String[]{"Leads", "Opportunities"});
+        moduleRelationshipItems.put("Leads", new String[]{"Opportunities", "Contacts"});
+        moduleRelationshipItems.put("Opportunities", new String[]{"Leads", "Opportunities"});
         
         pathForRelationship.put("Contacts", "contact");
         pathForRelationship.put("Leads", "lead");
         pathForRelationship.put("Opportunities", "opportunity");
+        
+        relationshipNames.put("Contacts", "contacts");
+        relationshipNames.put("Leads", "leads");
+        relationshipNames.put("Opportunities", "opportunities");
     }
 
     DatabaseHelper(Context context) {
@@ -248,11 +255,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                             + ContactsColumns.LAST_NAME + " LIKE '%" + searchString
                                             + "%'" + ")";
         }
+        //TODO: similarly for other modules
         return "";
     }
     
-    public static String[] getModuleMenuItems(String moduleName){
-        return moduleMenuItems.get(moduleName);
+    public static String[] getModuleRelationshipItems(String moduleName){
+        return moduleRelationshipItems.get(moduleName);
     }
 
     public static String getPathForRelationship(String moduleName) {
@@ -261,5 +269,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static List<String> getModuleList(){
         return  modulesList;
+    }
+    
+    public static String getRelationshipName(String moduleName){
+        return relationshipNames.get(moduleName);
     }
 }
