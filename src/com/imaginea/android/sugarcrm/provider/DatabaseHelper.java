@@ -28,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO:
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -45,6 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
 
     // TODO - replace with database calls - dynamic module generation
+    public static List<String> modulesList ;
     public static final HashMap<String, String> modules = new HashMap<String, String>();
 
     public static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
@@ -57,7 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
 
-    public static HashMap<String, HashMap<String, ModuleField>> moduleFields = new HashMap<String, HashMap<String, ModuleField>>();
+    public static HashMap<String, HashMap<String, ModuleField>> moduleFields ;// new HashMap<String, HashMap<String, ModuleField>>();
     
     public static final HashMap<String, List<String>> moduleMenuItems = new HashMap<String, List<String>>();
 
@@ -144,6 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsColumns.PARENT_NAME + " TEXT,"
                                         + AccountsColumns.PHONE_OFFICE + " TEXT,"
                                         + AccountsColumns.PHONE_FAX + " TEXT," 
+                                        + AccountsColumns.DELETED + " INTEGER," 
                                         + " UNIQUE(" + AccountsColumns.BEAN_ID + ")" + ");");
     }
 
@@ -161,6 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsColumns.CREATED_BY + " TEXT,"
                                         + ContactsColumns.MODIFIED_BY_NAME + " TEXT," 
                                         + ContactsColumns.ACCOUNT_ID + " Text,"
+                                        + ContactsColumns.DELETED + " INTEGER,"
                                         + " UNIQUE(" + ContactsColumns.BEAN_ID + ")" + ");");
     }
 
@@ -175,6 +178,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + LeadsColumns.PHONE_WORK + " TEXT,"
                                         + LeadsColumns.PHONE_FAX + " TEXT," 
                                         + LeadsColumns.ACCOUNT_ID + " Text,"
+                                        + LeadsColumns.DELETED + " INTEGER,"
                                         + " UNIQUE(" + LeadsColumns.BEAN_ID + ")" + ");");
     }
 
@@ -207,9 +211,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + OpportunitiesColumns.PROBABILITY + " TEXT,"
                                         + OpportunitiesColumns.SALES_STAGE + " TEXT,"
                                         + OpportunitiesColumns.ACCOUNT_ID + " Text,"
+                                        + OpportunitiesColumns.DELETED + " INTEGER,"
                                         + " UNIQUE(" + OpportunitiesColumns.BEAN_ID + ")" + ");");
     }
 
+    public static List<String> getModuleList(){
+        return  modulesList;
+    }
     public static String[] getModuleProjections(String moduleName) {
         return moduleProjections.get(moduleName);
     }
