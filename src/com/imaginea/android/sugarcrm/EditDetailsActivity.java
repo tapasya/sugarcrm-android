@@ -34,11 +34,11 @@ public class EditDetailsActivity extends Activity {
     private Cursor mCursor;
 
     private String mSugarBeanId;
-    
+
     private String mModuleName;
-    
+
     private String mParentModuleName;
-    
+
     private String mParentId;
 
     private String mRowId;
@@ -46,7 +46,7 @@ public class EditDetailsActivity extends Activity {
     private String[] mSelectFields;
 
     private String mLinkFieldName;
-    
+
     private String mAccountName;
 
     /** Called when the activity is first created. */
@@ -58,10 +58,10 @@ public class EditDetailsActivity extends Activity {
         setContentView(R.layout.account_details);
 
         Intent intent = getIntent();
-        Bundle extras = intent.getExtras();        
+        Bundle extras = intent.getExtras();
 
         mModuleName = "Contacts";
-        if (extras != null){
+        if (extras != null) {
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
             mRowId = (String) intent.getStringExtra(Util.ROW_ID);
             mLinkFieldName = extras.getString(RestUtilConstants.LINK_FIELD_NAME);
@@ -69,7 +69,7 @@ public class EditDetailsActivity extends Activity {
 
         if (mLinkFieldName != null) {
             MODE = Util.NEW_MODE;
-            if (extras != null){
+            if (extras != null) {
                 mLinkFieldName = extras.getString(RestUtilConstants.LINK_FIELD_NAME);
                 mParentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
                 mParentId = extras.getString(RestUtilConstants.BEAN_ID);
@@ -106,13 +106,13 @@ public class EditDetailsActivity extends Activity {
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        for (int i = 2; i < detailsProjection.length-2; i++) {
+        for (int i = 2; i < detailsProjection.length - 2; i++) {
             String fieldName = detailsProjection[i];
 
             // TODO: get the attributes of the moduleField
             ModuleField moduleField = DatabaseHelper.getModuleField(moduleName, fieldName);
 
-            if(ModuleFields.ACCOUNT_NAME.equals(fieldName))
+            if (ModuleFields.ACCOUNT_NAME.equals(fieldName))
                 continue;
             View tableRow = inflater.inflate(R.layout.edit_table_row, null);
             TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.editRowLabel);
@@ -131,14 +131,14 @@ public class EditDetailsActivity extends Activity {
                 Log.d(TAG, "Col:" + columnIndex);
 
                 mSugarBeanId = mCursor.getString(mCursor.getColumnIndex(AccountsColumns.BEAN_ID));
-                
+
                 Log.i(TAG, "mSugarBeanId - " + mSugarBeanId);
                 String value = mCursor.getString(columnIndex);
 
                 if (value != null && !value.equals("")) {
                     editTextForValue.setText(value);
                 }
-            } 
+            }
             mDetailsTable.addView(tableRow);
         }
 
@@ -153,12 +153,12 @@ public class EditDetailsActivity extends Activity {
                 if (MODE == Util.EDIT_MODE)
                     modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
 
-                for (int i = 2; i < detailsProjection.length-2; i++) {
-                    if(ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i])){
+                for (int i = 2; i < detailsProjection.length - 2; i++) {
+                    if (ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i])) {
                         modifiedValues.put(detailsProjection[i], mAccountName);
                         continue;
                     }
-                    
+
                     EditText editText = (EditText) mDetailsTable.findViewById(i);
                     Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
 
@@ -178,7 +178,7 @@ public class EditDetailsActivity extends Activity {
 
                 if (MODE == Util.EDIT_MODE) {
                     ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), mRowId), moduleName, mSugarBeanId, modifiedValues);
-                } else if(MODE == Util.NEW_MODE){
+                } else if (MODE == Util.NEW_MODE) {
                     ServiceHelper.startServiceForInsert(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(mParentModuleName), mRowId), mParentModuleName, mParentId, mModuleName, mLinkFieldName, modifiedValues);
                 }
 
@@ -186,6 +186,15 @@ public class EditDetailsActivity extends Activity {
             }
         });
         mDetailsTable.addView(submit);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mCursor != null && !mCursor.isClosed())
+            mCursor.close();
 
     }
 }
