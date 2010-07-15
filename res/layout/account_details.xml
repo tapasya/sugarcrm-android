@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent" 
-    android:layout_height="fill_parent"
-    android:background="@drawable/bg">
-    <include layout="@layout/header"/>
-    <TextView android:id="@+id/accountName"
-		android:layout_height="wrap_content" 
-		android:layout_width="wrap_content"
-		android:layout_gravity="center" 
-		android:textSize="18sp" />
-	<TableLayout 
-		android:id="@+id/accountDetalsTable"	
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
-		android:stretchColumns="1"
-		android:padding="5dip"
-		android:orientation="vertical"
-		>   			
-	</TableLayout>
-</LinearLayout>
+ <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+ 	android:layout_width="fill_parent" 
+ 	android:layout_height="fill_parent"
+ 	android:background="@drawable/bg">
+   	<LinearLayout 
+	    android:orientation="vertical"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="fill_parent">
+	    <include layout="@layout/header"/>
+	    <TextView android:id="@+id/accountName"
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content"
+			android:layout_gravity="center" 
+			android:textSize="18sp"
+			android:textColor="@color/translucent_dark" />
+		<TableLayout 
+			android:id="@+id/accountDetalsTable"	
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" 
+			android:stretchColumns="1"
+			android:padding="5dip"
+			android:orientation="vertical"
+			>   			
+		</TableLayout>
+		<include layout="@layout/common_list"/>
+	</LinearLayout>
+</ScrollView>
