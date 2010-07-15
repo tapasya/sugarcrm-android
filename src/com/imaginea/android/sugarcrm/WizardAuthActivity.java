@@ -421,18 +421,24 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             try {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
-
-                HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
-                for (String moduleName : moduleNames) {
-                    String[] fields = {};
-                    List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
-                    HashMap<String, ModuleField> nameVsModuleField = new HashMap<String, ModuleField>();
-                    for (int i = 0; i < moduleFields.size(); i++) {
-                        nameVsModuleField.put(moduleFields.get(i).getName(), moduleFields.get(i));
+                if (DatabaseHelper.moduleFields == null) {
+                    HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
+                    for (String moduleName : moduleNames) {
+                        String[] fields = {};
+                        List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
+                        HashMap<String, ModuleField> nameVsModuleField = new HashMap<String, ModuleField>();
+                        for (int i = 0; i < moduleFields.size(); i++) {
+                            nameVsModuleField.put(moduleFields.get(i).getName(), moduleFields.get(i));
+                        }
+                        moduleNameVsFields.put(moduleName, nameVsModuleField);
                     }
-                    moduleNameVsFields.put(moduleName, nameVsModuleField);
+                    DatabaseHelper.moduleFields = moduleNameVsFields;
                 }
-                DatabaseHelper.moduleFields = moduleNameVsFields;
+                if(DatabaseHelper.modulesList == null)
+                {
+                    List<String> modules = RestUtil.getAvailableModules(url, sessionId);
+                    DatabaseHelper.modulesList = modules;
+                }
 
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
