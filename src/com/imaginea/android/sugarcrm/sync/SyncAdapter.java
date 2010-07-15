@@ -7,20 +7,28 @@ import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.imaginea.android.sugarcrm.R;
+import com.imaginea.android.sugarcrm.SugarCrmApp;
+import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.util.RestUtil;
+import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 
 import org.apache.http.ParseException;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 /**
- * SyncAdapter implementation for syncing sample SyncAdapter contacts to the platform
- * ContactOperations provider.
+ * SyncAdapter implementation for syncing sugarcrm modules on the server to sugar crm provider and
+ * vice versa.
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -40,25 +48,61 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
-                                    ContentProviderClient provider, SyncResult syncResult) {      
+                                    ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "onPerformSync");
         String authtoken = null;
         try {
             // use the account manager to request the credentials
             authtoken = mAccountManager.blockingGetAuthToken(account, Util.AUTHTOKEN_TYPE, true /* notifyAuthFailure */);
+            // Log.v(LOG_TAG, "authtoken:" + authtoken);
+            // Log.v(LOG_TAG, "password:" + mAccountManager.getPassword(account));
+            // if we are a password based system, the SugarCRM OAuth setup is not clear yet
+            String userName = account.name;
+            String password = mAccountManager.getPassword(account);
+            Log.v(LOG_TAG, "user name:" + userName);
+
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+            // TODO use a constant and remove this as we start from the login screen
+            String url = pref.getString(Util.PREF_REST_URL, mContext.getString(R.string.defaultUrl));
+            String sessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();
+            if (sessionId == null) {
+                sessionId = RestUtil.loginToSugarCRM(url, account.name, password);
+            }
+
+            List<String> moduleList = DatabaseHelper.getModuleList();
+            if(moduleList == null)
+                moduleList = RestUtil.getAvailableModules(url, sessionId);
+            for (String moduleName : moduleList) {
+                Log.i(LOG_TAG, "Syncing Module:" + moduleName);
+                SugarSyncManager.syncModules(mContext, account.name, sessionId, moduleName);
+            }
+
+            // update the last synced date.
+            mLastUpdated = new Date();
 
         } catch (final ParseException e) {
             syncResult.stats.numParseExceptions++;
             Log.e(LOG_TAG, "ParseException", e);
         } catch (OperationCanceledException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO - whats the stats update here
+            // syncResult.stats.++;
+            Log.e(LOG_TAG, e.getMessage(), e);
         } catch (AuthenticatorException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // syncResult.stats.numAuthExceptions++;
+            Log.e(LOG_TAG, e.getMessage(), e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            syncResult.stats.numIoExceptions++;
+            Log.e(LOG_TAG, e.getMessage(), e);
+        } catch (SugarCrmException se) {
+            Log.e(LOG_TAG, se.getMessage(), se);
         }
     }
+
+    @Override
+    public void onSyncCanceled() {
+        super.onSyncCanceled();
+        // TODO - notify is part if sync framework, with the SyncResults giving details about the
+        // last sync, we perform additional steps that are specific to our app if required
+    }
+
 }
