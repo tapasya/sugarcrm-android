@@ -96,7 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleRelationshipItems.put("Accounts", new String[]{"Contacts", "Leads", "Opportunities"});
         moduleRelationshipItems.put("Contacts", new String[]{"Leads", "Opportunities"});
         moduleRelationshipItems.put("Leads", new String[]{"Opportunities", "Contacts"});
-        moduleRelationshipItems.put("Opportunities", new String[]{"Leads", "Opportunities"});
+        moduleRelationshipItems.put("Opportunities", new String[]{"Leads", "Contacts"});
         
         pathForRelationship.put("Contacts", "contact");
         pathForRelationship.put("Leads", "lead");
