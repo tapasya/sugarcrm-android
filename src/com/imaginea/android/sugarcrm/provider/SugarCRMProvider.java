@@ -12,7 +12,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.RestUtilConstants;
-import com.imaginea.android.sugarcrm.ServiceHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
@@ -107,12 +106,14 @@ public class SugarCRMProvider extends ContentProvider {
 
         case CONTACT:
             module = RestUtilConstants.CONTACTS_MODULE;
-            Log.d(TAG, "Querying Contacts");
-            Log.d(TAG, "Uri:->" + uri.toString());
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "Querying Contacts");
+                Log.d(TAG, "Uri:->" + uri.toString());
 
-            // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
-            Log.d(TAG, "Offset" + offset);
-            Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+                Log.d(TAG, "Offset" + offset);
+                Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+            }
+
             if (maxResultsLimit != null) {
                 // maxResultsLimit = maxResultsLimit + "  OFFSET " + offset;
                 if (selection == null) {
@@ -126,20 +127,18 @@ public class SugarCRMProvider extends ContentProvider {
 
         case CONTACT_ID:
             module = RestUtilConstants.CONTACTS_MODULE;
-            // db.setProjectionMap(sNotesProjectionMap);
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
-            // qb.appendWhere(Notes._ID + "=" + uri.getPathSegments().get(1));
             break;
 
         case LEAD:
             module = RestUtilConstants.LEADS_MODULE;
-            // Log.d(TAG, "Querying Leads");
-            // Log.d(TAG, "Uri:->" + uri.toString());
-
-            // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
-            // Log.d(TAG, "Offset" + offset);
-            // Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "Querying Leads");
+                Log.d(TAG, "Uri:->" + uri.toString());
+                Log.d(TAG, "Offset" + offset);
+                Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+            }
             if (maxResultsLimit != null) {
                 // maxResultsLimit = maxResultsLimit + "  OFFSET " + offset;
                 if (selection == null) {
@@ -161,12 +160,15 @@ public class SugarCRMProvider extends ContentProvider {
 
         case OPPORTUNITY:
             module = RestUtilConstants.OPPORTUNITIES_MODULE;
-            Log.d(TAG, "Querying OPPORTUNITIES");
-            Log.d(TAG, "Uri:->" + uri.toString());
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "Querying OPPORTUNITIES");
+                Log.d(TAG, "Uri:->" + uri.toString());
 
-            // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
-            Log.d(TAG, "Offset" + offset);
-            Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+                // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
+
+                Log.d(TAG, "Offset" + offset);
+                Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+            }
             if (maxResultsLimit != null) {
                 // maxResultsLimit = maxResultsLimit + "  OFFSET " + offset;
                 if (selection == null) {
@@ -188,15 +190,15 @@ public class SugarCRMProvider extends ContentProvider {
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
-
-        Log.d(TAG, "Count:" + c.getCount());
+        if (Log.isLoggable(TAG, Log.DEBUG))
+            Log.d(TAG, "Count:" + c.getCount());
         // Tell the cursor what uri to watch, so it knows when its source data changes
         c.setNotificationUri(getContext().getContentResolver(), uri);
 
         // TODO - moce this code to sync and cache manager - database cache miss, start a rest api
         // call , package the params appropriately
-         if (c.getCount() == 0)
-             ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
+        // if (c.getCount() == 0)
+        // ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
         return c;
     }
 
