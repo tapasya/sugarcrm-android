@@ -52,7 +52,7 @@ public class SugarCRMProvider extends ContentProvider {
     private static final int CALL = 12;
 
     private static final int CALL_ID = 13;
-    
+
     private static final int ACCOUNT_CONTACT = 14;
 
     private static final UriMatcher sUriMatcher;
@@ -127,12 +127,12 @@ public class SugarCRMProvider extends ContentProvider {
 
         case LEAD:
             module = RestUtilConstants.LEADS_MODULE;
-            Log.d(TAG, "Querying Contacts");
-            Log.d(TAG, "Uri:->" + uri.toString());
+            // Log.d(TAG, "Querying Leads");
+            // Log.d(TAG, "Uri:->" + uri.toString());
 
             // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
-            Log.d(TAG, "Offset" + offset);
-            Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
+            // Log.d(TAG, "Offset" + offset);
+            // Log.d(TAG, "maxResultsLimit" + maxResultsLimit);
             if (maxResultsLimit != null) {
                 // maxResultsLimit = maxResultsLimit + "  OFFSET " + offset;
                 if (selection == null) {
@@ -154,7 +154,7 @@ public class SugarCRMProvider extends ContentProvider {
 
         case OPPORTUNITY:
             module = RestUtilConstants.OPPORTUNITIES_MODULE;
-            Log.d(TAG, "Querying Contacts");
+            Log.d(TAG, "Querying OPPORTUNITIES");
             Log.d(TAG, "Uri:->" + uri.toString());
 
             // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
@@ -186,15 +186,17 @@ public class SugarCRMProvider extends ContentProvider {
         // Tell the cursor what uri to watch, so it knows when its source data changes
         c.setNotificationUri(getContext().getContentResolver(), uri);
 
-        // database cache miss, start a rest api call , package the params appropriately
-        if (c.getCount() == 0)
-            ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
+        // TODO - moce this code to sync and cache manager - database cache miss, start a rest api
+        // call , package the params appropriately
+         if (c.getCount() == 0)
+             ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
         return c;
     }
 
     @Override
     public String getType(Uri uri) {
         switch (sUriMatcher.match(uri)) {
+        // TODO - add the remaining types
         case ACCOUNT:
             return "vnd.android.cursor.dir/accounts";
         case CONTACT:
@@ -231,9 +233,9 @@ public class SugarCRMProvider extends ContentProvider {
                 return accountUri;
             }
             break;
-        
+
         case ACCOUNT_CONTACT:
-            //String accountId = uri.getPathSegments().get(1);            
+            // String accountId = uri.getPathSegments().get(1);
             Log.i(TAG, uri.getPathSegments().get(0) + "  " + uri.getPathSegments().get(1));
             rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -242,7 +244,7 @@ public class SugarCRMProvider extends ContentProvider {
                 return accountUri;
             }
             break;
-            
+
         case CONTACT:
             rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -251,7 +253,7 @@ public class SugarCRMProvider extends ContentProvider {
                 return contactUri;
             }
             break;
-            
+
         case LEAD:
             rowId = db.insert(DatabaseHelper.LEADS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -369,6 +371,32 @@ public class SugarCRMProvider extends ContentProvider {
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
+
+        case LEAD:
+            count = db.update(DatabaseHelper.LEADS_TABLE_NAME, values, where, whereArgs);
+            break;
+
+        case LEAD_ID:
+            String leadId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.LEADS_TABLE_NAME, values, Leads.ID
+                                            + "="
+                                            + leadId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case OPPORTUNITY:
+            count = db.update(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, values, where, whereArgs);
+            break;
+
+        case OPPORTUNITY_ID:
+            String oppId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, values, Opportunities.ID
+                                            + "="
+                                            + oppId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -383,7 +411,7 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/#", ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#", ACCOUNT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/contact", ACCOUNT_CONTACT);
-        
+
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact", CONTACT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#", CONTACT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#/#", CONTACT);
