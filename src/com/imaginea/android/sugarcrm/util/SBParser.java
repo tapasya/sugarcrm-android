@@ -13,11 +13,14 @@ public class SBParser {
 
     private JSONArray mEntryListJson;
 
+    private static final String LOG_TAG = SBParser.class.getSimpleName();
+
     // TODO: realtionship_list also has to be looked at
     // private JSONArray mRelationshipListJson;
 
     public SBParser(String jsonText) throws JSONException {
-        Log.i("SBParser", jsonText);
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, jsonText);
         JSONObject responseObj = new JSONObject(jsonText);
         this.mEntryListJson = responseObj.getJSONArray(ENTRY_LIST);
     }
