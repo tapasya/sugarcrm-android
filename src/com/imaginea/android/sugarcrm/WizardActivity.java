@@ -409,7 +409,7 @@ public class WizardActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                progressDialog = ProgressDialog.show(WizardActivity.this, "Sugar CRM", "Processing", true, false);
+                progressDialog = ProgressDialog.show(WizardActivity.this, "Sugar CRM", "Processing", true, true);
             }
         }
 
