@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,11 +14,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
 
 /**
@@ -69,6 +75,32 @@ public class AccountDetailsActivity extends Activity {
         // startManagingCursor(mCursor);
         setContents(mModuleName);
         
+        final String[] relationshipModules = DatabaseHelper.getModuleRelationshipItems(mModuleName);
+        
+        ListView listView = (ListView)findViewById(android.R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+                Log.i(LOG_TAG, "clicked on " + relationshipModules[position]);
+                openListScreen(relationshipModules[position]);
+            }
+        });
+        
+        RelationshipAdapter adapter = new RelationshipAdapter(this);
+        adapter.setRelationshipArray(relationshipModules);
+        listView.setAdapter(adapter);
+        
+    }
+
+    protected void openListScreen(String moduleName) {
+        Intent detailIntent = new Intent(AccountDetailsActivity.this, ContactListActivity.class);
+        Uri uri = Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId);
+        uri = Uri.withAppendedPath(uri, DatabaseHelper.getPathForRelationship(moduleName));
+        detailIntent.setData(uri);
+        detailIntent.putExtra(RestUtilConstants.PARENT_MODULE_NAME, mModuleName);
+        detailIntent.putExtra(RestUtilConstants.MODULE_NAME, moduleName);
+        detailIntent.putExtra(RestUtilConstants.BEAN_ID, mSugarBeanId);
+        startActivity(detailIntent);
     }
 
     @Override
@@ -121,6 +153,7 @@ public class AccountDetailsActivity extends Activity {
 
         String[] detailsProjection = mSelectFields;
 
+        TextView textViewForAccountName = (TextView) findViewById(R.id.accountName);
         mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
 
         mCursor.moveToFirst();
@@ -142,8 +175,10 @@ public class AccountDetailsActivity extends Activity {
             textViewForLabel.setText(moduleField.getLabel());
             String value = mCursor.getString(columnIndex);
             
-            if(ModuleFields.ACCOUNT_NAME.equals(fieldName)){
+            if(ModuleFields.NAME.equals(fieldName)){
                 mAccountName = value;
+                textViewForAccountName.setText(value);
+                continue;
             }
             
             if(moduleField.getType().equals("phone"))
@@ -158,5 +193,47 @@ public class AccountDetailsActivity extends Activity {
 
         }
     }
+    
+    private class RelationshipAdapter extends BaseAdapter {
+
+        private Context mContext;
+        
+        private String[] relationships;
+        
+        private LayoutInflater mInflater;
+        
+        public RelationshipAdapter(Context context) {
+            mContext = context;
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+        
+        public void setRelationshipArray(String[] relationshipArray) {
+            relationships = relationshipArray;
+        }
+        
+        @Override
+        public int getCount() {
+            return relationships.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return relationships[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView relationshipName = (TextView)mInflater.inflate(R.layout.listitem, null);
+            relationshipName.setText(relationships[position]);
+            return relationshipName;
+        }
+        
+    }
+
     
 }
