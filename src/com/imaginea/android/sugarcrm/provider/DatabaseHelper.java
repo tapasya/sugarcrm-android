@@ -27,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO:
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -174,6 +174,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsColumns.EMAIL1 + " TEXT,"
                                         + ContactsColumns.CREATED_BY + " TEXT,"
                                         + ContactsColumns.MODIFIED_BY_NAME + " TEXT," 
+                                        + ContactsColumns.DATE_ENTERED + " TEXT," 
+                                        + ContactsColumns.DATE_MODIFIED + " TEXT," 
                                         + ContactsColumns.DELETED + " INTEGER,"
                                         + ContactsColumns.ACCOUNT_ID + " INTEGER,"
                                         + " UNIQUE(" + ContactsColumns.BEAN_ID + ")" + ");");
@@ -189,6 +191,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + LeadsColumns.EMAIL1 + " TEXT," 
                                         + LeadsColumns.PHONE_WORK + " TEXT,"
                                         + LeadsColumns.PHONE_FAX + " TEXT,"
+                                        + LeadsColumns.DATE_ENTERED + " TEXT," 
+                                        + LeadsColumns.DATE_MODIFIED + " TEXT," 
                                         + LeadsColumns.DELETED + " INTEGER," 
                                         + LeadsColumns.ACCOUNT_ID + " INTEGER,"
                                         + " UNIQUE(" + LeadsColumns.BEAN_ID + ")" + ");");

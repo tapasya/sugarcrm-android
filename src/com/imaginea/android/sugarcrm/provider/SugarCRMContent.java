@@ -95,7 +95,7 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME, EMAIL1 };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
-                ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, DELETED, ACCOUNT_ID };
+                ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
 
     }
 
@@ -124,6 +124,10 @@ public final class SugarCRMContent {
         
         //TODO: may move out to separate table having the contact beanId and accountId
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+        
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+        
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
     }
 
     public static final class Leads implements LeadsColumns {
@@ -141,7 +145,7 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
-                PHONE_WORK, PHONE_FAX, EMAIL1, DELETED, ACCOUNT_ID};
+                PHONE_WORK, PHONE_FAX, EMAIL1, DATE_ENTERED, DATE_MODIFIED,DELETED, ACCOUNT_ID};
 
     }
 
@@ -163,6 +167,10 @@ public final class SugarCRMContent {
         public String DELETED = ModuleFields.DELETED;
         
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+        
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+        
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
     }
 
     public static final class Opportunities implements OpportunitiesColumns {
@@ -180,7 +188,7 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { NAME, OPPORTUNITY_TYPE };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
-                OPPORTUNITY_TYPE, SALES_STAGE, DELETED, ACCOUNT_ID };
+                OPPORTUNITY_TYPE, SALES_STAGE, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
 
     }
 
@@ -240,6 +248,7 @@ public final class SugarCRMContent {
         public String DELETED = ModuleFields.DELETED;
         
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+        
     }
 
 }
