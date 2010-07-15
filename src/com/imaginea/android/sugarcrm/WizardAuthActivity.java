@@ -421,8 +421,9 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             try {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
-                if (DatabaseHelper.moduleFields == null) {
-                    HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
+                HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = DatabaseHelper.getModuleFields();
+                if (moduleNameVsFields == null || moduleNameVsFields.size() ==0) {
+                    moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
                     for (String moduleName : moduleNames) {
                         String[] fields = {};
                         List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
@@ -432,12 +433,13 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                         }
                         moduleNameVsFields.put(moduleName, nameVsModuleField);
                     }
-                    DatabaseHelper.moduleFields = moduleNameVsFields;
+                    DatabaseHelper.setModuleFields(moduleNameVsFields);
                 }
-                if(DatabaseHelper.modulesList == null)
+                List<String> modules = DatabaseHelper.getModuleList();
+                if(modules == null || modules.size() ==0)
                 {
-                    List<String> modules = RestUtil.getAvailableModules(url, sessionId);
-                    DatabaseHelper.modulesList = modules;
+                    modules = RestUtil.getAvailableModules(url, sessionId);
+                    DatabaseHelper.setModulesList(modules);
                 }
 
             } catch (SugarCrmException sce) {

@@ -42,7 +42,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WizardActivity extends Activity {
 
@@ -372,8 +371,9 @@ public class WizardActivity extends Activity {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
 
-                if (DatabaseHelper.moduleFields == null) {
-                    HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
+                HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = DatabaseHelper.getModuleFields();
+                if (moduleNameVsFields == null || moduleNameVsFields.size() == 0) {
+                    moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
                     for (String moduleName : moduleNames) {
                         String[] fields = {};
                         List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
@@ -383,14 +383,13 @@ public class WizardActivity extends Activity {
                         }
                         moduleNameVsFields.put(moduleName, nameVsModuleField);
                     }
-                    DatabaseHelper.moduleFields = moduleNameVsFields;
+                    DatabaseHelper.setModuleFields(moduleNameVsFields);
                 }
-                if(DatabaseHelper.modulesList == null)
-                {
-                    List<String> modules = RestUtil.getAvailableModules(url, sessionId);
-                    DatabaseHelper.modulesList = modules;
+                List<String> modules = DatabaseHelper.getModuleList();
+                if (modules == null || modules.size() == 0) {
+                    modules = RestUtil.getAvailableModules(url, sessionId);
+                    DatabaseHelper.setModulesList(modules);
                 }
-
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
