@@ -29,6 +29,8 @@ import java.util.List;
 /**
  * SyncAdapter implementation for syncing sugarcrm modules on the server to sugar crm provider and
  * vice versa.
+ * 
+ * //TODO - Stress testing for large datasets - test cases
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -56,21 +58,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             authtoken = mAccountManager.blockingGetAuthToken(account, Util.AUTHTOKEN_TYPE, true /* notifyAuthFailure */);
             // Log.v(LOG_TAG, "authtoken:" + authtoken);
             // Log.v(LOG_TAG, "password:" + mAccountManager.getPassword(account));
-            // if we are a password based system, the SugarCRM OAuth setup is not clear yet
+            /*
+             * if we are a password based system, the SugarCRM OAuth setup is not clear yet but
+             * based on preferences, we ahould select the right one -?
+             */
             String userName = account.name;
             String password = mAccountManager.getPassword(account);
             Log.v(LOG_TAG, "user name:" + userName);
 
+            if (!Util.isNetworkOn(mContext)) {
+                Log.v(LOG_TAG, "Network is not on..skipping sync:");
+                syncResult.stats.numIoExceptions++;
+                return;
+            }
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
             // TODO use a constant and remove this as we start from the login screen
             String url = pref.getString(Util.PREF_REST_URL, mContext.getString(R.string.defaultUrl));
-            String sessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();
+            SugarCrmApp app = ((SugarCrmApp) SugarCrmApp.app);
+            String sessionId = app != null ? app.getSessionId() : null;
             if (sessionId == null) {
                 sessionId = RestUtil.loginToSugarCRM(url, account.name, password);
             }
 
             List<String> moduleList = DatabaseHelper.getModuleList();
-            if(moduleList == null)
+            if (moduleList == null)
                 moduleList = RestUtil.getAvailableModules(url, sessionId);
             for (String moduleName : moduleList) {
                 Log.i(LOG_TAG, "Syncing Module:" + moduleName);
