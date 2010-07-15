@@ -108,7 +108,12 @@ public class ContactListActivity extends ListActivity {
         }
         // TODO - optimize this, if we sync up a dataset, then no need to run detail projectio
         // nhere, just do a list projection
-        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
+        Cursor cursor;
+        // if the parentModuleName is not null, then it is the list of relationship beans 
+        String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
+        
+        cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
+        
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
         GenericCursorAdapter adapter;
