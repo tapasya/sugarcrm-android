@@ -92,7 +92,7 @@ public final class SugarCRMContent {
         public static final String[] REST_LIST_PROJECTION = { ModuleFields.ID, FIRST_NAME,
                 LAST_NAME, EMAIL1 };
 
-        public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME, EMAIL1 };
+        public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
                 ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
@@ -185,7 +185,7 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, OPPORTUNITY_TYPE };
 
-        public static final String[] LIST_VIEW_PROJECTION = { NAME, OPPORTUNITY_TYPE };
+        public static final String[] LIST_VIEW_PROJECTION = { NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
                 OPPORTUNITY_TYPE, SALES_STAGE, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
