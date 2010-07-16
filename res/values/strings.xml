@@ -71,4 +71,10 @@
 	<!-- Menu items - not present above-->
 	<string name="addItem">Add</string>
 	<string name="noResults">No results found</string>
+	
+	<string name="syncFilters">Sync Filters</string>	
+	<string name="dateFilters">Date Filters</string>
+	<string name="startDate">Start Date</string>
+	<string name="endDate">End Date</string>
+	
 </resources>
