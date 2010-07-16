@@ -80,16 +80,16 @@ public class AccountDetailsActivity extends Activity {
 
         mRelationshipModules = DatabaseHelper.getModuleRelationshipItems(mModuleName);
 
-        ListView listView = (ListView) findViewById(android.R.id.list);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-                if (Log.isLoggable(LOG_TAG, Log.INFO)) {
-                    Log.i(LOG_TAG, "clicked on " + mRelationshipModules[position]);
-                }
-                openListScreen(mRelationshipModules[position]);
-            }
-        });
+//        ListView listView = (ListView) findViewById(android.R.id.list);
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+//                if (Log.isLoggable(LOG_TAG, Log.INFO)) {
+//                    Log.i(LOG_TAG, "clicked on " + mRelationshipModules[position]);
+//                }
+//                openListScreen(mRelationshipModules[position]);
+//            }
+//        });
 
         /*RelationshipAdapter adapter = new RelationshipAdapter(this);
         adapter.setRelationshipArray(mRelationshipModules);
