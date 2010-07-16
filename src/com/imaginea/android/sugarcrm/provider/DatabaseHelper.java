@@ -44,8 +44,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     // TODO - replace with database calls - dynamic module generation
-    private static List<String> modulesList ;
-    
+    private static List<String> modulesList;
+
     private static final HashMap<String, String> modules = new HashMap<String, String>();
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
@@ -58,14 +58,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
 
-    private static HashMap<String, HashMap<String, ModuleField>> moduleFields ;// new HashMap<String, HashMap<String, ModuleField>>();
-    
+    private static HashMap<String, HashMap<String, ModuleField>> moduleFields;// new HashMap<String, HashMap<String, ModuleField>>();
+
     private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
-    
+
     private static final HashMap<String, String> relationshipNames = new HashMap<String, String>();
-    
+
     private static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
-    
+
     private static final HashMap<String, String> relationshipForPath = new HashMap<String, String>();
 
     static {
@@ -94,21 +94,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put("Contacts", Contacts.CONTENT_URI);
         moduleUris.put("Leads", Leads.CONTENT_URI);
         moduleUris.put("Opportunities", Opportunities.CONTENT_URI);
-        
-        moduleRelationshipItems.put("Accounts", new String[]{"Contacts", "Leads", "Opportunities"});
-        moduleRelationshipItems.put("Contacts", new String[]{"Leads", "Opportunities"});
-        moduleRelationshipItems.put("Leads", new String[]{"Opportunities", "Contacts"});
-        moduleRelationshipItems.put("Opportunities", new String[]{"Leads", "Contacts"});
-        
+
+        moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Leads", "Opportunities" });
+        moduleRelationshipItems.put("Contacts", new String[] { "Leads", "Opportunities" });
+        moduleRelationshipItems.put("Leads", new String[] { "Opportunities", "Contacts" });
+        moduleRelationshipItems.put("Opportunities", new String[] { "Leads", "Contacts" });
+
         pathForRelationship.put("Contacts", "contact");
         pathForRelationship.put("Leads", "lead");
         pathForRelationship.put("Opportunities", "opportunity");
-        
+
         relationshipForPath.put("account", "Accounts");
         relationshipForPath.put("contact", "Contacts");
         relationshipForPath.put("lead", "Leads");
         relationshipForPath.put("opportunity", "Opportunities");
-        
+
         relationshipNames.put("Contacts", "contacts");
         relationshipNames.put("Leads", "leads");
         relationshipNames.put("Opportunities", "opportunities");
@@ -156,61 +156,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static void createAccountsTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" 
-                                        + AccountsColumns.ID + " INTEGER PRIMARY KEY," 
-                                        + AccountsColumns.BEAN_ID + " TEXT," 
-                                        + AccountsColumns.NAME + " TEXT,"
+        db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + AccountsColumns.ID
+                                        + " INTEGER PRIMARY KEY," + AccountsColumns.BEAN_ID
+                                        + " TEXT," + AccountsColumns.NAME + " TEXT,"
                                         + AccountsColumns.EMAIL1 + " TEXT,"
                                         + AccountsColumns.PARENT_NAME + " TEXT,"
                                         + AccountsColumns.PHONE_OFFICE + " TEXT,"
                                         + AccountsColumns.PHONE_FAX + " TEXT,"
-                                        + AccountsColumns.DELETED + " INTEGER," 
-                                        + " UNIQUE(" + AccountsColumns.BEAN_ID + ")" + ");");
+                                        + AccountsColumns.DELETED + " INTEGER," + " UNIQUE("
+                                        + AccountsColumns.BEAN_ID + ")" + ");");
     }
 
     private static void createContactsTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + CONTACTS_TABLE_NAME + " (" 
-                                        + ContactsColumns.ID + " INTEGER PRIMARY KEY," 
-                                        + ContactsColumns.BEAN_ID + " TEXT," 
-                                        + ContactsColumns.FIRST_NAME + " TEXT,"
+        db.execSQL("CREATE TABLE " + CONTACTS_TABLE_NAME + " (" + ContactsColumns.ID
+                                        + " INTEGER PRIMARY KEY," + ContactsColumns.BEAN_ID
+                                        + " TEXT," + ContactsColumns.FIRST_NAME + " TEXT,"
                                         + ContactsColumns.LAST_NAME + " TEXT,"
                                         + ContactsColumns.ACCOUNT_NAME + " TEXT,"
                                         + ContactsColumns.PHONE_MOBILE + " TEXT,"
                                         + ContactsColumns.PHONE_WORK + " TEXT,"
                                         + ContactsColumns.EMAIL1 + " TEXT,"
                                         + ContactsColumns.CREATED_BY + " TEXT,"
-                                        + ContactsColumns.MODIFIED_BY_NAME + " TEXT," 
-                                        + ContactsColumns.DATE_ENTERED + " TEXT," 
-                                        + ContactsColumns.DATE_MODIFIED + " TEXT," 
+                                        + ContactsColumns.MODIFIED_BY_NAME + " TEXT,"
+                                        + ContactsColumns.DATE_ENTERED + " TEXT,"
+                                        + ContactsColumns.DATE_MODIFIED + " TEXT,"
                                         + ContactsColumns.DELETED + " INTEGER,"
-                                        + ContactsColumns.ACCOUNT_ID + " INTEGER,"
-                                        + " UNIQUE(" + ContactsColumns.BEAN_ID + ")" + ");");
+                                        + ContactsColumns.ACCOUNT_ID + " INTEGER," + " UNIQUE("
+                                        + ContactsColumns.BEAN_ID + ")" + ");");
     }
 
     private static void createLeadsTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + LEADS_TABLE_NAME + " (" 
-                                        + LeadsColumns.ID + " INTEGER PRIMARY KEY," 
-                                        + LeadsColumns.BEAN_ID + " TEXT,"
+        db.execSQL("CREATE TABLE " + LEADS_TABLE_NAME + " (" + LeadsColumns.ID
+                                        + " INTEGER PRIMARY KEY," + LeadsColumns.BEAN_ID + " TEXT,"
                                         + LeadsColumns.FIRST_NAME + " TEXT,"
-                                        + LeadsColumns.LAST_NAME + " TEXT," 
-                                        + LeadsColumns.EMAIL1 + " TEXT," 
-                                        + LeadsColumns.PHONE_WORK + " TEXT,"
+                                        + LeadsColumns.LAST_NAME + " TEXT," + LeadsColumns.EMAIL1
+                                        + " TEXT," + LeadsColumns.PHONE_WORK + " TEXT,"
                                         + LeadsColumns.PHONE_FAX + " TEXT,"
-                                        + LeadsColumns.DATE_ENTERED + " TEXT," 
-                                        + LeadsColumns.DATE_MODIFIED + " TEXT," 
-                                        + LeadsColumns.DELETED + " INTEGER," 
-                                        + LeadsColumns.ACCOUNT_ID + " INTEGER,"
-                                        + " UNIQUE(" + LeadsColumns.BEAN_ID + ")" + ");");
+                                        + LeadsColumns.DATE_ENTERED + " TEXT,"
+                                        + LeadsColumns.DATE_MODIFIED + " TEXT,"
+                                        + LeadsColumns.DELETED + " INTEGER,"
+                                        + LeadsColumns.ACCOUNT_ID + " INTEGER," + " UNIQUE("
+                                        + LeadsColumns.BEAN_ID + ")" + ");");
     }
 
     private static void createOpportunitiesTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + OPPORTUNITIES_TABLE_NAME + " (" 
-                                        + OpportunitiesColumns.ID + " INTEGER PRIMARY KEY," 
-                                        + OpportunitiesColumns.BEAN_ID + " TEXT," 
-                                        + OpportunitiesColumns.NAME + " TEXT,"
+        db.execSQL("CREATE TABLE " + OPPORTUNITIES_TABLE_NAME + " (" + OpportunitiesColumns.ID
+                                        + " INTEGER PRIMARY KEY," + OpportunitiesColumns.BEAN_ID
+                                        + " TEXT," + OpportunitiesColumns.NAME + " TEXT,"
                                         + OpportunitiesColumns.ACCOUNT_NAME + " TEXT,"
                                         + OpportunitiesColumns.AMOUNT + " TEXT,"
                                         + OpportunitiesColumns.AMOUNT_USDOLLAR + " TEXT,"
@@ -257,7 +252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static ModuleField getModuleField(String moduleName, String fieldName) {
         return moduleFields.get(moduleName).get(fieldName);
     }
-    
+
     public static HashMap<String, HashMap<String, ModuleField>> getModuleFields() {
         return moduleFields;
     }
@@ -273,12 +268,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return "(" + ContactsColumns.FIRST_NAME + " LIKE '%" + searchString + "%' OR "
                                             + ContactsColumns.LAST_NAME + " LIKE '%" + searchString
                                             + "%'" + ")";
+        } else if (moduleName.equals("Leads")) {
+            return "(" + LeadsColumns.FIRST_NAME + " LIKE '%" + searchString + "%' OR "
+                                            + LeadsColumns.LAST_NAME + " LIKE '%" + searchString
+                                            + "%'" + ")";
+        } else if (moduleName.equals("Opportunities")) {
+            return OpportunitiesColumns.NAME + " LIKE '%" + searchString + "%'";
         }
-        //TODO: similarly for other modules
+        // TODO: similarly for other modules
         return "";
     }
-    
-    public static String[] getModuleRelationshipItems(String moduleName){
+
+    public static String[] getModuleRelationshipItems(String moduleName) {
         return moduleRelationshipItems.get(moduleName);
     }
 
@@ -286,19 +287,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return pathForRelationship.get(moduleName);
     }
 
-    public static List<String> getModuleList(){
-        return  modulesList;
+    public static List<String> getModuleList() {
+        return modulesList;
     }
-    
+
     public static void setModulesList(List<String> modulesList) {
         DatabaseHelper.modulesList = modulesList;
     }
 
-    public static String getRelationshipName(String moduleName){
+    public static String getRelationshipName(String moduleName) {
         return relationshipNames.get(moduleName);
     }
-    
-    public static String getRelationshipForPath(String path){
+
+    public static String getRelationshipForPath(String path) {
         return relationshipForPath.get(path);
     }
 }
