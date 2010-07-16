@@ -11,12 +11,16 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.RestUtilConstants;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
 
 /**
  * SugarCRMProvider Provides access to a database of sugar modules, their data and relationships.
@@ -54,7 +58,17 @@ public class SugarCRMProvider extends ContentProvider {
     private static final int CALL_ID = 13;
 
     private static final int ACCOUNT_CONTACT = 14;
-
+    
+    private static final int ACCOUNT_LEAD = 15;
+    
+    private static final int ACCOUNT_OPPORTUNITY = 16;
+    
+    private static final int CONTACT_LEAD = 17;
+    
+    private static final int CONTACT_OPPORTUNITY = 18;
+    
+    private static final int LEAD_OPPORTUNITY = 19;
+    
     private static final UriMatcher sUriMatcher;
 
     private static final String TAG = "SugarCRMProvider";
@@ -103,6 +117,18 @@ public class SugarCRMProvider extends ContentProvider {
             selection = ContactsColumns.ACCOUNT_ID + " = ?";
             c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
+            
+        case ACCOUNT_LEAD:
+            module = RestUtilConstants.LEADS_MODULE;
+            selection = LeadsColumns.ACCOUNT_ID + " = ?";
+            c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
+
+        case ACCOUNT_OPPORTUNITY:
+            module = RestUtilConstants.OPPORTUNITIES_MODULE;
+            selection = OpportunitiesColumns.ACCOUNT_ID + " = ?";
+            c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
 
         case CONTACT:
             module = RestUtilConstants.CONTACTS_MODULE;
@@ -130,6 +156,18 @@ public class SugarCRMProvider extends ContentProvider {
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
+            
+        case CONTACT_LEAD:
+            module = RestUtilConstants.LEADS_MODULE;
+            selection = LeadsColumns.ACCOUNT_ID + " = ?";
+            c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
+            
+        case CONTACT_OPPORTUNITY:
+            module = RestUtilConstants.OPPORTUNITIES_MODULE;
+            selection = OpportunitiesColumns.ACCOUNT_ID + " = ?";
+            c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
 
         case LEAD:
             module = RestUtilConstants.LEADS_MODULE;
@@ -156,6 +194,12 @@ public class SugarCRMProvider extends ContentProvider {
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             // qb.appendWhere(Notes._ID + "=" + uri.getPathSegments().get(1));
+            break;
+            
+        case LEAD_OPPORTUNITY:
+            module = RestUtilConstants.OPPORTUNITIES_MODULE;
+            selection = OpportunitiesColumns.ACCOUNT_ID + " = ?";
+            c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
         case OPPORTUNITY:
@@ -198,7 +242,7 @@ public class SugarCRMProvider extends ContentProvider {
         // TODO - moce this code to sync and cache manager - database cache miss, start a rest api
         // call , package the params appropriately
         // if (c.getCount() == 0)
-        // ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
+            //ServiceHelper.startService(getContext(), uri, module, projection, sortOrder);
         return c;
     }
 
@@ -244,16 +288,58 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case ACCOUNT_CONTACT:
-            // String accountId = uri.getPathSegments().get(1);
-            Log.i(TAG, uri.getPathSegments().get(0) + "  " + uri.getPathSegments().get(1));
+            String accountId = uri.getPathSegments().get(1);
+            String selection = AccountsColumns.ID + "=" + accountId; 
+            Cursor cursor = query(DatabaseHelper.getModuleUri("Accounts"), Accounts.DETAILS_PROJECTION, selection, null, null);
+            cursor.moveToFirst();
+            String accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
+            values.put(ModuleFields.ACCOUNT_ID, accountId);
+            values.put(ModuleFields.ACCOUNT_NAME, accountName);
+            
             rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
             if (rowId > 0) {
-                Uri accountUri = ContentUris.withAppendedId(Accounts.CONTENT_URI, rowId);
-                getContext().getContentResolver().notifyChange(accountUri, null);
-                return accountUri;
+                Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(contactUri, null);
+                cursor.close();
+                return contactUri;
             }
             break;
 
+        case ACCOUNT_LEAD:
+            accountId = uri.getPathSegments().get(1);
+            selection = AccountsColumns.ID + "=" + accountId; 
+            cursor = query(DatabaseHelper.getModuleUri("Accounts"), Accounts.DETAILS_PROJECTION, selection, null, null);
+            cursor.moveToFirst();
+            accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));            
+            values.put(ModuleFields.ACCOUNT_ID, accountId);
+            values.put(ModuleFields.ACCOUNT_NAME, accountName);
+            
+            rowId = db.insert(DatabaseHelper.LEADS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri leadUri = ContentUris.withAppendedId(Leads.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(leadUri, null);
+                cursor.close();
+                return leadUri;
+            }
+            break;
+
+        case ACCOUNT_OPPORTUNITY:
+            accountId = uri.getPathSegments().get(1);
+            selection = AccountsColumns.ID + "=" + accountId; 
+            cursor = query(DatabaseHelper.getModuleUri("Accounts"), Accounts.DETAILS_PROJECTION, selection, null, null);
+            cursor.moveToFirst();
+            accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));            
+            values.put(ModuleFields.ACCOUNT_ID, accountId);
+            values.put(ModuleFields.ACCOUNT_NAME, accountName);
+            
+            rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri opportunityUri = ContentUris.withAppendedId(Opportunities.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(opportunityUri, null);
+                return opportunityUri;
+            }
+            break;
+            
         case CONTACT:
             rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -263,6 +349,24 @@ public class SugarCRMProvider extends ContentProvider {
             }
             break;
 
+        case CONTACT_LEAD:
+            rowId = db.insert(DatabaseHelper.LEADS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri leadUri = ContentUris.withAppendedId(Leads.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(leadUri, null);
+                return leadUri;
+            }
+            break;
+            
+        case CONTACT_OPPORTUNITY:
+            rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri opportunityUri = ContentUris.withAppendedId(Opportunities.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(opportunityUri, null);
+                return opportunityUri;
+            }
+            break;
+            
         case LEAD:
             rowId = db.insert(DatabaseHelper.LEADS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -272,6 +376,15 @@ public class SugarCRMProvider extends ContentProvider {
             }
             break;
 
+        case LEAD_OPPORTUNITY:
+            rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri opportunityUri = ContentUris.withAppendedId(Leads.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(opportunityUri, null);
+                return opportunityUri;
+            }
+            break;
+            
         case OPPORTUNITY:
             rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -284,7 +397,6 @@ public class SugarCRMProvider extends ContentProvider {
             throw new IllegalArgumentException("Unknown URI " + uri);
 
         }
-
         throw new SQLException("Failed to insert row into " + uri);
     }
 
@@ -420,14 +532,18 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/#", ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#", ACCOUNT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/contact", ACCOUNT_CONTACT);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/lead", ACCOUNT_LEAD);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "account/#/opportunity", ACCOUNT_OPPORTUNITY);
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact", CONTACT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#", CONTACT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#/#", CONTACT);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#/opportunity", CONTACT_OPPORTUNITY);
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "lead", LEAD);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "lead/#", LEAD_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "lead/#/#", LEAD);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "lead/#/opportunity", LEAD_OPPORTUNITY);
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "opportunity", OPPORTUNITY);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "opportunity/#", OPPORTUNITY_ID);
