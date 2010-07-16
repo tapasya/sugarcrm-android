@@ -15,8 +15,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.util.Util;
 
 public class SearchActivity extends ListActivity {
     
@@ -60,7 +62,9 @@ public class SearchActivity extends ListActivity {
         
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             mQuery = intent.getStringExtra(SearchManager.QUERY);
-            Log.i(TAG, "query - " + mQuery);
+            if (Log.isLoggable(TAG, Log.DEBUG)){
+                Log.d(TAG, "query - " + mQuery);
+            }
             showResults(mQuery);
         }
     }
@@ -70,6 +74,9 @@ public class SearchActivity extends ListActivity {
         if (getIntent().getData() == null) {
             getIntent().setData(moduleUri);
         }
+        
+        TextView tv = (TextView) findViewById(R.id.headerText);
+        tv.setText(mModuleName + " : Search results");
         
         Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), DatabaseHelper.getModuleSelection(mModuleName, query), null, null);
         
@@ -112,8 +119,10 @@ public class SearchActivity extends ListActivity {
         }
         // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
         // TODO
-        Log.d(TAG, "beanId:" + cursor.getString(1));
-        detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
+        if (Log.isLoggable(TAG, Log.DEBUG)){
+            Log.d(TAG, "beanId:" + cursor.getString(1) + " rowId: " + cursor.getString(0));
+        }
+        detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
     }
