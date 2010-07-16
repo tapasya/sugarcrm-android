@@ -23,6 +23,8 @@ import com.imaginea.android.sugarcrm.util.Util;
 import org.apache.http.ParseException;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -83,6 +85,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             List<String> moduleList = DatabaseHelper.getModuleList();
             if (moduleList == null)
                 moduleList = RestUtil.getAvailableModules(url, sessionId);
+                // TODO - dynamically determine the relationships and get the values
+            Collections.sort(moduleList);
             for (String moduleName : moduleList) {
                 Log.i(LOG_TAG, "Syncing Module:" + moduleName);
                 SugarSyncManager.syncModules(mContext, account.name, sessionId, moduleName);
