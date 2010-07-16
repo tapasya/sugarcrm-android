@@ -132,7 +132,8 @@ public class RestUtil {
      */
     public static SugarBean[] getEntryList(String url, String sessionId, String moduleName,
                                     String query, String orderBy, String offset,
-                                    String[] selectFields, Map<String, List<String>> linkNameToFieldsArray,
+                                    String[] selectFields,
+                                    Map<String, List<String>> linkNameToFieldsArray,
                                     String maxResults, String deleted) throws SugarCrmException {
 
         Map<String, Object> data = new LinkedHashMap<String, Object>();
@@ -145,16 +146,18 @@ public class RestUtil {
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            for (Entry<String, List<String>> entry : linkNameToFieldsArray.entrySet()) {
-                JSONObject nameValue = new JSONObject();
-                nameValue.put("name", entry.getKey());
-                nameValue.put("value", new JSONArray(entry.getValue()));
-                nameValueArray.put(nameValue);
+            if (linkNameToFieldsArray != null) {
+                for (Entry<String, List<String>> entry : linkNameToFieldsArray.entrySet()) {
+                    JSONObject nameValue = new JSONObject();
+                    nameValue.put("name", entry.getKey());
+                    nameValue.put("value", new JSONArray(entry.getValue()));
+                    nameValueArray.put(nameValue);
+                }
             }
             data.put(LINK_NAME_TO_FIELDS_ARRAY, nameValueArray);
             data.put(MAX_RESULTS, maxResults);
             data.put(DELETED, deleted);
-            
+
             String restData = org.json.simple.JSONValue.toJSONString(data);
             Log.i(LOG_TAG, "restData : " + restData);
 
@@ -185,7 +188,8 @@ public class RestUtil {
 
     public static SugarBean[] getEntries(String url, String sessionId, String moduleName,
                                     String[] ids, String[] selectFields,
-                                    Map<String, List<String>> linkNameToFieldsArray) throws SugarCrmException {
+                                    Map<String, List<String>> linkNameToFieldsArray)
+                                    throws SugarCrmException {
 
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
@@ -202,7 +206,7 @@ public class RestUtil {
                 nameValueArray.put(nameValue);
             }
             data.put(LINK_NAME_TO_FIELDS_ARRAY, nameValueArray);
-            
+
             String restData = org.json.simple.JSONValue.toJSONString(data);
             Log.i(LOG_TAG, "restData : " + restData);
 
@@ -232,7 +236,8 @@ public class RestUtil {
     }
 
     public static SugarBean getEntry(String url, String sessionId, String moduleName, String id,
-                                    String[] selectFields, Map<String, List<String>> linkNameToFieldsArray)
+                                    String[] selectFields,
+                                    Map<String, List<String>> linkNameToFieldsArray)
                                     throws SugarCrmException {
 
         Map<String, Object> data = new LinkedHashMap<String, Object>();
@@ -530,7 +535,7 @@ public class RestUtil {
                 nameValue.put("value", new JSONArray(entry.getValue()));
                 linkNametoFieldJson.put(nameValue);
             }
-            
+
             data.put(RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY, linkNametoFieldJson);
             data.put(DELETED, deleted);
 
@@ -895,7 +900,7 @@ public class RestUtil {
             }
 
             final String response = EntityUtils.toString(res.getEntity());
-            if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
                 Log.i(LOG_TAG, "available modules : " + response);
             JSONObject responseObj = new JSONObject(response);
             JSONArray modulesArray = responseObj.getJSONArray(MODULES);
@@ -951,7 +956,7 @@ public class RestUtil {
             nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
             nameValuePairs.add(new BasicNameValuePair(REST_DATA, restData.toString()));
             req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            if(Log.isLoggable(LOG_TAG, Log.DEBUG))
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 Log.d(LOG_TAG, EntityUtils.toString(req.getEntity()));
 
             // Send POST request
@@ -963,7 +968,7 @@ public class RestUtil {
             }
 
             final String response = EntityUtils.toString(res.getEntity());
-            if(Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
                 Log.v(LOG_TAG, "moduleFields : " + response);
             return new ModuleFieldsParser(response).getModuleFields();
 
