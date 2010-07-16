@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-
+<resources>    
 	<!-- Application name -->
 	<string name="appName">iCRM- Android</string>
-	<string name="appProviderDesc">Provider for Accounts, Contacts, Leads, Oppurtunities and other modules of Sugar CRM</string>
+	<string name="appProviderDesc">Provider for Accounts, Contacts, Leads, Opportunities and other modules of Sugar CRM</string>
 
 	<string name="home">Home</string>	
 
@@ -74,9 +73,11 @@
 	
 	<string name="noResults">No results found</string>
 	
-	<string name="syncFilters">Sync Filters</string>	
+	<string name="syncFilters">Sync Filters</string>
 	<string name="dateFilters">Date Filters</string>
 	<string name="startDate">Start Date</string>
 	<string name="endDate">End Date</string>
-	
+	<string name="editDetailsHeader">Edit %s Details</string>
+	<string name="newDetailsHeader">New %s Details</string>
+	<string name="save">Save</string>
 </resources>
