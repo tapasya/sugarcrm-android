@@ -70,6 +70,8 @@
 	
 	<!-- Menu items - not present above-->
 	<string name="addItem">Add</string>
+	<string name="related">Related</string>
+	
 	<string name="noResults">No results found</string>
 	
 	<string name="syncFilters">Sync Filters</string>	
