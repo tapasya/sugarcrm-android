@@ -123,13 +123,8 @@ public class EditDetailsActivity extends Activity {
             // do not display account_name field, i.e. user cannot modify the account name
             if (!mModuleName.equals(getString(R.string.accounts))
                                             && ModuleFields.ACCOUNT_NAME.equals(fieldName))
-                continue;
-
-            if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                // TODO - constants for all types
-                if (moduleField.getType().equals("relate"))
-                    continue;
-            }
+                continue;                         
+            
             View tableRow = inflater.inflate(R.layout.edit_table_row, null);
             TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.editRowLabel);
             EditText editTextForValue = (EditText) tableRow.findViewById(R.id.editRowValue);
@@ -168,7 +163,8 @@ public class EditDetailsActivity extends Activity {
                     if (!mModuleName.equals(getString(R.string.accounts))
                                                     && ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
                         continue;
-
+                    
+                    
                     EditText editText = (EditText) mDetailsTable.findViewById(i);
                     Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
 
