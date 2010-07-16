@@ -96,6 +96,13 @@
 			android:clearTaskOnLaunch="true" 
 			android:excludeFromRecents="true">			
 		</activity>
+		<activity android:name=".SyncConfigActivity" 
+			android:label="@string/appName"
+			android:theme="@android:style/Theme.Light.NoTitleBar">		
+			 <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>	
+		</activity>
         <service android:name=".SugarService" />
         <!-- The authenticator service -->
 		<service android:name=".auth.AuthenticationService"
