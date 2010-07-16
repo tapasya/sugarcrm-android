@@ -19,12 +19,19 @@ import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Class for managing sugar crm sync related mOperations
+ * Class for managing sugar crm sync related mOperations. should be capable of updating the
+ * SyncStats in SyncResult object.
+ * 
+ * //TODO - pushing changes to server, as well as handling statistics of SyncResult, Merge conflicts
  */
 public class SugarSyncManager {
 
@@ -33,9 +40,17 @@ public class SugarSyncManager {
 
     static String mBeanIdField = Contacts.BEAN_ID;
 
-    private static String query = "";// new String[] {};
+    private static String mQuery = "";// new String[] {};
 
+    // TODO - link field names
     private static Map<String, List<String>> mLinkNameToFieldsArray = new HashMap<String, List<String>>();
+
+    /**
+     * make the date formatter static as we are synchronized even though its not thread-safe
+     */
+    private static DateFormat mDateFormat;
+
+    private static Calendar mCalendar;
 
     private static final String LOG_TAG = SugarSyncManager.class.getSimpleName();
 
@@ -46,8 +61,10 @@ public class SugarSyncManager {
      *            The context of Authenticator Activity
      * @param account
      *            The username for the account
-     * @param users
-     *            The list of users
+     * @param sessionId
+     *            The session Id associated with sugarcrm session
+     * @param moduleName
+     *            The name of the module to sync
      */
     public static synchronized void syncModules(Context context, String account, String sessionId,
                                     String moduleName) throws SugarCrmException {
@@ -69,7 +86,27 @@ public class SugarSyncManager {
         while (true) {
             if (projections == null || projections.length == 0)
                 break;
-            SugarBean[] sBeans = RestUtil.getEntryList(url, sessionId, moduleName, query, orderBy, ""
+
+            // TODO - Fetching based on dates
+            // Date startDate = new Date();
+            // long duration = 3 * 30 * 24 * 60 * 60 * 1000;
+            long duration = 24 * 60 * 60 * 1000;
+            // Date endDate = new Date(startDate.getTime() - duration);
+            if (mDateFormat == null)
+                mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            // mDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+            mCalendar = new GregorianCalendar();
+            mCalendar.setTimeInMillis(System.currentTimeMillis() - duration);
+            String remoteDateStr = mDateFormat.format(mCalendar.getTime());
+            // mQuery = moduleName + "." + ModuleFields.DATE_MODIFIED + " > " + "DATE('"
+            // + remoteDateStr + "')";
+            mQuery = moduleName + "." + ModuleFields.DATE_MODIFIED + " > "
+                                            + mCalendar.getTimeInMillis();
+            // + " AND " + ModuleFields.DATE_MODIFIED + "< " + startDate.toGMTString();
+            // CalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:[NSTimeZone timeZoneWithName:@"GMT"]
+            // locale:nil];
+            SugarBean[] sBeans = RestUtil.getEntryList(url, sessionId, moduleName, mQuery, orderBy, ""
                                             + offset, projections, mLinkNameToFieldsArray, ""
                                             + maxResults, deleted);
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
