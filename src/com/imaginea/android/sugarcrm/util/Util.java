@@ -45,9 +45,13 @@ public class Util {
     
     // View modes : EDIT / NEW
     
-    public static final int EDIT_MODE = 0;
+    public static final int EDIT_ORPHAN_MODE = 0;
     
-    public static final int NEW_MODE = 1; 
+    public static final int EDIT_RELATIONSHIP_MODE = 1;
+    
+    public static final int NEW_ORPHAN_MODE = 2;
+    
+    public static final int NEW_RELATIONSHIP_MODE = 3;
 
     // constants for settings / Preferences
     public static final String PREF_REST_URL = "restUrl";
