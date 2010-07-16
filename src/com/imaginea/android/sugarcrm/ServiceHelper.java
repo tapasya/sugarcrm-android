@@ -53,17 +53,14 @@ public class ServiceHelper {
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValueList);
         context.startService(serviceIntent);
     }
-    
-    public static void startServiceForInsert(Context context, Uri uri, String parentModule, String parentBeanId, String moduleName, String linkFieldName, 
+
+    public static void startServiceForInsert(Context context, Uri uri, String moduleName,
                                     Map<String, String> nameValueList) {
         Intent serviceIntent = new Intent(context, SugarService.class);
         serviceIntent.setData(uri);
 
         serviceIntent.putExtra(Util.COMMAND, R.id.insert);
-        serviceIntent.putExtra(RestUtilConstants.PARENT_MODULE_NAME, parentModule);
-        serviceIntent.putExtra(RestUtilConstants.BEAN_ID, parentBeanId);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, moduleName);
-        serviceIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME, linkFieldName);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValueList);
         context.startService(serviceIntent);
     }
