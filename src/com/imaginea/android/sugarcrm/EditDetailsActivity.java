@@ -100,9 +100,9 @@ public class EditDetailsActivity extends Activity {
 
         TextView tv = (TextView) findViewById(R.id.headerText);
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            tv.setText("Edit " + mModuleName + " details");
+            tv.setText(String.format(getString(R.string.editDetailsHeader), moduleName));
         } else if (MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE) {
-            tv.setText("New " + mModuleName + " details");
+            tv.setText(String.format(getString(R.string.newDetailsHeader), moduleName));
         }
 
         mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
@@ -147,7 +147,7 @@ public class EditDetailsActivity extends Activity {
         }
 
         Button submit = new Button(EditDetailsActivity.this);
-        submit.setText("Save");
+        submit.setText(R.string.save);
         submit.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
