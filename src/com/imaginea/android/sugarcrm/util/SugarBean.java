@@ -16,7 +16,9 @@ public class SugarBean {
     
     private String moduleName;
 
-    private Map<String, String> entryList = new HashMap<String, String>();
+    private Map<String, String> entryList;
+    
+    private Map<String, SugarBean[]> relationshipList; 
 
     public SugarBean() {
     }
@@ -64,6 +66,18 @@ public class SugarBean {
 
     public String getFieldValue(String fieldName) {
         return entryList.get(fieldName);
+    }
+
+    public Map<String, SugarBean[]> getRelationshipList() {
+        return relationshipList;
+    }
+
+    public void setRelationshipList(Map<String, SugarBean[]> relationshipList) {
+        this.relationshipList = relationshipList;
+    }
+    
+    public SugarBean[] getRelationshipBeans(String linkField){
+        return relationshipList.get(linkField);
     }
 
 }
