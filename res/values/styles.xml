@@ -3,8 +3,15 @@
 
 	<style name="TextAppearance" parent="android:TextAppearance">
 	</style>
-
-
+					
+	<style name="header_text_label">	              
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textStyle">bold</item>               		
+		<item name="android:layout_gravity">center</item>
+		<item name="android:background">@android:color/white</item>
+		
+	</style>
 	<style name="text_label">	              
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
         <item name="android:textStyle">bold</item>               
@@ -25,7 +32,7 @@
 		<item name="android:paddingLeft">4dip</item>
 		<item name="android:paddingRight">7dip</item>
 		<item name="android:paddingTop">8dip</item>
-		<item name="android:textColor">@color/blue</item>
+		<item name="android:textColor">@android:color/black</item>
 	</style>
 	
 	<style name="edit_text_layout">	
