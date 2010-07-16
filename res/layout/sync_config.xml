@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	  android:id="@+id/sync_config"        
+	  android:orientation="vertical"
+	  android:layout_width="fill_parent"
+	  android:layout_height="fill_parent"
+	  android:background="@drawable/bg">
+	<include layout="@layout/header"/>
+	<ScrollView 
+	    android:id="@+id/scroll_view"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">	    
+   
+    <!-- WHEN -->
+    <LinearLayout android:id="@+id/when_container"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"            
+        >
+		<TextView android:id="@+id/what_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/dateFilters"
+	        style="@style/text_label"/>   
+        
+
+		<TextView android:id="@+id/what_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/startDate"
+	        style="@style/text_label"/> 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button android:id="@+id/start_date"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:gravity="left|center_vertical"
+                style="?android:attr/textAppearanceMedium"/>              
+
+        </LinearLayout>   
+        <TextView android:id="@+id/what_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/endDate"
+	        style="@style/text_label"/> 
+          <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button android:id="@+id/end_date"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:gravity="left|center_vertical"
+                style="?android:attr/textAppearanceMedium"/>                
+
+        </LinearLayout>     
+    </LinearLayout>
+   </ScrollView>   
+</LinearLayout>
