@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +50,7 @@ public class EditDetailsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.account_details);
-        findViewById(R.id.commonList).setVisibility(View.GONE);
+        // findViewById(R.id.commonList).setVisibility(View.GONE);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -98,12 +99,12 @@ public class EditDetailsActivity extends Activity {
         String[] detailsProjection = mSelectFields;
 
         TextView tv = (TextView) findViewById(R.id.headerText);
-        if(MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE){
+        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
             tv.setText("Edit " + mModuleName + " details");
-        } else if(MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE){
+        } else if (MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE) {
             tv.setText("New " + mModuleName + " details");
         }
-        
+
         mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
 
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
@@ -124,6 +125,11 @@ public class EditDetailsActivity extends Activity {
                                             && ModuleFields.ACCOUNT_NAME.equals(fieldName))
                 continue;
 
+            if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                // TODO - constants for all types
+                if (moduleField.getType().equals("relate"))
+                    continue;
+            }
             View tableRow = inflater.inflate(R.layout.edit_table_row, null);
             TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.editRowLabel);
             EditText editTextForValue = (EditText) tableRow.findViewById(R.id.editRowValue);
@@ -140,6 +146,7 @@ public class EditDetailsActivity extends Activity {
                 if (value != null && !value.equals("")) {
                     editTextForValue.setText(value);
                 }
+                setInputType(editTextForValue, moduleField);
             }
             mDetailsTable.addView(tableRow);
         }
@@ -184,6 +191,16 @@ public class EditDetailsActivity extends Activity {
         });
         mDetailsTable.addView(submit);
 
+    }
+
+    /*
+     * takes care of basic validation automatically for some fields
+     */
+    private void setInputType(TextView editTextForValue, ModuleField moduleField) {
+        // if(Log.isLoggable(TAG,Log.VERBOSE))
+        Log.v(TAG, "ModuleField type:" + moduleField.getType());
+        if (moduleField.getType().equals("phone"))
+            editTextForValue.setInputType(InputType.TYPE_CLASS_PHONE);
     }
 
     @Override
