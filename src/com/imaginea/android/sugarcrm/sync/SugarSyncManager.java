@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -21,6 +20,7 @@ import com.imaginea.android.sugarcrm.util.Util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public class SugarSyncManager {
 
         String[] projections = DatabaseHelper.getModuleProjections(moduleName);
         String orderBy = DatabaseHelper.getModuleSortOrder(moduleName);
-
+        setLinkNameToFieldsArray(moduleName);
         while (true) {
             if (projections == null || projections.length == 0)
                 break;
@@ -106,9 +106,10 @@ public class SugarSyncManager {
             // + " AND " + ModuleFields.DATE_MODIFIED + "< " + startDate.toGMTString();
             // CalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:[NSTimeZone timeZoneWithName:@"GMT"]
             // locale:nil];
+            
             SugarBean[] sBeans = RestUtil.getEntryList(url, sessionId, moduleName, mQuery, orderBy, ""
                                             + offset, projections, mLinkNameToFieldsArray, ""
-                                            + maxResults, deleted);
+                                            + maxResults, deleted);            
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 Log.d(LOG_TAG, "fetching " + offset + "to " + (offset + maxResults));
             if (sBeans == null || sBeans.length == 0)
@@ -116,6 +117,7 @@ public class SugarSyncManager {
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 Log.d(LOG_TAG, "In Syncmanager");
             for (SugarBean sBean : sBeans) {
+                
                 String beandIdValue = sBean.getFieldValue(mBeanIdField);
                 // Check to see if the contact needs to be inserted or updated
                 rawId = lookupRawId(resolver, moduleName, beandIdValue);
@@ -137,6 +139,7 @@ public class SugarSyncManager {
                         addModuleItem(context, account, sBean, moduleName, batchOperation);
                     }
                 }
+                syncRelationships(context, account, sessionId, moduleName, sBean);
                 // A sync adapter should batch operations on multiple contacts,
                 // because it will make a dramatic performance difference.
                 if (batchOperation.size() >= 50) {
@@ -145,6 +148,35 @@ public class SugarSyncManager {
             }
             batchOperation.execute();
             offset = offset + maxResults;
+            
+            mLinkNameToFieldsArray.clear();
+        }
+        //syncRelationships(context, account, sessionId, moduleName);
+    }
+    
+    public static void syncRelationships(Context context, String account, String sessionId, String moduleName, SugarBean bean){
+        String [] relationships = DatabaseHelper.getModuleRelationshipItems(moduleName);
+        if(relationships == null)
+            return;
+        for (String relation:relationships) {
+            String linkFieldName =  DatabaseHelper.getPathForRelationship(relation); 
+            // for a particular module-link field name
+            SugarBean[] relationshipBeans  = bean.getRelationshipBeans(linkFieldName);
+            
+        }
+        
+        
+    }
+    
+    public static void setLinkNameToFieldsArray( String moduleName) throws SugarCrmException 
+    {
+        String [] relationships = DatabaseHelper.getModuleRelationshipItems(moduleName);
+        if(relationships == null)
+            return;
+        for (String relation:relationships) {
+            String linkFieldName =  DatabaseHelper.getPathForRelationship(relation);
+            String[] relationProj = DatabaseHelper.getModuleProjections(relation);
+            mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));                       
         }
     }
 
