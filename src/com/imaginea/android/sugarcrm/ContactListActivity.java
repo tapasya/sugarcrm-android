@@ -49,17 +49,13 @@ public class ContactListActivity extends ListActivity {
 
     private boolean mBusy = false;
 
-    private int mCurrentOffset = 0;
-
     private String mModuleName;
 
     private Uri mModuleUri;
 
     private boolean mStopLoading = false;
-
-    private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME };
-
-    private String[] mLinkNameToFieldsArray = new String[] {};
+    
+    private Uri mIntentUri;
 
     // we don't make this final as we may want to use the sugarCRM value dynamically
     public static int mMaxResults = 20;
@@ -75,13 +71,16 @@ public class ContactListActivity extends ListActivity {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         mModuleName = "Contacts";
-        if (extras != null)
+        if (extras != null) {
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
+        }
 
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(mModuleName);
 
         mListView = getListView();
+        
+        mIntentUri = intent.getData();
         // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -102,6 +101,7 @@ public class ContactListActivity extends ListActivity {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "Instance count:" + getInstanceCount());
         Log.d(LOG_TAG, "ModuleName" + mModuleName);
+        
         mModuleUri = DatabaseHelper.getModuleUri(mModuleName);
         if (intent.getData() == null) {
             intent.setData(mModuleUri);
@@ -125,11 +125,20 @@ public class ContactListActivity extends ListActivity {
             adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] { android.R.id.text1 });
         setListAdapter(adapter);
 
-        if (adapter.getCount() == 0)
-            mListView.setVisibility(View.GONE);
-        mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
         TextView tv1 = (TextView) (mEmpty.findViewById(R.id.mainText));
-        tv1.setVisibility(View.GONE);
+        
+        if (adapter.getCount() == 0){
+            mListView.setVisibility(View.GONE);
+            mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
+            tv1.setVisibility(View.VISIBLE);
+            if(mIntentUri != null){
+                tv1.setText("No " + mModuleName + " found");
+            }
+        } else{
+            mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
+            tv1.setVisibility(View.GONE);
+        }
+        
 
         mListFooterView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_footer, mListView, false);
         getListView().addFooterView(mListFooterView);
@@ -232,6 +241,9 @@ public class ContactListActivity extends ListActivity {
         // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
+        if(mIntentUri != null)
+            detailIntent.setData(mIntentUri);
+        
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
@@ -356,12 +368,22 @@ public class ContactListActivity extends ListActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+        case R.id.home:
+            Intent myIntent = new Intent(ContactListActivity.this, DashboardActivity.class);
+            ContactListActivity.this.startActivity(myIntent);
+            return true;
         case R.id.search:
             onSearchRequested();
-            /*Intent myIntent = new Intent(ContactListActivity.this, SearchActivity.class);
-            ContactListActivity.this.startActivity(myIntent);*/
             return true;
-
+        case R.id.addItem:
+            myIntent = new Intent(ContactListActivity.this, EditDetailsActivity.class);
+            myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
+            if(mIntentUri != null)
+                myIntent.setData(mIntentUri);
+            //myIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME, DatabaseHelper.getRelationshipName(mModuleName));
+            ContactListActivity.this.startActivity(myIntent);
+            
+            return true;
         }
         return false;
     }
