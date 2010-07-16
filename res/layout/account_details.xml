@@ -23,6 +23,5 @@
 			android:orientation="vertical"
 			>   			
 		</TableLayout>
-		<include layout="@layout/common_list"/>
 	</LinearLayout>
 </ScrollView>
