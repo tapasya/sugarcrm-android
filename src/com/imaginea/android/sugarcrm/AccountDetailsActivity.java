@@ -135,7 +135,7 @@ public class AccountDetailsActivity extends Activity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.details_activity_menu, menu);
 
-        SubMenu relationshipMenu = menu.addSubMenu(0, 123456, 0, "Related");
+        SubMenu relationshipMenu = menu.addSubMenu(0, R.string.related, 0, getString(R.string.related));
         for (int i = 0; i < mRelationshipModules.length; i++) {
             relationshipMenu.add(0, Menu.FIRST + i, 0, mRelationshipModules[i]);
         }
@@ -150,7 +150,7 @@ public class AccountDetailsActivity extends Activity {
             Intent myIntent = new Intent(AccountDetailsActivity.this, DashboardActivity.class);
             AccountDetailsActivity.this.startActivity(myIntent);
             return true;
-        case 123456:
+        case R.string.related:
             return true;
         default:
             if (Log.isLoggable(LOG_TAG, Log.INFO)){
