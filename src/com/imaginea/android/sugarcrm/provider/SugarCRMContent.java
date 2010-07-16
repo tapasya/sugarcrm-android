@@ -5,7 +5,7 @@ import android.net.Uri;
 import com.imaginea.android.sugarcrm.ModuleFields;
 
 /**
- * convinience class to identify the selection arguments(projections) and provide a projection map
+ * Convenience class to identify the selection arguments(projections) and provide a projection map
  * to retrieve column values by name instead of column number
  * 
  * @author chander
@@ -15,7 +15,7 @@ public final class SugarCRMContent {
     public static final String AUTHORITY = SugarCRMProvider.AUTHORITY;
 
     public static final String RECORD_ID = "_id";
-    
+
     public static final String SUGAR_BEAN_ID = ModuleFields.ID;
 
     public static final class Accounts implements AccountsColumns {
@@ -33,7 +33,8 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, PARENT_NAME,
-                PHONE_OFFICE, PHONE_FAX, EMAIL1, DELETED };
+                PHONE_OFFICE, PHONE_FAX, EMAIL1, WEBSITE, EMPLOYEES, TICKER_SYMBOL, ANNUAL_REVENUE,
+                ASSIGNED_USER_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
 
@@ -51,8 +52,22 @@ public final class SugarCRMContent {
         public String PHONE_OFFICE = ModuleFields.PHONE_OFFICE;
 
         public String PHONE_FAX = ModuleFields.PHONE_FAX;
-        
+
+        public String WEBSITE = ModuleFields.WEBSITE;
+
+        public String EMPLOYEES = ModuleFields.EMPLOYEES;
+
+        public String TICKER_SYMBOL = ModuleFields.TICKER_SYMBOL;
+
+        public String ANNUAL_REVENUE = ModuleFields.ANNUAL_REVENUE;
+
         public String DELETED = ModuleFields.DELETED;
+
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
 
     }
 
@@ -94,8 +109,9 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
-                ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME,
+                LAST_NAME, ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, DATE_ENTERED,
+                DATE_MODIFIED, DELETED, ACCOUNT_ID };
 
     }
 
@@ -119,14 +135,14 @@ public final class SugarCRMContent {
         public String CREATED_BY = ModuleFields.CREATED_BY;
 
         public String MODIFIED_BY_NAME = ModuleFields.MODIFIED_BY_NAME;
-        
+
         public String DELETED = ModuleFields.DELETED;
-        
-        //TODO: may move out to separate table having the contact beanId and accountId
+
+        // TODO: may move out to separate table having the contact beanId and accountId
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
-        
+
         public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
-        
+
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
     }
 
@@ -144,8 +160,9 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
-                PHONE_WORK, PHONE_FAX, EMAIL1, DATE_ENTERED, DATE_MODIFIED,DELETED, ACCOUNT_ID};
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME,
+                LAST_NAME, LEAD_SOURCE, PHONE_WORK, PHONE_FAX, EMAIL1, ACCOUNT_NAME, TITLE,
+                ASSIGNED_USER_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
 
     }
 
@@ -158,18 +175,28 @@ public final class SugarCRMContent {
 
         public String LAST_NAME = ModuleFields.LAST_NAME;
 
+        public String LEAD_SOURCE = ModuleFields.LEAD_SOURCE;
+
+        public String ACCOUNT_NAME = ModuleFields.ACCOUNT_NAME;
+
+        public String PHONE_MOBILE = ModuleFields.PHONE_MOBILE;
+
         public String EMAIL1 = ModuleFields.EMAIL1;
 
         public String PHONE_WORK = ModuleFields.PHONE_WORK;
 
         public String PHONE_FAX = ModuleFields.PHONE_FAX;
-        
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
+
+        public String TITLE = ModuleFields.TITLE;
+
         public String DELETED = ModuleFields.DELETED;
-        
+
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
-        
+
         public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
-        
+
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
     }
 
@@ -188,7 +215,8 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
-                OPPORTUNITY_TYPE, SALES_STAGE, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
+                AMOUNT, DATE_CLOSED, OPPORTUNITY_TYPE, LEAD_SOURCE, SALES_STAGE, CAMPAIGN_NAME,
+                PROBABILITY, ASSIGNED_USER_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
 
     }
 
@@ -244,11 +272,11 @@ public final class SugarCRMContent {
         public String SALES_STAGE = ModuleFields.SALES_STAGE;
 
         public String PROBABILITY = ModuleFields.PROBABILITY;
-        
+
         public String DELETED = ModuleFields.DELETED;
-        
+
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
-        
+
     }
 
 }

@@ -58,7 +58,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
 
-    private static HashMap<String, HashMap<String, ModuleField>> moduleFields;// new HashMap<String, HashMap<String, ModuleField>>();
+    private static HashMap<String, HashMap<String, ModuleField>> moduleFields;// new HashMap<String,
+                                                                              // HashMap<String,
+                                                                              // ModuleField>>();
 
     private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
 
@@ -163,6 +165,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsColumns.PARENT_NAME + " TEXT,"
                                         + AccountsColumns.PHONE_OFFICE + " TEXT,"
                                         + AccountsColumns.PHONE_FAX + " TEXT,"
+                                        + AccountsColumns.WEBSITE + " TEXT,"
+                                        + AccountsColumns.EMPLOYEES + " TEXT,"
+                                        + AccountsColumns.TICKER_SYMBOL + " TEXT,"
+                                        + AccountsColumns.ANNUAL_REVENUE + " TEXT,"
+                                        + AccountsColumns.ASSIGNED_USER_NAME + " TEXT,"
+                                        + AccountsColumns.DATE_ENTERED + " TEXT,"
+                                        + AccountsColumns.DATE_MODIFIED + " TEXT,"
                                         + AccountsColumns.DELETED + " INTEGER," + " UNIQUE("
                                         + AccountsColumns.BEAN_ID + ")" + ");");
     }
@@ -191,9 +200,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + LEADS_TABLE_NAME + " (" + LeadsColumns.ID
                                         + " INTEGER PRIMARY KEY," + LeadsColumns.BEAN_ID + " TEXT,"
                                         + LeadsColumns.FIRST_NAME + " TEXT,"
-                                        + LeadsColumns.LAST_NAME + " TEXT," + LeadsColumns.EMAIL1
+                                        + LeadsColumns.LAST_NAME + " TEXT,"
+                                        + LeadsColumns.LEAD_SOURCE + " TEXT," + LeadsColumns.EMAIL1
                                         + " TEXT," + LeadsColumns.PHONE_WORK + " TEXT,"
                                         + LeadsColumns.PHONE_FAX + " TEXT,"
+
+                                        + LeadsColumns.ACCOUNT_NAME + " TEXT," + LeadsColumns.TITLE
+                                        + " TEXT," + LeadsColumns.ASSIGNED_USER_NAME + " TEXT,"
                                         + LeadsColumns.DATE_ENTERED + " TEXT,"
                                         + LeadsColumns.DATE_MODIFIED + " TEXT,"
                                         + LeadsColumns.DELETED + " INTEGER,"
