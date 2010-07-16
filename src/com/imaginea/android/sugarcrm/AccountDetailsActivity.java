@@ -80,20 +80,21 @@ public class AccountDetailsActivity extends Activity {
 
         mRelationshipModules = DatabaseHelper.getModuleRelationshipItems(mModuleName);
 
-//        ListView listView = (ListView) findViewById(android.R.id.list);
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-//                if (Log.isLoggable(LOG_TAG, Log.INFO)) {
-//                    Log.i(LOG_TAG, "clicked on " + mRelationshipModules[position]);
-//                }
-//                openListScreen(mRelationshipModules[position]);
-//            }
-//        });
+        // ListView listView = (ListView) findViewById(android.R.id.list);
+        // listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // @Override
+        // public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+        // if (Log.isLoggable(LOG_TAG, Log.INFO)) {
+        // Log.i(LOG_TAG, "clicked on " + mRelationshipModules[position]);
+        // }
+        // openListScreen(mRelationshipModules[position]);
+        // }
+        // });
 
-        /*RelationshipAdapter adapter = new RelationshipAdapter(this);
-        adapter.setRelationshipArray(mRelationshipModules);
-        listView.setAdapter(adapter);*/
+        /*
+         * RelationshipAdapter adapter = new RelationshipAdapter(this);
+         * adapter.setRelationshipArray(mRelationshipModules); listView.setAdapter(adapter);
+         */
 
     }
 
@@ -153,10 +154,10 @@ public class AccountDetailsActivity extends Activity {
         case R.string.related:
             return true;
         default:
-            if (Log.isLoggable(LOG_TAG, Log.INFO)){
+            if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                 Log.i(LOG_TAG, "item id : " + item.getItemId());
             }
-            
+
             if (mModuleName.equals("Accounts")) {
                 openListScreen(mRelationshipModules[item.getItemId() - 1]);
             } else {
