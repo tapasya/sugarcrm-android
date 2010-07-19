@@ -40,10 +40,10 @@ public class SBParser {
                 sugarBeans[i].setModuleName(jsonObject.getString("module_name").toString());
                 String nameValueList = jsonObject.get("name_value_list").toString();
                 sugarBeans[i].setEntryList(SBParseHelper.getNameValuePairs(nameValueList));
-                
+
                 Map<String, SugarBean[]> relationshipList = getRelationshipBeans(i);
                 sugarBeans[i].setRelationshipList(relationshipList);
-                
+
             } catch (JSONException e) {
                 throw new SugarCrmException(JSON_EXCEPTION, e.getMessage());
             }
@@ -54,6 +54,8 @@ public class SBParser {
     public Map<String, SugarBean[]> getRelationshipBeans(int index) throws SugarCrmException {
         Map<String, SugarBean[]> relationshipList = new HashMap<String, SugarBean[]>();
         try {
+            if (index >= mRelationshipListJson.length())
+                return relationshipList;
             JSONArray relationshipJson = mRelationshipListJson.getJSONArray(index);
             for (int i = 0; i < relationshipJson.length(); i++) {
                 JSONObject relationshipModule = relationshipJson.getJSONObject(i);
@@ -63,6 +65,7 @@ public class SBParser {
                 relationshipList.put(linkFieldName, sugarBeans);
             }
         } catch (JSONException jsone) {
+            Log.e(LOG_TAG, jsone.getMessage(), jsone);
             throw new SugarCrmException(jsone.getMessage());
         }
         return relationshipList;
@@ -81,5 +84,5 @@ public class SBParser {
             throw new SugarCrmException(e.getMessage());
         }
     }
-    
+
 }
