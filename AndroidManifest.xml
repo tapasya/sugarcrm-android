@@ -20,7 +20,7 @@
 	    android:debuggable="true">
         
         <activity android:name=".DashboardActivity"    
-        	android:label="@string/appName" android:theme="@android:style/Theme.Black.NoTitleBar"  
+        	android:label="@string/appName" android:theme="@android:style/Theme.Light.NoTitleBar"  
         	android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" /> 
@@ -35,14 +35,7 @@
 			</intent-filter>
 			<meta-data android:name="android.app.default_searchable"
                android:value=".SearchActivity" />
-		</activity>
-		
-		<activity android:name=".AccountListActivity" android:label="@string/accounts" 
-			android:theme="@android:style/Theme.Black.NoTitleBar">
-            <intent-filter>
-                <action android:name="com.imaginea.android.sugarcrm.DEFAULT" />
-            </intent-filter>
-        </activity>
+		</activity>			
         
         <activity android:name=".SugarCrmSettings" android:label="@string/settings"
         	 android:theme="@android:style/Theme.Light">
@@ -53,27 +46,24 @@
         </activity>
         
         <activity android:name=".AccountDetailsActivity" android:label="@string/contactDetails"
-       	 android:theme="@android:style/Theme.Black.NoTitleBar" >
+       	 	android:theme="@android:style/Theme.Light.NoTitleBar" 
+       	 	android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
-        </activity>
-        
-        <activity android:name=".ContactDetailsActivity" android:label="@string/contactDetails"
-        	android:theme="@android:style/Theme.Black.NoTitleBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        
+        </activity>                
+                
         <activity android:name=".EditDetailsActivity" android:label="@string/editDetails"
-       	 android:theme="@android:style/Theme.Black.NoTitleBar" >
+       	 	android:theme="@android:style/Theme.Light.NoTitleBar" 
+       	 	android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 	    
-	    <activity android:name=".SearchActivity" android:launchMode="singleTop">
+	    <activity android:name=".SearchActivity" android:launchMode="singleTop"
+	    	android:theme="@android:style/Theme.Light.NoTitleBar" 
+       	 	android:configChanges="orientation|keyboardHidden">
 	        <intent-filter>
 	            <action android:name="android.intent.action.SEARCH" />
 	        </intent-filter>
@@ -82,7 +72,7 @@
                
         <activity android:name=".WizardActivity" 
 			android:label="@string/appName"
-			android:theme="@android:style/Theme.Black.NoTitleBar"
+			android:theme="@android:style/Theme.Light.NoTitleBar"
 			android:clearTaskOnLaunch="true"
 			android:excludeFromRecents="true">
 			<!--
@@ -92,7 +82,7 @@
 		</activity>
 		<activity android:name=".WizardAuthActivity" 
 			android:label="@string/appName"
-			android:theme="@android:style/Theme.Black.NoTitleBar"
+			android:theme="@android:style/Theme.Light.NoTitleBar"
 			android:clearTaskOnLaunch="true" 
 			android:excludeFromRecents="true">			
 		</activity>
