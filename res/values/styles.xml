@@ -5,7 +5,7 @@
 	</style>
 					
 	<style name="header_text_label">	              
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textStyle">bold</item>               		
 		<item name="android:layout_gravity">center</item>
@@ -13,7 +13,8 @@
 		
 	</style>
 	<style name="text_label">	              
-        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+        <!-- item name="android:textAppearance">?android:attr/textAppearanceSmall</item-->
+        <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>               
 		<item name="android:layout_marginLeft">10dip</item>
 		<item name="android:layout_marginRight">1dip</item>
