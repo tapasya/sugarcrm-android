@@ -290,6 +290,7 @@ public class SugarCRMProvider extends ContentProvider {
         case ACCOUNT_CONTACT:
             String accountId = uri.getPathSegments().get(1);
             String selection = AccountsColumns.ID + "=" + accountId; 
+            //TODO - Hardcording needs to make way for better design/constants-?
             Cursor cursor = query(DatabaseHelper.getModuleUri("Accounts"), Accounts.DETAILS_PROJECTION, selection, null, null);
             cursor.moveToFirst();
             String accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
