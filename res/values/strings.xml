@@ -17,7 +17,7 @@
 		name="default_url">http://demo.sugarcrm.com/sugarcrm/service/v2/rest.php</string
 	-->
 
-	<string name="defaultUrl">http://192.168.2.245/sugarcrm/service/v2/rest.php
+	<string name="defaultUrl">http://10.0.2.2/sugarcrm/service/v2/rest.php
 	</string>
 	<string name="defaultUser">will</string>
 	<string name="defaultPwd">will</string>
