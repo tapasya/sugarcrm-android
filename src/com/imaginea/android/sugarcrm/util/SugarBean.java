@@ -7,18 +7,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class SugarBean {
 
     private String beanId;
-    
+
     private String moduleName;
 
     private Map<String, String> entryList;
-    
-    private Map<String, SugarBean[]> relationshipList; 
+
+    private Map<String, SugarBean[]> relationshipList;
 
     public SugarBean() {
     }
@@ -75,8 +74,8 @@ public class SugarBean {
     public void setRelationshipList(Map<String, SugarBean[]> relationshipList) {
         this.relationshipList = relationshipList;
     }
-    
-    public SugarBean[] getRelationshipBeans(String linkField){
+
+    public SugarBean[] getRelationshipBeans(String linkField) {
         return relationshipList.get(linkField);
     }
 
