@@ -64,7 +64,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
 
-    private static final HashMap<String, String> relationshipNames = new HashMap<String, String>();
+    private static final HashMap<String, String> linkfieldNames = new HashMap<String, String>();
 
     private static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
 
@@ -111,9 +111,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         relationshipForPath.put("lead", "Leads");
         relationshipForPath.put("opportunity", "Opportunities");
 
-        relationshipNames.put("Contacts", "contacts");
-        relationshipNames.put("Leads", "leads");
-        relationshipNames.put("Opportunities", "opportunities");
+        linkfieldNames.put("Contacts", "contacts");
+        linkfieldNames.put("Leads", "leads");
+        linkfieldNames.put("Opportunities", "opportunities");
     }
 
     DatabaseHelper(Context context) {
@@ -308,8 +308,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         DatabaseHelper.modulesList = modulesList;
     }
 
-    public static String getRelationshipName(String moduleName) {
-        return relationshipNames.get(moduleName);
+    public static String getLinkfieldName(String moduleName) {
+        return linkfieldNames.get(moduleName);
     }
 
     public static String getRelationshipForPath(String path) {

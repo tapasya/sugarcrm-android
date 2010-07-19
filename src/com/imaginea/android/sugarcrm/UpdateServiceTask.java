@@ -63,7 +63,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         
         if (mUri.getPathSegments().size() == 3) {
             mParentModuleName = DatabaseHelper.getRelationshipForPath(mUri.getPathSegments().get(0));
-            mLinkFieldName = DatabaseHelper.getRelationshipName(DatabaseHelper.getRelationshipForPath(mUri.getPathSegments().get(2)));
+            mLinkFieldName = DatabaseHelper.getLinkfieldName(DatabaseHelper.getRelationshipForPath(mUri.getPathSegments().get(2)));
             if (Log.isLoggable(LOG_TAG, Log.DEBUG)){
                 Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : " + mLinkFieldName);
             }
