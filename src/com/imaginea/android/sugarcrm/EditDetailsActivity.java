@@ -9,9 +9,9 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -50,7 +50,7 @@ public class EditDetailsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.account_details);
-        // findViewById(R.id.commonList).setVisibility(View.GONE);
+        findViewById(R.id.save).setVisibility(View.VISIBLE);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -91,18 +91,18 @@ public class EditDetailsActivity extends Activity {
             mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
         }
         // startManagingCursor(mCursor);
-        setContents(mModuleName);
+        setContents();
     }
 
-    private void setContents(final String moduleName) {
+    private void setContents() {
 
         String[] detailsProjection = mSelectFields;
 
         TextView tv = (TextView) findViewById(R.id.headerText);
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            tv.setText(String.format(getString(R.string.editDetailsHeader), moduleName));
+            tv.setText(String.format(getString(R.string.editDetailsHeader), mModuleName));
         } else if (MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE) {
-            tv.setText(String.format(getString(R.string.newDetailsHeader), moduleName));
+            tv.setText(String.format(getString(R.string.newDetailsHeader), mModuleName));
         }
 
         mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
@@ -118,13 +118,13 @@ public class EditDetailsActivity extends Activity {
             String fieldName = detailsProjection[i];
 
             // get the attributes of the moduleField
-            ModuleField moduleField = DatabaseHelper.getModuleField(moduleName, fieldName);
+            ModuleField moduleField = DatabaseHelper.getModuleField(mModuleName, fieldName);
 
             // do not display account_name field, i.e. user cannot modify the account name
             if (!mModuleName.equals(getString(R.string.accounts))
                                             && ModuleFields.ACCOUNT_NAME.equals(fieldName))
-                continue;                         
-            
+                continue;
+
             View tableRow = inflater.inflate(R.layout.edit_table_row, null);
             TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.editRowLabel);
             EditText editTextForValue = (EditText) tableRow.findViewById(R.id.editRowValue);
@@ -146,47 +146,68 @@ public class EditDetailsActivity extends Activity {
             mDetailsTable.addView(tableRow);
         }
 
-        Button submit = new Button(EditDetailsActivity.this);
-        submit.setText(R.string.save);
-        submit.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String[] detailsProjection = mSelectFields;
+    }
 
-                Map<String, String> modifiedValues = new LinkedHashMap<String, String>();
-                if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
-                    modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
+    /**
+     * on click listener for saving a module item
+     * 
+     * @param v
+     */
+    public void saveModuleItem(View v) {
+        String[] detailsProjection = mSelectFields;
 
-                for (int i = 2; i < detailsProjection.length - 2; i++) {
+        Map<String, String> modifiedValues = new LinkedHashMap<String, String>();
+        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
+            modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
 
-                    // do not display account_name field, i.e. user cannot modify the account name
-                    if (!mModuleName.equals(getString(R.string.accounts))
-                                                    && ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
-                        continue;
-                    
-                    
-                    EditText editText = (EditText) mDetailsTable.findViewById(i);
-                    Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
+        for (int i = 2; i < detailsProjection.length - 2; i++) {
 
-                    // TODO: validation
+            // do not display account_name field, i.e. user cannot modify the account name
+            if (!mModuleName.equals(getString(R.string.accounts))
+                                            && ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
+                continue;
 
-                    // add the fieldName : fieldValue in the ContentValues
-                    modifiedValues.put(detailsProjection[i], editText.getText().toString());
-                }
+            EditText editText = (EditText) mDetailsTable.findViewById(i);
+            Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
 
-                if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                    ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(moduleName), mRowId), moduleName, mSugarBeanId, modifiedValues);
-                } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
-                    ServiceHelper.startServiceForInsert(getBaseContext(), mIntentUri, mModuleName, modifiedValues);
-                } else if (MODE == Util.NEW_ORPHAN_MODE) {
-                    ServiceHelper.startServiceForInsert(getBaseContext(), DatabaseHelper.getModuleUri(mModuleName), moduleName, modifiedValues);
-                }
+            // TODO: validation
 
-                finish();
-            }
-        });
-        mDetailsTable.addView(submit);
+            // add the fieldName : fieldValue in the ContentValues
+            modifiedValues.put(detailsProjection[i], editText.getText().toString());
+        }
 
+        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+            ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId), mModuleName, mSugarBeanId, modifiedValues);
+        } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+            ServiceHelper.startServiceForInsert(getBaseContext(), mIntentUri, mModuleName, modifiedValues);
+        } else if (MODE == Util.NEW_ORPHAN_MODE) {
+            ServiceHelper.startServiceForInsert(getBaseContext(), DatabaseHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
+        }
+
+        finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Hold on to this
+        // Inflate the currently selected menu XML resource.
+        MenuItem item;
+        item = menu.add(1, R.id.save, 1, R.string.save);
+        item.setIcon(android.R.drawable.ic_menu_save);
+        item.setAlphabeticShortcut('s');
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.save:
+            saveModuleItem(null);
+            return true;
+        default:
+            return true;
+        }
+        // return false;
     }
 
     /*
