@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -26,8 +25,8 @@ public class DashboardActivity extends Activity {
     private GridView mDashboard;
 
     // references to the module images
-    private Integer[] mModuleThumbIds = { R.drawable.account, R.drawable.contacts, R.drawable.leads,
-            R.drawable.opportunity, R.drawable.settings };
+    private Integer[] mModuleThumbIds = { R.drawable.account, R.drawable.contacts,
+            R.drawable.leads, R.drawable.opportunity, R.drawable.settings };
 
     // reference to the module names
     private Integer[] mModuleNameIds = { R.string.accounts, R.string.contacts, R.string.leads,
@@ -38,7 +37,7 @@ public class DashboardActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        Class wizardActivity = WizardDetector.getClass(getBaseContext()) ;
+        Class wizardActivity = WizardDetector.getClass(getBaseContext());
         startActivityForResult(new Intent(this, wizardActivity), 0);
 
         setContentView(R.layout.dashboard_activity);
@@ -87,7 +86,7 @@ public class DashboardActivity extends Activity {
                 TextView tv = (TextView) view.findViewById(R.id.moduleName);
                 tv.setText(mModuleNameIds[position]);
             } else {
-                view = (LinearLayout) convertView;
+                view = convertView;
             }
 
             return view;
