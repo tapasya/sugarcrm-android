@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -35,6 +36,8 @@ import java.util.Map;
  */
 public class SugarSyncManager {
 
+    private static DatabaseHelper databaseHelper;
+    
     // TODO - change the BEAN_ID into sugarContetn
     static String mSelection = Contacts.BEAN_ID + "=?";
 
@@ -73,6 +76,7 @@ public class SugarSyncManager {
         final ContentResolver resolver = context.getContentResolver();
         final BatchOperation batchOperation = new BatchOperation(context, resolver);
 
+        databaseHelper = new DatabaseHelper(context);
         int offset = 0;
         int maxResults = 20;
         String deleted = "";
@@ -80,8 +84,8 @@ public class SugarSyncManager {
         // TODO use a constant and remove this as we start from the login screen
         String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
 
-        String[] projections = DatabaseHelper.getModuleProjections(moduleName);
-        String orderBy = DatabaseHelper.getModuleSortOrder(moduleName);
+        String[] projections = databaseHelper.getModuleProjections(moduleName);
+        String orderBy = databaseHelper.getModuleSortOrder(moduleName);
         setLinkNameToFieldsArray(moduleName);
         while (true) {
             if (projections == null || projections.length == 0)
@@ -106,10 +110,10 @@ public class SugarSyncManager {
             // + " AND " + ModuleFields.DATE_MODIFIED + "< " + startDate.toGMTString();
             // CalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:[NSTimeZone timeZoneWithName:@"GMT"]
             // locale:nil];
-            
+
             SugarBean[] sBeans = RestUtil.getEntryList(url, sessionId, moduleName, mQuery, orderBy, ""
                                             + offset, projections, mLinkNameToFieldsArray, ""
-                                            + maxResults, deleted);            
+                                            + maxResults, deleted);
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 Log.d(LOG_TAG, "fetching " + offset + "to " + (offset + maxResults));
             if (sBeans == null || sBeans.length == 0)
@@ -117,7 +121,7 @@ public class SugarSyncManager {
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 Log.d(LOG_TAG, "In Syncmanager");
             for (SugarBean sBean : sBeans) {
-                
+
                 String beandIdValue = sBean.getFieldValue(mBeanIdField);
                 // Check to see if the contact needs to be inserted or updated
                 rawId = lookupRawId(resolver, moduleName, beandIdValue);
@@ -139,7 +143,16 @@ public class SugarSyncManager {
                         addModuleItem(context, account, sBean, moduleName, batchOperation);
                     }
                 }
-                syncRelationships(context, account, sessionId, moduleName, sBean);
+                // syncRelationships(context, account, sessionId, moduleName, sBean,
+                // batchOperation);
+                // A sync adapter should batch operations on multiple contacts,
+                // because it will make a dramatic performance difference.
+                if (batchOperation.size() >= 50) {
+                    batchOperation.execute();
+                }
+            }
+            for (SugarBean sBean : sBeans) {
+                syncRelationships(context, account, sessionId, moduleName, sBean, batchOperation);
                 // A sync adapter should batch operations on multiple contacts,
                 // because it will make a dramatic performance difference.
                 if (batchOperation.size() >= 50) {
@@ -148,35 +161,71 @@ public class SugarSyncManager {
             }
             batchOperation.execute();
             offset = offset + maxResults;
-            
+
             mLinkNameToFieldsArray.clear();
         }
-        //syncRelationships(context, account, sessionId, moduleName);
+        // syncRelationships(context, account, sessionId, moduleName);
     }
-    
-    public static void syncRelationships(Context context, String account, String sessionId, String moduleName, SugarBean bean){
-        String [] relationships = DatabaseHelper.getModuleRelationshipItems(moduleName);
-        if(relationships == null)
+
+    /**
+     * syncRelationships
+     * 
+     * @param context
+     * @param account
+     * @param sessionId
+     * @param moduleName
+     * @param bean
+     * @param batchOperation
+     */
+    public static void syncRelationships(Context context, String account, String sessionId,
+                                    String moduleName, SugarBean bean, BatchOperation batchOperation) {
+        String[] relationships = databaseHelper.getModuleRelationshipItems(moduleName);
+        if (relationships == null) {
+            Log.v(LOG_TAG, "relationships is null");
             return;
-        for (String relation:relationships) {
-            String linkFieldName =  DatabaseHelper.getPathForRelationship(relation); 
-            // for a particular module-link field name
-            SugarBean[] relationshipBeans  = bean.getRelationshipBeans(linkFieldName);
-            
         }
-        
-        
+        long rawId = lookupRawId(context.getContentResolver(), moduleName, bean.getBeanId());
+        for (String relation : relationships) {
+            String linkFieldName = databaseHelper.getLinkfieldName(relation);
+            // for a particular module-link field name
+            SugarBean[] relationshipBeans = bean.getRelationshipBeans(linkFieldName);
+            // Log.v(LOG_TAG, "linkFieldName:" + linkFieldName);
+            if (relationshipBeans == null || relationshipBeans.length == 0) {
+                // if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, "relationship beans is null or empty");
+                continue;
+            }
+            for (SugarBean relationbean : relationshipBeans) {
+                long relationRawId = lookupRawId(context.getContentResolver(), relation, relationbean.getBeanId());
+                if (relationRawId != 0) {
+                    if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
+                        // update module Item
+
+                        updateRelatedModuleItem(context, context.getContentResolver(), account, moduleName, relationbean, relationRawId, batchOperation);
+                    } else {
+                        // delete module item
+                        deleteRelatedModuleItem(context, rawId, relationRawId, moduleName, relation, batchOperation);
+                    }
+                } else {
+                    // add new moduleItem
+                    // Log.v(LOG_TAG, "In addModuleItem");
+                    if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
+                        addRelatedModuleItem(context, account, rawId, bean, relationbean, moduleName, relation, batchOperation);
+                    }
+                }
+
+            }
+        }
     }
-    
-    public static void setLinkNameToFieldsArray( String moduleName) throws SugarCrmException 
-    {
-        String [] relationships = DatabaseHelper.getModuleRelationshipItems(moduleName);
-        if(relationships == null)
+
+    public static void setLinkNameToFieldsArray(String moduleName) throws SugarCrmException {
+        String[] relationships = databaseHelper.getModuleRelationshipItems(moduleName);
+        if (relationships == null)
             return;
-        for (String relation:relationships) {
-            String linkFieldName =  DatabaseHelper.getPathForRelationship(relation);
-            String[] relationProj = DatabaseHelper.getModuleProjections(relation);
-            mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));                       
+        for (String relation : relationships) {
+            String linkFieldName = databaseHelper.getLinkfieldName(relation);
+            String[] relationProj = databaseHelper.getModuleProjections(relation);
+            mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));
         }
     }
 
@@ -201,6 +250,28 @@ public class SugarSyncManager {
     }
 
     /**
+     * Adds a single sugar bean to the sugar crm provider.
+     * 
+     * @param context
+     *            the Authenticator Activity context
+     * @param accountName
+     *            the account the contact belongs to
+     * @param sBean
+     *            the SyncAdapter SugarBean object
+     */
+    private static void addRelatedModuleItem(Context context, String accountName, long rawId,
+                                    SugarBean sBean, SugarBean relatedBean, String moduleName,
+                                    String relationModuleName, BatchOperation batchOperation) {
+        // Put the data in the contacts provider
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, "In addRelatedModuleItem");
+
+        final SugarCRMOperations moduleItemOp = SugarCRMOperations.createNewRelatedModuleItem(context, moduleName, relationModuleName, accountName, rawId, sBean, relatedBean, batchOperation);
+        moduleItemOp.addRelatedSugarBean(sBean, relatedBean);
+
+    }
+
+    /**
      * Updates a single module item to the sugar crm content provider.
      * 
      * @param context
@@ -221,15 +292,33 @@ public class SugarSyncManager {
                                     long rawId, BatchOperation batchOperation) {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateModuleItem");
-        Uri contentUri = DatabaseHelper.getModuleUri(moduleName);
+        Uri contentUri = databaseHelper.getModuleUri(moduleName);
         String[] projections = DatabaseHelper.getModuleProjections(moduleName);
         Uri uri = ContentUris.withAppendedId(contentUri, rawId);
         // TODO - is this query resolver needed to query here
         final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(rawId) }, null);
-        // TODO - do something here qith cursor
+        // TODO - do something here with cursor
         c.close();
         final SugarCRMOperations moduleItemOp = SugarCRMOperations.updateExistingModuleItem(context, moduleName, sBean, rawId, batchOperation);
         moduleItemOp.updateSugarBean(sBean, uri);
+
+    }
+
+    private static void updateRelatedModuleItem(Context context, ContentResolver resolver,
+                                    String accountName, String relatedModuleName,
+                                    SugarBean relatedBean, long relationRawId,
+                                    BatchOperation batchOperation) {
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, "In updateModuleItem");
+        Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
+        String[] projections = DatabaseHelper.getModuleProjections(relatedModuleName);
+        Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
+        // TODO - is this query resolver needed to query here
+        final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(relationRawId) }, null);
+        // TODO - do something here with cursor
+        c.close();
+        final SugarCRMOperations moduleItemOp = SugarCRMOperations.updateExistingModuleItem(context, relatedModuleName, relatedBean, relationRawId, batchOperation);
+        moduleItemOp.updateSugarBean(relatedBean, uri);
 
     }
 
@@ -243,9 +332,27 @@ public class SugarSyncManager {
      */
     private static void deleteModuleItem(Context context, long rawId, String moduleName,
                                     BatchOperation batchOperation) {
-        Uri contentUri = DatabaseHelper.getModuleUri(moduleName);
+        Uri contentUri = databaseHelper.getModuleUri(moduleName);
 
         batchOperation.add(SugarCRMOperations.newDeleteCpo(ContentUris.withAppendedId(contentUri, rawId), true).build());
+    }
+
+    /**
+     * Deletes a module item from the sugar crm provider.
+     * 
+     * @param context
+     *            the Authenticator Activity context
+     * @param rawId
+     *            the unique Id for this rawId in the sugar crm provider
+     */
+    private static void deleteRelatedModuleItem(Context context, long rawId, long relatedRawId,
+                                    String moduleName, String relaledModuleName,
+                                    BatchOperation batchOperation) {
+        Uri contentUri = databaseHelper.getModuleUri(moduleName);
+        Uri parentUri = ContentUris.withAppendedId(contentUri, rawId);
+        Uri relatedUri = Uri.withAppendedPath(parentUri, relaledModuleName);
+        Uri deleteUri = ContentUris.withAppendedId(relatedUri, relatedRawId);
+        batchOperation.add(SugarCRMOperations.newDeleteCpo(deleteUri, true).build());
     }
 
     /**
@@ -259,7 +366,7 @@ public class SugarSyncManager {
      */
     private static long lookupRawId(ContentResolver resolver, String moduleName, String beanId) {
         long rawId = 0;
-        Uri contentUri = DatabaseHelper.getModuleUri(moduleName);
+        Uri contentUri = databaseHelper.getModuleUri(moduleName);
         String[] projection = new String[] { SugarCRMContent.RECORD_ID };
 
         final Cursor c = resolver.query(contentUri, projection, mSelection, new String[] { beanId }, null);
