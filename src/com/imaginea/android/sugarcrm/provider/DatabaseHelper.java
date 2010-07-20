@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
@@ -27,11 +28,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO:
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
     public static final String CONTACTS_TABLE_NAME = "contacts";
+
+    public static final String ACCOUNTS_CONTACTS_TABLE_NAME = "accounts_contacts";
+
+    public static final String ACCOUNTS_OPPURTUNITIES_TABLE_NAME = "accounts_opportunities";
 
     public static final String LEADS_TABLE_NAME = "leads";
 
@@ -59,8 +64,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
 
     private static HashMap<String, HashMap<String, ModuleField>> moduleFields;// new HashMap<String,
-                                                                              // HashMap<String,
-                                                                              // ModuleField>>();
+
+    // HashMap<String,
+    // ModuleField>>();
 
     private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
 
@@ -97,7 +103,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put("Leads", Leads.CONTENT_URI);
         moduleUris.put("Opportunities", Opportunities.CONTENT_URI);
 
-        moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Leads", "Opportunities" });
+        // TODO - complete this list
+        // moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Leads",
+        // "Opportunities" });
+        moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Opportunities" });
         moduleRelationshipItems.put("Contacts", new String[] { "Leads", "Opportunities" });
         moduleRelationshipItems.put("Leads", new String[] { "Opportunities", "Contacts" });
         moduleRelationshipItems.put("Opportunities", new String[] { "Leads", "Contacts" });
@@ -127,6 +136,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createLeadsTable(db);
         createOpportunitiesTable(db);
 
+        // create join tables
+
+        createAccountsContactsTable(db);
     }
 
     void dropAccountsTable(SQLiteDatabase db) {
@@ -145,6 +157,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + OPPORTUNITIES_TABLE_NAME);
     }
 
+    void dropAccountsContactsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CONTACTS_TABLE_NAME);
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
@@ -153,6 +169,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropContactsTable(db);
         dropLeadsTable(db);
         dropOpportunitiesTable(db);
+
+        // drop join tables
+        dropAccountsContactsTable(db);
         onCreate(db);
     }
 
@@ -244,6 +263,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + OpportunitiesColumns.DELETED + " INTEGER,"
                                         + OpportunitiesColumns.ACCOUNT_ID + " INTEGER,"
                                         + " UNIQUE(" + OpportunitiesColumns.BEAN_ID + ")" + ");");
+    }
+
+    private static void createAccountsContactsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + ACCOUNTS_CONTACTS_TABLE_NAME + " ("
+                                        + AccountsContactsColumns.ACCOUNT_ID + " INTEGER ,"
+                                        + AccountsContactsColumns.CONTACT_ID + " INTEGER ,"
+                                        + AccountsContactsColumns.DATE_MODIFIED + " TEXT,"
+                                        + AccountsContactsColumns.DELETED + " INTEGER,"
+                                        + " UNIQUE(" + AccountsContactsColumns.ACCOUNT_ID + ","
+                                        + AccountsContactsColumns.CONTACT_ID + ")" + ");");
     }
 
     public static String[] getModuleProjections(String moduleName) {
