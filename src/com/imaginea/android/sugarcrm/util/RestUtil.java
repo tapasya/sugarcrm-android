@@ -934,7 +934,7 @@ public class RestUtil {
      *         'link_fields' -- Array - The vardef information on the link fields
      * @exception 'SoapFault' -- The SOAP error, if any
      */
-    public static List<ModuleField> getModuleFields(String url, String sessionId,
+    public static Module getModuleFields(String url, String sessionId,
                                     String moduleName, String[] fields) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
@@ -968,14 +968,16 @@ public class RestUtil {
             }
 
             final String response = EntityUtils.toString(res.getEntity());
-            if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
-                Log.v(LOG_TAG, "moduleFields : " + response);
-            return new ModuleFieldsParser(response).getModuleFields();
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+                Log.v(LOG_TAG, "moduleFields for " + moduleName + ": " + response);
+            
+            ModuleFieldsParser parser = new ModuleFieldsParser(response);
+            return new Module(moduleName, parser.getModuleFields(), parser.getLinkFields());
 
         } catch (JSONException jo) {
-            throw new SugarCrmException(JSON_EXCEPTION, jo.getMessage());
+            throw new SugarCrmException(jo.getMessage());
         } catch (IOException ioe) {
-            throw new SugarCrmException(ioe.getMessage(), ioe.getMessage());
+            throw new SugarCrmException(ioe.getMessage());
         }
     }
 
