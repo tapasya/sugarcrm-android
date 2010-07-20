@@ -146,6 +146,12 @@ public interface RestUtilConstants {
     public static final String RECORDS = "records";
     
     public static final String VALUE = "value";
+    
+    public static final String MODULE = "module";
+    
+    public static final String BEAN_NAME = "bean_name";
+    
+    public static final String RELATIONSHIP = "relationship";
 
     // Exceptions
     public static final String EXCEPTION = "Exception";
