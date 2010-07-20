@@ -3,6 +3,7 @@ package com.imaginea.android.sugarcrm.provider;
 import android.net.Uri;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
+import com.imaginea.android.sugarcrm.RestUtilConstants;
 
 /**
  * Convenience class to identify the selection arguments(projections) and provide a projection map
@@ -17,6 +18,8 @@ public final class SugarCRMContent {
     public static final String RECORD_ID = "_id";
 
     public static final String SUGAR_BEAN_ID = ModuleFields.ID;
+
+    public static final String MODULE_ROW_ID = "module_id";
 
     public static final class Accounts implements AccountsColumns {
 
@@ -299,4 +302,71 @@ public final class SugarCRMContent {
 
     }
 
+    public static final class Modules implements ModuleColumns {
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, MODULE_NAME };
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = MODULE_NAME + " DESC";
+    }
+
+    public interface ModuleColumns {
+
+        public String ID = RECORD_ID;
+
+        public String MODULE_NAME = RestUtilConstants.NAME;
+    }
+
+    public static final class ModuleField implements ModuleFieldColumns {
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME, LABEL, TYPE, IS_REQUIRED, MODULE_ID };
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
+    }
+
+    public interface ModuleFieldColumns {
+        public String ID = RECORD_ID;
+
+        public String NAME = RestUtilConstants.NAME;
+
+        public String LABEL = RestUtilConstants.LABEL;
+
+        public String TYPE = RestUtilConstants.TYPE;
+        
+        public String IS_REQUIRED = RestUtilConstants.REQUIRED;
+
+        public String MODULE_ID = MODULE_ROW_ID;
+    }
+
+    public static final class LinkFields implements LinkFieldColumns {
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME, TYPE, RELATIONSHIP,
+                MODULE, BEAN_NAME, MODULE_ID };
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
+    }
+
+    public interface LinkFieldColumns {
+        public String ID = RECORD_ID;
+
+        public String NAME = RestUtilConstants.NAME;
+
+        public String TYPE = RestUtilConstants.TYPE;
+
+        public String RELATIONSHIP = RestUtilConstants.RELATIONSHIP;
+
+        public String MODULE = RestUtilConstants.MODULE;
+
+        public String BEAN_NAME = RestUtilConstants.BEAN_NAME;
+
+        public String MODULE_ID = MODULE_ROW_ID;
+    }
 }
