@@ -146,6 +146,26 @@ public final class SugarCRMContent {
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
     }
 
+    public interface AccountsContactsColumns {
+        public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+
+        public String CONTACT_ID = ModuleFields.CONTACT_ID;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+    }
+
+    public interface AccountsOpportunitiesColumns {
+        public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+
+        public String OPPORTUNITY_ID = ModuleFields.OPPORTUNITY_ID;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+    }
+
     public static final class Leads implements LeadsColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
