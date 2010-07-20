@@ -81,11 +81,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             if (sessionId == null) {
                 sessionId = RestUtil.loginToSugarCRM(url, account.name, password);
             }
-
-            List<String> moduleList = DatabaseHelper.getModuleList();
+            DatabaseHelper databaseHelper = new DatabaseHelper(mContext);
+            List<String> moduleList = databaseHelper.getModuleList();
             if (moduleList == null)
                 moduleList = RestUtil.getAvailableModules(url, sessionId);
-                // TODO - dynamically determine the relationships and get the values
+            // TODO - dynamically determine the relationships and get the values
             Collections.sort(moduleList);
             for (String moduleName : moduleList) {
                 Log.i(LOG_TAG, "Syncing Module:" + moduleName);
