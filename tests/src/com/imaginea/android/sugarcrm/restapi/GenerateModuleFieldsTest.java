@@ -52,28 +52,28 @@ public class GenerateModuleFieldsTest extends RestAPITest {
 	public void testGetAllModuleFields() throws Exception {
 
 		List<ModuleField> moduleFields = RestUtil.getModuleFields(url,
-				mSessionId, "Accounts", fields);
+				mSessionId, "Accounts", fields).getModuleFields();
 		assertNotNull(moduleFields);
 		addToModuleFieldList(moduleFields);
 
 		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Contacts",
-				fields);
+				fields).getModuleFields();
 		addToModuleFieldList(moduleFields);
 		moduleFields = RestUtil.getModuleFields(url, mSessionId,
-				"Opportunities", fields);
+				"Opportunities", fields).getModuleFields();
 		addToModuleFieldList(moduleFields);
 		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Leads",
-				fields);
+				fields).getModuleFields();
 		addToModuleFieldList(moduleFields);
 		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Campaigns",
-				fields);
+				fields).getModuleFields();
 		addToModuleFieldList(moduleFields);
 		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Meetings",
-				fields);
+				fields).getModuleFields();
 		addToModuleFieldList(moduleFields);
 
 		moduleFields = RestUtil.getModuleFields(url, mSessionId, "Cases",
-				fields);
+				fields).getModuleFields();
 		addToModuleFieldList(moduleFields);
 
 		for (Iterator iterator = moduleFields.iterator(); iterator.hasNext();) {
