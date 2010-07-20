@@ -466,10 +466,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.endTransaction();
     }
 
-    public void setModuleFieldsInfo(SQLiteDatabase db, Set<Module> moduleFieldsInfo)
+    public void setModuleFieldsInfo(Set<Module> moduleFieldsInfo)
                                     throws SugarCrmException {
         boolean hasFailed = false;
-
+        SQLiteDatabase db = getWritableDatabase();
+        
         for (Module module : moduleFieldsInfo) {
             // get module row id
             String selection = ModuleColumns.MODULE_NAME + "='" + module.getModuleName() + "'";
