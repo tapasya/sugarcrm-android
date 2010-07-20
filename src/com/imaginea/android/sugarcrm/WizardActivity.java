@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +29,7 @@ import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
-import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -40,8 +41,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class WizardActivity extends Activity {
 
@@ -72,6 +74,8 @@ public class WizardActivity extends Activity {
     private ProgressDialog progressDialog;
 
     private TextView mHeaderTextView;
+    
+    private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -350,10 +354,6 @@ public class WizardActivity extends Activity {
 
         private String sceDesc;
 
-        // TODO: remove this moduleNames from here and use the one from DB
-        // reference to the module names
-        private String[] moduleNames = { "Accounts", "Contacts", "Leads", "Opportunities" };
-
         @Override
         protected Object doInBackground(Object... args) {
             /*
@@ -371,25 +371,45 @@ public class WizardActivity extends Activity {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
 
-                HashMap<String, HashMap<String, ModuleField>> moduleNameVsFields = DatabaseHelper.getModuleFields();
-                if (moduleNameVsFields == null || moduleNameVsFields.size() == 0) {
-                    moduleNameVsFields = new HashMap<String, HashMap<String, ModuleField>>();
-                    for (String moduleName : moduleNames) {
-                        String[] fields = {};
-                        List<ModuleField> moduleFields = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
-                        HashMap<String, ModuleField> nameVsModuleField = new HashMap<String, ModuleField>();
-                        for (int i = 0; i < moduleFields.size(); i++) {
-                            nameVsModuleField.put(moduleFields.get(i).getName(), moduleFields.get(i));
-                        }
-                        moduleNameVsFields.put(moduleName, nameVsModuleField);
+                DatabaseHelper openHelper = new DatabaseHelper(getBaseContext());
+                SQLiteDatabase db;
+
+                // check moduleNames for null
+                db = openHelper.getReadableDatabase();
+                List<String> userModules = mDbHelper.getUserModules();
+                Log.i(LOG_TAG, "userModules : size - " + userModules.size());
+                if (userModules == null || userModules.size() == 0) {
+                    userModules = RestUtil.getAvailableModules(url, sessionId);
+                    db = openHelper.getWritableDatabase();
+                    try {
+                        mDbHelper.setUserModules(userModules);
+                    } catch (SugarCrmException sce) {
+                        // TODO
                     }
-                    DatabaseHelper.setModuleFields(moduleNameVsFields);
                 }
-                List<String> modules = DatabaseHelper.getModuleList();
-                if (modules == null || modules.size() == 0) {
-                    modules = RestUtil.getAvailableModules(url, sessionId);
-                    DatabaseHelper.setModulesList(modules);
+                Log.i(LOG_TAG, "loaded user modules");
+
+                // TODO: getModuleFieldsInfo
+                Set<Module> moduleFieldsInfo = new HashSet<Module>();
+                for (String moduleName : userModules) {
+                    String[] fields = {};
+                    try {
+                        //TODO: check if the module is already there in the db. make the rest call
+                        // only if it isn't
+                        Module module = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
+                        moduleFieldsInfo.add(module);
+                        Log.i(LOG_TAG, "loaded module fields for : " + moduleName);
+                    } catch (SugarCrmException sce) {
+                        Log.e(LOG_TAG, "failed to load module fields for : " + moduleName);
+                    }
                 }
+                db = openHelper.getWritableDatabase();
+                try {
+                    mDbHelper.setModuleFieldsInfo(moduleFieldsInfo);
+                } catch (SugarCrmException sce) {
+                    // TODO
+                }
+
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();

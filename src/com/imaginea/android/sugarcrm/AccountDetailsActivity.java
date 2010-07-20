@@ -53,6 +53,8 @@ public class AccountDetailsActivity extends Activity {
     private TableLayout mDetailsTable;
 
     private String[] mRelationshipModules;
+    
+    private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
 
     /** Called when the activity is first created. */
     @Override
@@ -71,14 +73,14 @@ public class AccountDetailsActivity extends Activity {
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
 
         if (intent.getData() == null) {
-            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId));
+            intent.setData(Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId));
         }
         mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
-        mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
+        mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
         // startManagingCursor(mCursor);
         setContents(mModuleName);
 
-        mRelationshipModules = DatabaseHelper.getModuleRelationshipItems(mModuleName);
+        mRelationshipModules = mDbHelper.getModuleRelationshipItems(mModuleName);
 
         // ListView listView = (ListView) findViewById(android.R.id.list);
         // listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -101,8 +103,8 @@ public class AccountDetailsActivity extends Activity {
     protected void openListScreen(String moduleName) {
         if (mModuleName.equals("Accounts")) {
             Intent detailIntent = new Intent(AccountDetailsActivity.this, ContactListActivity.class);
-            Uri uri = Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId);
-            uri = Uri.withAppendedPath(uri, DatabaseHelper.getPathForRelationship(moduleName));
+            Uri uri = Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId);
+            uri = Uri.withAppendedPath(uri, mDbHelper.getPathForRelationship(moduleName));
             detailIntent.setData(uri);
             detailIntent.putExtra(RestUtilConstants.MODULE_NAME, moduleName);
             detailIntent.putExtra(RestUtilConstants.BEAN_ID, mSugarBeanId);
@@ -177,7 +179,7 @@ public class AccountDetailsActivity extends Activity {
 
         TextView textViewForTitle = (TextView) findViewById(R.id.accountName);
         String title = "";
-        List<String> titleFields = Arrays.asList(DatabaseHelper.getModuleListSelections(mModuleName));
+        List<String> titleFields = Arrays.asList(mDbHelper.getModuleListSelections(mModuleName));
 
         mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
 
@@ -194,7 +196,7 @@ public class AccountDetailsActivity extends Activity {
             }
 
             // get the attributes of the moduleField
-            ModuleField moduleField = DatabaseHelper.getModuleField(moduleName, fieldName);
+            ModuleField moduleField = mDbHelper.getModuleField(moduleName, fieldName);
 
             View tableRow = inflater.inflate(R.layout.table_row, null);
             TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.detailRowLabel);

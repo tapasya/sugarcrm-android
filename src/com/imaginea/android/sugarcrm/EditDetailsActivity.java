@@ -42,6 +42,8 @@ public class EditDetailsActivity extends Activity {
     private String[] mSelectFields;
 
     private Uri mIntentUri;
+    
+    private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
 
     /** Called when the activity is first created. */
     @Override
@@ -80,15 +82,15 @@ public class EditDetailsActivity extends Activity {
         }
 
         if (intent.getData() == null && MODE == Util.EDIT_ORPHAN_MODE) {
-            intent.setData(Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId));
+            intent.setData(Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId));
         } else if (intent.getData() == null && MODE == Util.NEW_ORPHAN_MODE) {
-            intent.setData(DatabaseHelper.getModuleUri(mModuleName));
+            intent.setData(mDbHelper.getModuleUri(mModuleName));
         }
 
         mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
 
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
+            mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
         }
         // startManagingCursor(mCursor);
         setContents();
@@ -118,7 +120,7 @@ public class EditDetailsActivity extends Activity {
             String fieldName = detailsProjection[i];
 
             // get the attributes of the moduleField
-            ModuleField moduleField = DatabaseHelper.getModuleField(mModuleName, fieldName);
+            ModuleField moduleField = mDbHelper.getModuleField(mModuleName, fieldName);
 
             // do not display account_name field, i.e. user cannot modify the account name
             if (!mModuleName.equals(getString(R.string.accounts))
@@ -177,11 +179,11 @@ public class EditDetailsActivity extends Activity {
         }
 
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(DatabaseHelper.getModuleUri(mModuleName), mRowId), mModuleName, mSugarBeanId, modifiedValues);
+            ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId), mModuleName, mSugarBeanId, modifiedValues);
         } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
             ServiceHelper.startServiceForInsert(getBaseContext(), mIntentUri, mModuleName, modifiedValues);
         } else if (MODE == Util.NEW_ORPHAN_MODE) {
-            ServiceHelper.startServiceForInsert(getBaseContext(), DatabaseHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
+            ServiceHelper.startServiceForInsert(getBaseContext(), mDbHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
         }
 
         finish();

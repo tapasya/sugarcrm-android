@@ -70,7 +70,8 @@ public class SearchActivity extends ListActivity {
     }
 
     private void showResults(String query) {
-        Uri moduleUri = DatabaseHelper.getModuleUri(mModuleName);
+        DatabaseHelper dbHelper = new DatabaseHelper(SearchActivity.this);
+        Uri moduleUri = dbHelper.getModuleUri(mModuleName);
         if (getIntent().getData() == null) {
             getIntent().setData(moduleUri);
         }
@@ -78,11 +79,11 @@ public class SearchActivity extends ListActivity {
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(mModuleName + " : Search results");
         
-        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), DatabaseHelper.getModuleSelection(mModuleName, query), null, null);
+        Cursor cursor = managedQuery(getIntent().getData(), dbHelper.getModuleProjections(mModuleName), dbHelper.getModuleSelection(mModuleName, query), null, null);
         
         //startManagingCursor(cursor);
         GenericCursorAdapter adapter;
-        String[] moduleSel = DatabaseHelper.getModuleListSelections(mModuleName);
+        String[] moduleSel = dbHelper.getModuleListSelections(mModuleName);
         cursor.moveToFirst();
         if (moduleSel.length >= 2)
             adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] {

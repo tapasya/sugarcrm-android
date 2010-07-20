@@ -61,6 +61,8 @@ public class ContactListActivity extends ListActivity {
     public static int mMaxResults = 20;
 
     public final static String LOG_TAG = "ContactListActivity";
+    
+    private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,7 +104,7 @@ public class ContactListActivity extends ListActivity {
             Log.d(LOG_TAG, "Instance count:" + getInstanceCount());
         Log.d(LOG_TAG, "ModuleName" + mModuleName);
         
-        mModuleUri = DatabaseHelper.getModuleUri(mModuleName);
+        mModuleUri = mDbHelper.getModuleUri(mModuleName);
         if (intent.getData() == null) {
             intent.setData(mModuleUri);
         }
@@ -112,12 +114,12 @@ public class ContactListActivity extends ListActivity {
         // if the parentModuleName is not null, then it is the list of relationship beans 
         String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
         
-        cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, DatabaseHelper.getModuleSortOrder(mModuleName));
+        cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
         
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
         GenericCursorAdapter adapter;
-        String[] moduleSel = DatabaseHelper.getModuleListSelections(mModuleName);
+        String[] moduleSel = mDbHelper.getModuleListSelections(mModuleName);
         if (moduleSel.length >= 2)
             adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] {
                     android.R.id.text1, android.R.id.text2 });
@@ -262,7 +264,7 @@ public class ContactListActivity extends ListActivity {
         }
         // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
-        mModuleUri = DatabaseHelper.getModuleUri(mModuleName);
+        mModuleUri = mDbHelper.getModuleUri(mModuleName);
         Uri deleteUri = Uri.withAppendedPath(mModuleUri, cursor.getString(0));
         getContentResolver().registerContentObserver(deleteUri, false, new DeleteContentObserver(new Handler()));
         ServiceHelper.startServiceForDelete(getBaseContext(), deleteUri, mModuleName, cursor.getString(1));
@@ -403,9 +405,9 @@ public class ContactListActivity extends ListActivity {
 
         menu.add(2, R.string.edit, 3, R.string.edit);
         menu.add(3, R.string.delete, 4, R.string.delete);
-        if (DatabaseHelper.getModuleField(mModuleName, ModuleFields.PHONE_WORK) != null)
+        if (mDbHelper.getModuleField(mModuleName, ModuleFields.PHONE_WORK) != null)
             menu.add(4, R.string.call, 4, R.string.call);
-        if (DatabaseHelper.getModuleField(mModuleName, ModuleFields.EMAIL1) != null)
+        if (mDbHelper.getModuleField(mModuleName, ModuleFields.EMAIL1) != null)
             menu.add(5, R.string.email, 4, R.string.email);
 
     }
