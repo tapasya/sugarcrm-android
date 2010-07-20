@@ -17,13 +17,22 @@ public class ModuleFieldsParser {
 
     private List<ModuleField> moduleFields;
 
+    private List<LinkField> linkFields;
+
     public ModuleFieldsParser(String jsonResponse) throws JSONException {
         JSONObject responseObj = new JSONObject(jsonResponse);
         String moduleName = responseObj.get("module_name").toString();
-        Log.i(LOG_TAG, moduleName);
 
         JSONObject moduleFieldsJSON = (JSONObject) responseObj.get("module_fields");
         setModuleFields(moduleFieldsJSON);
+
+        try {
+            JSONObject linkFieldsJSON = (JSONObject) responseObj.get("link_fields");
+            setLinkFields(linkFieldsJSON);
+        } catch (ClassCastException cce) {
+            // ignore : no linkFields
+            linkFields = new ArrayList<LinkField>();
+        }
 
     }
 
@@ -39,6 +48,18 @@ public class ModuleFieldsParser {
         }
     }
 
+    private void setLinkFields(JSONObject linkFieldsJSON) throws JSONException {
+        linkFields = new ArrayList<LinkField>();
+        Iterator iterator = linkFieldsJSON.keys();
+        while (iterator.hasNext()) {
+            String key = (String) iterator.next();
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, key);
+            JSONObject nameValuePairsJson = (JSONObject) linkFieldsJSON.get(key);
+            linkFields.add(getLinkFieldAttributes(nameValuePairsJson));
+        }
+    }
+
     private ModuleField getModuleField(JSONObject nameValuePairsJson) throws JSONException {
         String name = nameValuePairsJson.getString(RestUtilConstants.NAME);
         String type = nameValuePairsJson.getString(RestUtilConstants.TYPE);
@@ -48,8 +69,22 @@ public class ModuleFieldsParser {
         return new ModuleField(name, type, label, isRequired);
     }
 
+    private LinkField getLinkFieldAttributes(JSONObject nameValuePairsJson) throws JSONException {
+        String name = nameValuePairsJson.getString(RestUtilConstants.NAME);
+        String type = nameValuePairsJson.getString(RestUtilConstants.TYPE);
+        String relationship = nameValuePairsJson.getString(RestUtilConstants.RELATIONSHIP);
+        String module = nameValuePairsJson.getString(RestUtilConstants.MODULE);
+        String beanName = nameValuePairsJson.getString(RestUtilConstants.BEAN_NAME);
+
+        return new LinkField(name, type, relationship, module, beanName);
+    }
+
     public List<ModuleField> getModuleFields() {
         return moduleFields;
+    }
+
+    public List<LinkField> getLinkFields() {
+        return linkFields;
     }
 
 }
