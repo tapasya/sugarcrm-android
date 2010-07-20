@@ -1,6 +1,8 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -13,12 +15,21 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LinkFieldColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
+import com.imaginea.android.sugarcrm.util.LinkField;
+import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.SugarCrmException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class helps open, create, and upgrade the database file.
@@ -27,8 +38,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "sugar_crm.db";
 
-    // TODO:
-    private static final int DATABASE_VERSION = 11;
+    // TODO: RESET the database version to 1
+    private static final int DATABASE_VERSION = 15;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -46,11 +57,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CALLS_TABLE_NAME = "calls";
 
+    public static final String MODULES_TABLE_NAME = "modules";
+
+    public static final String MODULE_FIELDS_TABLE_NAME = "module_fields";
+
+    public static final String LINK_FIELDS_TABLE_NAME = "link_fields";
+
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     // TODO - replace with database calls - dynamic module generation
-    private static List<String> modulesList;
-
+    private static List<String> moduleList;
+    
     private static final HashMap<String, String> modules = new HashMap<String, String>();
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
@@ -125,7 +142,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         linkfieldNames.put("Opportunities", "opportunities");
     }
 
-    DatabaseHelper(Context context) {
+    public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -136,7 +153,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createLeadsTable(db);
         createOpportunitiesTable(db);
 
-        // create join tables
+        createModulesTable(db);
+        createModuleFieldsTable(db);
+        createLinkFieldsTable(db);
+         // create join tables
 
         createAccountsContactsTable(db);
     }
@@ -157,6 +177,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + OPPORTUNITIES_TABLE_NAME);
     }
 
+    void dropModulesTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + MODULES_TABLE_NAME);
+    }
+
+    void dropModuleFieldsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_TABLE_NAME);
+    }
+
+    void dropLinkFieldsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + LINK_FIELDS_TABLE_NAME);
+    }
+
     void dropAccountsContactsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CONTACTS_TABLE_NAME);
     }
@@ -169,6 +201,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropContactsTable(db);
         dropLeadsTable(db);
         dropOpportunitiesTable(db);
+
+        dropModulesTable(db);
+        dropModuleFieldsTable(db);
+        dropLinkFieldsTable(db);
+
 
         // drop join tables
         dropAccountsContactsTable(db);
@@ -265,6 +302,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " UNIQUE(" + OpportunitiesColumns.BEAN_ID + ")" + ");");
     }
 
+    private static void createModulesTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + MODULES_TABLE_NAME + " (" + ModuleColumns.ID
+                                        + " INTEGER PRIMARY KEY," + ModuleColumns.MODULE_NAME
+                                        + " TEXT," + " UNIQUE(" + ModuleColumns.MODULE_NAME + ")"
+                                        + ");");
+    }
+
+    private static void createModuleFieldsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + MODULE_FIELDS_TABLE_NAME + " (" + ModuleFieldColumns.ID
+                                        + " INTEGER PRIMARY KEY," + ModuleFieldColumns.NAME
+                                        + " TEXT," + ModuleFieldColumns.LABEL + " TEXT,"
+                                        + ModuleFieldColumns.TYPE + " TEXT,"
+                                        + ModuleFieldColumns.IS_REQUIRED + " INTEGER,"
+                                        + ModuleFieldColumns.MODULE_ID + " INTEGER" + ");");
+    }
+
+    private static void createLinkFieldsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + LINK_FIELDS_TABLE_NAME + " (" + LinkFieldColumns.ID
+                                        + " INTEGER PRIMARY KEY," + LinkFieldColumns.NAME
+                                        + " TEXT," + LinkFieldColumns.TYPE + " TEXT,"
+                                        + LinkFieldColumns.RELATIONSHIP + " TEXT,"
+                                        + LinkFieldColumns.MODULE + " TEXT,"
+                                        + LinkFieldColumns.BEAN_NAME + " TEXT,"
+                                        + LinkFieldColumns.MODULE_ID + " INTEGER" + ");");
+    }
+
     private static void createAccountsContactsTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + ACCOUNTS_CONTACTS_TABLE_NAME + " ("
@@ -280,31 +346,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return moduleProjections.get(moduleName);
     }
 
-    public static String[] getModuleListSelections(String moduleName) {
+    public String[] getModuleListSelections(String moduleName) {
         return moduleListSelections.get(moduleName);
     }
 
-    public static String getModuleSortOrder(String moduleName) {
+    public String getModuleSortOrder(String moduleName) {
         return moduleSortOrder.get(moduleName);
     }
 
-    public static Uri getModuleUri(String moduleName) {
+    public Uri getModuleUri(String moduleName) {
         return moduleUris.get(moduleName);
     }
 
-    public static ModuleField getModuleField(String moduleName, String fieldName) {
-        return moduleFields.get(moduleName).get(fieldName);
-    }
+    /*
+     * public static HashMap<String, HashMap<String, ModuleField>> getModuleFields() { return
+     * moduleFields; }
+     */
 
-    public static HashMap<String, HashMap<String, ModuleField>> getModuleFields() {
-        return moduleFields;
-    }
+    /*
+     * public static void setModuleFields(HashMap<String, HashMap<String, ModuleField>>
+     * moduleFields) { DatabaseHelper.moduleFields = moduleFields; //TODO: insert in DB }
+     */
 
-    public static void setModuleFields(HashMap<String, HashMap<String, ModuleField>> moduleFields) {
-        DatabaseHelper.moduleFields = moduleFields;
-    }
-
-    public static String getModuleSelection(String moduleName, String searchString) {
+    public String getModuleSelection(String moduleName, String searchString) {
         if (moduleName.equals("Accounts")) {
             return AccountsColumns.NAME + " LIKE '%" + searchString + "%'";
         } else if (moduleName.equals("Contacts")) {
@@ -322,27 +386,136 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return "";
     }
 
-    public static String[] getModuleRelationshipItems(String moduleName) {
+    public String[] getModuleRelationshipItems(String moduleName) {
         return moduleRelationshipItems.get(moduleName);
     }
 
-    public static String getPathForRelationship(String moduleName) {
+    public String getPathForRelationship(String moduleName) {
         return pathForRelationship.get(moduleName);
     }
 
-    public static List<String> getModuleList() {
-        return modulesList;
+    public List<String> getModuleList() {
+        return moduleList;
     }
 
-    public static void setModulesList(List<String> modulesList) {
-        DatabaseHelper.modulesList = modulesList;
-    }
-
-    public static String getLinkfieldName(String moduleName) {
+    public String getLinkfieldName(String moduleName) {
         return linkfieldNames.get(moduleName);
     }
 
-    public static String getRelationshipForPath(String path) {
+    public String getRelationshipForPath(String path) {
         return relationshipForPath.get(path);
     }
+
+    public ModuleField getModuleField(String moduleName, String fieldName) {
+        HashMap<String, ModuleField> nameVsModuleField = moduleFields.get(moduleName);
+        if (nameVsModuleField != null && nameVsModuleField.get(fieldName) != null) {
+            return nameVsModuleField.get(fieldName);
+        } else {
+            nameVsModuleField = new HashMap<String, ModuleField>();
+        }
+
+        SQLiteDatabase db = getReadableDatabase();
+        String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
+        Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
+        cursor.moveToFirst();
+        String moduleId = cursor.getString(0);
+        cursor.close();
+
+        selection = "(" + ModuleFieldColumns.MODULE_ID + "=" + moduleId + " AND "
+                                        + ModuleFieldColumns.NAME + "='" + fieldName + "')";
+        cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
+        cursor.moveToFirst();
+        ModuleField moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
+                                        : false);
+        nameVsModuleField.put(fieldName, moduleField);
+        moduleFields.put(moduleName, nameVsModuleField);
+        return moduleField;
+    }
+
+    public List<String> getUserModules() {
+        if (moduleList != null && moduleList.size() != 0)
+            return moduleList;
+
+        SQLiteDatabase db = getReadableDatabase();
+        moduleList = new ArrayList<String>();
+        Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, null, null, null, null, null);
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            String moduleName = cursor.getString(cursor.getColumnIndex(ModuleColumns.MODULE_NAME));
+            moduleList.add(moduleName);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return moduleList;
+    }
+
+    public void setUserModules(List<String> moduleNames) throws SugarCrmException {
+        boolean hasFailed = false;
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        for (String moduleName : moduleNames) {
+            ContentValues values = new ContentValues();
+            values.put(ModuleColumns.MODULE_NAME, moduleName);
+            long rowId = db.insert(MODULES_TABLE_NAME, "", values);
+            if (rowId <= 0)
+                hasFailed = true;
+        }
+        if (hasFailed)
+            throw new SugarCrmException("FAILED to insert user modules!");
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    public void setModuleFieldsInfo(SQLiteDatabase db, Set<Module> moduleFieldsInfo)
+                                    throws SugarCrmException {
+        boolean hasFailed = false;
+
+        for (Module module : moduleFieldsInfo) {
+            // get module row id
+            String selection = ModuleColumns.MODULE_NAME + "='" + module.getModuleName() + "'";
+            Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
+            cursor.moveToFirst();
+            String moduleId = cursor.getString(0);
+            cursor.close();
+
+            db.beginTransaction();
+            List<ModuleField> moduleFields = module.getModuleFields();
+            for (ModuleField moduleField : moduleFields) {
+                ContentValues values = new ContentValues();
+                values.put(ModuleFieldColumns.NAME, moduleField.getName());
+                values.put(ModuleFieldColumns.LABEL, moduleField.getLabel());
+                values.put(ModuleFieldColumns.TYPE, moduleField.getType());
+                values.put(ModuleFieldColumns.IS_REQUIRED, moduleField.isRequired());
+                values.put(ModuleFieldColumns.MODULE_ID, moduleId);
+                long rowId = db.insert(MODULE_FIELDS_TABLE_NAME, "", values);
+                if (rowId <= 0)
+                    hasFailed = true;
+            }
+
+            List<LinkField> linkFields = module.getLinkFields();
+            for (LinkField linkField : linkFields) {
+                ContentValues values = new ContentValues();
+                values.put(LinkFieldColumns.NAME, linkField.getName());
+                values.put(LinkFieldColumns.TYPE, linkField.getType());
+                values.put(LinkFieldColumns.RELATIONSHIP, linkField.getRelationship());
+                values.put(LinkFieldColumns.MODULE, linkField.getModule());
+                values.put(LinkFieldColumns.BEAN_NAME, linkField.getBeanName());
+                values.put(ModuleFieldColumns.MODULE_ID, moduleId);
+                long rowId = db.insert(LINK_FIELDS_TABLE_NAME, "", values);
+                if (rowId < 0)
+                    hasFailed = true;
+            }
+            if (hasFailed)
+                throw new SugarCrmException("FAILED to insert module fields!");
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+    }
+
+    /*
+     * public static Set<Module> getModuleFieldsInfo(SQLiteDatabase db){ Cursor cursor =
+     * db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, null, null, null, null,
+     * Modules.DEFAULT_SORT_ORDER); cursor.moveToFirst(); String moduleId = cursor.getString(0);
+     * cursor.close(); }
+     */
 }
