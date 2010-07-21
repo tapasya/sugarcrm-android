@@ -414,7 +414,7 @@ public class SugarSyncManager {
     public static synchronized void syncModules(Context context, String account, String sessionId) {
         if (databaseHelper == null)
             databaseHelper = new DatabaseHelper(context);
-        List<String> userModules = Arrays.asList(databaseHelper.getSupportedModulesList());
+        List<String> userModules = databaseHelper.getModuleList();
 
         Set<Module> moduleFieldsInfo = new HashSet<Module>();
         for (String moduleName : userModules) {
