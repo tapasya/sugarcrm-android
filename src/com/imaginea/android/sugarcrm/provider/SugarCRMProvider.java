@@ -151,7 +151,7 @@ public class SugarCRMProvider extends ContentProvider {
         case ACCOUNT_OPPORTUNITY:
             module = RestUtilConstants.OPPORTUNITIES_MODULE;
 
-            c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+           // c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
 
             qb = new SQLiteQueryBuilder();
             qb.setTables(DatabaseHelper.ACCOUNTS_TABLE_NAME + ","
@@ -337,8 +337,16 @@ public class SugarCRMProvider extends ContentProvider {
             String selection = AccountsColumns.ID + "=" + accountId;
 
             String parentModuleName = mOpenHelper.getRelationshipForPath(parentPath);
-            Cursor cursor = query(mOpenHelper.getModuleUri(parentModuleName), Accounts.DETAILS_PROJECTION, selection, null, null);
-            cursor.moveToFirst();
+            Uri parentUri = mOpenHelper.getModuleUri(parentModuleName);
+            Cursor cursor = query(parentUri, Accounts.DETAILS_PROJECTION, selection, null, null);
+            boolean rowsPresent = cursor.moveToFirst();
+            if (Log.isLoggable(TAG, Log.VERBOSE))
+                Log.v(TAG, "Uri to insert:" + uri.toString() + " rows present:" + rowsPresent);
+            if(!rowsPresent )
+            {
+                cursor.close();
+                return uri;
+            }
             String accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
             // values.put(Contacts.ACCOUNT_ID, accountId);
             values.put(Contacts.ACCOUNT_NAME, accountName);
