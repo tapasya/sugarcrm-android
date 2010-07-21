@@ -37,7 +37,12 @@ public final class SugarCRMContent {
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, PARENT_NAME,
                 PHONE_OFFICE, PHONE_FAX, EMAIL1, WEBSITE, EMPLOYEES, TICKER_SYMBOL, ANNUAL_REVENUE,
-                ASSIGNED_USER_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
+                BILLING_ADDRESS_STREET, BILLING_ADDRESS_STREET_2, BILLING_ADDRESS_STREET_3,
+                BILLING_ADDRESS_STREET_4, BILLING_ADDRESS_CITY, BILLING_ADDRESS_STATE,
+                BILLING_ADDRESS_POSTALCODE, BILLING_ADDRESS_COUNTRY, SHIPPING_ADDRESS_STREET,
+                SHIPPING_ADDRESS_STREET_2, SHIPPING_ADDRESS_STREET_3, SHIPPING_ADDRESS_STREET_4,
+                SHIPPING_ADDRESS_CITY, SHIPPING_ADDRESS_STATE, SHIPPING_ADDRESS_POSTALCODE,
+                SHIPPING_ADDRESS_COUNTRY, ASSIGNED_USER_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
 
@@ -63,6 +68,38 @@ public final class SugarCRMContent {
         public String TICKER_SYMBOL = ModuleFields.TICKER_SYMBOL;
 
         public String ANNUAL_REVENUE = ModuleFields.ANNUAL_REVENUE;
+
+        public String BILLING_ADDRESS_STREET = ModuleFields.BILLING_ADDRESS_STREET;
+
+        public String BILLING_ADDRESS_STREET_2 = ModuleFields.BILLING_ADDRESS_STREET_2;
+
+        public String BILLING_ADDRESS_STREET_3 = ModuleFields.BILLING_ADDRESS_STREET_3;
+
+        public String BILLING_ADDRESS_STREET_4 = ModuleFields.BILLING_ADDRESS_STREET_4;
+
+        public String BILLING_ADDRESS_CITY = ModuleFields.BILLING_ADDRESS_CITY;
+
+        public String BILLING_ADDRESS_STATE = ModuleFields.BILLING_ADDRESS_STATE;
+
+        public String BILLING_ADDRESS_POSTALCODE = ModuleFields.BILLING_ADDRESS_POSTALCODE;;
+
+        public String BILLING_ADDRESS_COUNTRY = ModuleFields.BILLING_ADDRESS_COUNTRY;;
+
+        public String SHIPPING_ADDRESS_STREET = ModuleFields.SHIPPING_ADDRESS_STREET;
+
+        public String SHIPPING_ADDRESS_STREET_2 = ModuleFields.SHIPPING_ADDRESS_STREET_2;
+
+        public String SHIPPING_ADDRESS_STREET_3 = ModuleFields.SHIPPING_ADDRESS_STREET_3;
+
+        public String SHIPPING_ADDRESS_STREET_4 = ModuleFields.SHIPPING_ADDRESS_STREET_4;
+
+        public String SHIPPING_ADDRESS_CITY = ModuleFields.SHIPPING_ADDRESS_CITY;
+
+        public String SHIPPING_ADDRESS_STATE = ModuleFields.SHIPPING_ADDRESS_STATE;
+
+        public String SHIPPING_ADDRESS_POSTALCODE = ModuleFields.SHIPPING_ADDRESS_POSTALCODE;
+
+        public String SHIPPING_ADDRESS_COUNTRY = ModuleFields.SHIPPING_ADDRESS_COUNTRY;
 
         public String DELETED = ModuleFields.DELETED;
 
@@ -321,7 +358,8 @@ public final class SugarCRMContent {
 
     public static final class ModuleField implements ModuleFieldColumns {
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME, LABEL, TYPE, IS_REQUIRED, MODULE_ID };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, NAME, LABEL, TYPE,
+                IS_REQUIRED, MODULE_ID };
 
         /**
          * The default sort order for this table
@@ -337,7 +375,7 @@ public final class SugarCRMContent {
         public String LABEL = RestUtilConstants.LABEL;
 
         public String TYPE = RestUtilConstants.TYPE;
-        
+
         public String IS_REQUIRED = RestUtilConstants.REQUIRED;
 
         public String MODULE_ID = MODULE_ROW_ID;
