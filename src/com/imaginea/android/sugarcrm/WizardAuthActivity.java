@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +34,6 @@ import android.widget.ViewFlipper;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMProvider;
 import com.imaginea.android.sugarcrm.util.Module;
-import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -47,7 +45,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -115,8 +112,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
     private TextView mHeaderTextView;
 
     private static final String LOG_TAG = "WizardAuthActivity";
-    
-    private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
+
+    private DatabaseHelper mDbHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -427,20 +424,16 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             try {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
-
-                DatabaseHelper openHelper = new DatabaseHelper(getBaseContext());
-                SQLiteDatabase db;
-
                 // check moduleNames for null
-                db = openHelper.getReadableDatabase();
+                mDbHelper = new DatabaseHelper(getBaseContext());
                 List<String> userModules = mDbHelper.getUserModules();
                 Log.i(LOG_TAG, "userModules : size - " + userModules.size());
                 if (userModules == null || userModules.size() == 0) {
                     userModules = RestUtil.getAvailableModules(url, sessionId);
-                    db = openHelper.getWritableDatabase();
                     try {
                         mDbHelper.setUserModules(userModules);
                     } catch (SugarCrmException sce) {
+                        Log.e(LOG_TAG, sce.getMessage(), sce);
                         // TODO
                     }
                 }
@@ -450,7 +443,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 for (String moduleName : userModules) {
                     String[] fields = {};
                     try {
-                        //TODO: check if the module is already there in the db. make the rest call
+                        // TODO: check if the module is already there in the db. make the rest call
                         // only if it isn't
                         Module module = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
                         moduleFieldsInfo.add(module);
@@ -459,10 +452,10 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                         Log.e(LOG_TAG, "failed to load module fields for : " + moduleName);
                     }
                 }
-                db = openHelper.getWritableDatabase();
                 try {
                     mDbHelper.setModuleFieldsInfo(moduleFieldsInfo);
                 } catch (SugarCrmException sce) {
+                    Log.e(LOG_TAG, sce.getMessage(), sce);
                     // TODO
                 }
 
