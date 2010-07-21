@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.SugarBean;
@@ -132,6 +133,7 @@ public class SugarCRMOperations {
                                     SugarBean sBean, long rawId, BatchOperation batchOperation) {
         this(context, batchOperation);
         mModuleName = moduleName;
+        mRelatedModuleName = relationModuleName;
         mIsNewId = false;
         mRawId = rawId;
     }
@@ -155,7 +157,8 @@ public class SugarCRMOperations {
             mValues.put(fieldName, fieldValue);
         }
         if (mValues.size() > 0) {
-            addRelatedInsertOp(sBean.getBeanId());
+            // String beandIdValue = sBean.getFieldValue(SugarSyncManager.mBeanIdField);
+            addRelatedInsertOp();
         }
         return this;
     }
@@ -194,12 +197,13 @@ public class SugarCRMOperations {
     /**
      * Adds an insert operation into the batch
      */
-    private void addRelatedInsertOp(String beanId) {
+    private void addRelatedInsertOp() {
         // if (!mIsNewId) {
         // mValues.put(SugarCRMContent.RECORD_ID, mRawId);
         // }
         Uri contentUri = databaseHelper.getModuleUri(mModuleName);
         String uriPath = databaseHelper.getPathForRelationship(mRelatedModuleName);
+        //Log.v("Ops", "addRelatedInsertOp:" + uriPath);
         // ;
         // long id = 0;
 
