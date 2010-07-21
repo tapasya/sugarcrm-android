@@ -82,15 +82,21 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 sessionId = RestUtil.loginToSugarCRM(url, account.name, password);
             }
             DatabaseHelper databaseHelper = new DatabaseHelper(mContext);
-            List<String> moduleList = databaseHelper.getModuleList();
+            List<String> moduleList = databaseHelper.getUserModules();
+            // TODO - this should have been taken care during the first login
             if (moduleList == null)
                 moduleList = RestUtil.getAvailableModules(url, sessionId);
+            // TODO run this list through our local DB and see if any changes have happened and sync
+            // those modules and module fields
+            SugarSyncManager.syncModules(mContext, account.name, sessionId);
             // TODO - dynamically determine the relationships and get the values
             Collections.sort(moduleList);
             for (String moduleName : moduleList) {
                 Log.i(LOG_TAG, "Syncing Module:" + moduleName);
-                SugarSyncManager.syncModules(mContext, account.name, sessionId, moduleName);
+                SugarSyncManager.syncModulesData(mContext, account.name, sessionId, moduleName);
             }
+            
+            databaseHelper.close();
 
             // update the last synced date.
             mLastUpdated = new Date();
