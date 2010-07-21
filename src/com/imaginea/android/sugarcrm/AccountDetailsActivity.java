@@ -14,10 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +22,7 @@ import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +51,7 @@ public class AccountDetailsActivity extends Activity {
 
     private String[] mRelationshipModules;
     
-    private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
+    private DatabaseHelper mDbHelper;
 
     /** Called when the activity is first created. */
     @Override
@@ -72,6 +69,7 @@ public class AccountDetailsActivity extends Activity {
         if (extras != null)
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
 
+        mDbHelper = new DatabaseHelper(getBaseContext());
         if (intent.getData() == null) {
             intent.setData(Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId));
         }
@@ -103,6 +101,8 @@ public class AccountDetailsActivity extends Activity {
     protected void openListScreen(String moduleName) {
         if (mModuleName.equals("Accounts")) {
             Intent detailIntent = new Intent(AccountDetailsActivity.this, ContactListActivity.class);
+            if(mDbHelper == null)
+                mDbHelper = new DatabaseHelper(getBaseContext());
             Uri uri = Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId);
             uri = Uri.withAppendedPath(uri, mDbHelper.getPathForRelationship(moduleName));
             detailIntent.setData(uri);
@@ -120,8 +120,8 @@ public class AccountDetailsActivity extends Activity {
 
         if (mCursor != null && !mCursor.isClosed())
             mCursor.close();
-
-    }
+            
+    }       
 
     /*
      * @Override public boolean onPrepareOptionsMenu(Menu menu) {
@@ -177,6 +177,9 @@ public class AccountDetailsActivity extends Activity {
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(mModuleName + " Details");
 
+        if(mDbHelper == null)
+            mDbHelper = new DatabaseHelper(getBaseContext());
+        
         TextView textViewForTitle = (TextView) findViewById(R.id.accountName);
         String title = "";
         List<String> titleFields = Arrays.asList(mDbHelper.getModuleListSelections(mModuleName));
@@ -186,11 +189,11 @@ public class AccountDetailsActivity extends Activity {
         mCursor.moveToFirst();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        
         for (int i = 2; i < detailsProjection.length - 2; i++) {
             String fieldName = detailsProjection[i];
             int columnIndex = mCursor.getColumnIndex(fieldName);
-            if (Log.isLoggable(LOG_TAG, Log.INFO)) {
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                 Log.d(LOG_TAG, "Col:" + columnIndex + " moduleName : " + moduleName
                                                 + " fieldName : " + fieldName);
             }
@@ -207,6 +210,7 @@ public class AccountDetailsActivity extends Activity {
                 value = mCursor.getString(columnIndex);
             }
 
+            // set the title
             if (titleFields.contains(fieldName)) {
                 title = title + value + " ";
                 textViewForTitle.setText(title);
@@ -228,7 +232,7 @@ public class AccountDetailsActivity extends Activity {
         }
     }
 
-    private class RelationshipAdapter extends BaseAdapter {
+    /*private class RelationshipAdapter extends BaseAdapter {
 
         private Context mContext;
 
@@ -270,6 +274,6 @@ public class AccountDetailsActivity extends Activity {
             return layout;
         }
 
-    }
+    }*/
 
 }
