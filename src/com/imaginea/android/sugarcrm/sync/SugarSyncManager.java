@@ -167,8 +167,9 @@ public class SugarSyncManager {
             }
             batchOperation.execute();
 
-            mLinkNameToFieldsArray.clear();
+           
         }
+        mLinkNameToFieldsArray.clear();
         // syncRelationships(context, account, sessionId, moduleName);
         databaseHelper.close();
         databaseHelper = null;
