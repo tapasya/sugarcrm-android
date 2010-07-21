@@ -65,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String LINK_FIELDS_TABLE_NAME = "link_fields";
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
-
+    
     // TODO - replace with database calls - dynamic module generation
     private static List<String> moduleList;
     
@@ -81,10 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final HashMap<String, String> moduleSelections = new HashMap<String, String>();
 
-    private static HashMap<String, HashMap<String, ModuleField>> moduleFields;// new HashMap<String,
-
-    // HashMap<String,
-    // ModuleField>>();
+    private static HashMap<String, HashMap<String, ModuleField>> moduleFields;
 
     private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
 
@@ -429,7 +426,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String getRelationshipForPath(String path) {
         return relationshipForPath.get(path);
     }
-
+    
     public ModuleField getModuleField(String moduleName, String fieldName) {
         HashMap<String, ModuleField> nameVsModuleField = moduleFields.get(moduleName);
         if (nameVsModuleField != null && nameVsModuleField.get(fieldName) != null) {
@@ -452,6 +449,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ModuleField moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
                                         : false);
         cursor.close();
+        db.close();
         nameVsModuleField.put(fieldName, moduleField);
         moduleFields.put(moduleName, nameVsModuleField);
         return moduleField;
@@ -490,6 +488,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             throw new SugarCrmException("FAILED to insert user modules!");
         db.setTransactionSuccessful();
         db.endTransaction();
+        db.close();
     }
 
     public void setModuleFieldsInfo(Set<Module> moduleFieldsInfo)
@@ -536,6 +535,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 throw new SugarCrmException("FAILED to insert module fields!");
             db.setTransactionSuccessful();
             db.endTransaction();
+            db.close();
         }
     }
 
