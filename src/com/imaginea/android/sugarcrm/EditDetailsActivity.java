@@ -89,7 +89,7 @@ public class EditDetailsActivity extends Activity {
             intent.setData(mDbHelper.getModuleUri(mModuleName));
         }
 
-        mSelectFields = mDbHelper.getModuleProjections(mModuleName);
+        mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
 
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
             mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
