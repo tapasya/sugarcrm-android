@@ -155,6 +155,8 @@ public class SugarSyncManager {
                     batchOperation.execute();
                 }
             }
+            batchOperation.execute();
+            offset = offset + maxResults;
             for (SugarBean sBean : sBeans) {
                 syncRelationshipsData(context, account, sessionId, moduleName, sBean, batchOperation);
                 // A sync adapter should batch operations on multiple contacts,
@@ -164,7 +166,6 @@ public class SugarSyncManager {
                 }
             }
             batchOperation.execute();
-            offset = offset + maxResults;
 
             mLinkNameToFieldsArray.clear();
         }
@@ -191,7 +192,10 @@ public class SugarSyncManager {
             return;
         }
         String beandIdValue = bean.getFieldValue(mBeanIdField);
+        Log.v(LOG_TAG, "syncRelationshipsData: beanId:" + beandIdValue);
+       
         long rawId = lookupRawId(context.getContentResolver(), moduleName, beandIdValue);
+        Log.v(LOG_TAG, "syncRelationshipsData: RawId:" + rawId);
         for (String relation : relationships) {
             String linkFieldName = databaseHelper.getLinkfieldName(relation);
             // for a particular module-link field name
@@ -212,7 +216,7 @@ public class SugarSyncManager {
                 long relationRawId = lookupRawId(context.getContentResolver(), relation, relationBeanId);
                 if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
                     Log.v(LOG_TAG, "RelationBeanId/RelatedRawid:"
-                                                    + relationbean.getFieldValue(mBeanIdField)
+                                                    + relationRawId
                                                     + "/" + relationBeanId);
                 if (relationRawId != 0) {
                     if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
@@ -410,7 +414,7 @@ public class SugarSyncManager {
     public static synchronized void syncModules(Context context, String account, String sessionId) {
         if (databaseHelper == null)
             databaseHelper = new DatabaseHelper(context);
-        List<String> userModules = databaseHelper.getUserModules();
+        List<String> userModules = Arrays.asList(databaseHelper.getSupportedModulesList());
 
         Set<Module> moduleFieldsInfo = new HashSet<Module>();
         for (String moduleName : userModules) {
