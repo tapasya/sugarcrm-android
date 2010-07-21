@@ -54,7 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ACCOUNTS_CONTACTS_TABLE_NAME = "accounts_contacts";
 
     public static final String ACCOUNTS_OPPORTUNITIES_TABLE_NAME = "accounts_opportunities";
-    
+
     public static final String CONTACTS_OPPORTUNITIES_TABLE_NAME = "contacts_opportunities";
 
     public static final String LEADS_TABLE_NAME = "leads";
@@ -72,11 +72,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String LINK_FIELDS_TABLE_NAME = "link_fields";
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
-    
-    private String[] defaultSupportedModules = {"Accounts", "Contacts", "Leads", "Opportunities"};
-    
+
+    private String[] defaultSupportedModules = { "Accounts", "Contacts", "Leads", "Opportunities" };
+
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
-    
+
     // TODO - replace with database calls - dynamic module generation
     private static List<String> moduleList;
 
@@ -99,9 +99,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
 
     private static final HashMap<String, String> relationshipForPath = new HashMap<String, String>();
-    
+
     private static List<String> billingAddressGroup = new ArrayList<String>();
-    
+
     private static List<String> shippingAddressGroup = new ArrayList<String>();
 
     static {
@@ -111,7 +111,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleIcons.put("Leads", R.drawable.leads);
         moduleIcons.put("Opportunities", R.drawable.opportunity);
         moduleIcons.put("Settings", R.drawable.settings);
-        
+
         moduleProjections.put("Accounts", Accounts.DETAILS_PROJECTION);
         moduleProjections.put("Contacts", Contacts.DETAILS_PROJECTION);
         moduleProjections.put("Leads", Leads.DETAILS_PROJECTION);
@@ -151,7 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         linkfieldNames.put("Contacts", "contacts");
         linkfieldNames.put("Leads", "leads");
         linkfieldNames.put("Opportunities", "opportunities");
-        
+
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET);
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_2);
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_3);
@@ -160,7 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STATE);
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_POSTALCODE);
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_COUNTRY);
-        
+
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STREET);
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STREET_2);
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STREET_3);
@@ -185,7 +185,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createModulesTable(db);
         createModuleFieldsTable(db);
         createLinkFieldsTable(db);
-         // create join tables
+        // create join tables
 
         createAccountsContactsTable(db);
         createAccountsOpportunitiesTable(db);
@@ -223,11 +223,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropAccountsContactsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CONTACTS_TABLE_NAME);
     }
-    
+
     void dropAccountsOpportunitiesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_OPPORTUNITIES_TABLE_NAME);
     }
-    
+
     void dropContactsOpportunitiesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_OPPORTUNITIES_TABLE_NAME);
     }
@@ -240,9 +240,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropAllDataTables(db);
         onCreate(db);
     }
-    
-    private void dropAllDataTables(SQLiteDatabase db)
-    {
+
+    private void dropAllDataTables(SQLiteDatabase db) {
         dropAccountsTable(db);
         dropContactsTable(db);
         dropLeadsTable(db);
@@ -251,7 +250,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropModulesTable(db);
         dropModuleFieldsTable(db);
         dropLinkFieldsTable(db);
-
 
         // drop join tables
         dropAccountsContactsTable(db);
@@ -272,8 +270,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsColumns.EMPLOYEES + " TEXT,"
                                         + AccountsColumns.TICKER_SYMBOL + " TEXT,"
                                         + AccountsColumns.ANNUAL_REVENUE + " TEXT,"
-                                        + AccountsColumns.BILLING_ADDRESS_STREET + " TEXT," 
-                                        + AccountsColumns.BILLING_ADDRESS_STREET_2 + " TEXT," 
+                                        + AccountsColumns.BILLING_ADDRESS_STREET + " TEXT,"
+                                        + AccountsColumns.BILLING_ADDRESS_STREET_2 + " TEXT,"
                                         + AccountsColumns.BILLING_ADDRESS_STREET_3 + " TEXT,"
                                         + AccountsColumns.BILLING_ADDRESS_STREET_4 + " TEXT,"
                                         + AccountsColumns.BILLING_ADDRESS_CITY + " TEXT,"
@@ -284,7 +282,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsColumns.SHIPPING_ADDRESS_STREET_2 + " TEXT,"
                                         + AccountsColumns.SHIPPING_ADDRESS_STREET_3 + " TEXT,"
                                         + AccountsColumns.SHIPPING_ADDRESS_STREET_4 + " TEXT,"
-                                        + AccountsColumns.SHIPPING_ADDRESS_CITY  + " TEXT,"
+                                        + AccountsColumns.SHIPPING_ADDRESS_CITY + " TEXT,"
                                         + AccountsColumns.SHIPPING_ADDRESS_STATE + " TEXT,"
                                         + AccountsColumns.SHIPPING_ADDRESS_POSTALCODE + " TEXT,"
                                         + AccountsColumns.SHIPPING_ADDRESS_COUNTRY + " TEXT,"
@@ -404,26 +402,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " UNIQUE(" + AccountsContactsColumns.ACCOUNT_ID + ","
                                         + AccountsContactsColumns.CONTACT_ID + ")" + ");");
     }
-    
+
     private static void createAccountsOpportunitiesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + ACCOUNTS_OPPORTUNITIES_TABLE_NAME + " ("
                                         + AccountsOpportunitiesColumns.ACCOUNT_ID + " INTEGER ,"
-                                        + AccountsOpportunitiesColumns.OPPORTUNITY_ID + " INTEGER ,"
-                                        + AccountsOpportunitiesColumns.DATE_MODIFIED + " TEXT,"
-                                        + AccountsOpportunitiesColumns.DELETED + " INTEGER,"
-                                        + " UNIQUE(" + AccountsOpportunitiesColumns.ACCOUNT_ID + ","
+                                        + AccountsOpportunitiesColumns.OPPORTUNITY_ID
+                                        + " INTEGER ," + AccountsOpportunitiesColumns.DATE_MODIFIED
+                                        + " TEXT," + AccountsOpportunitiesColumns.DELETED
+                                        + " INTEGER," + " UNIQUE("
+                                        + AccountsOpportunitiesColumns.ACCOUNT_ID + ","
                                         + AccountsOpportunitiesColumns.OPPORTUNITY_ID + ")" + ");");
     }
-    
+
     private static void createContactsOpportunitiesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + CONTACTS_OPPORTUNITIES_TABLE_NAME + " ("
                                         + ContactsOpportunitiesColumns.CONTACT_ID + " INTEGER ,"
-                                        + ContactsOpportunitiesColumns.OPPORTUNITY_ID + " INTEGER ,"
-                                        + ContactsOpportunitiesColumns.DATE_MODIFIED + " TEXT,"
-                                        + ContactsOpportunitiesColumns.DELETED + " INTEGER,"
-                                        + " UNIQUE(" + ContactsOpportunitiesColumns.CONTACT_ID + ","
+                                        + ContactsOpportunitiesColumns.OPPORTUNITY_ID
+                                        + " INTEGER ," + ContactsOpportunitiesColumns.DATE_MODIFIED
+                                        + " TEXT," + ContactsOpportunitiesColumns.DELETED
+                                        + " INTEGER," + " UNIQUE("
+                                        + ContactsOpportunitiesColumns.CONTACT_ID + ","
                                         + ContactsOpportunitiesColumns.OPPORTUNITY_ID + ")" + ");");
     }
 
@@ -473,14 +473,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<String> userModules = getUserModules();
         List<String> supportedModules = Arrays.asList(getSupportedModulesList());
         List<String> modules = new ArrayList<String>();
-        for(String module : userModules){
-            if(supportedModules.contains(module)){
+        for (String module : userModules) {
+            if (supportedModules.contains(module)) {
                 modules.add(module);
             }
         }
         return modules;
-        //TODO: return the module List after the exclusion of modules from the user moduleList
-        //return moduleList;
+        // TODO: return the module List after the exclusion of modules from the user moduleList
+        // return moduleList;
     }
 
     public String getLinkfieldName(String moduleName) {
@@ -491,14 +491,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return relationshipForPath.get(path);
     }
 
-    public String[] getSupportedModulesList(){
+    public String[] getSupportedModulesList() {
         return defaultSupportedModules;
     }
-    
-    public int getModuleIcon(String moduleName){
+
+    public int getModuleIcon(String moduleName) {
         return moduleIcons.get(moduleName);
     }
-    
+
     public List<String> getBillingAddressGroup() {
         return billingAddressGroup;
     }
@@ -520,16 +520,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
         cursor.moveToFirst();
         ModuleField moduleField = null;
-        if(cursor.getCount() > 0)
+        if (cursor.getCount() > 0)
             moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
-                                        : false);
+                                            : false);
         cursor.close();
         db.close();
-        
+
         return moduleField;
     }
-    
-    public Map<String, ModuleField> getModuleFields(String moduleName){
+
+    public Map<String, ModuleField> getModuleFields(String moduleName) {
+        if (moduleFields != null) {
+            HashMap<String, ModuleField> map = moduleFields.get(moduleName);
+            if (map != null && map.size() > 0)
+                return map;
+        } else
+            moduleFields = new HashMap<String, HashMap<String, ModuleField>>();
         SQLiteDatabase db = getReadableDatabase();
         String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
         Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
@@ -537,20 +543,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String moduleId = cursor.getString(0);
         cursor.close();
 
-        Map<String, ModuleField> fieldNameVsModuleField = new HashMap<String, ModuleField>();
+        HashMap<String, ModuleField> fieldNameVsModuleField = new HashMap<String, ModuleField>();
         selection = ModuleFieldColumns.MODULE_ID + "=" + moduleId;
         cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
         cursor.moveToFirst();
-        for(int i=0; i<cursor.getCount(); i++){
+        for (int i = 0; i < cursor.getCount(); i++) {
             String name = cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME));
             ModuleField moduleField = new ModuleField(name, cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
-                                        : false);
+                                            : false);
             cursor.moveToNext();
             fieldNameVsModuleField.put(name, moduleField);
         }
         cursor.close();
         db.close();
-        
+        moduleFields.put(moduleName, fieldNameVsModuleField);
         return fieldNameVsModuleField;
     }
 
@@ -587,10 +593,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void setModuleFieldsInfo(Set<Module> moduleFieldsInfo)
-                                    throws SugarCrmException {
+    public void setModuleFieldsInfo(Set<Module> moduleFieldsInfo) throws SugarCrmException {
         boolean hasFailed = false;
-        
+
         for (Module module : moduleFieldsInfo) {
             // get module row id
             SQLiteDatabase db = getReadableDatabase();
@@ -636,5 +641,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-    
+
 }
