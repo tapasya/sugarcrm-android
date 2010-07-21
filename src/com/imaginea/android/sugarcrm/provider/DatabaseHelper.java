@@ -456,22 +456,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     public ModuleField getModuleField(String moduleName, String fieldName) {
-        HashMap<String, ModuleField> nameVsModuleField = moduleFields.get(moduleName);
-        if (nameVsModuleField != null && nameVsModuleField.get(fieldName) != null) {
-            return nameVsModuleField.get(fieldName);
-        } else {
-            nameVsModuleField = new HashMap<String, ModuleField>();
-        }
-
         SQLiteDatabase db = getReadableDatabase();
         String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
         Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
         cursor.moveToFirst();
         String moduleId = cursor.getString(0);
         cursor.close();
-        db.close();
 
-        db = getReadableDatabase();
         selection = "(" + ModuleFieldColumns.MODULE_ID + "=" + moduleId + " AND "
                                         + ModuleFieldColumns.NAME + "='" + fieldName + "')";
         cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
@@ -480,15 +471,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         : false);
         cursor.close();
         db.close();
-        nameVsModuleField.put(fieldName, moduleField);
-        moduleFields.put(moduleName, nameVsModuleField);
+        
         return moduleField;
     }
 
     public List<String> getUserModules() {
-        if (moduleList != null && moduleList.size() != 0)
-            return moduleList;
-
         SQLiteDatabase db = getReadableDatabase();
         moduleList = new ArrayList<String>();
         Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, null, null, null, null, null);
