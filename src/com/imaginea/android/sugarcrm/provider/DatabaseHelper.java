@@ -11,6 +11,7 @@ import android.util.Log;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
@@ -47,7 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String ACCOUNTS_CONTACTS_TABLE_NAME = "accounts_contacts";
 
-    public static final String ACCOUNTS_OPPURTUNITIES_TABLE_NAME = "accounts_opportunities";
+    public static final String ACCOUNTS_OPPORTUNITIES_TABLE_NAME = "accounts_opportunities";
 
     public static final String LEADS_TABLE_NAME = "leads";
 
@@ -159,6 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
          // create join tables
 
         createAccountsContactsTable(db);
+        createAccountsOpportunitiesTable(db);
     }
 
     void dropAccountsTable(SQLiteDatabase db) {
@@ -192,11 +194,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropAccountsContactsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CONTACTS_TABLE_NAME);
     }
+    
+    void dropAccountsOpportunitiesTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_OPPORTUNITIES_TABLE_NAME);
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
                                         + ", which will destroy all old data");
+        // TODO - do not drop - only for development right now
+        dropAllDataTables(db);
+        onCreate(db);
+    }
+    
+    private void dropAllDataTables(SQLiteDatabase db)
+    {
         dropAccountsTable(db);
         dropContactsTable(db);
         dropLeadsTable(db);
@@ -209,7 +222,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // drop join tables
         dropAccountsContactsTable(db);
-        onCreate(db);
+        dropAccountsOpportunitiesTable(db);
     }
 
     private static void createAccountsTable(SQLiteDatabase db) {
@@ -341,6 +354,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " UNIQUE(" + AccountsContactsColumns.ACCOUNT_ID + ","
                                         + AccountsContactsColumns.CONTACT_ID + ")" + ");");
     }
+    
+    private static void createAccountsOpportunitiesTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + ACCOUNTS_OPPORTUNITIES_TABLE_NAME + " ("
+                                        + AccountsOpportunitiesColumns.ACCOUNT_ID + " INTEGER ,"
+                                        + AccountsOpportunitiesColumns.OPPORTUNITY_ID + " INTEGER ,"
+                                        + AccountsOpportunitiesColumns.DATE_MODIFIED + " TEXT,"
+                                        + AccountsOpportunitiesColumns.DELETED + " INTEGER,"
+                                        + " UNIQUE(" + AccountsOpportunitiesColumns.ACCOUNT_ID + ","
+                                        + AccountsOpportunitiesColumns.OPPORTUNITY_ID + ")" + ");");
+    }
 
     public static String[] getModuleProjections(String moduleName) {
         return moduleProjections.get(moduleName);
@@ -427,6 +451,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         ModuleField moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
                                         : false);
+        cursor.close();
         nameVsModuleField.put(fieldName, moduleField);
         moduleFields.put(moduleName, nameVsModuleField);
         return moduleField;
@@ -446,6 +471,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
         cursor.close();
+        db.close();
         return moduleList;
     }
 
