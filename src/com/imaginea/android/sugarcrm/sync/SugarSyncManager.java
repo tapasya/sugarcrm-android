@@ -136,7 +136,8 @@ public class SugarSyncManager {
 
                         updateModuleItem(context, resolver, account, moduleName, sBean, rawId, batchOperation);
                     } else {
-                        // delete module item - never delete the item here, just update the deleted flag
+                        // delete module item - never delete the item here, just update the deleted
+                        // flag
                         deleteModuleItem(context, rawId, moduleName, batchOperation);
                     }
                 } else {
@@ -189,7 +190,8 @@ public class SugarSyncManager {
             Log.v(LOG_TAG, "relationships is null");
             return;
         }
-        long rawId = lookupRawId(context.getContentResolver(), moduleName, bean.getBeanId());
+        String beandIdValue = bean.getFieldValue(mBeanIdField);
+        long rawId = lookupRawId(context.getContentResolver(), moduleName, beandIdValue);
         for (String relation : relationships) {
             String linkFieldName = databaseHelper.getLinkfieldName(relation);
             // for a particular module-link field name
@@ -201,19 +203,22 @@ public class SugarSyncManager {
                 continue;
             }
             for (SugarBean relationbean : relationshipBeans) {
-               // long relationRawId = lookupRawId(context.getContentResolver(), relation, relationbean.getBeanId());
-                String relationBeanId =relationbean.getFieldValue(mBeanIdField);
-                
-                if(relationBeanId == null)
+                // long relationRawId = lookupRawId(context.getContentResolver(), relation,
+                // relationbean.getBeanId());
+                String relationBeanId = relationbean.getFieldValue(mBeanIdField);
+
+                if (relationBeanId == null)
                     continue;
                 long relationRawId = lookupRawId(context.getContentResolver(), relation, relationBeanId);
                 if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
-                    Log.v(LOG_TAG, "RelationBeanId/RelatedRawid:" + relationbean.getFieldValue(mBeanIdField) + "/" + relationBeanId);
+                    Log.v(LOG_TAG, "RelationBeanId/RelatedRawid:"
+                                                    + relationbean.getFieldValue(mBeanIdField)
+                                                    + "/" + relationBeanId);
                 if (relationRawId != 0) {
                     if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
                         // update module Item
 
-                        updateRelatedModuleItem(context, context.getContentResolver(), account, moduleName, relationbean, relationRawId, batchOperation);
+                        updateRelatedModuleItem(context, context.getContentResolver(), account, moduleName, relation, relationbean, relationRawId, batchOperation);
                     } else {
                         // delete module item
                         deleteRelatedModuleItem(context, rawId, relationRawId, moduleName, relation, batchOperation);
@@ -236,7 +241,7 @@ public class SugarSyncManager {
             return;
         for (String relation : relationships) {
             String linkFieldName = databaseHelper.getLinkfieldName(relation);
-            String[] relationProj = databaseHelper.getModuleProjections(relation);            
+            String[] relationProj = databaseHelper.getModuleProjections(relation);
             mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));
         }
     }
@@ -277,7 +282,7 @@ public class SugarSyncManager {
         // Put the data in the contacts provider
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In addRelatedModuleItem");
-
+        Log.v(LOG_TAG, " addRelatedModuleItem Rawid:" + rawId);
         final SugarCRMOperations moduleItemOp = SugarCRMOperations.createNewRelatedModuleItem(context, moduleName, relationModuleName, accountName, rawId, sBean, relatedBean, batchOperation);
         moduleItemOp.addRelatedSugarBean(sBean, relatedBean);
 
@@ -317,14 +322,15 @@ public class SugarSyncManager {
     }
 
     private static void updateRelatedModuleItem(Context context, ContentResolver resolver,
-                                    String accountName, String relatedModuleName,
+                                    String accountName, String moduleName, String relatedModuleName,
                                     SugarBean relatedBean, long relationRawId,
                                     BatchOperation batchOperation) {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
-            Log.v(LOG_TAG, "In updateModuleItem");
+            Log.v(LOG_TAG, "In updateRelatedModuleItem");
         Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
         String[] projections = DatabaseHelper.getModuleProjections(relatedModuleName);
         Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
+        Log.v(LOG_TAG, "updateRelatedModuleItem URI:" + uri.toString());
         // TODO - is this query resolver needed to query here
         final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(relationRawId) }, null);
         // TODO - do something here with cursor
