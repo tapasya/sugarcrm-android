@@ -33,7 +33,6 @@ import android.widget.ViewFlipper;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMProvider;
-import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -45,9 +44,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * WizardAuthActivity, same as Wizard Activity, but with account manager integration works only with
@@ -438,26 +435,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     }
                 }
                 Log.i(LOG_TAG, "loaded user modules");
-
-                Set<Module> moduleFieldsInfo = new HashSet<Module>();
-                for (String moduleName : userModules) {
-                    String[] fields = {};
-                    try {
-                        // TODO: check if the module is already there in the db. make the rest call
-                        // only if it isn't
-                        Module module = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
-                        moduleFieldsInfo.add(module);
-                        Log.i(LOG_TAG, "loaded module fields for : " + moduleName);
-                    } catch (SugarCrmException sce) {
-                        Log.e(LOG_TAG, "failed to load module fields for : " + moduleName);
-                    }
-                }
-                try {
-                    mDbHelper.setModuleFieldsInfo(moduleFieldsInfo);
-                } catch (SugarCrmException sce) {
-                    Log.e(LOG_TAG, sce.getMessage(), sce);
-                    // TODO
-                }
 
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
