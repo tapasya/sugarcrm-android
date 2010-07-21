@@ -16,6 +16,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsCo
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LinkFieldColumns;
@@ -53,6 +54,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ACCOUNTS_CONTACTS_TABLE_NAME = "accounts_contacts";
 
     public static final String ACCOUNTS_OPPORTUNITIES_TABLE_NAME = "accounts_opportunities";
+    
+    public static final String CONTACTS_OPPORTUNITIES_TABLE_NAME = "contacts_opportunities";
 
     public static final String LEADS_TABLE_NAME = "leads";
 
@@ -186,6 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         createAccountsContactsTable(db);
         createAccountsOpportunitiesTable(db);
+        createContactsOpportunitiesTable(db);
     }
 
     void dropAccountsTable(SQLiteDatabase db) {
@@ -223,6 +227,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropAccountsOpportunitiesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_OPPORTUNITIES_TABLE_NAME);
     }
+    
+    void dropContactsOpportunitiesTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_OPPORTUNITIES_TABLE_NAME);
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -248,6 +256,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // drop join tables
         dropAccountsContactsTable(db);
         dropAccountsOpportunitiesTable(db);
+        dropContactsOpportunitiesTable(db);
     }
 
     private static void createAccountsTable(SQLiteDatabase db) {
@@ -405,6 +414,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsOpportunitiesColumns.DELETED + " INTEGER,"
                                         + " UNIQUE(" + AccountsOpportunitiesColumns.ACCOUNT_ID + ","
                                         + AccountsOpportunitiesColumns.OPPORTUNITY_ID + ")" + ");");
+    }
+    
+    private static void createContactsOpportunitiesTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + CONTACTS_OPPORTUNITIES_TABLE_NAME + " ("
+                                        + ContactsOpportunitiesColumns.CONTACT_ID + " INTEGER ,"
+                                        + ContactsOpportunitiesColumns.OPPORTUNITY_ID + " INTEGER ,"
+                                        + ContactsOpportunitiesColumns.DATE_MODIFIED + " TEXT,"
+                                        + ContactsOpportunitiesColumns.DELETED + " INTEGER,"
+                                        + " UNIQUE(" + ContactsOpportunitiesColumns.CONTACT_ID + ","
+                                        + ContactsOpportunitiesColumns.OPPORTUNITY_ID + ")" + ");");
     }
 
     public static String[] getModuleProjections(String moduleName) {
