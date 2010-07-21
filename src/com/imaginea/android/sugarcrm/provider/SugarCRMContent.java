@@ -206,6 +206,16 @@ public final class SugarCRMContent {
         public String DELETED = ModuleFields.DELETED;
     }
 
+    public interface ContactsOpportunitiesColumns {
+        public String CONTACT_ID = ModuleFields.CONTACT_ID;
+
+        public String OPPORTUNITY_ID = ModuleFields.OPPORTUNITY_ID;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+    }
+    
     public static final class Leads implements LeadsColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
