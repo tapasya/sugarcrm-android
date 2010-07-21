@@ -440,8 +440,12 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
             }
+            finally{
+                if(mDbHelper!= null)
+                    mDbHelper.close();
+            }
             // test Account manager code
-
+            
             return sessionId;
 
         }
