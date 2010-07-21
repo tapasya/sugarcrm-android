@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
 
+import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
@@ -28,6 +29,7 @@ import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -66,10 +68,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
     
+    private String[] defaultSupportedModules = {"Accounts", "Contacts", "Leads", "Opportunities", "Settings"};
+    
+    private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
+    
     // TODO - replace with database calls - dynamic module generation
     private static List<String> moduleList;
-    
-    private static final HashMap<String, String> modules = new HashMap<String, String>();
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
 
@@ -92,13 +96,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final HashMap<String, String> relationshipForPath = new HashMap<String, String>();
 
     static {
-        // modules.put(0, "Accounts");
-        // modules.put(1, "Contacts");
-        // modules.put(2, "Leads");
-        // modules.put(3, "Opportunity");
-        // modules.put(4, "Meetings");
-        // modules.put(5, "Calls");
 
+        moduleIcons.put("Accounts", R.drawable.account);
+        moduleIcons.put("Contacts", R.drawable.contacts);
+        moduleIcons.put("Leads", R.drawable.leads);
+        moduleIcons.put("Opportunities", R.drawable.opportunity);
+        moduleIcons.put("Settings", R.drawable.settings);
+        
         moduleProjections.put("Accounts", Accounts.DETAILS_PROJECTION);
         moduleProjections.put("Contacts", Contacts.DETAILS_PROJECTION);
         moduleProjections.put("Leads", Leads.DETAILS_PROJECTION);
@@ -379,16 +383,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return moduleUris.get(moduleName);
     }
 
-    /*
-     * public static HashMap<String, HashMap<String, ModuleField>> getModuleFields() { return
-     * moduleFields; }
-     */
-
-    /*
-     * public static void setModuleFields(HashMap<String, HashMap<String, ModuleField>>
-     * moduleFields) { DatabaseHelper.moduleFields = moduleFields; //TODO: insert in DB }
-     */
-
     public String getModuleSelection(String moduleName, String searchString) {
         if (moduleName.equals("Accounts")) {
             return AccountsColumns.NAME + " LIKE '%" + searchString + "%'";
@@ -416,7 +410,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<String> getModuleList() {
-        return moduleList;
+        return Arrays.asList(getSupportedModulesList());
+        //TODO: return the module List after the exclusion of modules from the user moduleList
+        //return moduleList;
     }
 
     public String getLinkfieldName(String moduleName) {
@@ -425,6 +421,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getRelationshipForPath(String path) {
         return relationshipForPath.get(path);
+    }
+
+    public String[] getSupportedModulesList(){
+        return defaultSupportedModules;
+    }
+    
+    public int getModuleIcon(String moduleName){
+        return moduleIcons.get(moduleName);
     }
     
     public ModuleField getModuleField(String moduleName, String fieldName) {
@@ -441,7 +445,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         String moduleId = cursor.getString(0);
         cursor.close();
+        db.close();
 
+        db = getReadableDatabase();
         selection = "(" + ModuleFieldColumns.MODULE_ID + "=" + moduleId + " AND "
                                         + ModuleFieldColumns.NAME + "='" + fieldName + "')";
         cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
@@ -494,16 +500,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void setModuleFieldsInfo(Set<Module> moduleFieldsInfo)
                                     throws SugarCrmException {
         boolean hasFailed = false;
-        SQLiteDatabase db = getWritableDatabase();
         
         for (Module module : moduleFieldsInfo) {
             // get module row id
+            SQLiteDatabase db = getReadableDatabase();
             String selection = ModuleColumns.MODULE_NAME + "='" + module.getModuleName() + "'";
             Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
             cursor.moveToFirst();
             String moduleId = cursor.getString(0);
             cursor.close();
+            db.close();
 
+            db = getWritableDatabase();
             db.beginTransaction();
             List<ModuleField> moduleFields = module.getModuleFields();
             for (ModuleField moduleField : moduleFields) {
@@ -538,11 +546,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-
-    /*
-     * public static Set<Module> getModuleFieldsInfo(SQLiteDatabase db){ Cursor cursor =
-     * db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, null, null, null, null,
-     * Modules.DEFAULT_SORT_ORDER); cursor.moveToFirst(); String moduleId = cursor.getString(0);
-     * cursor.close(); }
-     */
+    
 }
