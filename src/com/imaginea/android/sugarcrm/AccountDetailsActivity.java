@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,9 +23,9 @@ import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AccountDetailsActivity
@@ -120,7 +121,6 @@ public class AccountDetailsActivity extends Activity {
 
         if (mCursor != null && !mCursor.isClosed())
             mCursor.close();
-            
     }       
 
     /*
@@ -189,6 +189,13 @@ public class AccountDetailsActivity extends Activity {
         mCursor.moveToFirst();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        List<String> billingAddressGroup = mDbHelper.getBillingAddressGroup();
+        
+        List<String> shippingAddressGroup = mDbHelper.getShippingAddressGroup();
+        
+        String value = "";
+        Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(moduleName);
         
         for (int i = 2; i < detailsProjection.length - 2; i++) {
             String fieldName = detailsProjection[i];
@@ -199,25 +206,52 @@ public class AccountDetailsActivity extends Activity {
             }
 
             // get the attributes of the moduleField
-            ModuleField moduleField = mDbHelper.getModuleField(moduleName, fieldName);
+            ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
 
             View tableRow = inflater.inflate(R.layout.table_row, null);
             TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.detailRowLabel);
+            textViewForLabel.setText(moduleField.getLabel());
             TextView textViewForValue = (TextView) tableRow.findViewById(R.id.detailRowValue);
-
-            String value = "";
-            if (mCursor.getCount() > 0) {
-                value = mCursor.getString(columnIndex);
+            String tempValue = mCursor.getString(columnIndex);
+            
+            if(!TextUtils.isEmpty(tempValue)){
+                if(!TextUtils.isEmpty(value)){
+                    value = value + ", " + tempValue;
+                } else{
+                    value = tempValue;
+                }
             }
 
             // set the title
             if (titleFields.contains(fieldName)) {
-                title = title + value + " ";
+                title = title + tempValue + " ";
                 textViewForTitle.setText(title);
                 continue;
             }
+            
+            // group billing address n shopping address
+            if(moduleName.equals(getString(R.string.accounts))){
+                if(billingAddressGroup.contains(fieldName)){
+                    if(!fieldName.equals(ModuleFields.BILLING_ADDRESS_COUNTRY)){
+                        continue;
+                    } else{
+                        textViewForLabel.setText("Billing Address:");
+                    }
+                } else if(shippingAddressGroup.contains(fieldName)){
+                    if(!fieldName.equals(ModuleFields.SHIPPING_ADDRESS_COUNTRY)){
+                        continue;
+                    } else{
+                        textViewForLabel.setText("Shipping Address:");
+                        textViewForValue.setMaxLines(3);
+                    }
+                }else{
+                    value = tempValue;
+                }
+            } else{
+                value = tempValue;
+            }
 
-            textViewForLabel.setText(moduleField.getLabel());
+            
 
             if (moduleField.getType().equals("phone"))
                 textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
