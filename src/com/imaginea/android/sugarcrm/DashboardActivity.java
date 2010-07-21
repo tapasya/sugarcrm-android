@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+
+import java.util.List;
+
 /**
  * DashboardActivity
  * 
@@ -24,14 +29,10 @@ public class DashboardActivity extends Activity {
 
     private GridView mDashboard;
 
-    // references to the module images
-    private Integer[] mModuleThumbIds = { R.drawable.account, R.drawable.contacts,
-            R.drawable.leads, R.drawable.opportunity, R.drawable.settings };
+    private List<String> mModuleNames;
 
-    // reference to the module names
-    private Integer[] mModuleNameIds = { R.string.accounts, R.string.contacts, R.string.leads,
-            R.string.opportunities, R.string.settings };
-
+    private DatabaseHelper mDbHelper = new DatabaseHelper(this);
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,21 +41,26 @@ public class DashboardActivity extends Activity {
         Class wizardActivity = WizardDetector.getClass(getBaseContext());
         startActivityForResult(new Intent(this, wizardActivity), 0);
 
+        mModuleNames = mDbHelper.getModuleList();
+        
         setContentView(R.layout.dashboard_activity);
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(R.string.home);
         mDashboard = (GridView) findViewById(R.id.dashboard);
         mDashboard.setAdapter(new AppsAdapter(this));
 
-        // Activities corresponding to the items in the GridView
-        final Class[] moduleActivities = { ContactListActivity.class, ContactListActivity.class,
-                ContactListActivity.class, ContactListActivity.class, SugarCrmSettings.class };
-
         mDashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 // invoke the corresponding activity when the item in the GridView is clicked
-                Intent myIntent = new Intent(DashboardActivity.this, moduleActivities[position]);
-                myIntent.putExtra(RestUtilConstants.MODULE_NAME, getString(mModuleNameIds[position]));
+                Intent myIntent;
+                String moduleName = mModuleNames.get(position);
+                if(moduleName.equals("Settings")){
+                    myIntent = new Intent(DashboardActivity.this, SugarCrmSettings.class);
+                } else{
+                    myIntent = new Intent(DashboardActivity.this, ContactListActivity.class);
+                }
+                
+                myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleNames.get(position));
                 DashboardActivity.this.startActivity(myIntent);
             }
         });
@@ -70,7 +76,7 @@ public class DashboardActivity extends Activity {
 
     public class AppsAdapter extends BaseAdapter {
         private Context mContext;
-
+        
         public AppsAdapter(Context context) {
             mContext = context;
         }
@@ -80,11 +86,13 @@ public class DashboardActivity extends Activity {
             if (convertView == null) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.dashboard_item, parent, false);
 
+                String moduleName = mModuleNames.get(position);
+                
                 ImageView iv = (ImageView) view.findViewById(R.id.moduleImage);
-                iv.setImageResource(mModuleThumbIds[position]);
+                iv.setImageResource(mDbHelper.getModuleIcon(moduleName));
 
                 TextView tv = (TextView) view.findViewById(R.id.moduleName);
-                tv.setText(mModuleNameIds[position]);
+                tv.setText(moduleName);
             } else {
                 view = convertView;
             }
@@ -93,7 +101,7 @@ public class DashboardActivity extends Activity {
         }
 
         public final int getCount() {
-            return mModuleThumbIds.length;
+            return mModuleNames.size();
         }
 
         public final Object getItem(int position) {
@@ -103,5 +111,6 @@ public class DashboardActivity extends Activity {
         public final long getItemId(int position) {
             return 0;
         }
+        
     }
 }
