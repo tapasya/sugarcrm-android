@@ -68,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
     
-    private String[] defaultSupportedModules = {"Accounts", "Contacts", "Leads", "Opportunities", "Settings"};
+    private String[] defaultSupportedModules = {"Accounts", "Contacts", "Leads", "Opportunities"};
     
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
     
@@ -410,7 +410,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<String> getModuleList() {
-        return Arrays.asList(getSupportedModulesList());
+        List<String> userModules = getUserModules();
+        List<String> supportedModules = Arrays.asList(getSupportedModulesList());
+        List<String> modules = new ArrayList<String>();
+        for(String module : userModules){
+            if(supportedModules.contains(module)){
+                modules.add(module);
+            }
+        }
+        return modules;
         //TODO: return the module List after the exclusion of modules from the user moduleList
         //return moduleList;
     }
