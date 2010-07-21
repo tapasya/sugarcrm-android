@@ -17,6 +17,7 @@ import com.imaginea.android.sugarcrm.RestUtilConstants;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
@@ -141,6 +142,7 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case ACCOUNT_LEAD:
+            // TODO - whats the set relationship for this
             module = RestUtilConstants.LEADS_MODULE;
             selection = LeadsColumns.ACCOUNT_ID + " = ?";
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
@@ -148,8 +150,28 @@ public class SugarCRMProvider extends ContentProvider {
 
         case ACCOUNT_OPPORTUNITY:
             module = RestUtilConstants.OPPORTUNITIES_MODULE;
-            selection = OpportunitiesColumns.ACCOUNT_ID + " = ?";
+
             c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+
+            qb = new SQLiteQueryBuilder();
+            qb.setTables(DatabaseHelper.ACCOUNTS_TABLE_NAME + ","
+                                            + DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME
+                                            + "," + DatabaseHelper.OPPORTUNITIES_TABLE_NAME);
+
+            selection = DatabaseHelper.ACCOUNTS_TABLE_NAME + "." + Accounts.ID + " = ?" + " AND "
+                                            + DatabaseHelper.ACCOUNTS_TABLE_NAME + "."
+                                            + Accounts.ID + "="
+                                            + DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME
+                                            + "." + AccountsOpportunitiesColumns.ACCOUNT_ID
+                                            + " AND "
+                                            + DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME
+                                            + "." + AccountsOpportunitiesColumns.OPPORTUNITY_ID
+                                            + "=" + DatabaseHelper.OPPORTUNITIES_TABLE_NAME + "."
+                                            + Opportunities.ID;
+            Map<String, String> oppurtunityProjectionMap = getProjectionMap(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection);
+            qb.setProjectionMap(oppurtunityProjectionMap);
+            c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
+
             break;
 
         case CONTACT:
@@ -315,7 +337,6 @@ public class SugarCRMProvider extends ContentProvider {
             String selection = AccountsColumns.ID + "=" + accountId;
 
             String parentModuleName = mOpenHelper.getRelationshipForPath(parentPath);
-            // TODO - Hardcording needs to make way for better design/constants-?
             Cursor cursor = query(mOpenHelper.getModuleUri(parentModuleName), Accounts.DETAILS_PROJECTION, selection, null, null);
             cursor.moveToFirst();
             String accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
@@ -329,38 +350,6 @@ public class SugarCRMProvider extends ContentProvider {
 
                 ContentValues val2 = new ContentValues();
                 val2.put(AccountsContactsColumns.ACCOUNT_ID, accountId);
-                val2.put(AccountsContactsColumns.CONTACT_ID, rowId);
-                // TODO - delete flag and date_modified
-                db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val2);
-
-                return contactUri;
-            }
-            break;
-
-        case ACCOUNT_BEAN_CONTACT:
-            parentPath = uri.getPathSegments().get(0);
-            parentModuleName = mOpenHelper.getRelationshipForPath(parentPath);
-            // is called only when no contact id exists and account id exists and has this related
-            // contact beanId
-            String accountBeanId = uri.getPathSegments().get(1);
-            selection = AccountsColumns.BEAN_ID + "='" + accountBeanId + "'";
-
-            // TODO - Hardcording needs to make way for better design/constants-?
-            cursor = query(mOpenHelper.getModuleUri(parentModuleName), new String[] {
-                    SugarCRMContent.RECORD_ID, Accounts.NAME }, selection, null, null);
-            cursor.moveToFirst();
-            long account_Id = cursor.getLong(0);
-            accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
-            // values.put(Contacts.ACCOUNT_ID, account_Id);
-            values.put(Contacts.ACCOUNT_NAME, accountName);
-            cursor.close();
-            rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
-            if (rowId > 0) {
-                Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, rowId);
-                getContext().getContentResolver().notifyChange(contactUri, null);
-
-                ContentValues val2 = new ContentValues();
-                val2.put(AccountsContactsColumns.ACCOUNT_ID, account_Id);
                 val2.put(AccountsContactsColumns.CONTACT_ID, rowId);
                 // TODO - delete flag and date_modified
                 db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val2);
@@ -388,20 +377,31 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case ACCOUNT_OPPORTUNITY:
+            parentPath = uri.getPathSegments().get(0);
             accountId = uri.getPathSegments().get(1);
             selection = AccountsColumns.ID + "=" + accountId;
-            cursor = query(mOpenHelper.getModuleUri("Accounts"), Accounts.DETAILS_PROJECTION, selection, null, null);
+
+            parentModuleName = mOpenHelper.getRelationshipForPath(parentPath);
+            cursor = query(mOpenHelper.getModuleUri(parentModuleName), Accounts.DETAILS_PROJECTION, selection, null, null);
             cursor.moveToFirst();
             accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
-            values.put(ModuleFields.ACCOUNT_ID, accountId);
-            values.put(ModuleFields.ACCOUNT_NAME, accountName);
-
+            // values.put(Contacts.ACCOUNT_ID, accountId);
+            values.put(Contacts.ACCOUNT_NAME, accountName);
+            cursor.close();
             rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
             if (rowId > 0) {
                 Uri opportunityUri = ContentUris.withAppendedId(Opportunities.CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(opportunityUri, null);
+
+                ContentValues val2 = new ContentValues();
+                val2.put(AccountsOpportunitiesColumns.ACCOUNT_ID, accountId);
+                val2.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, rowId);
+                // TODO - delete flag and date_modified
+                db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val2);
+
                 return opportunityUri;
             }
+
             break;
 
         case CONTACT:
