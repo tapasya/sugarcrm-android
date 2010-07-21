@@ -18,6 +18,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,6 +43,8 @@ public class DashboardActivity extends Activity {
         startActivityForResult(new Intent(this, wizardActivity), 0);
 
         mModuleNames = mDbHelper.getModuleList();
+        mModuleNames.add("Settings");
+        Collections.sort(mModuleNames);
         
         setContentView(R.layout.dashboard_activity);
         TextView tv = (TextView) findViewById(R.id.headerText);
