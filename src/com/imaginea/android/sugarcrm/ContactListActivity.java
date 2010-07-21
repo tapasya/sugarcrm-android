@@ -62,7 +62,7 @@ public class ContactListActivity extends ListActivity {
 
     public final static String LOG_TAG = "ContactListActivity";
     
-    private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
+    private DatabaseHelper mDbHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +70,8 @@ public class ContactListActivity extends ListActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
 
+        mDbHelper = new DatabaseHelper(getBaseContext());
+        
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         mModuleName = "Contacts";
@@ -264,6 +266,10 @@ public class ContactListActivity extends ListActivity {
         }
         // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        
+        if(mDbHelper == null)
+            mDbHelper = new DatabaseHelper(getBaseContext());
+        
         mModuleUri = mDbHelper.getModuleUri(mModuleName);
         Uri deleteUri = Uri.withAppendedPath(mModuleUri, cursor.getString(0));
         getContentResolver().registerContentObserver(deleteUri, false, new DeleteContentObserver(new Handler()));
@@ -405,6 +411,11 @@ public class ContactListActivity extends ListActivity {
 
         menu.add(2, R.string.edit, 3, R.string.edit);
         menu.add(3, R.string.delete, 4, R.string.delete);
+        
+        if(mDbHelper == null)
+            mDbHelper = new DatabaseHelper(getBaseContext());
+        
+        //TODO
         if (mDbHelper.getModuleField(mModuleName, ModuleFields.PHONE_WORK) != null)
             menu.add(4, R.string.call, 4, R.string.call);
         if (mDbHelper.getModuleField(mModuleName, ModuleFields.EMAIL1) != null)
