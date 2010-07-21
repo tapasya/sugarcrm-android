@@ -19,6 +19,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
@@ -151,7 +152,8 @@ public class SugarCRMProvider extends ContentProvider {
         case ACCOUNT_OPPORTUNITY:
             module = RestUtilConstants.OPPORTUNITIES_MODULE;
 
-           // c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            // c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new
+            // String[] { uri.getPathSegments().get(1) }, null, null, null);
 
             qb = new SQLiteQueryBuilder();
             qb.setTables(DatabaseHelper.ACCOUNTS_TABLE_NAME + ","
@@ -208,9 +210,27 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case CONTACT_OPPORTUNITY:
+
             module = RestUtilConstants.OPPORTUNITIES_MODULE;
-            selection = OpportunitiesColumns.ACCOUNT_ID + " = ?";
-            c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            qb = new SQLiteQueryBuilder();
+            qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME + ","
+                                            + DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME
+                                            + "," + DatabaseHelper.OPPORTUNITIES_TABLE_NAME);
+
+            selection = DatabaseHelper.CONTACTS_TABLE_NAME + "." + Contacts.ID + " = ?" + " AND "
+                                            + DatabaseHelper.CONTACTS_TABLE_NAME + "."
+                                            + Contacts.ID + "="
+                                            + DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME
+                                            + "." + ContactsOpportunitiesColumns.CONTACT_ID
+                                            + " AND "
+                                            + DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME
+                                            + "." + ContactsOpportunitiesColumns.OPPORTUNITY_ID
+                                            + "=" + DatabaseHelper.OPPORTUNITIES_TABLE_NAME + "."
+                                            + Opportunities.ID;
+            oppurtunityProjectionMap = getProjectionMap(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection);
+            qb.setProjectionMap(oppurtunityProjectionMap);
+            c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
+
             break;
 
         case LEAD:
@@ -342,8 +362,7 @@ public class SugarCRMProvider extends ContentProvider {
             boolean rowsPresent = cursor.moveToFirst();
             if (Log.isLoggable(TAG, Log.VERBOSE))
                 Log.v(TAG, "Uri to insert:" + uri.toString() + " rows present:" + rowsPresent);
-            if(!rowsPresent )
-            {
+            if (!rowsPresent) {
                 cursor.close();
                 return uri;
             }
@@ -431,12 +450,33 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case CONTACT_OPPORTUNITY:
+           
+            parentPath = uri.getPathSegments().get(0);
+            String contactId = uri.getPathSegments().get(1);
+            selection = Contacts.ID + "=" + contactId;
+
+            parentModuleName = mOpenHelper.getRelationshipForPath(parentPath);
+            // cursor = query(mOpenHelper.getModuleUri(parentModuleName),
+            // Contacts.DETAILS_PROJECTION, selection, null, null);
+            // cursor.moveToFirst();
+
+            // values.put(Contacts.ACCOUNT_ID, accountId);
+            // values.put(Contacts.ACCOUNT_NAME, accountName);
+            // cursor.close();
             rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
             if (rowId > 0) {
                 Uri opportunityUri = ContentUris.withAppendedId(Opportunities.CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(opportunityUri, null);
+
+                ContentValues val2 = new ContentValues();
+                val2.put(ContactsOpportunitiesColumns.CONTACT_ID, contactId);
+                val2.put(ContactsOpportunitiesColumns.OPPORTUNITY_ID, rowId);
+                // TODO - delete flag and date_modified
+                db.insert(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, "", val2);
+
                 return opportunityUri;
             }
+
             break;
 
         case LEAD:
@@ -508,11 +548,11 @@ public class SugarCRMProvider extends ContentProvider {
         case ACCOUNT_OPPORTUNITY:
             accountId = uri.getPathSegments().get(1);
             String opportunityId = uri.getPathSegments().get(3);
-            count = db.delete(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, AccountsContactsColumns.ACCOUNT_ID
+            count = db.delete(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, AccountsOpportunitiesColumns.ACCOUNT_ID
                                             + "="
                                             + accountId
                                             + " AND "
-                                            + AccountsContactsColumns.CONTACT_ID
+                                            + AccountsOpportunitiesColumns.OPPORTUNITY_ID
                                             + "="
                                             + opportunityId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
@@ -530,6 +570,21 @@ public class SugarCRMProvider extends ContentProvider {
 
                                             : ""), whereArgs);
             break;
+            
+        case CONTACT_OPPORTUNITY:
+            contactId = uri.getPathSegments().get(1);
+            opportunityId = uri.getPathSegments().get(3);
+            count = db.delete(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, ContactsOpportunitiesColumns.CONTACT_ID
+                                            + "="
+                                            + contactId
+                                            + " AND "
+                                            + ContactsOpportunitiesColumns.OPPORTUNITY_ID
+                                            + "="
+                                            + opportunityId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+            
         case LEAD:
             count = db.delete(DatabaseHelper.LEADS_TABLE_NAME, where, whereArgs);
             break;
@@ -668,6 +723,14 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "meeting", MEETING);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "meeting/#", MEETING_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "meeting/#/#", MEETING);
+        
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "call", CALL);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "call/#", CALL_ID);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "call/#/#", CALL);
+        
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "case", CASE);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "case/#", CASE_ID);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "case/#/#", CASE);
 
         // sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans/#", SUGAR_BEAN_ID);
 
