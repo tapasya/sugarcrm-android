@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
 
+import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -94,6 +96,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
 
     private static final HashMap<String, String> relationshipForPath = new HashMap<String, String>();
+    
+    private static List<String> billingAddressGroup = new ArrayList<String>();
+    
+    private static List<String> shippingAddressGroup = new ArrayList<String>();
 
     static {
 
@@ -142,6 +148,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         linkfieldNames.put("Contacts", "contacts");
         linkfieldNames.put("Leads", "leads");
         linkfieldNames.put("Opportunities", "opportunities");
+        
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET);
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_2);
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_3);
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_4);
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_CITY);
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STATE);
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_POSTALCODE);
+        billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_COUNTRY);
+        
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STREET);
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STREET_2);
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STREET_3);
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STREET_4);
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_CITY);
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STATE);
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_POSTALCODE);
+        shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_COUNTRY);
     }
 
     public DatabaseHelper(Context context) {
@@ -455,6 +479,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return moduleIcons.get(moduleName);
     }
     
+    public List<String> getBillingAddressGroup() {
+        return billingAddressGroup;
+    }
+
+    public List<String> getShippingAddressGroup() {
+        return shippingAddressGroup;
+    }
+
     public ModuleField getModuleField(String moduleName, String fieldName) {
         SQLiteDatabase db = getReadableDatabase();
         String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
@@ -467,12 +499,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ModuleFieldColumns.NAME + "='" + fieldName + "')";
         cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
         cursor.moveToFirst();
-        ModuleField moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
+        ModuleField moduleField = null;
+        if(cursor.getCount() > 0)
+            moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
                                         : false);
         cursor.close();
         db.close();
         
         return moduleField;
+    }
+    
+    public Map<String, ModuleField> getModuleFields(String moduleName){
+        SQLiteDatabase db = getReadableDatabase();
+        String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
+        Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
+        cursor.moveToFirst();
+        String moduleId = cursor.getString(0);
+        cursor.close();
+
+        Map<String, ModuleField> fieldNameVsModuleField = new HashMap<String, ModuleField>();
+        selection = ModuleFieldColumns.MODULE_ID + "=" + moduleId;
+        cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
+        cursor.moveToFirst();
+        for(int i=0; i<cursor.getCount(); i++){
+            String name = cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME));
+            ModuleField moduleField = new ModuleField(name, cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
+                                        : false);
+            cursor.moveToNext();
+            fieldNameVsModuleField.put(name, moduleField);
+        }
+        cursor.close();
+        db.close();
+        
+        return fieldNameVsModuleField;
     }
 
     public List<String> getUserModules() {
