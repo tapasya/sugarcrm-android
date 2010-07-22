@@ -50,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 16;
+    private static final int DATABASE_VERSION = 17;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -268,6 +268,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropContactsTable(db);
         dropLeadsTable(db);
         dropOpportunitiesTable(db);
+        dropCasesTable(db);
 
         dropModulesTable(db);
         dropModuleFieldsTable(db);
@@ -390,9 +391,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static void createCasesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + CASES_TABLE_NAME + " (" + Cases.ID + " INTEGER PRIMARY KEY,"
-                                        + Cases.BEAN_ID + " TEXT," + Cases.CASE_NUMBER + " TEXT,"
-                                        + Cases.PRIORITY + " TEXT," + Cases.ASSIGNED_USER_NAME
-                                        + " TEXT," + Cases.STATUS + " TEXT," + Cases.DATE_ENTERED
+                                        + Cases.BEAN_ID + " TEXT," + Cases.NAME + " TEXT,"
+                                        + Cases.CASE_NUMBER + " TEXT," + Cases.PRIORITY + " TEXT,"
+                                        + Cases.ASSIGNED_USER_NAME + " TEXT," + Cases.STATUS
+                                        + " TEXT," + Cases.DESCRIPTION + " TEXT,"
+                                        + Cases.RESOLUTION + " TEXT," + Cases.DATE_ENTERED
                                         + " TEXT," + Cases.DATE_MODIFIED + " TEXT," + Cases.DELETED
                                         + " INTEGER," + " UNIQUE(" + Cases.BEAN_ID + ")" + ");");
     }
