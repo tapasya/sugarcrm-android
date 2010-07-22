@@ -11,10 +11,13 @@ import android.util.Log;
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Cases;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsCasesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
@@ -32,6 +35,7 @@ import com.imaginea.android.sugarcrm.util.SugarCrmException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +58,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ACCOUNTS_CONTACTS_TABLE_NAME = "accounts_contacts";
 
     public static final String ACCOUNTS_OPPORTUNITIES_TABLE_NAME = "accounts_opportunities";
+    
+    public static final String ACCOUNTS_CASES_TABLE_NAME = "accounts_cases";
 
     public static final String CONTACTS_OPPORTUNITIES_TABLE_NAME = "contacts_opportunities";
+
+    public static final String CONTACTS_CASES_TABLE_NAME = "contacts_cases";
 
     public static final String LEADS_TABLE_NAME = "leads";
 
@@ -64,6 +72,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MEETINGS_TABLE_NAME = "meetings";
 
     public static final String CALLS_TABLE_NAME = "calls";
+
+    public static final String CASES_TABLE_NAME = "cases";
 
     public static final String MODULES_TABLE_NAME = "modules";
 
@@ -130,14 +140,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put("Contacts", Contacts.CONTENT_URI);
         moduleUris.put("Leads", Leads.CONTENT_URI);
         moduleUris.put("Opportunities", Opportunities.CONTENT_URI);
+        moduleUris.put("Cases", Opportunities.CONTENT_URI);
 
         // TODO - complete this list
         // moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Leads",
         // "Opportunities" });
-        moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Opportunities" });
+        moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Opportunities", "Cases" });
         moduleRelationshipItems.put("Contacts", new String[] { "Leads", "Opportunities" });
         moduleRelationshipItems.put("Leads", new String[] { "Opportunities", "Contacts" });
         moduleRelationshipItems.put("Opportunities", new String[] { "Leads", "Contacts" });
+        moduleRelationshipItems.put("Cases", new String[] { "Contacts" });
 
         pathForRelationship.put("Contacts", "contact");
         pathForRelationship.put("Leads", "lead");
@@ -181,15 +193,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createContactsTable(db);
         createLeadsTable(db);
         createOpportunitiesTable(db);
+        createCasesTable(db);
 
+        // create meta-data tables
         createModulesTable(db);
         createModuleFieldsTable(db);
         createLinkFieldsTable(db);
+
         // create join tables
 
         createAccountsContactsTable(db);
         createAccountsOpportunitiesTable(db);
+        createAccountsCasesTable(db);
         createContactsOpportunitiesTable(db);
+        createContactsCases(db);
     }
 
     void dropAccountsTable(SQLiteDatabase db) {
@@ -208,6 +225,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + OPPORTUNITIES_TABLE_NAME);
     }
 
+    void dropCasesTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + CASES_TABLE_NAME);
+    }
+
     void dropModulesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + MODULES_TABLE_NAME);
     }
@@ -223,6 +244,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropAccountsContactsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CONTACTS_TABLE_NAME);
     }
+    
+    void dropAccountsCasesTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CASES_TABLE_NAME);
+    }
 
     void dropAccountsOpportunitiesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_OPPORTUNITIES_TABLE_NAME);
@@ -230,6 +255,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     void dropContactsOpportunitiesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_OPPORTUNITIES_TABLE_NAME);
+    }
+
+    void dropContactsCasesTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_CASES_TABLE_NAME);
     }
 
     @Override
@@ -254,7 +283,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // drop join tables
         dropAccountsContactsTable(db);
         dropAccountsOpportunitiesTable(db);
+        dropAccountsCasesTable(db);
         dropContactsOpportunitiesTable(db);
+        dropContactsCasesTable(db);
     }
 
     private static void createAccountsTable(SQLiteDatabase db) {
@@ -363,6 +394,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " UNIQUE(" + OpportunitiesColumns.BEAN_ID + ")" + ");");
     }
 
+    private static void createCasesTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + CASES_TABLE_NAME + " (" + Cases.ID + " INTEGER PRIMARY KEY,"
+                                        + Cases.BEAN_ID + " TEXT," + Cases.CASE_NUMBER + " TEXT,"
+                                        + Cases.PRIORITY + " TEXT," + Cases.ASSIGNED_USER_NAME
+                                        + " TEXT," + Cases.STATUS + " TEXT," + Cases.DATE_ENTERED
+                                        + " TEXT," + Cases.DATE_MODIFIED + " TEXT," + Cases.DELETED
+                                        + " INTEGER," + " UNIQUE(" + Cases.BEAN_ID + ")" + ");");
+    }
+
     private static void createModulesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + MODULES_TABLE_NAME + " (" + ModuleColumns.ID
@@ -415,6 +456,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsOpportunitiesColumns.OPPORTUNITY_ID + ")" + ");");
     }
 
+    private static void createAccountsCasesTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + ACCOUNTS_CASES_TABLE_NAME + " ("
+                                        + AccountsCasesColumns.ACCOUNT_ID + " INTEGER ,"
+                                        + AccountsCasesColumns.CASE_ID + " INTEGER ,"
+                                        + AccountsCasesColumns.DATE_MODIFIED + " TEXT,"
+                                        + AccountsCasesColumns.DELETED + " INTEGER,"
+                                        + " UNIQUE(" + AccountsCasesColumns.ACCOUNT_ID + ","
+                                        + AccountsCasesColumns.CASE_ID + ")" + ");");
+    }
+    
     private static void createContactsOpportunitiesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + CONTACTS_OPPORTUNITIES_TABLE_NAME + " ("
@@ -425,6 +477,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " INTEGER," + " UNIQUE("
                                         + ContactsOpportunitiesColumns.CONTACT_ID + ","
                                         + ContactsOpportunitiesColumns.OPPORTUNITY_ID + ")" + ");");
+    }
+
+    private static void createContactsCases(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + CONTACTS_CASES_TABLE_NAME + " ("
+                                        + ContactsCasesColumns.CONTACT_ID + " INTEGER ,"
+                                        + ContactsCasesColumns.CASE_ID + " INTEGER ,"
+                                        + ContactsCasesColumns.DATE_MODIFIED + " TEXT,"
+                                        + ContactsCasesColumns.DELETED + " INTEGER," + " UNIQUE("
+                                        + ContactsCasesColumns.CONTACT_ID + ","
+                                        + ContactsCasesColumns.CASE_ID + ")" + ");");
     }
 
     public static String[] getModuleProjections(String moduleName) {
@@ -481,6 +544,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return modules;
         // TODO: return the module List after the exclusion of modules from the user moduleList
         // return moduleList;
+    }
+
+    /**
+     * while fetching relationship module items, we need to determine if current user has access to
+     * that module, this module should be present in the modules available to the user
+     * 
+     * @param moduleName
+     * @return
+     */
+    public boolean isModuleAccessAvailable(String moduleName) {
+        // userModules list is already sorted when querying from DB, hey we can as well go against
+        // the db or use a map
+        List<String> userModules = getUserModules();
+        int index = Collections.binarySearch(userModules, moduleName);
+        return index < 0 ? false : true;
     }
 
     public String getLinkfieldName(String moduleName) {
@@ -563,7 +641,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<String> getUserModules() {
         SQLiteDatabase db = getReadableDatabase();
         moduleList = new ArrayList<String>();
-        Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, null, null, null, null, null);
+        // get a sorted list with module_name OrderBy
+        Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, null, null, null, null, ModuleColumns.MODULE_NAME);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             String moduleName = cursor.getString(cursor.getColumnIndex(ModuleColumns.MODULE_NAME));
