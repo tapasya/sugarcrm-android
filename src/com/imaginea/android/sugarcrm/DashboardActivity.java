@@ -41,15 +41,11 @@ public class DashboardActivity extends Activity {
         Class wizardActivity = WizardDetector.getClass(getBaseContext());
         startActivityForResult(new Intent(this, wizardActivity), 0);
 
-        mModuleNames = mDbHelper.getModuleList();
-        mModuleNames.add("Settings");
-        Collections.sort(mModuleNames);
-
         setContentView(R.layout.dashboard_activity);
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(R.string.home);
         mDashboard = (GridView) findViewById(R.id.dashboard);
-        mDashboard.setAdapter(new AppsAdapter(this));
+      
 
         mDashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -74,6 +70,13 @@ public class DashboardActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_CANCELED)
             finish();
+        else {
+            // we have the module list after the login, so get them and store
+            mModuleNames = mDbHelper.getModuleList();
+            mModuleNames.add("Settings");
+            Collections.sort(mModuleNames);
+            mDashboard.setAdapter(new AppsAdapter(this));
+        }
     }
 
     public class AppsAdapter extends BaseAdapter {
