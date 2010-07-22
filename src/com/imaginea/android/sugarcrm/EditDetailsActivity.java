@@ -5,15 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -29,7 +31,7 @@ public class EditDetailsActivity extends Activity {
 
     private int MODE = -1;
 
-    private TableLayout mDetailsTable;
+    private ViewGroup mDetailsTable;
 
     private Cursor mCursor;
 
@@ -44,6 +46,8 @@ public class EditDetailsActivity extends Activity {
     private Uri mIntentUri;
 
     private DatabaseHelper mDbHelper;
+    
+    private LoadContentTask mTask;
 
     /** Called when the activity is first created. */
     @Override
@@ -51,8 +55,7 @@ public class EditDetailsActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.account_details);
-        findViewById(R.id.save).setVisibility(View.VISIBLE);
+        setContentView(R.layout.edit_details);
 
         mDbHelper = new DatabaseHelper(this);
 
@@ -91,71 +94,225 @@ public class EditDetailsActivity extends Activity {
 
         mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
 
-        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+        /*if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
             mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
-        }
+        }*/
         // startManagingCursor(mCursor);
-        setContents();
+        //setContents();
+        
+        mTask = new LoadContentTask();
+        mTask.execute(null);
     }
 
-    private void setContents() {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        
+        if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mTask.cancel(true);
+        }
+    }
+    
+    class LoadContentTask extends AsyncTask<Object, Object, Object> {
 
-        String[] detailsProjection = mSelectFields;
+        int staticRowsCount;
 
-        if (mDbHelper == null)
-            mDbHelper = new DatabaseHelper(getBaseContext());
+        final int STATIC_ROW = 1;
 
-        TextView tv = (TextView) findViewById(R.id.headerText);
-        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            tv.setText(String.format(getString(R.string.editDetailsHeader), mModuleName));
-        } else if (MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE) {
-            tv.setText(String.format(getString(R.string.newDetailsHeader), mModuleName));
+        final int DYNAMIC_ROW = 2;
+        
+        final int SAVE_BUTTON = 3;
+        
+        final int INPUT_TYPE = 4;
+
+        LoadContentTask() {
+            mDetailsTable = (ViewGroup) findViewById(R.id.accountDetalsTable);
+
+            // as the last child is the SAVE button, count - 1 has to be done.
+            staticRowsCount = mDetailsTable.getChildCount() - 1;
         }
 
-        mDetailsTable = (TableLayout) findViewById(R.id.accountDetalsTable);
-
-        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            mCursor.moveToFirst();
-            mSugarBeanId = mCursor.getString(1); // beanId has columnIndex 1
-        }
-
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
-
-        for (int i = 2; i < detailsProjection.length - 2; i++) {
-            String fieldName = detailsProjection[i];
-
-            // get the attributes of the moduleField
-            ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
-
-            // do not display account_name field, i.e. user cannot modify the account name
-            if (!mModuleName.equals(getString(R.string.accounts))
-                                            && ModuleFields.ACCOUNT_NAME.equals(fieldName))
-                continue;
-
-            View tableRow = inflater.inflate(R.layout.edit_table_row, null);
-            TextView textViewForLabel = (TextView) tableRow.findViewById(R.id.editRowLabel);
-            EditText editTextForValue = (EditText) tableRow.findViewById(R.id.editRowValue);
-
-            if (moduleField.isRequired()) {
-                textViewForLabel.setText(moduleField.getLabel() + " *");
-            } else {
-                textViewForLabel.setText(moduleField.getLabel());
-            }
-
-            editTextForValue.setId(i);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            
+            TextView tv = (TextView) findViewById(R.id.headerText);
             if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                String value = mCursor.getString(mCursor.getColumnIndex(fieldName));
-                if (value != null && !value.equals("")) {
-                    editTextForValue.setText(value);
-                }
-                setInputType(editTextForValue, moduleField);
+                tv.setText(String.format(getString(R.string.editDetailsHeader), mModuleName));
+            } else if (MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE) {
+                tv.setText(String.format(getString(R.string.newDetailsHeader), mModuleName));
             }
-            mDetailsTable.addView(tableRow);
         }
 
+        @Override
+        protected void onProgressUpdate(Object... values) {
+            super.onProgressUpdate(values);
+
+            switch ((Integer) values[0]) {
+
+            case STATIC_ROW:
+                View editRow = (View) values[1];
+                editRow.setVisibility(View.VISIBLE);
+
+                TextView labelView = (TextView) values[2];
+                labelView.setText((String) values[3]);
+                EditText valueView = (EditText) values[4];
+                valueView.setText((String) values[5]);
+                break;
+
+            case DYNAMIC_ROW:
+                editRow = (View) values[1];
+                editRow.setVisibility(View.VISIBLE);
+
+                labelView = (TextView) values[2];
+                labelView.setText((String) values[3]);
+                valueView = (EditText) values[4];
+                valueView.setText((String) values[5]);
+                mDetailsTable.addView(editRow);
+                break;
+                
+            case INPUT_TYPE:
+                valueView = (EditText)values[1];
+                valueView.setInputType((Integer)values[2]);
+                break;
+                
+            }
+        }
+
+        @Override
+        protected Object doInBackground(Object... params) {
+            try {
+                if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                    mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
+                }
+                setContents();
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+                return Util.FETCH_FAILED;
+            }
+
+            return Util.FETCH_SUCCESS;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+        }
+
+        @Override
+        protected void onPostExecute(Object result) {
+            super.onPostExecute(result);
+
+            // close the cursor irrespective of the result
+            if (mCursor != null && !mCursor.isClosed())
+                mCursor.close();
+
+            if (isCancelled())
+                return;
+            int retVal = (Integer) result;
+            switch (retVal) {
+            case Util.FETCH_FAILED:
+                break;
+            case Util.FETCH_SUCCESS:
+                // set visibility for the SAVE button
+                findViewById(R.id.save).setVisibility(View.VISIBLE);                
+                break;
+            default:
+
+            }
+        }
+
+        private void setContents() {
+
+            String[] detailsProjection = mSelectFields;
+
+            if (mDbHelper == null)
+                mDbHelper = new DatabaseHelper(getBaseContext());
+
+            if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                if(!isCancelled()){
+                    mCursor.moveToFirst();
+                    mSugarBeanId = mCursor.getString(1); // beanId has columnIndex 1
+                }
+            }
+
+            LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
+
+            // iterating from the 3rd element as the first two columns in the detail projection are
+            // ROW_ID and BEAN_ID
+            for (int i = 2; i < detailsProjection.length - 2; i++) {
+                // if the task gets cancelled
+                if(isCancelled())
+                    break;
+                
+                String fieldName = detailsProjection[i];
+
+                // get the attributes of the moduleField
+                ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
+
+                // do not display account_name field, i.e. user cannot modify the account name
+                if (!mModuleName.equals(getString(R.string.accounts))
+                                                && ModuleFields.ACCOUNT_NAME.equals(fieldName))
+                    continue;
+
+                ViewGroup tableRow;
+                TextView textViewForLabel;
+                EditText editTextForValue;
+                // first two columns in the detail projection are ROW_ID and BEAN_ID
+                if (staticRowsCount > i - 2) {
+                    tableRow = (ViewGroup) mDetailsTable.getChildAt(i - 2);
+                    textViewForLabel = (TextView) tableRow.getChildAt(0);
+                    editTextForValue = (EditText) tableRow.getChildAt(1);
+                } else {
+                    tableRow = (ViewGroup) inflater.inflate(R.layout.edit_table_row, null);
+                    textViewForLabel = (TextView) tableRow.getChildAt(0);
+                    editTextForValue = (EditText) tableRow.getChildAt(1);
+                }
+
+                String label;
+                if (moduleField.isRequired()) {
+                    label = moduleField.getLabel() + " *";
+                } else {
+                    label = moduleField.getLabel();
+                }
+
+                int command = STATIC_ROW;
+                if (staticRowsCount < i - 2) {
+                    command = DYNAMIC_ROW;
+                }
+                
+                if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                    String value = mCursor.getString(mCursor.getColumnIndex(fieldName));
+                    if (!TextUtils.isEmpty(value)) {
+                        publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, value);
+                    } else{
+                        publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, "");
+                    }
+                    setInputType(editTextForValue, moduleField);
+                    
+                } else{
+                    publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, "");
+                }
+            }
+            
+        }
+        
+        /*
+         * takes care of basic validation automatically for some fields
+         */
+        private void setInputType(TextView editTextForValue, ModuleField moduleField) {
+            if(Log.isLoggable(TAG,Log.VERBOSE))
+                Log.v(TAG, "ModuleField type:" + moduleField.getType());
+            if (moduleField.getType().equals("phone")){
+                //editTextForValue.setInputType(InputType.TYPE_CLASS_PHONE);
+                publishProgress(INPUT_TYPE, editTextForValue, InputType.TYPE_CLASS_PHONE);
+            }
+        }
     }
+    
 
     /**
      * on click listener for saving a module item
@@ -176,7 +333,8 @@ public class EditDetailsActivity extends Activity {
                                             && ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
                 continue;
 
-            EditText editText = (EditText) mDetailsTable.findViewById(i);
+            //EditText editText = (EditText) mDetailsTable.findViewById(i);
+            EditText editText = (EditText)((ViewGroup)mDetailsTable.getChildAt(i-2)).getChildAt(1);
             Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
 
             // TODO: validation
@@ -218,23 +376,5 @@ public class EditDetailsActivity extends Activity {
         }
         // return false;
     }
-
-    /*
-     * takes care of basic validation automatically for some fields
-     */
-    private void setInputType(TextView editTextForValue, ModuleField moduleField) {
-        // if(Log.isLoggable(TAG,Log.VERBOSE))
-        Log.v(TAG, "ModuleField type:" + moduleField.getType());
-        if (moduleField.getType().equals("phone"))
-            editTextForValue.setInputType(InputType.TYPE_CLASS_PHONE);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (mCursor != null && !mCursor.isClosed())
-            mCursor.close();
-
-    }
+    
 }
