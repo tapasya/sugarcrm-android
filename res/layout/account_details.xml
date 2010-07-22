@@ -22,27 +22,21 @@
 		    android:orientation="vertical"
 		    android:layout_width="fill_parent" 
 		    android:layout_height="fill_parent">
-
-		<!-- TableLayout 
-			android:id="@+id/accountDetalsTable"	
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content" 
-			android:stretchColumns="1"
-			android:padding="5dip"
-			android:orientation="vertical"
-			android:scrollbars="horizontal|vertical"
-			>   			
-		</TableLayout-->
-		<Button
-           android:id="@+id/save"
-           android:layout_width="fill_parent"
-           android:layout_height="fill_parent"
-           android:layout_gravity="center_horizontal"           
-           android:text="@string/save"
-           android:onClick="saveModuleItem"
-           android:visibility="gone"/>
-	</LinearLayout>
-	 
+		    
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			<include layout="@layout/table_row" />
+			
+		</LinearLayout>
 	</ScrollView>
 </RelativeLayout>
 
