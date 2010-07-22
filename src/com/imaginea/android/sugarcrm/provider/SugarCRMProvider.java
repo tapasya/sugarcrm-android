@@ -15,9 +15,11 @@ import android.util.Log;
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.RestUtilConstants;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Cases;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
@@ -69,14 +71,18 @@ public class SugarCRMProvider extends ContentProvider {
 
     private static final int ACCOUNT_OPPORTUNITY = 16;
 
-    private static final int CONTACT_LEAD = 17;
+    private static final int ACCOUNT_CASE = 17;
+
+    private static final int CONTACT_LEAD = 18;
 
     // TODO - is this required
-    private static final int CONTACT_OPPORTUNITY = 18;
+    private static final int CONTACT_OPPORTUNITY = 19;
 
-    private static final int LEAD_OPPORTUNITY = 19;
+    private static final int CONTACT_CASE = 20;
 
-    private static final int OPPORTUNITY_CONTACT = 20;
+    private static final int LEAD_OPPORTUNITY = 21;
+
+    private static final int OPPORTUNITY_CONTACT = 22;
 
     private static final UriMatcher sUriMatcher;
 
@@ -177,6 +183,31 @@ public class SugarCRMProvider extends ContentProvider {
 
             break;
 
+        case ACCOUNT_CASE:
+            module = RestUtilConstants.CASES_MODULE;
+
+            // c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new
+            // String[] { uri.getPathSegments().get(1) }, null, null, null);
+
+            qb = new SQLiteQueryBuilder();
+            qb.setTables(DatabaseHelper.ACCOUNTS_TABLE_NAME + ","
+                                            + DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME + ","
+                                            + DatabaseHelper.CASES_TABLE_NAME);
+
+            selection = DatabaseHelper.ACCOUNTS_TABLE_NAME + "." + Accounts.ID + " = ?" + " AND "
+                                            + DatabaseHelper.ACCOUNTS_TABLE_NAME + "."
+                                            + Accounts.ID + "="
+                                            + DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME + "."
+                                            + AccountsCasesColumns.ACCOUNT_ID + " AND "
+                                            + DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME + "."
+                                            + AccountsCasesColumns.CASE_ID + "="
+                                            + DatabaseHelper.CASES_TABLE_NAME + "." + Cases.ID;
+            Map<String, String> casesProjectionMap = getProjectionMap(DatabaseHelper.CASES_TABLE_NAME, projection);
+            qb.setProjectionMap(casesProjectionMap);
+            c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
+
+            break;
+
         case CONTACT:
             module = RestUtilConstants.CONTACTS_MODULE;
             if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -210,7 +241,7 @@ public class SugarCRMProvider extends ContentProvider {
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
-            // TODO - this case is dubious - remove it later
+        // TODO - this case is dubious - remove it later
         case CONTACT_OPPORTUNITY:
 
             module = RestUtilConstants.OPPORTUNITIES_MODULE;
@@ -457,6 +488,35 @@ public class SugarCRMProvider extends ContentProvider {
 
             break;
 
+        case ACCOUNT_CASE:
+            parentPath = uri.getPathSegments().get(0);
+            accountId = uri.getPathSegments().get(1);
+            selection = AccountsColumns.ID + "=" + accountId;
+
+            parentModuleName = mOpenHelper.getRelationshipForPath(parentPath);
+            // cursor = query(mOpenHelper.getModuleUri(parentModuleName),
+            // Accounts.DETAILS_PROJECTION, selection, null, null);
+            // cursor.moveToFirst();
+            // accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
+            // values.put(Contacts.ACCOUNT_ID, accountId);
+            // values.put(Contacts.ACCOUNT_NAME, accountName);
+            // cursor.close();
+            rowId = db.insert(DatabaseHelper.CASES_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri caseUri = ContentUris.withAppendedId(Cases.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(caseUri, null);
+
+                ContentValues val2 = new ContentValues();
+                val2.put(AccountsCasesColumns.ACCOUNT_ID, accountId);
+                val2.put(AccountsCasesColumns.CASE_ID, rowId);
+                // TODO - delete flag and date_modified
+                db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val2);
+
+                return caseUri;
+            }
+
+            break;
+
         case CONTACT:
             rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
             if (rowId > 0) {
@@ -531,7 +591,7 @@ public class SugarCRMProvider extends ContentProvider {
                 return oppUri;
             }
             break;
-            
+
         case OPPORTUNITY_CONTACT:
 
             parentPath = uri.getPathSegments().get(0);
@@ -766,6 +826,7 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#", CONTACT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#/#", CONTACT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#/opportunity", CONTACT_OPPORTUNITY);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "contact/#/case", CONTACT_CASE);
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "lead", LEAD);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "lead/#", LEAD_ID);
