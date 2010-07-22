@@ -74,6 +74,8 @@ public class Util {
     
     public static final String DELETED_ITEM = "1";
     
+    public static final String CASE_ID =     "case_id";
+    
     private static final String LOG_TAG = Util.class.getSimpleName();
 
     // calculate the MD5 hash of a string
