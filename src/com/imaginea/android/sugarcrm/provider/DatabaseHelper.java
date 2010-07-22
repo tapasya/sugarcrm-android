@@ -85,7 +85,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     private String[] defaultSupportedModules = { Util.ACCOUNTS, Util.CONTACTS, Util.LEADS,
-            Util.OPPORTUNITIES };
+            Util.OPPORTUNITIES, Util.CASES };
 
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
 
@@ -124,12 +124,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleProjections.put(Util.CONTACTS, Contacts.DETAILS_PROJECTION);
         moduleProjections.put(Util.LEADS, Leads.DETAILS_PROJECTION);
         moduleProjections.put(Util.OPPORTUNITIES, Opportunities.DETAILS_PROJECTION);
+        moduleProjections.put(Util.CASES, Cases.DETAILS_PROJECTION);
         // moduleProjections.put(4, Meetings.DETAILS_PROJECTION );
 
         moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CONTACTS, Contacts.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.LEADS, Leads.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.OPPORTUNITIES, Opportunities.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.CASES, Cases.LIST_VIEW_PROJECTION);
 
         moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.CONTACTS, Contacts.DEFAULT_SORT_ORDER);
@@ -138,7 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put(Util.CONTACTS, Contacts.CONTENT_URI);
         moduleUris.put(Util.LEADS, Leads.CONTENT_URI);
         moduleUris.put(Util.OPPORTUNITIES, Opportunities.CONTENT_URI);
-        moduleUris.put(Util.CASES, Opportunities.CONTENT_URI);
+        moduleUris.put(Util.CASES, Cases.CONTENT_URI);
 
         // TODO - complete this list
         // moduleRelationshipItems.put(Util.ACCOUNTS_MODULE, new String[] { Util.CONTACTS_MODULE,
@@ -557,7 +559,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getModuleIcon(String moduleName) {
-        return moduleIcons.get(moduleName);
+        Integer iconResource = moduleIcons.get(moduleName);
+        if (iconResource == null)
+            return android.R.drawable.alert_dark_frame;
+        return iconResource;
     }
 
     public List<String> getBillingAddressGroup() {
