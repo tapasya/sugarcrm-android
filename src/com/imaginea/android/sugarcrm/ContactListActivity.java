@@ -241,9 +241,9 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
-        // TODO
-        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+                
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+            Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         if(mIntentUri != null)
             detailIntent.setData(mIntentUri);
@@ -265,7 +265,8 @@ public class ContactListActivity extends ListActivity {
             return;
         }
         // TODO
-        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+            Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         
         if(mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
@@ -469,9 +470,11 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+       
         int index = cursor.getColumnIndex(ModuleFields.PHONE_WORK);
         String number = cursor.getString(index);
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+        Log.d(LOG_TAG, "Work number to call:" + number);
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
         startActivity(intent);
     }
@@ -482,10 +485,11 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        // emailAddress
-        Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+        // emailAddress        
         int index = cursor.getColumnIndex(ModuleFields.EMAIL1);
         String emailAddress = cursor.getString(index);
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+            Log.d(LOG_TAG, "email :" + emailAddress);
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + emailAddress));
         startActivity(intent);
     }
