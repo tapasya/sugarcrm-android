@@ -100,16 +100,17 @@ public class ContactListActivity extends ListActivity {
         mListView.setEmptyView(mEmpty);
         registerForContextMenu(getListView());
 
-        // Perform a managed query. The Activity will handle closing and requerying the cursor
-        // when needed.
-        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             Log.d(LOG_TAG, "Instance count:" + getInstanceCount());
-        Log.d(LOG_TAG, "ModuleName" + mModuleName);
+            Log.d(LOG_TAG, "ModuleName:-->" + mModuleName);
+        }
 
         mModuleUri = mDbHelper.getModuleUri(mModuleName);
         if (intent.getData() == null) {
             intent.setData(mModuleUri);
         }
+        // Perform a managed query. The Activity will handle closing and requerying the cursor
+        // when needed.
         // TODO - optimize this, if we sync up a dataset, then no need to run detail projectio
         // nhere, just do a list projection
         Cursor cursor;
@@ -224,7 +225,7 @@ public class ContactListActivity extends ListActivity {
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
-        
+
         startActivity(detailIntent);
     }
 
@@ -250,7 +251,7 @@ public class ContactListActivity extends ListActivity {
 
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
-        
+
         startActivity(detailIntent);
     }
 
