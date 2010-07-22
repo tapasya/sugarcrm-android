@@ -188,8 +188,7 @@ public class AccountDetailsActivity extends Activity {
         LoadContentTask() {
             mDetailsTable = (ViewGroup) findViewById(R.id.accountDetalsTable);
 
-            // as the last child is the SAVE button, count - 1 has to be done.
-            staticRowsCount = mDetailsTable.getChildCount() - 1;
+            staticRowsCount = mDetailsTable.getChildCount();
         }
 
         @Override
@@ -211,7 +210,6 @@ public class AccountDetailsActivity extends Activity {
                 break;
 
             case STATIC_ROW:
-                // TODO: order
                 View detailRow = (View) values[1];
                 detailRow.setVisibility(View.VISIBLE);
 
