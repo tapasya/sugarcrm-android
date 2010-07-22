@@ -25,7 +25,7 @@ public final class SugarCRMContent {
     public static final class Accounts implements AccountsColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
-                                        + "/account");
+                                        + "/" + Util.ACCOUNTS);
 
         /**
          * The default sort order for this table
@@ -115,7 +115,7 @@ public final class SugarCRMContent {
     public static final class Contacts implements ContactsColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
-                                        + "/contact");
+                                        + "/" + Util.CONTACTS);
 
         public static final int ID_COLUMN = 0;
 
@@ -241,7 +241,7 @@ public final class SugarCRMContent {
     public static final class Leads implements LeadsColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
-                                        + "/lead");
+                                        + "/" + Util.LEADS);
 
         /**
          * The default sort order for this table
@@ -295,7 +295,7 @@ public final class SugarCRMContent {
     public static final class Opportunities implements OpportunitiesColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
-                                        + "/opportunity");
+                                        + "/" + Util.OPPORTUNITIES);
 
         /**
          * The default sort order for this table
@@ -374,7 +374,7 @@ public final class SugarCRMContent {
     public static final class Cases implements CasesColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
-                                        + "/case");
+                                        + "/" + Util.CASES);
 
         /**
          * The default sort order for this table
