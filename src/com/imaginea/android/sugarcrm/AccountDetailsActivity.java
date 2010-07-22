@@ -194,7 +194,6 @@ public class AccountDetailsActivity extends Activity {
 
         @Override
         protected void onPreExecute() {
-            mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
             super.onPreExecute();
             TextView tv = (TextView) findViewById(R.id.headerText);
             tv.setText(mModuleName + " Details");
@@ -238,6 +237,7 @@ public class AccountDetailsActivity extends Activity {
         @Override
         protected Object doInBackground(Object... params) {
             try {
+                mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
                 setContents();
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -285,7 +285,8 @@ public class AccountDetailsActivity extends Activity {
             String title = "";
             List<String> titleFields = Arrays.asList(mDbHelper.getModuleListSelections(mModuleName));
 
-            mCursor.moveToFirst();
+            if(!isCancelled())
+                mCursor.moveToFirst();
 
             LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -301,6 +302,10 @@ public class AccountDetailsActivity extends Activity {
             // iterating from the 3rd element as the first two columns in the detail projection are
             // ROW_ID and BEAN_ID
             for (int i = 2; i < detailsProjection.length - 2; i++) {
+                // if the task gets cancelled
+                if(isCancelled())
+                    break;
+                
                 String fieldName = detailsProjection[i];
                 int columnIndex = mCursor.getColumnIndex(fieldName);
                 if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
