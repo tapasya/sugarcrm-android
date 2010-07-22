@@ -115,12 +115,11 @@ public class SugarCRMProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
         case ACCOUNT:
-            module = Util.ACCOUNTS;
             c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
             break;
 
         case ACCOUNT_ID:
-            module = Util.ACCOUNTS;
+
             // db.setProjectionMap(sNotesProjectionMap);
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
@@ -132,7 +131,7 @@ public class SugarCRMProvider extends ContentProvider {
             qb.setTables(DatabaseHelper.ACCOUNTS_TABLE_NAME + ","
                                             + DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME + ","
                                             + DatabaseHelper.CONTACTS_TABLE_NAME);
-            module = Util.CONTACTS;
+
             selection = DatabaseHelper.ACCOUNTS_TABLE_NAME + "." + Accounts.ID + " = ?" + " AND "
                                             + DatabaseHelper.ACCOUNTS_TABLE_NAME + "."
                                             + Accounts.ID + "="
@@ -151,13 +150,12 @@ public class SugarCRMProvider extends ContentProvider {
 
         case ACCOUNT_LEAD:
             // TODO - whats the set relationship for this
-            module = Util.LEADS;
+
             selection = LeadsColumns.ACCOUNT_ID + " = ?";
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
         case ACCOUNT_OPPORTUNITY:
-            module = Util.OPPORTUNITIES;
 
             // c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new
             // String[] { uri.getPathSegments().get(1) }, null, null, null);
@@ -184,7 +182,6 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case ACCOUNT_CASE:
-            module = Util.CASES;
 
             // c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new
             // String[] { uri.getPathSegments().get(1) }, null, null, null);
@@ -209,7 +206,7 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case CONTACT:
-            module = Util.CONTACTS;
+
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Querying Contacts");
                 Log.d(TAG, "Uri:->" + uri.toString());
@@ -230,13 +227,13 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case CONTACT_ID:
-            module = Util.CONTACTS;
+
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
         case CONTACT_LEAD:
-            module = Util.LEADS;
+
             selection = LeadsColumns.ACCOUNT_ID + " = ?";
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
@@ -244,7 +241,6 @@ public class SugarCRMProvider extends ContentProvider {
         // TODO - this case is dubious - remove it later
         case CONTACT_OPPORTUNITY:
 
-            module = Util.OPPORTUNITIES;
             qb = new SQLiteQueryBuilder();
             qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME + ","
                                             + DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME
@@ -267,7 +263,6 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case LEAD:
-            module = Util.LEADS;
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Querying Leads");
                 Log.d(TAG, "Uri:->" + uri.toString());
@@ -286,7 +281,6 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case LEAD_ID:
-            module = Util.LEADS;
             // db.setProjectionMap(sNotesProjectionMap);
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
@@ -294,13 +288,12 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case LEAD_OPPORTUNITY:
-            module = Util.OPPORTUNITIES;
             selection = OpportunitiesColumns.ACCOUNT_ID + " = ?";
             c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
         case OPPORTUNITY:
-            module = Util.OPPORTUNITIES;
+
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Querying OPPORTUNITIES");
                 Log.d(TAG, "Uri:->" + uri.toString());
@@ -322,16 +315,13 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case OPPORTUNITY_ID:
-            module = Util.OPPORTUNITIES;
-            // db.setProjectionMap(sNotesProjectionMap);
+
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
-            // qb.appendWhere(Notes._ID + "=" + uri.getPathSegments().get(1));
             break;
 
         case OPPORTUNITY_CONTACT:
 
-            module = Util.OPPORTUNITIES;
             qb = new SQLiteQueryBuilder();
             qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME + ","
                                             + DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME
@@ -352,6 +342,16 @@ public class SugarCRMProvider extends ContentProvider {
             c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
 
             break;
+
+        case CASE:
+            c = db.query(DatabaseHelper.CASES_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+            break;
+
+        case CASE_ID:
+            selection = SugarCRMContent.RECORD_ID + " = ?";
+            c = db.query(DatabaseHelper.CASES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -616,6 +616,15 @@ public class SugarCRMProvider extends ContentProvider {
             }
 
             break;
+
+        case CASE:
+            rowId = db.insert(DatabaseHelper.CASES_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri accountUri = ContentUris.withAppendedId(Cases.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(accountUri, null);
+                return accountUri;
+            }
+            break;
         default:
             // return uri;
             throw new IllegalArgumentException("Unknown URI " + uri);
@@ -721,6 +730,19 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
 
+        case CASE:
+            count = db.delete(DatabaseHelper.CASES_TABLE_NAME, where, whereArgs);
+            break;
+
+        case CASE_ID:
+            String caseId = uri.getPathSegments().get(1);
+            count = db.delete(DatabaseHelper.CASES_TABLE_NAME, Opportunities.ID
+                                            + "="
+                                            + caseId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -813,10 +835,10 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/#", ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#", ACCOUNT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.CONTACTS, ACCOUNT_CONTACT);
-        // sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS_MODULE + "/*/contact",
-        // ACCOUNT_BEAN_CONTACT);
+
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.LEADS, ACCOUNT_LEAD);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.OPPORTUNITIES, ACCOUNT_OPPORTUNITY);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.CASES, ACCOUNT_CASE);
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CONTACTS, CONTACT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CONTACTS + "/#", CONTACT_ID);
