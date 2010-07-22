@@ -224,7 +224,6 @@ public class ContactListActivity extends ListActivity {
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
-        cursor.close();
         
         startActivity(detailIntent);
     }
@@ -251,7 +250,6 @@ public class ContactListActivity extends ListActivity {
 
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
-        cursor.close();
         
         startActivity(detailIntent);
     }
@@ -476,7 +474,6 @@ public class ContactListActivity extends ListActivity {
 
         int index = cursor.getColumnIndex(ModuleFields.PHONE_WORK);
         String number = cursor.getString(index);
-        cursor.close();
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "Work number to call:" + number);
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
@@ -492,7 +489,6 @@ public class ContactListActivity extends ListActivity {
         // emailAddress
         int index = cursor.getColumnIndex(ModuleFields.EMAIL1);
         String emailAddress = cursor.getString(index);
-        cursor.close();
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "email :" + emailAddress);
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + emailAddress));
