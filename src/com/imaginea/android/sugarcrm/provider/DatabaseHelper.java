@@ -15,6 +15,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColum
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Calls;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Cases;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsCasesColumns;
@@ -23,6 +24,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsOpportunit
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LinkFieldColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Meetings;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules;
@@ -85,7 +87,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     private String[] defaultSupportedModules = { Util.ACCOUNTS, Util.CONTACTS, Util.LEADS,
-            Util.OPPORTUNITIES, Util.CASES };
+            Util.OPPORTUNITIES, Util.CASES, Util.CALLS, Util.MEETINGS };
 
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
 
@@ -118,6 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleIcons.put(Util.CONTACTS, R.drawable.contacts);
         moduleIcons.put(Util.LEADS, R.drawable.leads);
         moduleIcons.put(Util.OPPORTUNITIES, R.drawable.opportunity);
+        moduleIcons.put(Util.CASES, R.drawable.cases);
         moduleIcons.put("Settings", R.drawable.settings);
 
         moduleProjections.put(Util.ACCOUNTS, Accounts.DETAILS_PROJECTION);
@@ -125,6 +128,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleProjections.put(Util.LEADS, Leads.DETAILS_PROJECTION);
         moduleProjections.put(Util.OPPORTUNITIES, Opportunities.DETAILS_PROJECTION);
         moduleProjections.put(Util.CASES, Cases.DETAILS_PROJECTION);
+        moduleProjections.put(Util.CALLS, Calls.DETAILS_PROJECTION);
+        moduleProjections.put(Util.MEETINGS, Meetings.DETAILS_PROJECTION);
         // moduleProjections.put(4, Meetings.DETAILS_PROJECTION );
 
         moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
@@ -132,6 +137,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleListSelections.put(Util.LEADS, Leads.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.OPPORTUNITIES, Opportunities.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CASES, Cases.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.CALLS, Calls.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.MEETINGS, Meetings.LIST_VIEW_PROJECTION);
 
         moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.CONTACTS, Contacts.DEFAULT_SORT_ORDER);
@@ -141,6 +148,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put(Util.LEADS, Leads.CONTENT_URI);
         moduleUris.put(Util.OPPORTUNITIES, Opportunities.CONTENT_URI);
         moduleUris.put(Util.CASES, Cases.CONTENT_URI);
+        moduleUris.put(Util.CALLS, Calls.CONTENT_URI);
+        moduleUris.put(Util.MEETINGS, Meetings.CONTENT_URI);
 
         // TODO - complete this list
         // moduleRelationshipItems.put(Util.ACCOUNTS_MODULE, new String[] { Util.CONTACTS_MODULE,
@@ -152,10 +161,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleRelationshipItems.put(Util.LEADS, new String[] { Util.OPPORTUNITIES, Util.CONTACTS });
         moduleRelationshipItems.put(Util.OPPORTUNITIES, new String[] { Util.LEADS, Util.CONTACTS });
         moduleRelationshipItems.put(Util.CASES, new String[] { Util.CONTACTS });
+        moduleRelationshipItems.put(Util.CALLS, new String[] { Util.CONTACTS });
+        moduleRelationshipItems.put(Util.MEETINGS, new String[] { Util.CONTACTS });
 
         linkfieldNames.put(Util.CONTACTS, "contacts");
         linkfieldNames.put(Util.LEADS, "leads");
         linkfieldNames.put(Util.OPPORTUNITIES, "opportunities");
+        linkfieldNames.put(Util.CASES, "cases");
+        linkfieldNames.put(Util.CALLS, "calls");
+        linkfieldNames.put(Util.MEETINGS, "meetings");
 
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET);
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_2);
@@ -187,6 +201,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createLeadsTable(db);
         createOpportunitiesTable(db);
         createCasesTable(db);
+        createCallsTable(db);
+        createMeetingsTable(db);
 
         // create meta-data tables
         createModulesTable(db);
@@ -220,6 +236,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     void dropCasesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + CASES_TABLE_NAME);
+    }
+
+    void dropCallsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + CALLS_TABLE_NAME);
+    }
+
+    void dropMeetingsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + MEETINGS_TABLE_NAME);
     }
 
     void dropModulesTable(SQLiteDatabase db) {
@@ -269,6 +293,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropLeadsTable(db);
         dropOpportunitiesTable(db);
         dropCasesTable(db);
+        dropCallsTable(db);
+        dropMeetingsTable(db);
 
         dropModulesTable(db);
         dropModuleFieldsTable(db);
@@ -400,6 +426,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " INTEGER," + " UNIQUE(" + Cases.BEAN_ID + ")" + ");");
     }
 
+    private static void createCallsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + CALLS_TABLE_NAME + " (" + Calls.ID + " INTEGER PRIMARY KEY,"
+                                        + Calls.BEAN_ID + " TEXT," + Calls.NAME + " TEXT,"
+                                        + Calls.STATUS + " TEXT," + Calls.START_DATE + " TEXT,"
+                                        + Calls.DURATION_HOURS + " TEXT," + Calls.DURATION_MINUTES
+                                        + " TEXT," + Calls.ASSIGNED_USER_NAME + " TEXT,"
+                                        + Calls.DESCRIPTION + " TEXT," + Calls.DATE_ENTERED
+                                        + " TEXT," + Calls.DATE_MODIFIED + " TEXT," + Calls.DELETED
+                                        + " INTEGER," + " UNIQUE(" + Calls.BEAN_ID + ")" + ");");
+    }
+
+    private static void createMeetingsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + MEETINGS_TABLE_NAME + " (" + Meetings.ID
+                                        + " INTEGER PRIMARY KEY," + Meetings.BEAN_ID + " TEXT,"
+                                        + Meetings.NAME + " TEXT," + Meetings.STATUS + " TEXT,"
+                                        + Meetings.LOCATION + " TEXT," + Meetings.START_DATE
+                                        + " TEXT," + Meetings.DURATION_HOURS + " TEXT,"
+                                        + Meetings.DURATION_MINUTES + " TEXT,"
+                                        + Meetings.ASSIGNED_USER_NAME + " TEXT,"
+                                        + Meetings.DESCRIPTION + " TEXT," + Meetings.DATE_ENTERED
+                                        + " TEXT," + Meetings.DATE_MODIFIED + " TEXT,"
+                                        + Meetings.DELETED + " INTEGER," + " UNIQUE("
+                                        + Meetings.BEAN_ID + ")" + ");");
+    }
+
     private static void createModulesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + MODULES_TABLE_NAME + " (" + ModuleColumns.ID
@@ -520,6 +573,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return "";
     }
 
+    // TODO - get from DB
     public String[] getModuleRelationshipItems(String moduleName) {
         return moduleRelationshipItems.get(moduleName);
     }
