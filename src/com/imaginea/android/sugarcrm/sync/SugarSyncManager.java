@@ -167,7 +167,6 @@ public class SugarSyncManager {
             }
             batchOperation.execute();
 
-           
         }
         mLinkNameToFieldsArray.clear();
         // syncRelationships(context, account, sessionId, moduleName);
@@ -194,7 +193,7 @@ public class SugarSyncManager {
         }
         String beandIdValue = bean.getFieldValue(mBeanIdField);
         Log.v(LOG_TAG, "syncRelationshipsData: beanId:" + beandIdValue);
-       
+
         long rawId = lookupRawId(context.getContentResolver(), moduleName, beandIdValue);
         Log.v(LOG_TAG, "syncRelationshipsData: RawId:" + rawId);
         for (String relation : relationships) {
@@ -216,9 +215,8 @@ public class SugarSyncManager {
                     continue;
                 long relationRawId = lookupRawId(context.getContentResolver(), relation, relationBeanId);
                 if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
-                    Log.v(LOG_TAG, "RelationBeanId/RelatedRawid:"
-                                                    + relationRawId
-                                                    + "/" + relationBeanId);
+                    Log.v(LOG_TAG, "RelationBeanId/RelatedRawid:" + relationRawId + "/"
+                                                    + relationBeanId);
                 if (relationRawId != 0) {
                     if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
                         // update module Item
@@ -240,14 +238,23 @@ public class SugarSyncManager {
         }
     }
 
+    /**
+     * set LinkNameToFieldsArray sets the array of link names to get for a given module
+     * 
+     * @param moduleName
+     * @throws SugarCrmException
+     */
     public static void setLinkNameToFieldsArray(String moduleName) throws SugarCrmException {
         String[] relationships = databaseHelper.getModuleRelationshipItems(moduleName);
         if (relationships == null)
             return;
         for (String relation : relationships) {
-            String linkFieldName = databaseHelper.getLinkfieldName(relation);
-            String[] relationProj = databaseHelper.getModuleProjections(relation);
-            mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));
+            // get the relationships for a user only if access is allowed
+            if (databaseHelper.isModuleAccessAvailable(relation)) {
+                String linkFieldName = databaseHelper.getLinkfieldName(relation);
+                String[] relationProj = databaseHelper.getModuleProjections(relation);
+                mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));
+            }
         }
     }
 
@@ -327,9 +334,9 @@ public class SugarSyncManager {
     }
 
     private static void updateRelatedModuleItem(Context context, ContentResolver resolver,
-                                    String accountName, String moduleName, String relatedModuleName,
-                                    SugarBean relatedBean, long relationRawId,
-                                    BatchOperation batchOperation) {
+                                    String accountName, String moduleName,
+                                    String relatedModuleName, SugarBean relatedBean,
+                                    long relationRawId, BatchOperation batchOperation) {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateRelatedModuleItem");
         Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
