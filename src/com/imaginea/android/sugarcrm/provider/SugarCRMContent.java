@@ -381,11 +381,11 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = DATE_MODIFIED + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, CASE_NUMBER, PRIORITY };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER, PRIORITY, DATE_MODIFIED };
 
-        public static final String[] LIST_VIEW_PROJECTION = { CASE_NUMBER };
+        public static final String[] LIST_VIEW_PROJECTION = { NAME, PRIORITY, DATE_MODIFIED };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, CASE_NUMBER,
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER,
                 PRIORITY, ASSIGNED_USER_NAME, STATUS, DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
@@ -395,6 +395,8 @@ public final class SugarCRMContent {
 
         public String BEAN_ID = SUGAR_BEAN_ID;
 
+        public String  NAME = ModuleFields.NAME;
+        
         public String CASE_NUMBER = ModuleFields.CASE_NUMBER;
 
         public String PRIORITY = ModuleFields.PRIORITY;
@@ -402,6 +404,10 @@ public final class SugarCRMContent {
         public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
 
         public String STATUS = ModuleFields.STATUS;
+        
+        public String DESCRIPTION = ModuleFields.DESCRIPTION;
+        
+        public String RESOLUTION = ModuleFields.RESOLUTION;               
 
         public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
 
