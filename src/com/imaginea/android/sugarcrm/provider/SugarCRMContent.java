@@ -381,12 +381,14 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = DATE_MODIFIED + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER, PRIORITY, DATE_MODIFIED };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER,
+                PRIORITY, DATE_MODIFIED };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, PRIORITY, DATE_MODIFIED };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER,
-                PRIORITY, ASSIGNED_USER_NAME, STATUS, DATE_ENTERED, DATE_MODIFIED, DELETED };
+                PRIORITY, ASSIGNED_USER_NAME, STATUS, DESCRIPTION, RESOLUTION, DATE_ENTERED,
+                DATE_MODIFIED, DELETED };
 
     }
 
@@ -395,8 +397,8 @@ public final class SugarCRMContent {
 
         public String BEAN_ID = SUGAR_BEAN_ID;
 
-        public String  NAME = ModuleFields.NAME;
-        
+        public String NAME = ModuleFields.NAME;
+
         public String CASE_NUMBER = ModuleFields.CASE_NUMBER;
 
         public String PRIORITY = ModuleFields.PRIORITY;
@@ -404,10 +406,106 @@ public final class SugarCRMContent {
         public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
 
         public String STATUS = ModuleFields.STATUS;
-        
+
         public String DESCRIPTION = ModuleFields.DESCRIPTION;
-        
-        public String RESOLUTION = ModuleFields.RESOLUTION;               
+
+        public String RESOLUTION = ModuleFields.RESOLUTION;
+
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+
+    }
+
+    public static final class Calls implements CallsColumns {
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+                                        + "/" + Util.CALLS);
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = START_DATE + " DESC";
+
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE };
+
+        public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
+                DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME, DESCRIPTION, DATE_ENTERED,
+                DATE_MODIFIED, DELETED };
+
+    }
+
+    public interface CallsColumns {
+        public String ID = RECORD_ID;
+
+        public String BEAN_ID = SUGAR_BEAN_ID;
+
+        public String NAME = ModuleFields.NAME;
+
+        public String STATUS = ModuleFields.STATUS;
+
+        public String START_DATE = ModuleFields.START_DATE;
+
+        public String DURATION_HOURS = ModuleFields.DURATION_HOURS;
+
+        public String DURATION_MINUTES = ModuleFields.DURATION_MINUTES;
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
+
+        public String DESCRIPTION = ModuleFields.DESCRIPTION;
+
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+
+    }
+
+    public static final class Meetings implements MeetingsColumns {
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+                                        + "/" + Util.MEETINGS);
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = START_DATE + " DESC";
+
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE };
+
+        public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, STATUS,
+                LOCATION, START_DATE, DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME,
+                DESCRIPTION, DATE_ENTERED, DATE_MODIFIED, DELETED };
+
+    }
+
+    public interface MeetingsColumns {
+        public String ID = RECORD_ID;
+
+        public String BEAN_ID = SUGAR_BEAN_ID;
+
+        public String NAME = ModuleFields.NAME;
+
+        public String STATUS = ModuleFields.STATUS;
+
+        public String LOCATION = ModuleFields.LOCATION;
+
+        public String START_DATE = ModuleFields.START_DATE;
+
+        public String DURATION_HOURS = ModuleFields.DURATION_HOURS;
+
+        public String DURATION_MINUTES = ModuleFields.DURATION_MINUTES;
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
+
+        public String DESCRIPTION = ModuleFields.DESCRIPTION;
 
         public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
 
