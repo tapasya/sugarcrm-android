@@ -18,11 +18,13 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColum
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Calls;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Cases;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Leads;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LeadsColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Meetings;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -352,6 +354,24 @@ public class SugarCRMProvider extends ContentProvider {
             c = db.query(DatabaseHelper.CASES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
+        case CALL:
+            c = db.query(DatabaseHelper.CALLS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+            break;
+
+        case CALL_ID:
+            selection = SugarCRMContent.RECORD_ID + " = ?";
+            c = db.query(DatabaseHelper.CALLS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
+
+        case MEETING:
+            c = db.query(DatabaseHelper.MEETINGS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+            break;
+
+        case MEETING_ID:
+            selection = SugarCRMContent.RECORD_ID + " = ?";
+            c = db.query(DatabaseHelper.MEETINGS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -625,6 +645,25 @@ public class SugarCRMProvider extends ContentProvider {
                 return accountUri;
             }
             break;
+
+        case CALL:
+            rowId = db.insert(DatabaseHelper.CALLS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri accountUri = ContentUris.withAppendedId(Calls.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(accountUri, null);
+                return accountUri;
+            }
+            break;
+
+        case MEETING:
+            rowId = db.insert(DatabaseHelper.MEETINGS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri accountUri = ContentUris.withAppendedId(Meetings.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(accountUri, null);
+                return accountUri;
+            }
+            break;
+
         default:
             // return uri;
             throw new IllegalArgumentException("Unknown URI " + uri);
@@ -743,6 +782,32 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
 
+        case CALL:
+            count = db.delete(DatabaseHelper.CALLS_TABLE_NAME, where, whereArgs);
+            break;
+
+        case CALL_ID:
+            String callId = uri.getPathSegments().get(1);
+            count = db.delete(DatabaseHelper.CALLS_TABLE_NAME, Calls.ID
+                                            + "="
+                                            + callId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case MEETING:
+            count = db.delete(DatabaseHelper.MEETINGS_TABLE_NAME, where, whereArgs);
+            break;
+
+        case MEETING_ID:
+            String meetingId = uri.getPathSegments().get(1);
+            count = db.delete(DatabaseHelper.MEETINGS_TABLE_NAME, Meetings.ID
+                                            + "="
+                                            + meetingId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -804,6 +869,45 @@ public class SugarCRMProvider extends ContentProvider {
             count = db.update(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, values, Opportunities.ID
                                             + "="
                                             + oppId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case CASE:
+            count = db.update(DatabaseHelper.CASES_TABLE_NAME, values, where, whereArgs);
+            break;
+
+        case CASE_ID:
+            String caseId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.CASES_TABLE_NAME, values, Cases.ID
+                                            + "="
+                                            + caseId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case CALL:
+            count = db.update(DatabaseHelper.CALLS_TABLE_NAME, values, where, whereArgs);
+            break;
+
+        case CALL_ID:
+            String callId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.CALLS_TABLE_NAME, values, Calls.ID
+                                            + "="
+                                            + callId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case MEETING:
+            count = db.update(DatabaseHelper.MEETINGS_TABLE_NAME, values, where, whereArgs);
+            break;
+
+        case MEETING_ID:
+            String meetingId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.MEETINGS_TABLE_NAME, values, Meetings.ID
+                                            + "="
+                                            + meetingId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
