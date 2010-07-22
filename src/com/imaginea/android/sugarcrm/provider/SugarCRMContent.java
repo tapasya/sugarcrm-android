@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.RestUtilConstants;
+import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * Convenience class to identify the selection arguments(projections) and provide a projection map
@@ -29,7 +30,7 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
+        public static final String DEFAULT_SORT_ORDER = NAME + " ASC";
 
         public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, EMAIL1 };
 
@@ -206,6 +207,16 @@ public final class SugarCRMContent {
         public String DELETED = ModuleFields.DELETED;
     }
 
+    public interface AccountsCasesColumns {
+        public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+
+        public String CASE_ID = Util.CASE_ID;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+    }
+
     public interface ContactsOpportunitiesColumns {
         public String CONTACT_ID = ModuleFields.CONTACT_ID;
 
@@ -215,7 +226,18 @@ public final class SugarCRMContent {
 
         public String DELETED = ModuleFields.DELETED;
     }
-    
+
+    public interface ContactsCasesColumns {
+        public String CONTACT_ID = ModuleFields.CONTACT_ID;
+
+        // TODO - not really a todo but a cross check to see
+        public String CASE_ID = Util.CASE_ID;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+    }
+
     public static final class Leads implements LeadsColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
@@ -346,6 +368,46 @@ public final class SugarCRMContent {
         public String DELETED = ModuleFields.DELETED;
 
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+
+    }
+
+    public static final class Cases implements CasesColumns {
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+                                        + "/case");
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = DATE_MODIFIED + " DESC";
+
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, CASE_NUMBER, PRIORITY };
+
+        public static final String[] LIST_VIEW_PROJECTION = { CASE_NUMBER };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, CASE_NUMBER,
+                PRIORITY, ASSIGNED_USER_NAME, STATUS, DATE_ENTERED, DATE_MODIFIED, DELETED };
+
+    }
+
+    public interface CasesColumns {
+        public String ID = RECORD_ID;
+
+        public String BEAN_ID = SUGAR_BEAN_ID;
+
+        public String CASE_NUMBER = ModuleFields.CASE_NUMBER;
+
+        public String PRIORITY = ModuleFields.PRIORITY;
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
+
+        public String STATUS = ModuleFields.STATUS;
+
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
 
     }
 
