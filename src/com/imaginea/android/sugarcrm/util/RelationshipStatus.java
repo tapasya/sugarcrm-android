@@ -13,7 +13,6 @@ public class RelationshipStatus {
 
     private int mDeletedCount;
 
-    
     public RelationshipStatus(int createdCount, int failedCount, int deletedCount) {
         this.mCreatedCount = createdCount;
         this.mFailedCount = failedCount;

@@ -9,7 +9,7 @@ public class SugarCrmApp extends Application {
 
     // easy ref to App instance for classes which do not have access to Activity/Service context
     public static Application app = null;
-    
+
     /*
      * sessionId is obtained after successful login into the Sugar CRM instance Now, sessionId will
      * be available to the entire application Access the sessionId from any part of the application
@@ -26,6 +26,11 @@ public class SugarCrmApp extends Application {
             String userName = pref.getString("USER_NAME", getBaseContext().getString(R.string.defaultUser));
             String password = pref.getString("PASSWORD", getBaseContext().getString(R.string.defaultPwd));
             Log.i("SugarAPP", url + userName + password);
+            try {
+                // mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
+            } catch (Exception e) {
+                Log.e("SugarApp", e.getMessage(), e);
+            }
         }
         return mSessionId;
     }
@@ -35,7 +40,7 @@ public class SugarCrmApp extends Application {
     }
 
     @Override
-    public void onCreate() {        
+    public void onCreate() {
         super.onCreate();
         app = this;
     }

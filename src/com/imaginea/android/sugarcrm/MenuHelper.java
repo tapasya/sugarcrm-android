@@ -18,11 +18,11 @@ public class MenuHelper {
             menuItem = menu.findItem(R.id.search);
             menuItem.setEnabled(true);
             menuItem.setVisible(true);
-            
+
             menuItem = menu.findItem(R.id.addItem);
             menuItem.setEnabled(true);
             menuItem.setVisible(true);
-        } else{
+        } else {
 
         }
 

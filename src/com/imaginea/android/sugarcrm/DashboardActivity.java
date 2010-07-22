@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ public class DashboardActivity extends Activity {
     private List<String> mModuleNames;
 
     private DatabaseHelper mDbHelper = new DatabaseHelper(this);
-    
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,7 @@ public class DashboardActivity extends Activity {
         mModuleNames = mDbHelper.getModuleList();
         mModuleNames.add("Settings");
         Collections.sort(mModuleNames);
-        
+
         setContentView(R.layout.dashboard_activity);
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(R.string.home);
@@ -57,12 +56,12 @@ public class DashboardActivity extends Activity {
                 // invoke the corresponding activity when the item in the GridView is clicked
                 Intent myIntent;
                 String moduleName = mModuleNames.get(position);
-                if(moduleName.equals("Settings")){
+                if (moduleName.equals("Settings")) {
                     myIntent = new Intent(DashboardActivity.this, SugarCrmSettings.class);
-                } else{
+                } else {
                     myIntent = new Intent(DashboardActivity.this, ContactListActivity.class);
                 }
-                
+
                 myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleNames.get(position));
                 DashboardActivity.this.startActivity(myIntent);
             }
@@ -79,7 +78,7 @@ public class DashboardActivity extends Activity {
 
     public class AppsAdapter extends BaseAdapter {
         private Context mContext;
-        
+
         public AppsAdapter(Context context) {
             mContext = context;
         }
@@ -90,7 +89,7 @@ public class DashboardActivity extends Activity {
                 view = LayoutInflater.from(mContext).inflate(R.layout.dashboard_item, parent, false);
 
                 String moduleName = mModuleNames.get(position);
-                
+
                 ImageView iv = (ImageView) view.findViewById(R.id.moduleImage);
                 iv.setImageResource(mDbHelper.getModuleIcon(moduleName));
 
@@ -114,6 +113,6 @@ public class DashboardActivity extends Activity {
         public final long getItemId(int position) {
             return 0;
         }
-        
+
     }
 }

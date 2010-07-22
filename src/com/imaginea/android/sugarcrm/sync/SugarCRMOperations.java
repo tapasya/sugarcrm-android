@@ -5,7 +5,6 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.SugarBean;
@@ -202,13 +201,13 @@ public class SugarCRMOperations {
         // mValues.put(SugarCRMContent.RECORD_ID, mRawId);
         // }
         Uri contentUri = databaseHelper.getModuleUri(mModuleName);
-        String uriPath = databaseHelper.getPathForRelationship(mRelatedModuleName);
-        //Log.v("Ops", "addRelatedInsertOp:" + uriPath);
+        // String uriPath = mRelatedModuleName;
+        // Log.v("Ops", "addRelatedInsertOp:" + uriPath);
         // ;
         // long id = 0;
 
         // ContentUris.withAppendedId(contentUri, mRawId);
-        Uri relatedUri = Uri.withAppendedPath(ContentUris.withAppendedId(contentUri, mRawId), uriPath);
+        Uri relatedUri = Uri.withAppendedPath(ContentUris.withAppendedId(contentUri, mRawId), mRelatedModuleName);
 
         mBuilder = newInsertCpo(relatedUri, mYield);
         mBuilder.withValues(mValues);

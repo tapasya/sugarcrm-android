@@ -22,8 +22,8 @@ public class SugarCrmSettings extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        //TODO fix the settings screen for android 2.0 and above
+
+        // TODO fix the settings screen for android 2.0 and above
         findViewById(android.R.id.list).setBackgroundResource(R.drawable.bg);
         addPreferencesFromResource(R.xml.sugarcrm_settings);
     }

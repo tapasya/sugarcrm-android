@@ -67,7 +67,5 @@ public class SearchResultParser {
     public Map<String, SugarBean[]> getSearchResults() {
         return mSearchResults;
     }
-    
-    
 
 }

@@ -42,15 +42,15 @@ public class Util {
     public static final int URL_USER_AVAILABLE = 2;
 
     public static final int URL_USER_PWD_AVAILABLE = 3;
-    
+
     // View modes : EDIT / NEW
-    
+
     public static final int EDIT_ORPHAN_MODE = 0;
-    
+
     public static final int EDIT_RELATIONSHIP_MODE = 1;
-    
+
     public static final int NEW_ORPHAN_MODE = 2;
-    
+
     public static final int NEW_RELATIONSHIP_MODE = 3;
 
     // constants for settings / Preferences
@@ -69,13 +69,28 @@ public class Util {
     public static final String COMMAND = "cmd";
 
     private static int mRequestId = 0;
-    
+
     public static final String ROW_ID = "row_id";
-    
+
     public static final String DELETED_ITEM = "1";
-    
-    public static final String CASE_ID =     "case_id";
-    
+
+    public static final String CASE_ID = "case_id";
+
+    // module names
+    public static final String ACCOUNTS = "Accounts";
+
+    public static final String CONTACTS = "Contacts";
+
+    public static final String LEADS = "Leads";
+
+    public static final String OPPORTUNITIES = "Opportunities";
+
+    public static final String MEETINGS = "Meetings";
+
+    public static final String CALLS = "Calls";
+
+    public static final String CASES = "Cases";
+
     private static final String LOG_TAG = Util.class.getSimpleName();
 
     // calculate the MD5 hash of a string

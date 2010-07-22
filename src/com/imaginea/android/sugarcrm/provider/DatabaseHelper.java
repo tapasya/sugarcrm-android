@@ -32,6 +32,7 @@ import com.imaginea.android.sugarcrm.util.LinkField;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
+import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ACCOUNTS_CONTACTS_TABLE_NAME = "accounts_contacts";
 
     public static final String ACCOUNTS_OPPORTUNITIES_TABLE_NAME = "accounts_opportunities";
-    
+
     public static final String ACCOUNTS_CASES_TABLE_NAME = "accounts_cases";
 
     public static final String CONTACTS_OPPORTUNITIES_TABLE_NAME = "contacts_opportunities";
@@ -83,7 +84,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
-    private String[] defaultSupportedModules = { "Accounts", "Contacts", "Leads", "Opportunities" };
+    private String[] defaultSupportedModules = { Util.ACCOUNTS, Util.CONTACTS, Util.LEADS,
+            Util.OPPORTUNITIES };
 
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
 
@@ -106,63 +108,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final HashMap<String, String> linkfieldNames = new HashMap<String, String>();
 
-    private static final HashMap<String, String> pathForRelationship = new HashMap<String, String>();
-
-    private static final HashMap<String, String> relationshipForPath = new HashMap<String, String>();
-
     private static List<String> billingAddressGroup = new ArrayList<String>();
 
     private static List<String> shippingAddressGroup = new ArrayList<String>();
 
     static {
 
-        moduleIcons.put("Accounts", R.drawable.account);
-        moduleIcons.put("Contacts", R.drawable.contacts);
-        moduleIcons.put("Leads", R.drawable.leads);
-        moduleIcons.put("Opportunities", R.drawable.opportunity);
+        moduleIcons.put(Util.ACCOUNTS, R.drawable.account);
+        moduleIcons.put(Util.CONTACTS, R.drawable.contacts);
+        moduleIcons.put(Util.LEADS, R.drawable.leads);
+        moduleIcons.put(Util.OPPORTUNITIES, R.drawable.opportunity);
         moduleIcons.put("Settings", R.drawable.settings);
 
-        moduleProjections.put("Accounts", Accounts.DETAILS_PROJECTION);
-        moduleProjections.put("Contacts", Contacts.DETAILS_PROJECTION);
-        moduleProjections.put("Leads", Leads.DETAILS_PROJECTION);
-        moduleProjections.put("Opportunities", Opportunities.DETAILS_PROJECTION);
+        moduleProjections.put(Util.ACCOUNTS, Accounts.DETAILS_PROJECTION);
+        moduleProjections.put(Util.CONTACTS, Contacts.DETAILS_PROJECTION);
+        moduleProjections.put(Util.LEADS, Leads.DETAILS_PROJECTION);
+        moduleProjections.put(Util.OPPORTUNITIES, Opportunities.DETAILS_PROJECTION);
         // moduleProjections.put(4, Meetings.DETAILS_PROJECTION );
 
-        moduleListSelections.put("Accounts", Accounts.LIST_VIEW_PROJECTION);
-        moduleListSelections.put("Contacts", Contacts.LIST_VIEW_PROJECTION);
-        moduleListSelections.put("Leads", Leads.LIST_VIEW_PROJECTION);
-        moduleListSelections.put("Opportunities", Opportunities.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.CONTACTS, Contacts.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.LEADS, Leads.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.OPPORTUNITIES, Opportunities.LIST_VIEW_PROJECTION);
 
-        moduleSortOrder.put("Accounts", Accounts.DEFAULT_SORT_ORDER);
-        moduleSortOrder.put("Contacts", Contacts.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.CONTACTS, Contacts.DEFAULT_SORT_ORDER);
 
-        moduleUris.put("Accounts", Accounts.CONTENT_URI);
-        moduleUris.put("Contacts", Contacts.CONTENT_URI);
-        moduleUris.put("Leads", Leads.CONTENT_URI);
-        moduleUris.put("Opportunities", Opportunities.CONTENT_URI);
-        moduleUris.put("Cases", Opportunities.CONTENT_URI);
+        moduleUris.put(Util.ACCOUNTS, Accounts.CONTENT_URI);
+        moduleUris.put(Util.CONTACTS, Contacts.CONTENT_URI);
+        moduleUris.put(Util.LEADS, Leads.CONTENT_URI);
+        moduleUris.put(Util.OPPORTUNITIES, Opportunities.CONTENT_URI);
+        moduleUris.put(Util.CASES, Opportunities.CONTENT_URI);
 
         // TODO - complete this list
-        // moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Leads",
-        // "Opportunities" });
-        moduleRelationshipItems.put("Accounts", new String[] { "Contacts", "Opportunities", "Cases" });
-        moduleRelationshipItems.put("Contacts", new String[] { "Leads", "Opportunities" });
-        moduleRelationshipItems.put("Leads", new String[] { "Opportunities", "Contacts" });
-        moduleRelationshipItems.put("Opportunities", new String[] { "Leads", "Contacts" });
-        moduleRelationshipItems.put("Cases", new String[] { "Contacts" });
+        // moduleRelationshipItems.put(Util.ACCOUNTS_MODULE, new String[] { Util.CONTACTS_MODULE,
+        // Util.LEADS_MODULE,
+        // Util.OPPORTUNITIES_MODULE });
+        moduleRelationshipItems.put(Util.ACCOUNTS, new String[] { Util.CONTACTS,
+                Util.OPPORTUNITIES, Util.CASES });
+        moduleRelationshipItems.put(Util.CONTACTS, new String[] { Util.LEADS, Util.OPPORTUNITIES });
+        moduleRelationshipItems.put(Util.LEADS, new String[] { Util.OPPORTUNITIES, Util.CONTACTS });
+        moduleRelationshipItems.put(Util.OPPORTUNITIES, new String[] { Util.LEADS, Util.CONTACTS });
+        moduleRelationshipItems.put(Util.CASES, new String[] { Util.CONTACTS });
 
-        pathForRelationship.put("Contacts", "contact");
-        pathForRelationship.put("Leads", "lead");
-        pathForRelationship.put("Opportunities", "opportunity");
-
-        relationshipForPath.put("account", "Accounts");
-        relationshipForPath.put("contact", "Contacts");
-        relationshipForPath.put("lead", "Leads");
-        relationshipForPath.put("opportunity", "Opportunities");
-
-        linkfieldNames.put("Contacts", "contacts");
-        linkfieldNames.put("Leads", "leads");
-        linkfieldNames.put("Opportunities", "opportunities");
+        linkfieldNames.put(Util.CONTACTS, "contacts");
+        linkfieldNames.put(Util.LEADS, "leads");
+        linkfieldNames.put(Util.OPPORTUNITIES, "opportunities");
 
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET);
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_2);
@@ -244,7 +235,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropAccountsContactsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CONTACTS_TABLE_NAME);
     }
-    
+
     void dropAccountsCasesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNTS_CASES_TABLE_NAME);
     }
@@ -462,11 +453,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsCasesColumns.ACCOUNT_ID + " INTEGER ,"
                                         + AccountsCasesColumns.CASE_ID + " INTEGER ,"
                                         + AccountsCasesColumns.DATE_MODIFIED + " TEXT,"
-                                        + AccountsCasesColumns.DELETED + " INTEGER,"
-                                        + " UNIQUE(" + AccountsCasesColumns.ACCOUNT_ID + ","
+                                        + AccountsCasesColumns.DELETED + " INTEGER," + " UNIQUE("
+                                        + AccountsCasesColumns.ACCOUNT_ID + ","
                                         + AccountsCasesColumns.CASE_ID + ")" + ");");
     }
-    
+
     private static void createContactsOpportunitiesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + CONTACTS_OPPORTUNITIES_TABLE_NAME + " ("
@@ -507,17 +498,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getModuleSelection(String moduleName, String searchString) {
-        if (moduleName.equals("Accounts")) {
+        if (moduleName.equals(Util.ACCOUNTS)) {
             return AccountsColumns.NAME + " LIKE '%" + searchString + "%'";
-        } else if (moduleName.equals("Contacts")) {
+        } else if (moduleName.equals(Util.CONTACTS)) {
             return "(" + ContactsColumns.FIRST_NAME + " LIKE '%" + searchString + "%' OR "
                                             + ContactsColumns.LAST_NAME + " LIKE '%" + searchString
                                             + "%'" + ")";
-        } else if (moduleName.equals("Leads")) {
+        } else if (moduleName.equals(Util.LEADS)) {
             return "(" + LeadsColumns.FIRST_NAME + " LIKE '%" + searchString + "%' OR "
                                             + LeadsColumns.LAST_NAME + " LIKE '%" + searchString
                                             + "%'" + ")";
-        } else if (moduleName.equals("Opportunities")) {
+        } else if (moduleName.equals(Util.OPPORTUNITIES)) {
             return OpportunitiesColumns.NAME + " LIKE '%" + searchString + "%'";
         }
         // TODO: similarly for other modules
@@ -526,10 +517,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String[] getModuleRelationshipItems(String moduleName) {
         return moduleRelationshipItems.get(moduleName);
-    }
-
-    public String getPathForRelationship(String moduleName) {
-        return pathForRelationship.get(moduleName);
     }
 
     public List<String> getModuleList() {
@@ -563,10 +550,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getLinkfieldName(String moduleName) {
         return linkfieldNames.get(moduleName);
-    }
-
-    public String getRelationshipForPath(String path) {
-        return relationshipForPath.get(path);
     }
 
     public String[] getSupportedModulesList() {

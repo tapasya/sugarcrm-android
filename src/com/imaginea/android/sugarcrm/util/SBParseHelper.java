@@ -27,7 +27,7 @@ public class SBParseHelper {
                 fields.put(key, val);
             }
             return fields;
-            
+
         } catch (JSONException e) {
             /*
              * when the select_fields is empty while making the rest call, the default response will

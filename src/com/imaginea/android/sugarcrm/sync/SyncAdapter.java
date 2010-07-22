@@ -23,7 +23,6 @@ import com.imaginea.android.sugarcrm.util.Util;
 import org.apache.http.ParseException;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -95,7 +94,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.i(LOG_TAG, "Syncing Module:" + moduleName);
                 SugarSyncManager.syncModulesData(mContext, account.name, sessionId, moduleName);
             }
-            
+
             databaseHelper.close();
 
             // update the last synced date.

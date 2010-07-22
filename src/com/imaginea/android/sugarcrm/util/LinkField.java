@@ -1,19 +1,18 @@
 package com.imaginea.android.sugarcrm.util;
 
 public class LinkField {
-    
+
     private String mName;
-    
+
     private String mType;
-    
+
     private String mRelationship;
-    
+
     private String mModule;
-    
+
     private String mBeanName;
 
-    public LinkField(String name, String type, String relationship, String module,
-                                    String beanName) {
+    public LinkField(String name, String type, String relationship, String module, String beanName) {
         super();
         this.mName = name;
         this.mType = type;
@@ -61,5 +60,5 @@ public class LinkField {
     public void setmBeanName(String mBeanName) {
         this.mBeanName = mBeanName;
     }
-    
+
 }

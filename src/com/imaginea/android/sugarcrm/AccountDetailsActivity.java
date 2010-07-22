@@ -106,7 +106,7 @@ public class AccountDetailsActivity extends Activity {
         if (mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
         Uri uri = Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId);
-        uri = Uri.withAppendedPath(uri, mDbHelper.getPathForRelationship(moduleName));
+        uri = Uri.withAppendedPath(uri, moduleName);
         detailIntent.setData(uri);
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, moduleName);
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, mSugarBeanId);

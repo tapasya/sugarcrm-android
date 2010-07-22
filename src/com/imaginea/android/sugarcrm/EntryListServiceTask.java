@@ -60,7 +60,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
         if (count == 3) {
             mOffset = mUri.getPathSegments().get(1);
         }
-        mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);        
+        mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
         mSelectFields = extras.getStringArray(Util.PROJECTION);
         mOrderBy = extras.getString(Util.SORT_ORDER);
     }
@@ -68,9 +68,9 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
     @Override
     protected Object doInBackground(Object... params) {
         try {
-            
-            if (mSessionId == null) {                             
-                mSessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();               
+
+            if (mSessionId == null) {
+                mSessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();
             }
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
             // TODO use a constant and remove this as we start from the login screen

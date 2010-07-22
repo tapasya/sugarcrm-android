@@ -30,7 +30,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     private String mSessionId;
 
     private String mModuleName;
-    
+
     private String mParentModuleName;
 
     private Map<String, String> mUpdateNameValueMap;
@@ -38,7 +38,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     private String mBeanId;
 
     private Uri mUri;
-    
+
     private String mLinkFieldName;
 
     /*
@@ -53,30 +53,32 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     public UpdateServiceTask(Context context, Intent intent) {
         super(context);
         mContext = context;
-        
+
         Bundle extras = intent.getExtras();
         mUri = intent.getData();
         mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
-        if (Log.isLoggable(LOG_TAG, Log.DEBUG)){
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             Log.d(LOG_TAG, "size : " + mUri.getPathSegments().size());
         }
-        
+
         if (mUri.getPathSegments().size() == 3) {
             DatabaseHelper dbHelper = new DatabaseHelper(context);
-            mParentModuleName = dbHelper.getRelationshipForPath(mUri.getPathSegments().get(0));
-            mLinkFieldName = dbHelper.getLinkfieldName(dbHelper.getRelationshipForPath(mUri.getPathSegments().get(2)));
-            if (Log.isLoggable(LOG_TAG, Log.DEBUG)){
-                Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : " + mLinkFieldName);
+            mParentModuleName = mUri.getPathSegments().get(0);
+            mLinkFieldName = dbHelper.getLinkfieldName(mUri.getPathSegments().get(2));
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : "
+                                                + mLinkFieldName);
             }
         }
         mBeanId = extras.getString(RestUtilConstants.BEAN_ID);
         mUpdateNameValueMap = (Map<String, String>) extras.getSerializable(RestUtilConstants.NAME_VALUE_LIST);
         mCommand = extras.getInt(Util.COMMAND);
-        
-        /*Log.d(LOG_TAG, "mUri - " + mUri);
-        Log.d(LOG_TAG, "mParentModuleName - " + mParentModuleName);
-        Log.d(LOG_TAG, "mModuleName - " + mModuleName);
-        Log.d(LOG_TAG, "mBeanId - " + mBeanId);*/
+
+        /*
+         * Log.d(LOG_TAG, "mUri - " + mUri); Log.d(LOG_TAG, "mParentModuleName - " +
+         * mParentModuleName); Log.d(LOG_TAG, "mModuleName - " + mModuleName); Log.d(LOG_TAG,
+         * "mBeanId - " + mBeanId);
+         */
     }
 
     @Override
@@ -94,48 +96,48 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
             int updatedRows = 0;
             boolean serverUpdated = false;
             if (Util.isNetworkOn(mContext)) {
-                if (Log.isLoggable(LOG_TAG, Log.INFO)){
+                if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                     Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
                 }
-                if(mLinkFieldName != null){
+                if (mLinkFieldName != null) {
                     updatedBeanId = RestUtil.setEntry(url, mSessionId, mModuleName, mUpdateNameValueMap);
                     RelationshipStatus status = RestUtil.setRelationship(url, mSessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), 0);
-                    if (Log.isLoggable(LOG_TAG, Log.INFO)){
+                    if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                         Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
-                                                    + status.getFailedCount() + " deleted: "
-                                                    + status.getDeletedCount());
+                                                        + status.getFailedCount() + " deleted: "
+                                                        + status.getDeletedCount());
                     }
-                    
+
                     if (status.getCreatedCount() >= 1) {
-                        if (Log.isLoggable(LOG_TAG, Log.INFO)){
+                        if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                             Log.i(LOG_TAG, "Relationship is also set!");
                         }
                     } else {
-                        if (Log.isLoggable(LOG_TAG, Log.INFO)){
+                        if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                             Log.i(LOG_TAG, "setRelationship failed!");
                         }
                     }
-                } else{
+                } else {
                     // bean Id has to be put in the nameValuelist
                     mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
                     updatedBeanId = RestUtil.setEntry(url, mSessionId, mModuleName, mUpdateNameValueMap);
                     if (mBeanId.equals(updatedBeanId)) {
-                        if (Log.isLoggable(LOG_TAG, Log.VERBOSE)){
+                        if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
                             Log.v(LOG_TAG, "updated server successful");
                         }
                         serverUpdated = true;
-                    } else{
+                    } else {
                         serverUpdated = false;
                     }
-                    //TODO: If the update fails when the network is ON, display the message
+                    // TODO: If the update fails when the network is ON, display the message
                 }
             }
 
-            if(mCommand == R.id.insert){
+            if (mCommand == R.id.insert) {
                 for (String key : mUpdateNameValueMap.keySet()) {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
-                //add updatedBeanId to the values map
+                // add updatedBeanId to the values map
                 values.put(SugarCRMContent.SUGAR_BEAN_ID, updatedBeanId);
                 Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
                 Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
@@ -145,11 +147,10 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                         values.put(key, mUpdateNameValueMap.get(key));
                     }
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
-                }
-                else if (mCommand == R.id.delete) {
+                } else if (mCommand == R.id.delete) {
                     updatedRows = mContext.getContentResolver().delete(mUri, null, null);
                 }
-                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)){
+                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
                     // pass the success/failure msg to activity
                     if (updatedRows > 0) {
                         Log.v(LOG_TAG, "update successful");

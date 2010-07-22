@@ -74,7 +74,7 @@ public class WizardActivity extends Activity {
     private ProgressDialog progressDialog;
 
     private TextView mHeaderTextView;
-    
+
     private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
 
     @Override
@@ -394,7 +394,7 @@ public class WizardActivity extends Activity {
                 for (String moduleName : userModules) {
                     String[] fields = {};
                     try {
-                        //TODO: check if the module is already there in the db. make the rest call
+                        // TODO: check if the module is already there in the db. make the rest call
                         // only if it isn't
                         Module module = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
                         moduleFieldsInfo.add(module);

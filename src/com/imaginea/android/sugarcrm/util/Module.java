@@ -5,13 +5,13 @@ import java.util.List;
 public class Module {
 
     private String mModuleName;
-    
+
     private List<ModuleField> mModuleFields;
-    
+
     private List<LinkField> mLinkFields;
-    
-    public Module(){
-        
+
+    public Module() {
+
     }
 
     public Module(String moduleName, List<ModuleField> moduleFields, List<LinkField> linkFields) {
@@ -40,6 +40,5 @@ public class Module {
     public String getModuleName() {
         return mModuleName;
     }
-    
 
 }

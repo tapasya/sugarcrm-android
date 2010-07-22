@@ -44,7 +44,7 @@ public class ContactListActivity extends ListActivity {
     private TextView mListFooterText;
 
     private View mListFooterProgress;
-    
+
     private Menu mMenu;
 
     private boolean mBusy = false;
@@ -54,14 +54,14 @@ public class ContactListActivity extends ListActivity {
     private Uri mModuleUri;
 
     private boolean mStopLoading = false;
-    
+
     private Uri mIntentUri;
 
     // we don't make this final as we may want to use the sugarCRM value dynamically
     public static int mMaxResults = 20;
 
     public final static String LOG_TAG = "ContactListActivity";
-    
+
     private DatabaseHelper mDbHelper;
 
     @Override
@@ -71,7 +71,7 @@ public class ContactListActivity extends ListActivity {
         setContentView(R.layout.common_list);
 
         mDbHelper = new DatabaseHelper(getBaseContext());
-        
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         mModuleName = "Contacts";
@@ -83,7 +83,7 @@ public class ContactListActivity extends ListActivity {
         tv.setText(mModuleName);
 
         mListView = getListView();
-        
+
         mIntentUri = intent.getData();
         // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,7 +105,7 @@ public class ContactListActivity extends ListActivity {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "Instance count:" + getInstanceCount());
         Log.d(LOG_TAG, "ModuleName" + mModuleName);
-        
+
         mModuleUri = mDbHelper.getModuleUri(mModuleName);
         if (intent.getData() == null) {
             intent.setData(mModuleUri);
@@ -113,11 +113,11 @@ public class ContactListActivity extends ListActivity {
         // TODO - optimize this, if we sync up a dataset, then no need to run detail projectio
         // nhere, just do a list projection
         Cursor cursor;
-        // if the parentModuleName is not null, then it is the list of relationship beans 
+        // if the parentModuleName is not null, then it is the list of relationship beans
         String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
-        
+
         cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
-        
+
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
         GenericCursorAdapter adapter;
@@ -130,19 +130,18 @@ public class ContactListActivity extends ListActivity {
         setListAdapter(adapter);
 
         TextView tv1 = (TextView) (mEmpty.findViewById(R.id.mainText));
-        
-        if (adapter.getCount() == 0){
+
+        if (adapter.getCount() == 0) {
             mListView.setVisibility(View.GONE);
             mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
             tv1.setVisibility(View.VISIBLE);
-            if(mIntentUri != null){
+            if (mIntentUri != null) {
                 tv1.setText("No " + mModuleName + " found");
             }
-        } else{
+        } else {
             mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
             tv1.setVisibility(View.GONE);
         }
-        
 
         mListFooterView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_footer, mListView, false);
         getListView().addFooterView(mListFooterView);
@@ -241,13 +240,13 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-                
+
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
-        if(mIntentUri != null)
+        if (mIntentUri != null)
             detailIntent.setData(mIntentUri);
-        
+
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
         startActivity(detailIntent);
@@ -267,10 +266,10 @@ public class ContactListActivity extends ListActivity {
         // TODO
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
-        
-        if(mDbHelper == null)
+
+        if (mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
-        
+
         mModuleUri = mDbHelper.getModuleUri(mModuleName);
         Uri deleteUri = Uri.withAppendedPath(mModuleUri, cursor.getString(0));
         getContentResolver().registerContentObserver(deleteUri, false, new DeleteContentObserver(new Handler()));
@@ -304,19 +303,19 @@ public class ContactListActivity extends ListActivity {
     protected void onPause() {
         super.onPause();
     }
-    
+
     @Override
     public boolean onSearchRequested() {
-         Bundle appData = new Bundle();
-         String[] modules = {mModuleName};
-         appData.putString(RestUtilConstants.MODULE_NAME, mModuleName);
-         appData.putStringArray(RestUtilConstants.MODULES, modules);
-         appData.putInt(RestUtilConstants.OFFSET, 0);
-         appData.putInt(RestUtilConstants.MAX_RESULTS, 20);
-         
-         startSearch(null, false, appData, false);
-         return true;
-     }
+        Bundle appData = new Bundle();
+        String[] modules = { mModuleName };
+        appData.putString(RestUtilConstants.MODULE_NAME, mModuleName);
+        appData.putStringArray(RestUtilConstants.MODULES, modules);
+        appData.putInt(RestUtilConstants.OFFSET, 0);
+        appData.putInt(RestUtilConstants.MAX_RESULTS, 20);
+
+        startSearch(null, false, appData, false);
+        return true;
+    }
 
     // We can stop loading once we do not get the
     // if (sBeans.length < mMaxResults)
@@ -354,14 +353,13 @@ public class ContactListActivity extends ListActivity {
     //
     // }
     // }
-    
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuHelper.onPrepareOptionsMenu(this, menu, mModuleName);
         return super.onPrepareOptionsMenu(menu);
     }
 
-    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Hold on to this
@@ -387,11 +385,12 @@ public class ContactListActivity extends ListActivity {
         case R.id.addItem:
             myIntent = new Intent(ContactListActivity.this, EditDetailsActivity.class);
             myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
-            if(mIntentUri != null)
+            if (mIntentUri != null)
                 myIntent.setData(mIntentUri);
-            //myIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME, DatabaseHelper.getRelationshipName(mModuleName));
+            // myIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME,
+            // DatabaseHelper.getRelationshipName(mModuleName));
             ContactListActivity.this.startActivity(myIntent);
-            
+
             return true;
         }
         return false;
@@ -412,11 +411,11 @@ public class ContactListActivity extends ListActivity {
 
         menu.add(2, R.string.edit, 3, R.string.edit);
         menu.add(3, R.string.delete, 4, R.string.delete);
-        
-        if(mDbHelper == null)
+
+        if (mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
-        
-        //TODO
+
+        // TODO
         if (mDbHelper.getModuleField(mModuleName, ModuleFields.PHONE_WORK) != null)
             menu.add(4, R.string.call, 4, R.string.call);
         if (mDbHelper.getModuleField(mModuleName, ModuleFields.EMAIL1) != null)
@@ -470,11 +469,11 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-       
+
         int index = cursor.getColumnIndex(ModuleFields.PHONE_WORK);
         String number = cursor.getString(index);
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
-        Log.d(LOG_TAG, "Work number to call:" + number);
+            Log.d(LOG_TAG, "Work number to call:" + number);
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
         startActivity(intent);
     }
@@ -485,7 +484,7 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        // emailAddress        
+        // emailAddress
         int index = cursor.getColumnIndex(ModuleFields.EMAIL1);
         String emailAddress = cursor.getString(index);
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))

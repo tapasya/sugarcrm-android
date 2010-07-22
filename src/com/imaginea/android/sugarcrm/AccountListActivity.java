@@ -55,7 +55,7 @@ public class AccountListActivity extends ListActivity {
     private int mCurrentOffset = 0;
 
     private String[] mSelectFields = { ModuleFields.NAME, ModuleFields.EMAIL1 };
-    
+
     private HashMap<String, List<String>> mLinkNameToFieldsArray = new HashMap<String, List<String>>();
 
     // we don't make this final as we may want to use the sugarCRM value dynamically
@@ -66,15 +66,15 @@ public class AccountListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
-        
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         String moduleName = "Contacts";
         if (extras != null)
             moduleName = extras.getString(RestUtilConstants.MODULE_NAME);
-        
+
         TextView tv = (TextView) findViewById(R.id.headerText);
-        tv.setText(RestUtilConstants.ACCOUNTS_MODULE);
+        tv.setText(Util.ACCOUNTS);
         mStatus = (TextView) findViewById(R.id.status);
         // mStatus.setText("Idle");
 
@@ -193,7 +193,9 @@ public class AccountListActivity extends ListActivity {
 
                 int deleted = 0;
 
-                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, RestUtilConstants.ACCOUNTS_MODULE, query, orderBy, offset+"", mSelectFields, mLinkNameToFieldsArray, mMaxResults+"", deleted+"");
+                SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, Util.ACCOUNTS, query, orderBy, offset
+                                                + "", mSelectFields, mLinkNameToFieldsArray, mMaxResults
+                                                + "", deleted + "");
                 mAdapter.setSugarBeanArray(sBeans);
                 // We can stop loading once we do not get the
                 if (sBeans.length < mMaxResults)

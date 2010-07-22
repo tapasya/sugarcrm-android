@@ -42,7 +42,7 @@ public class EditDetailsActivity extends Activity {
     private String[] mSelectFields;
 
     private Uri mIntentUri;
-    
+
     private DatabaseHelper mDbHelper;
 
     /** Called when the activity is first created. */
@@ -54,8 +54,8 @@ public class EditDetailsActivity extends Activity {
         setContentView(R.layout.account_details);
         findViewById(R.id.save).setVisibility(View.VISIBLE);
 
-        mDbHelper = new DatabaseHelper(this); 
-            
+        mDbHelper = new DatabaseHelper(this);
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
 
@@ -102,9 +102,9 @@ public class EditDetailsActivity extends Activity {
 
         String[] detailsProjection = mSelectFields;
 
-        if(mDbHelper == null)
+        if (mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
-        
+
         TextView tv = (TextView) findViewById(R.id.headerText);
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
             tv.setText(String.format(getString(R.string.editDetailsHeader), mModuleName));
@@ -120,9 +120,9 @@ public class EditDetailsActivity extends Activity {
         }
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        
+
         Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
-        
+
         for (int i = 2; i < detailsProjection.length - 2; i++) {
             String fieldName = detailsProjection[i];
 
