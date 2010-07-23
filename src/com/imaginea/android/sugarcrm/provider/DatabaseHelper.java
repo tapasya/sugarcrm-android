@@ -535,7 +535,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsCasesColumns.CASE_ID + ")" + ");");
     }
 
-    public static String[] getModuleProjections(String moduleName) {
+    public String[] getModuleProjections(String moduleName) {
         return moduleProjections.get(moduleName);
     }
 
