@@ -3,6 +3,9 @@ package com.imaginea.android.sugarcrm.restapi;
 import java.util.List;
 
 import junit.framework.TestCase;
+
+import org.json.JSONObject;
+
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
