@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 import com.imaginea.android.sugarcrm.util.RestUtil;
-import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
 
 /**
@@ -30,19 +29,9 @@ public class ContactDetailsActivity extends Activity {
 
     private String mContactId;
 
-    private SugarBean mSugarBean;
-
     private String mSessionId;
 
     private Cursor mCursor;
-
-    private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
-            ModuleFields.ACCOUNT_NAME, ModuleFields.PHONE_MOBILE, ModuleFields.PHONE_WORK,
-            ModuleFields.EMAIL1 };
-
-    private String[] mLinkNameToFieldsArray = new String[] {};
-
-    private String mAccountName;
 
     private String mPhoneMobile;
 
@@ -62,7 +51,7 @@ public class ContactDetailsActivity extends Activity {
 
     private TextView mNameTextView;
 
-    private ContactDetailsTask mTask;
+    //private ContactDetailsTask mTask;
 
     private static final String LOG_TAG = ContactDetailsActivity.class.getSimpleName();
 
@@ -136,7 +125,6 @@ public class ContactDetailsActivity extends Activity {
         protected Object doInBackground(Object... params) {
             try {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                // TODO use a constant and remove this as we start from the login screen
                 String url = pref.getString("URL", getString(R.string.defaultUrl));
                 String userName = pref.getString("USER_NAME", getString(R.string.defaultUser));
                 String password = pref.getString("PASSWORD", getString(R.string.defaultPwd));

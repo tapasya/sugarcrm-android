@@ -118,7 +118,6 @@ public class AccountListActivity extends ListActivity {
             return;
         }
         // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
-        // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
         startActivity(detailIntent);
@@ -171,8 +170,6 @@ public class AccountListActivity extends ListActivity {
         protected Object doInBackground(Object... params) {
             try {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                // TODO use a constant and remove this as we start from the login screen
-
                 String url = pref.getString("URL", getString(R.string.defaultUrl));
                 String userName = pref.getString("USER_NAME", getString(R.string.defaultUser));
                 String password = pref.getString("PASSWORD", getString(R.string.defaultPwd));
@@ -183,7 +180,6 @@ public class AccountListActivity extends ListActivity {
                     mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
                 }
 
-                String[] fields = new String[] {};
                 // RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
                 String query = "", orderBy = ModuleFields.NAME;
 
