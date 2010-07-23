@@ -81,6 +81,8 @@ public class ContactListActivity extends ListActivity {
 
     private int mSortColumnIndex;
 
+    private int MODE = Util.LIST_MODE;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -383,7 +385,10 @@ public class ContactListActivity extends ListActivity {
         mModuleFieldsChoice = new String[moduleFields.length];
         for (int i = 0; i < moduleFields.length; i++) {
             // add the module field label to be displayed in the choice menu
-            mModuleFieldsChoice[i] = map.get(moduleFields[i]).getName();
+            mModuleFieldsChoice[i] = map.get(moduleFields[i]).getLabel();
+            if (mModuleFieldsChoice[i].indexOf(":") > 0) {
+                mModuleFieldsChoice[i] = mModuleFieldsChoice[i].substring(0, mModuleFieldsChoice[i].length() - 1);
+            }
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -467,7 +472,7 @@ public class ContactListActivity extends ListActivity {
                 }
             });
             return builder.create();
-          
+
         case R.string.delete:
 
             return new AlertDialog.Builder(ContactListActivity.this).setTitle(id).setMessage(R.string.deleteAlert).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -555,7 +560,23 @@ public class ContactListActivity extends ListActivity {
     }
 
     private void sortList(String sortOrder) {
-        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, sortOrder);
+        String selection = null;
+        if (MODE == Util.ASSIGNED_ITEMS_MODE) {
+            // TODO: get the user name from Account Manager
+            String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
+            selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
+        }
+        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), selection, null, sortOrder);
+        mAdapter.changeCursor(cursor);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void showAssignedItems(View view) {
+        MODE = Util.ASSIGNED_ITEMS_MODE;
+        // TODO: get the user name from Account Manager
+        String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
+        String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
+        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), selection, null, mDbHelper.getModuleSortOrder(mModuleName));
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
