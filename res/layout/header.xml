@@ -3,7 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-     android:background="@drawable/header">
+    android:background="@drawable/header">
        <TextView
 		android:id="@+id/headerText"
 		android:layout_width="wrap_content"
