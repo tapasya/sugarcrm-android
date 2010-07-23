@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -39,12 +40,14 @@ import java.util.Set;
  */
 public class SugarSyncManager {
 
+    public static int mTotalRecords;
+    
     private static DatabaseHelper databaseHelper;
 
     // TODO - change the BEAN_ID into sugarContetn
-    static String mSelection = Contacts.BEAN_ID + "=?";
+    private static String mSelection = Contacts.BEAN_ID + "=?";
 
-    static String mBeanIdField = Contacts.BEAN_ID;
+    private static String mBeanIdField = Contacts.BEAN_ID;
 
     private static String mQuery = "";// new String[] {};
 
@@ -73,7 +76,7 @@ public class SugarSyncManager {
      *            The name of the module to sync
      */
     public static synchronized void syncModulesData(Context context, String account,
-                                    String sessionId, String moduleName) throws SugarCrmException {
+                                    String sessionId, String moduleName, SyncResult syncResult) throws SugarCrmException {
         long userId;
         long rawId = 0;
         final ContentResolver resolver = context.getContentResolver();
