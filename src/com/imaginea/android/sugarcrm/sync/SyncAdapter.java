@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.imaginea.android.sugarcrm.ContactListActivity;
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.SugarCrmApp;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -82,9 +83,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             }
             DatabaseHelper databaseHelper = new DatabaseHelper(mContext);
             List<String> moduleList = databaseHelper.getUserModules();
+            databaseHelper.close();
+            
             // TODO - this should have been taken care during the first login
             if (moduleList == null)
                 moduleList = RestUtil.getAvailableModules(url, sessionId);
+            
             // TODO run this list through our local DB and see if any changes have happened and sync
             // those modules and module fields
             SugarSyncManager.syncModules(mContext, account.name, sessionId);
@@ -92,13 +96,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Collections.sort(moduleList);
             for (String moduleName : moduleList) {
                 Log.i(LOG_TAG, "Syncing Module:" + moduleName);
-                SugarSyncManager.syncModulesData(mContext, account.name, sessionId, moduleName);
+
+                // TODO - should be catch SugarCRMException and allow processing other modules and
+                // fail completely
+                SugarSyncManager.syncModulesData(mContext, account.name, sessionId, moduleName, syncResult);
             }
 
-            databaseHelper.close();
+           
 
             // update the last synced date.
             mLastUpdated = new Date();
+            // do not use  sync result status to notify, notify module specific comprehensive stats
+            mContext.getApplicationContext();
+            String msg = mContext.getString(R.string.syncMessage);
+            Util.notify(mContext, mContext.getApplicationContext().getPackageName(), ContactListActivity.class, R.string.syncSuccess, R.string.syncSuccess, String.format(msg, SugarSyncManager.mTotalRecords));
 
         } catch (final ParseException e) {
             syncResult.stats.numParseExceptions++;
