@@ -64,6 +64,8 @@ public class ContactListActivity extends ListActivity {
 
     private Uri mIntentUri;
 
+    private int mCurrentSelection;
+
     // we don't make this final as we may want to use the sugarCRM value dynamically
     public static int mMaxResults = 20;
 
@@ -271,11 +273,9 @@ public class ContactListActivity extends ListActivity {
 
     /**
      * deletes an item
-     * 
-     * @param position
      */
-    void deleteItem(int position) {
-        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+    void deleteItem() {
+        Cursor cursor = (Cursor) getListAdapter().getItem(mCurrentSelection);
         if (cursor == null) {
             // For some reason the requested item isn't available, do nothing
             return;
@@ -467,7 +467,22 @@ public class ContactListActivity extends ListActivity {
                 }
             });
             return builder.create();
+          
+        case R.string.delete:
+
+            return new AlertDialog.Builder(ContactListActivity.this).setTitle(id).setMessage(R.string.deleteAlert).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    deleteItem();
+
+                }
+            }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                }
+            }).create();
         }
+
         return null;
     }
 
@@ -522,7 +537,8 @@ public class ContactListActivity extends ListActivity {
             return true;
 
         case R.string.delete:
-            deleteItem(position);
+            mCurrentSelection = position;
+            showDialog(R.string.delete);
             return true;
 
         case R.string.call:
