@@ -29,9 +29,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
     // TODO - remove this
     private String mSessionId;
 
-    private String mModuleName;
-
-    private String[] fields = new String[] {};
+    private String mModuleName;    
 
     private String[] mSelectFields;
 
@@ -40,8 +38,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
     private String mMaxResults = "0";
 
     private Uri mUri;
-
-    // RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
+    
     private String mQuery = "", mOrderBy = "";
 
     private String mOffset = "0";
