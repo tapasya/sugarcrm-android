@@ -33,8 +33,6 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,13 +70,13 @@ public class ContactListActivity extends ListActivity {
     public final static String LOG_TAG = "ContactListActivity";
 
     private DatabaseHelper mDbHelper;
-    
+
     private GenericCursorAdapter mAdapter;
-    
+
     private final int DIALOG_SORT_CHOICE = 1;
-    
+
     private String[] mModuleFieldsChoice;
-    
+
     private int mSortColumnIndex;
 
     @Override
@@ -376,18 +374,18 @@ public class ContactListActivity extends ListActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuHelper.onPrepareOptionsMenu(this, menu, mModuleName);
-        
+
         // get the sort options
         // get the LIST projection
         String[] moduleFields = mDbHelper.getModuleListSelections(mModuleName);
         // get the module fields for the module
         Map<String, ModuleField> map = mDbHelper.getModuleFields(mModuleName);
         mModuleFieldsChoice = new String[moduleFields.length];
-        for(int i=0; i<moduleFields.length; i++){
+        for (int i = 0; i < moduleFields.length; i++) {
             // add the module field label to be displayed in the choice menu
             mModuleFieldsChoice[i] = map.get(moduleFields[i]).getName();
         }
-        
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -399,7 +397,7 @@ public class ContactListActivity extends ListActivity {
         // Inflate the currently selected menu XML resource.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_activity_menu, menu);
-        
+
         menu.add(0, Menu.FIRST + 1, 0, R.string.sort);
 
         return true;
@@ -431,9 +429,7 @@ public class ContactListActivity extends ListActivity {
         }
         return false;
     }
-    
-    
-    
+
     @Override
     protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
         super.onPrepareDialog(id, dialog, args);
@@ -451,26 +447,26 @@ public class ContactListActivity extends ListActivity {
             Builder builder = new AlertDialog.Builder(this);
             builder.setIcon(android.R.drawable.ic_dialog_alert);
             builder.setTitle(R.string.sortBy);
-            
+
             mSortColumnIndex = 0;
             builder.setSingleChoiceItems(mModuleFieldsChoice, 0, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        mSortColumnIndex = whichButton;
-                    }
-                });
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    mSortColumnIndex = whichButton;
+                }
+            });
             builder.setPositiveButton(R.string.ascending, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " ASC";
-                        sortList(sortOrder);
-                    }
-                });
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " ASC";
+                    sortList(sortOrder);
+                }
+            });
             builder.setNegativeButton(R.string.descending, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " DESC";
-                        sortList(sortOrder);
-                    }
-                });
-           return builder.create();
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " DESC";
+                    sortList(sortOrder);
+                }
+            });
+            return builder.create();
         }
         return null;
     }
@@ -542,12 +538,12 @@ public class ContactListActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void sortList(String sortOrder){
+    private void sortList(String sortOrder) {
         Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, sortOrder);
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
-    
+
     public void callNumber(int position) {
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
