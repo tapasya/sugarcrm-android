@@ -130,13 +130,13 @@ public class ContactListActivity extends ListActivity {
         }
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.
-        // TODO - optimize this, if we sync up a dataset, then no need to run detail projectio
-        // nhere, just do a list projection
-        Cursor cursor;
-        // if the parentModuleName is not null, then it is the list of relationship beans
-        String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
+        // TODO - optimize this, if we sync up a dataset, then no need to run detail projection
+        // here, just do a list projection
 
-        cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
+        // if the parentModuleName is not null, then it is the list of relationship beans
+        // String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
+
+        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
 
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
@@ -165,7 +165,6 @@ public class ContactListActivity extends ListActivity {
         mListFooterView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_footer, mListView, false);
         getListView().addFooterView(mListFooterView);
         mListFooterText = (TextView) findViewById(R.id.status);
-        // setListAdapter();
 
         mListFooterProgress = mListFooterView.findViewById(R.id.progress);
     }
@@ -237,8 +236,6 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
-        // TODO
         Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
