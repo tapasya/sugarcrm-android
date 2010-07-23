@@ -1,7 +1,11 @@
 package com.imaginea.android.sugarcrm;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -26,7 +30,12 @@ import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ContactListActivity
@@ -63,6 +72,14 @@ public class ContactListActivity extends ListActivity {
     public final static String LOG_TAG = "ContactListActivity";
 
     private DatabaseHelper mDbHelper;
+    
+    private GenericCursorAdapter mAdapter;
+    
+    private final int DIALOG_SORT_CHOICE = 1;
+    
+    private String[] mModuleFieldsChoice;
+    
+    private int mSortColumnIndex;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,18 +138,17 @@ public class ContactListActivity extends ListActivity {
 
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
-        GenericCursorAdapter adapter;
         String[] moduleSel = mDbHelper.getModuleListSelections(mModuleName);
         if (moduleSel.length >= 2)
-            adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] {
+            mAdapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] {
                     android.R.id.text1, android.R.id.text2 });
         else
-            adapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] { android.R.id.text1 });
-        setListAdapter(adapter);
+            mAdapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] { android.R.id.text1 });
+        setListAdapter(mAdapter);
 
         TextView tv1 = (TextView) (mEmpty.findViewById(R.id.mainText));
 
-        if (adapter.getCount() == 0) {
+        if (mAdapter.getCount() == 0) {
             mListView.setVisibility(View.GONE);
             mEmpty.findViewById(R.id.progress).setVisibility(View.VISIBLE);
             tv1.setVisibility(View.VISIBLE);
@@ -360,6 +376,18 @@ public class ContactListActivity extends ListActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuHelper.onPrepareOptionsMenu(this, menu, mModuleName);
+        
+        // get the sort options
+        // get the LIST projection
+        String[] moduleFields = mDbHelper.getModuleListSelections(mModuleName);
+        // get the module fields for the module
+        Map<String, ModuleField> map = mDbHelper.getModuleFields(mModuleName);
+        mModuleFieldsChoice = new String[moduleFields.length];
+        for(int i=0; i<moduleFields.length; i++){
+            // add the module field label to be displayed in the choice menu
+            mModuleFieldsChoice[i] = map.get(moduleFields[i]).getName();
+        }
+        
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -371,6 +399,8 @@ public class ContactListActivity extends ListActivity {
         // Inflate the currently selected menu XML resource.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_activity_menu, menu);
+        
+        menu.add(0, Menu.FIRST + 1, 0, R.string.sort);
 
         return true;
     }
@@ -395,8 +425,54 @@ public class ContactListActivity extends ListActivity {
             ContactListActivity.this.startActivity(myIntent);
 
             return true;
+        case Menu.FIRST + 1:
+            showDialog(DIALOG_SORT_CHOICE);
+            return true;
         }
         return false;
+    }
+    
+    
+    
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
+        super.onPrepareDialog(id, dialog, args);
+    }
+
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog) {
+        super.onPrepareDialog(id, dialog);
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+        case DIALOG_SORT_CHOICE:
+            Builder builder = new AlertDialog.Builder(this);
+            builder.setIcon(android.R.drawable.ic_dialog_alert);
+            builder.setTitle(R.string.sortBy);
+            
+            mSortColumnIndex = 0;
+            builder.setSingleChoiceItems(mModuleFieldsChoice, 0, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        mSortColumnIndex = whichButton;
+                    }
+                });
+            builder.setPositiveButton(R.string.ascending, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " ASC";
+                        sortList(sortOrder);
+                    }
+                });
+            builder.setNegativeButton(R.string.descending, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " DESC";
+                        sortList(sortOrder);
+                    }
+                });
+           return builder.create();
+        }
+        return null;
     }
 
     @Override
@@ -466,6 +542,12 @@ public class ContactListActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void sortList(String sortOrder){
+        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, sortOrder);
+        mAdapter.changeCursor(cursor);
+        mAdapter.notifyDataSetChanged();
+    }
+    
     public void callNumber(int position) {
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
