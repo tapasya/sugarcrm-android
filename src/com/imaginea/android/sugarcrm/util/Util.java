@@ -60,6 +60,10 @@ public class Util {
     public static final int NEW_ORPHAN_MODE = 2;
 
     public static final int NEW_RELATIONSHIP_MODE = 3;
+    
+    public static final int ASSIGNED_ITEMS_MODE = 4;
+    
+    public static final int LIST_MODE = 5;
 
     // constants for settings / Preferences
     public static final String PREF_REST_URL = "restUrl";
