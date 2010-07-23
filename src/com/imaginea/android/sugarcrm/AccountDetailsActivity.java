@@ -77,7 +77,7 @@ public class AccountDetailsActivity extends Activity {
         if (intent.getData() == null) {
             intent.setData(Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId));
         }
-        mSelectFields = DatabaseHelper.getModuleProjections(mModuleName);
+        mSelectFields = mDbHelper.getModuleProjections(mModuleName);
         // mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null,
         // mDbHelper.getModuleSortOrder(mModuleName));
         // startManagingCursor(mCursor);

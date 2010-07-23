@@ -212,7 +212,7 @@ public class AccountsApiTest extends RestAPITest {
 	@SmallTest
 	public void testGetEntryListWithNoSelectFields() throws Exception {
 		String query = "", orderBy = "";
-		String offset = 0 + "", maxResults = 5+"", deleted = 0+"";
+		String offset = 0 + "", maxResults = 5 + "", deleted = 0 + "";
 
 		SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName,
 				query, orderBy, offset, selectFields, linkNameToFieldsArray,
@@ -305,8 +305,9 @@ public class AccountsApiTest extends RestAPITest {
 			throws Exception {
 		int offset = 0;
 		int maxResults = 5;
+		DatabaseHelper dbHelper = new DatabaseHelper(getContext());
 		SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId,
-				relationshipModule, "", "", offset + "", DatabaseHelper
+				relationshipModule, "", "", offset + "", dbHelper
 						.getModuleProjections(relationshipModule),
 				linkNameToFieldsArray, maxResults + "", "");
 		return sBeans;

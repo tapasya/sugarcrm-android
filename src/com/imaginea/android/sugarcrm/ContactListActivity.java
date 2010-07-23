@@ -136,7 +136,7 @@ public class ContactListActivity extends ListActivity {
         // if the parentModuleName is not null, then it is the list of relationship beans
         // String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
 
-        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
 
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
@@ -563,7 +563,7 @@ public class ContactListActivity extends ListActivity {
             String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
             selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
         }
-        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), selection, null, sortOrder);
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, sortOrder);
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
@@ -573,7 +573,7 @@ public class ContactListActivity extends ListActivity {
         // TODO: get the user name from Account Manager
         String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
         String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
-        Cursor cursor = managedQuery(getIntent().getData(), DatabaseHelper.getModuleProjections(mModuleName), selection, null, mDbHelper.getModuleSortOrder(mModuleName));
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, mDbHelper.getModuleSortOrder(mModuleName));
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
