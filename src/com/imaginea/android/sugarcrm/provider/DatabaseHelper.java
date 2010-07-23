@@ -52,7 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 18;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -91,7 +91,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
 
-    // TODO - replace with database calls - dynamic module generation
     private static List<String> moduleList;
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
@@ -152,9 +151,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put(Util.MEETINGS, Meetings.CONTENT_URI);
 
         // TODO - complete this list
-        // moduleRelationshipItems.put(Util.ACCOUNTS_MODULE, new String[] { Util.CONTACTS_MODULE,
-        // Util.LEADS_MODULE,
-        // Util.OPPORTUNITIES_MODULE });
         moduleRelationshipItems.put(Util.ACCOUNTS, new String[] { Util.CONTACTS,
                 Util.OPPORTUNITIES, Util.CASES });
         moduleRelationshipItems.put(Util.CONTACTS, new String[] { Util.LEADS, Util.OPPORTUNITIES });
@@ -556,21 +552,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getModuleSelection(String moduleName, String searchString) {
-        if (moduleName.equals(Util.ACCOUNTS)) {
-            return AccountsColumns.NAME + " LIKE '%" + searchString + "%'";
-        } else if (moduleName.equals(Util.CONTACTS)) {
-            return "(" + ContactsColumns.FIRST_NAME + " LIKE '%" + searchString + "%' OR "
-                                            + ContactsColumns.LAST_NAME + " LIKE '%" + searchString
-                                            + "%'" + ")";
-        } else if (moduleName.equals(Util.LEADS)) {
+        // TODO: modify this if the selection criteria has to be applied on a different module field
+        // for a module
+        if (moduleName.equals(Util.CONTACTS) || moduleName.equals(Util.LEADS)) {
             return "(" + LeadsColumns.FIRST_NAME + " LIKE '%" + searchString + "%' OR "
                                             + LeadsColumns.LAST_NAME + " LIKE '%" + searchString
                                             + "%'" + ")";
-        } else if (moduleName.equals(Util.OPPORTUNITIES)) {
-            return OpportunitiesColumns.NAME + " LIKE '%" + searchString + "%'";
+        } else {
+            // for Accounts, Opportunities, Cases, Calls and Mettings
+            return ModuleFields.NAME + " LIKE '%" + searchString + "%'";
         }
-        // TODO: similarly for other modules
-        return "";
     }
 
     // TODO - get from DB
