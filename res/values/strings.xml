@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources>    
 	<!-- Application name -->
 	<string name="appName">iCRM- Android</string>
 	<string name="appProviderDesc">Provider for Accounts, Contacts, Leads, Opportunities and other modules of Sugar CRM</string>
@@ -17,7 +17,7 @@
 		name="default_url">http://demo.sugarcrm.com/sugarcrm/service/v2/rest.php</string
 	-->
 
-	<string name="defaultUrl">http://192.168.1.83/sugarcrm/service/v2/rest.php
+	<string name="defaultUrl">http://10.0.2.2/sugarcrm/service/v2/rest.php
 	</string>
 	<string name="defaultUser">will</string>
 	<string name="defaultPwd">will</string>
@@ -80,7 +80,10 @@
 	<string name="editDetailsHeader">Edit %s Details</string>
 	<string name="newDetailsHeader">New %s Details</string>
 	<string name="save">Save</string>
-	
+	<string name="deleteAlert">Are you sure you want to delete?</string>
+	<string name="syncSuccess">Sync Successful</string>
+	<string name="syncFailed">Sync Failed</string>	
+	<string name="syncMessage">Synced  %d records</string>				
 	<string name="sort">Sort</string>
     <string name="descending">Descending</string>
     <string name="ascending">Ascending</string>
