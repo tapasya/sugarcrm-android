@@ -24,6 +24,8 @@ import java.security.NoSuchAlgorithmException;
  */
 public class Util {
 
+    private static int mRequestId = 0;
+
     /**
      * Account type string.
      */
@@ -73,8 +75,6 @@ public class Util {
     public static final String SORT_ORDER = "orderby";
 
     public static final String COMMAND = "cmd";
-
-    private static int mRequestId = 0;
 
     public static final String ROW_ID = "row_id";
 
