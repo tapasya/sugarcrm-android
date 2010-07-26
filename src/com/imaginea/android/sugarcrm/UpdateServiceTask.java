@@ -96,7 +96,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
                 }
                 switch (mCommand) {
-                case R.id.insert:
+                case Util.INSERT:
                     // inserts with a relationship
                     if (mLinkFieldName != null) {
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
@@ -137,8 +137,8 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
                 // make the same calls for update and delete as delete only changes the DELETED flag
                 // to 1
-                case R.id.update:
-                case R.id.delete:
+                case Util.UPDATE:
+                case Util.DELETE:
                     mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
                     updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                     if (mBeanId.equals(updatedBeanId)) {
@@ -158,7 +158,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
             }
 
             switch (mCommand) {
-            case R.id.insert:
+            case Util.INSERT:
                 for (String key : mUpdateNameValueMap.keySet()) {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
@@ -172,14 +172,14 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
                 break;
 
-            case R.id.update:
+            case Util.UPDATE:
                 for (String key : mUpdateNameValueMap.keySet()) {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
                 updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                 break;
 
-            case R.id.delete:
+            case Util.DELETE:
                 if (serverUpdated) {
                     updatedRows = mContext.getContentResolver().delete(mUri, null, null);
                 } else {

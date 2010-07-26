@@ -192,28 +192,28 @@ public class SugarService extends Service {
 
             switch (msg.what) {
             // TODO cleanup the commands
-            case R.id.get:
+            case Util.GET:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
                     Log.i(TAG, "REST API -GET received:");
                 EntryListServiceTask entryListServiceTask = new EntryListServiceTask(getBaseContext(), intent);
                 mTaskMap.put(Util.getId(), entryListServiceTask);
                 entryListServiceTask.execute(null);
                 break;
-            case R.id.update:
+            case Util.UPDATE:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
                     Log.i(TAG, "REST API -Update received:");
                 UpdateServiceTask updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);
                 mTaskMap.put(Util.getId(), updateServiceTask);
                 updateServiceTask.execute(null);
                 break;
-            case R.id.delete:
+            case Util.DELETE:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
                     Log.i(TAG, "REST API -Delete received:");
                 updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);
                 mTaskMap.put(Util.getId(), updateServiceTask);
                 updateServiceTask.execute(null);
                 break;
-            case R.id.insert:
+            case Util.INSERT:
                 if (Log.isLoggable(TAG, Log.VERBOSE))
                     Log.i(TAG, "REST API -Insert received:");
                 updateServiceTask = new UpdateServiceTask(getBaseContext(), intent);

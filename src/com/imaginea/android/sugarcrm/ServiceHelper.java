@@ -22,7 +22,7 @@ public class ServiceHelper {
         // send a notify command to the service
         Intent serviceIntent = new Intent(context, SugarService.class);
         serviceIntent.setData(uri);
-        serviceIntent.putExtra(Util.COMMAND, R.id.get);
+        serviceIntent.putExtra(Util.COMMAND, Util.GET);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, module);
         serviceIntent.putExtra(Util.PROJECTION, projection);
         serviceIntent.putExtra(Util.SORT_ORDER, sortOrder);
@@ -36,7 +36,7 @@ public class ServiceHelper {
         nameValuePairs.put(RestUtilConstants.BEAN_ID, beanId);
         nameValuePairs.put(ModuleFields.DELETED, Util.DELETED_ITEM);
 
-        serviceIntent.putExtra(Util.COMMAND, R.id.delete);
+        serviceIntent.putExtra(Util.COMMAND, Util.DELETE);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, module);
         serviceIntent.putExtra(RestUtilConstants.BEAN_ID, beanId);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValuePairs);
@@ -48,7 +48,7 @@ public class ServiceHelper {
         Intent serviceIntent = new Intent(context, SugarService.class);
         serviceIntent.setData(uri);
 
-        serviceIntent.putExtra(Util.COMMAND, R.id.update);
+        serviceIntent.putExtra(Util.COMMAND, Util.UPDATE);
         serviceIntent.putExtra(RestUtilConstants.BEAN_ID, beanId);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, module);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValueList);
@@ -60,7 +60,7 @@ public class ServiceHelper {
         Intent serviceIntent = new Intent(context, SugarService.class);
         serviceIntent.setData(uri);
 
-        serviceIntent.putExtra(Util.COMMAND, R.id.insert);
+        serviceIntent.putExtra(Util.COMMAND, Util.INSERT);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, moduleName);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValueList);
         context.startService(serviceIntent);
