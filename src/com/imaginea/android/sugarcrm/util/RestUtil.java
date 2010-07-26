@@ -139,14 +139,15 @@ public class RestUtil {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put(QUERY, query);
-        data.put(ORDER_BY, orderBy);
-        data.put(OFFSET, offset);
-        data.put(SELECT_FIELDS, new JSONArray(Arrays.asList(selectFields)));
+        data.put(QUERY, query != null ? query : "");
+        data.put(ORDER_BY, orderBy != null ? orderBy : "");
+        data.put(OFFSET, offset != null ? offset : "");
+        data.put(SELECT_FIELDS, (selectFields != null && selectFields.length != 0) ? new JSONArray(Arrays.asList(selectFields))
+                                        : "");
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            if (linkNameToFieldsArray != null) {
+            if (linkNameToFieldsArray != null && linkNameToFieldsArray.size() != 0) {
                 for (Entry<String, List<String>> entry : linkNameToFieldsArray.entrySet()) {
                     JSONObject nameValue = new JSONObject();
                     nameValue.put("name", entry.getKey());
@@ -155,11 +156,10 @@ public class RestUtil {
                 }
             }
             data.put(LINK_NAME_TO_FIELDS_ARRAY, nameValueArray);
-            data.put(MAX_RESULTS, maxResults);
-            data.put(DELETED, deleted);
+            data.put(MAX_RESULTS, maxResults != null ? maxResults : "");
+            data.put(DELETED, deleted != null ? deleted : 0);
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -194,21 +194,23 @@ public class RestUtil {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put(IDS, ids);
-        data.put(SELECT_FIELDS, new JSONArray(Arrays.asList(selectFields)));
+        data.put(IDS, (ids != null && ids.length != 0) ? ids : "");
+        data.put(SELECT_FIELDS, (selectFields != null && selectFields.length != 0) ? new JSONArray(Arrays.asList(selectFields))
+                                        : "");
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            for (Entry<String, List<String>> entry : linkNameToFieldsArray.entrySet()) {
-                JSONObject nameValue = new JSONObject();
-                nameValue.put("name", entry.getKey());
-                nameValue.put("value", new JSONArray(entry.getValue()));
-                nameValueArray.put(nameValue);
+            if (linkNameToFieldsArray != null && linkNameToFieldsArray.size() != 0) {
+                for (Entry<String, List<String>> entry : linkNameToFieldsArray.entrySet()) {
+                    JSONObject nameValue = new JSONObject();
+                    nameValue.put("name", entry.getKey());
+                    nameValue.put("value", new JSONArray(entry.getValue()));
+                    nameValueArray.put(nameValue);
+                }
             }
             data.put(LINK_NAME_TO_FIELDS_ARRAY, nameValueArray);
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -243,20 +245,22 @@ public class RestUtil {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put(ID, id);
-        data.put(SELECT_FIELDS, new JSONArray(Arrays.asList(selectFields)));
+        data.put(ID, id != null ? id : "");
+        data.put(SELECT_FIELDS, (selectFields != null && selectFields.length != 0) ? new JSONArray(Arrays.asList(selectFields))
+                                        : "");
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            for (Entry<String, List<String>> entry : linkNameToFieldsArray.entrySet()) {
-                JSONObject nameValue = new JSONObject();
-                nameValue.put("name", entry.getKey());
-                nameValue.put("value", new JSONArray(entry.getValue()));
-                nameValueArray.put(nameValue);
+            if (linkNameToFieldsArray != null && linkNameToFieldsArray.size() != 0) {
+                for (Entry<String, List<String>> entry : linkNameToFieldsArray.entrySet()) {
+                    JSONObject nameValue = new JSONObject();
+                    nameValue.put("name", entry.getKey());
+                    nameValue.put("value", new JSONArray(entry.getValue()));
+                    nameValueArray.put(nameValue);
+                }
             }
             data.put(LINK_NAME_TO_FIELDS_ARRAY, nameValueArray);
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -297,16 +301,15 @@ public class RestUtil {
      * @exception 'SoapFault' -- The SOAP error, if any
      */
     public static int getEntriesCount(String url, String sessionId, String moduleName,
-                                    String query, int deleted) throws SugarCrmException {
+                                    String query, String deleted) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put(QUERY, query);
-        data.put(DELETED, deleted);
+        data.put(QUERY, query != null ? query : "");
+        data.put(DELETED, deleted != null ? deleted : 0);
 
         try {
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -357,16 +360,17 @@ public class RestUtil {
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            for (Entry<String, String> entry : nameValueList.entrySet()) {
-                JSONObject nameValue = new JSONObject();
-                nameValue.put("name", entry.getKey());
-                nameValue.put("value", entry.getValue());
-                nameValueArray.put(nameValue);
+            if (nameValueList != null && nameValueList.size() != 0) {
+                for (Entry<String, String> entry : nameValueList.entrySet()) {
+                    JSONObject nameValue = new JSONObject();
+                    nameValue.put("name", entry.getKey());
+                    nameValue.put("value", entry.getValue());
+                    nameValueArray.put(nameValue);
+                }
             }
             data.put(NAME_VALUE_LIST, nameValueArray);
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -421,20 +425,21 @@ public class RestUtil {
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            for (Map<String, String> nameValueList : nameValueLists) {
-                JSONArray beanNameValueArray = new JSONArray();
-                for (Entry<String, String> entry : nameValueList.entrySet()) {
-                    JSONObject nameValue = new JSONObject();
-                    nameValue.put("name", entry.getKey());
-                    nameValue.put("value", entry.getValue());
-                    beanNameValueArray.put(nameValue);
+            if (nameValueLists != null && nameValueLists.size() != 0) {
+                for (Map<String, String> nameValueList : nameValueLists) {
+                    JSONArray beanNameValueArray = new JSONArray();
+                    for (Entry<String, String> entry : nameValueList.entrySet()) {
+                        JSONObject nameValue = new JSONObject();
+                        nameValue.put("name", entry.getKey());
+                        nameValue.put("value", entry.getValue());
+                        beanNameValueArray.put(nameValue);
+                    }
+                    nameValueArray.put(beanNameValueArray);
                 }
-                nameValueArray.put(beanNameValueArray);
             }
             data.put(NAME_VALUE_LISTS, nameValueArray);
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "setEntries restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -518,29 +523,32 @@ public class RestUtil {
                                     String beanId, String linkFieldName, String relatedModuleQuery,
                                     String[] relatedFields,
                                     Map<String, List<String>> relatedModuleLinkNameToFieldsArray,
-                                    int deleted) throws SugarCrmException {
+                                    String deleted) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put(BEAN_ID, beanId);
-        data.put(LINK_FIELD_NAME, linkFieldName);
-        data.put(RELATED_MODULE_QUERY, relatedModuleQuery);
-        data.put(RELATED_FIELDS, new JSONArray(Arrays.asList(relatedFields)));
+        data.put(BEAN_ID, beanId != null ? beanId : "");
+        data.put(LINK_FIELD_NAME, linkFieldName != null ? linkFieldName : "");
+        data.put(RELATED_MODULE_QUERY, relatedModuleQuery != null ? relatedModuleQuery : "");
+        data.put(RELATED_FIELDS, (relatedFields != null && relatedFields.length != 0) ? new JSONArray(Arrays.asList(relatedFields))
+                                        : "");
 
         try {
             JSONArray linkNametoFieldJson = new JSONArray();
-            for (Entry<String, List<String>> entry : relatedModuleLinkNameToFieldsArray.entrySet()) {
-                JSONObject nameValue = new JSONObject();
-                nameValue.put("name", entry.getKey());
-                nameValue.put("value", new JSONArray(entry.getValue()));
-                linkNametoFieldJson.put(nameValue);
+            if (relatedModuleLinkNameToFieldsArray != null
+                                            && relatedModuleLinkNameToFieldsArray.size() != 0) {
+                for (Entry<String, List<String>> entry : relatedModuleLinkNameToFieldsArray.entrySet()) {
+                    JSONObject nameValue = new JSONObject();
+                    nameValue.put("name", entry.getKey());
+                    nameValue.put("value", new JSONArray(entry.getValue()));
+                    linkNametoFieldJson.put(nameValue);
+                }
             }
 
             data.put(RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY, linkNametoFieldJson);
-            data.put(DELETED, deleted);
+            data.put(DELETED, deleted != null ? deleted : 0);
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "getRelationships restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -603,32 +611,37 @@ public class RestUtil {
     public static RelationshipStatus setRelationships(String url, String sessionId,
                                     String[] moduleNames, String[] beanIds,
                                     String[] linkFieldNames, String[] relatedIds,
-                                    List<Map<String, String>> nameValueLists, int deleted)
+                                    List<Map<String, String>> nameValueLists, String deleted)
                                     throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
-        data.put(MODULE_NAMES, new JSONArray(Arrays.asList(moduleNames)));
-        data.put(BEAN_IDS, new JSONArray(Arrays.asList(beanIds)));
-        data.put(LINK_FIELD_NAMES, new JSONArray(Arrays.asList(linkFieldNames)));
-        data.put(RELATED_IDS, new JSONArray(Arrays.asList(relatedIds)));
+        data.put(MODULE_NAMES, (moduleNames != null && moduleNames.length != 0) ? new JSONArray(Arrays.asList(moduleNames))
+                                        : "");
+        data.put(BEAN_IDS, (beanIds != null && beanIds.length != 0) ? new JSONArray(Arrays.asList(beanIds))
+                                        : "");
+        data.put(LINK_FIELD_NAMES, (linkFieldNames != null && linkFieldNames.length != 0) ? new JSONArray(Arrays.asList(linkFieldNames))
+                                        : "");
+        data.put(RELATED_IDS, (relatedIds != null && relatedIds.length != 0) ? new JSONArray(Arrays.asList(relatedIds))
+                                        : "");
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            for (Map<String, String> nameValueList : nameValueLists) {
-                JSONArray beanNameValueArray = new JSONArray();
-                for (Entry<String, String> entry : nameValueList.entrySet()) {
-                    JSONObject nameValue = new JSONObject();
-                    nameValue.put("name", entry.getKey());
-                    nameValue.put("value", entry.getValue());
-                    beanNameValueArray.put(nameValue);
+            if (nameValueLists != null && nameValueLists.size() != 0) {
+                for (Map<String, String> nameValueList : nameValueLists) {
+                    JSONArray beanNameValueArray = new JSONArray();
+                    for (Entry<String, String> entry : nameValueList.entrySet()) {
+                        JSONObject nameValue = new JSONObject();
+                        nameValue.put("name", entry.getKey());
+                        nameValue.put("value", entry.getValue());
+                        beanNameValueArray.put(nameValue);
+                    }
+                    nameValueArray.put(beanNameValueArray);
                 }
-                nameValueArray.put(beanNameValueArray);
             }
             data.put(NAME_VALUE_LISTS, nameValueArray);
-            data.put(DELETED, deleted);
+            data.put(DELETED, deleted != null ? deleted : 0);
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -688,17 +701,18 @@ public class RestUtil {
     public static RelationshipStatus setRelationship(String url, String sessionId,
                                     String moduleName, String beanId, String linkFieldName,
                                     String[] relatedIds, Map<String, String> nameValueList,
-                                    int delete) throws SugarCrmException {
+                                    String delete) throws SugarCrmException {
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
         data.put(MODULE_NAME, moduleName);
-        data.put(BEAN_ID, beanId);
-        data.put(LINK_FIELD_NAME, linkFieldName);
-        data.put(RELATED_IDS, new JSONArray(Arrays.asList(relatedIds)));
+        data.put(BEAN_ID, beanId != null ? beanId : "");
+        data.put(LINK_FIELD_NAME, linkFieldName != null ? linkFieldName : "");
+        data.put(RELATED_IDS, (relatedIds != null && relatedIds.length != 0) ? new JSONArray(Arrays.asList(relatedIds))
+                                        : "");
 
         try {
             JSONArray nameValueArray = new JSONArray();
-            if (nameValueList != null) {
+            if (nameValueList != null && nameValueList.size() != 0) {
                 for (Entry<String, String> entry : nameValueList.entrySet()) {
                     JSONObject nameValue = new JSONObject();
                     nameValue.put("name", entry.getKey());
@@ -707,10 +721,9 @@ public class RestUtil {
                 }
             }
             data.put(NAME_VALUE_LIST, nameValueArray);
-            data.put(DELETED, delete);
+            data.put(DELETED, delete != null ? delete : 0);
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -756,19 +769,19 @@ public class RestUtil {
      * @exception 'SoapFault' -- The SOAP error, if any
      */
     public static Map<String, SugarBean[]> searchByModule(String url, String sessionId,
-                                    String searchString, String[] modules, int offset,
-                                    int maxResults) throws SugarCrmException {
+                                    String searchString, String[] modules, String offset,
+                                    String maxResults) throws SugarCrmException {
 
         Map<String, Object> data = new LinkedHashMap<String, Object>();
         data.put(SESSION, sessionId);
-        data.put(SEARCH_STRING, searchString);
-        data.put(MODULES, new JSONArray(Arrays.asList(modules)));
-        data.put(OFFSET, offset);
-        data.put(MAX_RESULTS, maxResults);
+        data.put(SEARCH_STRING, searchString != null ? searchString : "");
+        data.put(MODULES, (modules != null && modules.length != 0) ? new JSONArray(Arrays.asList(modules))
+                                        : "");
+        data.put(OFFSET, offset != null ? offset : "");
+        data.put(MAX_RESULTS, maxResults != null ? maxResults : "");
 
         try {
             String restData = org.json.simple.JSONValue.toJSONString(data);
-            Log.i(LOG_TAG, "restData : " + restData);
 
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -852,7 +865,6 @@ public class RestUtil {
 
             final String response = EntityUtils.toString(resLogin.getEntity());
             JSONObject responseObj = new JSONObject(response);
-            Log.i(LOG_TAG, "loginResponse : " + response);
             try {
                 String sessionId = responseObj.get(ID).toString();
                 return sessionId;
@@ -879,8 +891,8 @@ public class RestUtil {
     public static List<String> getAvailableModules(String url, String sessionId)
                                     throws SugarCrmException {
         try {
-            JSONObject sessId = new JSONObject();
-            sessId.put(SESSION, sessionId);
+            JSONObject data = new JSONObject();
+            data.put(SESSION, sessionId);
 
             HttpPost req = new HttpPost(url);
             // Add your data
@@ -888,7 +900,7 @@ public class RestUtil {
             nameValuePairs.add(new BasicNameValuePair(METHOD, GET_AVAILABLE_MODULES));
             nameValuePairs.add(new BasicNameValuePair(INPUT_TYPE, JSON));
             nameValuePairs.add(new BasicNameValuePair(RESPONSE_TYPE, JSON));
-            nameValuePairs.add(new BasicNameValuePair(REST_DATA, sessId.toString()));
+            nameValuePairs.add(new BasicNameValuePair(REST_DATA, data.toString()));
             req.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             // Send POST request
@@ -941,8 +953,10 @@ public class RestUtil {
         data.put(MODULE_NAME, moduleName);
 
         try {
-            JSONArray arr = new JSONArray(Arrays.asList(fields));
-            data.put(FIELDS, arr);
+            if (fields != null && fields.length > 0) {
+                JSONArray arr = new JSONArray(Arrays.asList(fields));
+                data.put(FIELDS, arr);
+            }
 
             String restData = org.json.simple.JSONValue.toJSONString(data);
 
