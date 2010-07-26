@@ -103,7 +103,7 @@ public class CRMSyncTestingBase extends SyncBaseInstrumentation {
      * @return
      */
     private String getMockAccountName() {
-        return "MockAccount" + mRandom.nextInt();
+        return "1_AccountMock" + mRandom.nextInt();
     }
 
     /**
