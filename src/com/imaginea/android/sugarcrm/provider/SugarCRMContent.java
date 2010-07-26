@@ -583,4 +583,34 @@ public final class SugarCRMContent {
 
         public String MODULE_ID = MODULE_ROW_ID;
     }
+
+    public interface SyncColumns {
+        public String ID = RECORD_ID;
+
+        public String SYNC_ID = Util.SYNC_ID;
+
+        public String SYNC_COMMAND = Util.SYNC_COMMAND;
+
+        public String MODULE = RestUtilConstants.MODULE;
+
+        public String RELATED_MODULE = Util.RELATED_MODULE;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+    }
+
+    public static final class Sync implements SyncColumns {
+
+        // public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+        // + "/" + Util.LEADS);
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = ModuleFields.DATE_MODIFIED + " DESC";
+
+        public static final String[] DETAILS_PROJECTION = { ID, SYNC_ID, SYNC_COMMAND, MODULE,
+                RELATED_MODULE, DATE_MODIFIED };
+
+    }
 }
