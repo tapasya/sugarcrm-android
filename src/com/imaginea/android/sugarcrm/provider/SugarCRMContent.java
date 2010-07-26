@@ -606,6 +606,16 @@ public final class SugarCRMContent {
         // public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
         // + "/" + Util.LEADS);
 
+        public static final int ID_COLUMN = 0;
+
+        public static final int SYNC_ID_COLUMN = 1;
+
+        public static final int SYNC_COMMAND_COLUMN = 2;
+
+        public static final int MODULE_NAME_COLUMN = 3;
+
+        public static final int RELATED_MODULE_NAME_COLUMN = 4;
+
         /**
          * The default sort order for this table
          */
