@@ -77,6 +77,8 @@ public class ContactListActivity extends ListActivity {
 
     private final int DIALOG_SORT_CHOICE = 1;
 
+    private String[] mModuleFields;
+
     private String[] mModuleFieldsChoice;
 
     private int mSortColumnIndex;
@@ -378,13 +380,13 @@ public class ContactListActivity extends ListActivity {
 
         // get the sort options
         // get the LIST projection
-        String[] moduleFields = mDbHelper.getModuleListSelections(mModuleName);
+        mModuleFields = mDbHelper.getModuleListSelections(mModuleName);
         // get the module fields for the module
         Map<String, ModuleField> map = mDbHelper.getModuleFields(mModuleName);
-        mModuleFieldsChoice = new String[moduleFields.length];
-        for (int i = 0; i < moduleFields.length; i++) {
+        mModuleFieldsChoice = new String[mModuleFields.length];
+        for (int i = 0; i < mModuleFields.length; i++) {
             // add the module field label to be displayed in the choice menu
-            mModuleFieldsChoice[i] = map.get(moduleFields[i]).getLabel();
+            mModuleFieldsChoice[i] = map.get(mModuleFields[i]).getLabel();
             if (mModuleFieldsChoice[i].indexOf(":") > 0) {
                 mModuleFieldsChoice[i] = mModuleFieldsChoice[i].substring(0, mModuleFieldsChoice[i].length() - 1);
             }
@@ -460,13 +462,13 @@ public class ContactListActivity extends ListActivity {
             });
             builder.setPositiveButton(R.string.ascending, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " ASC";
+                    String sortOrder = mModuleFields[mSortColumnIndex] + " ASC";
                     sortList(sortOrder);
                 }
             });
             builder.setNegativeButton(R.string.descending, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    String sortOrder = mModuleFieldsChoice[mSortColumnIndex] + " DESC";
+                    String sortOrder = mModuleFields[mSortColumnIndex] + " DESC";
                     sortList(sortOrder);
                 }
             });
