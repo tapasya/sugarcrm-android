@@ -34,10 +34,11 @@ public class ServiceHelper {
         serviceIntent.setData(uri);
         Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
         nameValuePairs.put(RestUtilConstants.BEAN_ID, beanId);
-        nameValuePairs.put(ModuleFields.DELETED, "1");
+        nameValuePairs.put(ModuleFields.DELETED, Util.DELETED_ITEM);
 
         serviceIntent.putExtra(Util.COMMAND, R.id.delete);
         serviceIntent.putExtra(RestUtilConstants.MODULE_NAME, module);
+        serviceIntent.putExtra(RestUtilConstants.BEAN_ID, beanId);
         serviceIntent.putExtra(RestUtilConstants.NAME_VALUE_LIST, (Serializable) nameValuePairs);
         context.startService(serviceIntent);
     }
