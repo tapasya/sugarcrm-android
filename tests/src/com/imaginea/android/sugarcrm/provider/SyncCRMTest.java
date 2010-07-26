@@ -2,6 +2,7 @@ package com.imaginea.android.sugarcrm.provider;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.text.format.Time;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
@@ -31,14 +32,15 @@ public class SyncCRMTest extends CRMSyncTestingBase {
         cursor.moveToNext();
         Time time = new Time();
         time.setToNow();
-        String newTitle = cursor.getString(cursor.getColumnIndex(ModuleFields.NAME)) + time.toString();
-     
+        String newTitle = cursor.getString(cursor.getColumnIndex(ModuleFields.NAME))
+                                        + time.toString();
+
         long accountId = cursor.getLong(cursor.getColumnIndex(SugarCRMContent.RECORD_ID));
 
         cursor.close();
         ContentValues values = new ContentValues();
         values.put(ModuleFields.NAME, newTitle);
-      //  values.put(ModuleFields., value)
+        // values.put(ModuleFields., value)
         editAccount(accountId, values);
         cursor = mResolver.query(mAccountsUri, null, null, null, null);
         assertTrue("Events count should remain same.", getAccountsCount() == countBeforeNewAccount);
@@ -52,4 +54,13 @@ public class SyncCRMTest extends CRMSyncTestingBase {
         cursor.close();
     }
 
+    public void testCreateAndDeleteAccount() throws Exception {
+        syncSugarCRMAccounts();
+        int countBeforeNewAccount = getAccountsCount();
+        Uri insertUri = insertAccount();
+
+        assertTrue("A account should have been created.", getAccountsCount() > countBeforeNewAccount);
+        deleteAccount(insertUri);
+        assertEquals("Account should have been deleted.", countBeforeNewAccount, getAccountsCount());
+    }
 }
