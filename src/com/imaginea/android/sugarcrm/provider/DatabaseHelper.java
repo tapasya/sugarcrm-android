@@ -30,6 +30,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldColumns
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
 import com.imaginea.android.sugarcrm.util.LinkField;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
@@ -83,6 +84,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MODULE_FIELDS_TABLE_NAME = "module_fields";
 
     public static final String LINK_FIELDS_TABLE_NAME = "link_fields";
+    
+    public static final String SYNC_TABLE_NAME = "sync_table";
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
@@ -115,22 +118,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     static {
 
+        // Icons projection
         moduleIcons.put(Util.ACCOUNTS, R.drawable.account);
         moduleIcons.put(Util.CONTACTS, R.drawable.contacts);
         moduleIcons.put(Util.LEADS, R.drawable.leads);
         moduleIcons.put(Util.OPPORTUNITIES, R.drawable.opportunity);
         moduleIcons.put(Util.CASES, R.drawable.cases);
+        moduleIcons.put(Util.CALLS, R.drawable.calls); 
+        moduleIcons.put(Util.MEETINGS, R.drawable.meeting);        
         moduleIcons.put("Settings", R.drawable.settings);
 
+        // Module Projections
         moduleProjections.put(Util.ACCOUNTS, Accounts.DETAILS_PROJECTION);
         moduleProjections.put(Util.CONTACTS, Contacts.DETAILS_PROJECTION);
         moduleProjections.put(Util.LEADS, Leads.DETAILS_PROJECTION);
         moduleProjections.put(Util.OPPORTUNITIES, Opportunities.DETAILS_PROJECTION);
         moduleProjections.put(Util.CASES, Cases.DETAILS_PROJECTION);
         moduleProjections.put(Util.CALLS, Calls.DETAILS_PROJECTION);
-        moduleProjections.put(Util.MEETINGS, Meetings.DETAILS_PROJECTION);
-        // moduleProjections.put(4, Meetings.DETAILS_PROJECTION );
+        moduleProjections.put(Util.MEETINGS, Meetings.DETAILS_PROJECTION);       
 
+        // Module List Selections
         moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CONTACTS, Contacts.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.LEADS, Leads.LIST_VIEW_PROJECTION);
@@ -139,9 +146,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleListSelections.put(Util.CALLS, Calls.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.MEETINGS, Meetings.LIST_VIEW_PROJECTION);
 
+        // Default sort orders
         moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.CONTACTS, Contacts.DEFAULT_SORT_ORDER);
 
+        // Content Uris
         moduleUris.put(Util.ACCOUNTS, Accounts.CONTENT_URI);
         moduleUris.put(Util.CONTACTS, Contacts.CONTENT_URI);
         moduleUris.put(Util.LEADS, Leads.CONTENT_URI);
@@ -212,6 +221,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createAccountsCasesTable(db);
         createContactsOpportunitiesTable(db);
         createContactsCases(db);
+        
+        // create sync tables
+        createSyncTable(db);
     }
 
     void dropAccountsTable(SQLiteDatabase db) {
@@ -274,6 +286,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_CASES_TABLE_NAME);
     }
 
+    void dropSyncTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_CASES_TABLE_NAME);
+    }
+    
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
@@ -533,6 +549,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsCasesColumns.DELETED + " INTEGER," + " UNIQUE("
                                         + ContactsCasesColumns.CONTACT_ID + ","
                                         + ContactsCasesColumns.CASE_ID + ")" + ");");
+    }
+    
+    private static void createSyncTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + SYNC_TABLE_NAME + " ("
+                                        + Sync.ID + " INTEGER PRIMARY KEY,"
+                                        + Sync.SYNC_ID + " INTEGER ,"
+                                        + Sync.SYNC_COMMAND + " INTEGER,"
+                                        + Sync.MODULE + " TEXT," 
+                                        + Sync.RELATED_MODULE + " TEXT," 
+                                        + Sync.DATE_MODIFIED  + " TEXT" + ");");
     }
 
     public String[] getModuleProjections(String moduleName) {
