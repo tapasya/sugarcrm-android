@@ -308,4 +308,10 @@ public interface ModuleFields {
 
     public static final String PRIORITY = "priority";
 
+    public static final String ACLTYPE = "acltype";
+
+    public static final String CATEGORY = "category";
+
+    public static final String ACLACCESS = "aclaccess";
+
 }
