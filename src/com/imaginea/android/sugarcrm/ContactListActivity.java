@@ -404,8 +404,6 @@ public class ContactListActivity extends ListActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_activity_menu, menu);
 
-        menu.add(0, Menu.FIRST + 1, 0, R.string.sort);
-
         return true;
     }
 
@@ -429,7 +427,7 @@ public class ContactListActivity extends ListActivity {
             ContactListActivity.this.startActivity(myIntent);
 
             return true;
-        case Menu.FIRST + 1:
+        case R.id.sort:
             showDialog(DIALOG_SORT_CHOICE);
             return true;
         }
