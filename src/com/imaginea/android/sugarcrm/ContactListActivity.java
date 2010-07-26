@@ -193,6 +193,7 @@ public class ContactListActivity extends ListActivity {
                 mBusy = true;
                 realoffset += count;
                 Uri uri = getIntent().getData();
+                // TODO - fix this, this is no longer used
                 Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset + "/" + limit);
                 Log.d(LOG_TAG, "Changing cursor:" + newUri.toString());
                 final Cursor cursor = managedQuery(newUri, Contacts.LIST_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
