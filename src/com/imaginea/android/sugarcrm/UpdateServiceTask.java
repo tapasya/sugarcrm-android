@@ -26,9 +26,6 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
     private Context mContext;
 
-    // TODO - remove this
-    private String mSessionId;
-
     private String mModuleName;
 
     private String mParentModuleName;
@@ -85,9 +82,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     protected Object doInBackground(Object... params) {
         try {
 
-            if (mSessionId == null) {
-                mSessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();
-            }
+            String sessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();
 
             String url = SugarCrmSettings.getSugarRestUrl(mContext);
             // Check network is on
@@ -100,8 +95,8 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
                 }
                 if (mLinkFieldName != null) {
-                    updatedBeanId = RestUtil.setEntry(url, mSessionId, mModuleName, mUpdateNameValueMap);
-                    RelationshipStatus status = RestUtil.setRelationship(url, mSessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), 0);
+                    updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                    RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), 0);
                     if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                         Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
                                                         + status.getFailedCount() + " deleted: "
@@ -120,7 +115,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 } else {
                     // bean Id has to be put in the nameValuelist
                     mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
-                    updatedBeanId = RestUtil.setEntry(url, mSessionId, mModuleName, mUpdateNameValueMap);
+                    updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                     if (mBeanId.equals(updatedBeanId)) {
                         if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
                             Log.v(LOG_TAG, "updated server successful");
