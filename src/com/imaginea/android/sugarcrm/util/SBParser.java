@@ -57,12 +57,14 @@ public class SBParser {
             if (index >= mRelationshipListJson.length())
                 return relationshipList;
             JSONArray relationshipJson = mRelationshipListJson.getJSONArray(index);
-            for (int i = 0; i < relationshipJson.length(); i++) {
-                JSONObject relationshipModule = relationshipJson.getJSONObject(i);
-                String linkFieldName = relationshipModule.getString("name");
-                String recordsJson = relationshipModule.get(RECORDS).toString();
-                SugarBean[] sugarBeans = getSugarBeans(recordsJson);
-                relationshipList.put(linkFieldName, sugarBeans);
+            if (relationshipJson.length() != 0) {
+                for (int i = 0; i < relationshipJson.length(); i++) {
+                    JSONObject relationshipModule = relationshipJson.getJSONObject(i);
+                    String linkFieldName = relationshipModule.getString("name");
+                    String recordsJson = relationshipModule.get(RECORDS).toString();
+                    SugarBean[] sugarBeans = getSugarBeans(recordsJson);
+                    relationshipList.put(linkFieldName, sugarBeans);
+                }
             }
         } catch (JSONException jsone) {
             Log.e(LOG_TAG, jsone.getMessage(), jsone);
