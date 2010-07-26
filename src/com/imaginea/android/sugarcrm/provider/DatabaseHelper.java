@@ -33,10 +33,11 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.SyncColumns;
+import com.imaginea.android.sugarcrm.sync.SyncRecord;
 import com.imaginea.android.sugarcrm.util.LinkField;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
-import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 
@@ -821,6 +822,71 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
             db.close();
         }
+    }
+
+    /**
+     * get a Sync record given syncId and moduleName
+     * 
+     * @param syncId
+     * @param moduleName
+     * @return
+     */
+    public SyncRecord getSyncRecord(long syncId, String moduleName) {
+
+        SQLiteDatabase db = getReadableDatabase();
+        String selection = Util.SYNC_ID + "=?" + " AND " + ModuleColumns.MODULE_NAME + "=?";
+        String selectionArgs[] = new String[] { "" + syncId, moduleName };
+        Cursor cursor = db.query(SYNC_TABLE_NAME, Sync.DETAILS_PROJECTION, selection, selectionArgs, null, null, null);
+        cursor.moveToFirst();
+        SyncRecord record = new SyncRecord();
+        record._id = cursor.getLong(Sync.ID_COLUMN);
+        record.syncId = cursor.getLong(Sync.SYNC_ID_COLUMN);
+        record.syncCommand = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
+        record.moduleName = cursor.getString(Sync.MODULE_NAME_COLUMN);
+        record.relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
+        cursor.close();
+        db.close();
+        return record;
+
+    }
+
+    /**
+     * // TODO - when do we update ?? - not required -??
+     * 
+     * @param record
+     * @return
+     * @throws SugarCrmException
+     */
+    public long updateSyncRecord(SyncRecord record) throws SugarCrmException {
+
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SyncColumns.ID, record._id);
+        values.put(SyncColumns.SYNC_ID, record.syncId);
+        // values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
+        values.put(SyncColumns.MODULE, record.moduleName);
+        values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
+
+        long rowId = db.insert(SYNC_TABLE_NAME, "", values);
+        if (rowId < 0)
+            throw new SugarCrmException("FAILED to update sync record!");
+        return rowId;
+    }
+
+    public long insertSyncRecord(SyncRecord record) throws SugarCrmException {
+
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SyncColumns.ID, record._id);
+        values.put(SyncColumns.SYNC_ID, record.syncId);
+        values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
+        values.put(SyncColumns.MODULE, record.moduleName);
+        values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
+
+        long rowId = db.insert(SYNC_TABLE_NAME, "", values);
+        if (rowId < 0)
+            throw new SugarCrmException("FAILED to insert sync record!");
+        return rowId;
     }
 
 }
