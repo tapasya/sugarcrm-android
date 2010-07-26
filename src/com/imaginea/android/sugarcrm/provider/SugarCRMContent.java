@@ -21,6 +21,8 @@ public final class SugarCRMContent {
     public static final String SUGAR_BEAN_ID = ModuleFields.ID;
 
     public static final String MODULE_ROW_ID = "module_id";
+    
+    public static final String ROLE_ROW_ID = "role_id";
 
     public static final class Accounts implements AccountsColumns {
 
@@ -612,5 +614,53 @@ public final class SugarCRMContent {
         public static final String[] DETAILS_PROJECTION = { ID, SYNC_ID, SYNC_COMMAND, MODULE,
                 RELATED_MODULE, DATE_MODIFIED };
 
+    }
+
+    public interface ACLRoleColumns {
+        public String ID = RECORD_ID;
+
+        public String ROLE_ID = SUGAR_BEAN_ID;
+
+        public String NAME = ModuleFields.NAME;
+
+        public String TYPE = ModuleFields.TYPE;
+
+        public String DESCRIPTION = ModuleFields.DESCRIPTION;
+    }
+
+    public static final class ACLRoles implements ACLRoleColumns {
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, SUGAR_BEAN_ID, NAME, TYPE,
+                DESCRIPTION };
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
+    }
+
+    public interface ACLActionColumns {
+        public String ID = RECORD_ID;
+
+        public String ACTION_ID = SUGAR_BEAN_ID;
+
+        public String NAME = ModuleFields.NAME;
+
+        public String CATEGORY = "category";
+
+        public String ACLACCESS = "aclaccess";
+
+        public String ACLTYPE = "acltype";
+        
+        public String ROLE_ID = ROLE_ROW_ID;
+    }
+
+    public static final class ACLActions implements ACLActionColumns {
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ACTION_ID, NAME, CATEGORY,
+                ACLACCESS, ACLTYPE };
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = NAME + " ASC";
     }
 }

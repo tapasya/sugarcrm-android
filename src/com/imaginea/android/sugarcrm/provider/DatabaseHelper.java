@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActionColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoleColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
@@ -34,6 +36,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
 import com.imaginea.android.sugarcrm.util.LinkField;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 
@@ -53,7 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 19;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -84,8 +87,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MODULE_FIELDS_TABLE_NAME = "module_fields";
 
     public static final String LINK_FIELDS_TABLE_NAME = "link_fields";
-    
+
     public static final String SYNC_TABLE_NAME = "sync_table";
+
+    public static final String ACL_ROLES_TABLE_NAME = "acl_roles";
+
+    public static final String ACL_ACTIONS_TABLE_NAME = "acl_actions";
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
@@ -124,8 +131,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleIcons.put(Util.LEADS, R.drawable.leads);
         moduleIcons.put(Util.OPPORTUNITIES, R.drawable.opportunity);
         moduleIcons.put(Util.CASES, R.drawable.cases);
-        moduleIcons.put(Util.CALLS, R.drawable.calls); 
-        moduleIcons.put(Util.MEETINGS, R.drawable.meeting);        
+        moduleIcons.put(Util.CALLS, R.drawable.calls);
+        moduleIcons.put(Util.MEETINGS, R.drawable.meeting);
         moduleIcons.put("Settings", R.drawable.settings);
 
         // Module Projections
@@ -135,7 +142,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleProjections.put(Util.OPPORTUNITIES, Opportunities.DETAILS_PROJECTION);
         moduleProjections.put(Util.CASES, Cases.DETAILS_PROJECTION);
         moduleProjections.put(Util.CALLS, Calls.DETAILS_PROJECTION);
-        moduleProjections.put(Util.MEETINGS, Meetings.DETAILS_PROJECTION);       
+        moduleProjections.put(Util.MEETINGS, Meetings.DETAILS_PROJECTION);
 
         // Module List Selections
         moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
@@ -214,6 +221,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createModuleFieldsTable(db);
         createLinkFieldsTable(db);
 
+        createAclRolesTable(db);
+        createAclActionsTable(db);
+
         // create join tables
 
         createAccountsContactsTable(db);
@@ -221,7 +231,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createAccountsCasesTable(db);
         createContactsOpportunitiesTable(db);
         createContactsCases(db);
-        
+
         // create sync tables
         createSyncTable(db);
     }
@@ -289,7 +299,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropSyncTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_CASES_TABLE_NAME);
     }
-    
+
+    void dropAclRolesTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + ACL_ROLES_TABLE_NAME);
+    }
+
+    void dropAclActionsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + ACL_ACTIONS_TABLE_NAME);
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
@@ -311,6 +329,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropModulesTable(db);
         dropModuleFieldsTable(db);
         dropLinkFieldsTable(db);
+
+        dropAclRolesTable(db);
+        dropAclActionsTable(db);
 
         // drop join tables
         dropAccountsContactsTable(db);
@@ -550,16 +571,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsCasesColumns.CONTACT_ID + ","
                                         + ContactsCasesColumns.CASE_ID + ")" + ");");
     }
-    
+
     private static void createSyncTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + SYNC_TABLE_NAME + " ("
-                                        + Sync.ID + " INTEGER PRIMARY KEY,"
-                                        + Sync.SYNC_ID + " INTEGER ,"
-                                        + Sync.SYNC_COMMAND + " INTEGER,"
-                                        + Sync.MODULE + " TEXT," 
-                                        + Sync.RELATED_MODULE + " TEXT," 
-                                        + Sync.DATE_MODIFIED  + " TEXT" + ");");
+        db.execSQL("CREATE TABLE " + SYNC_TABLE_NAME + " (" + Sync.ID + " INTEGER PRIMARY KEY,"
+                                        + Sync.SYNC_ID + " INTEGER ," + Sync.SYNC_COMMAND
+                                        + " INTEGER," + Sync.MODULE + " TEXT,"
+                                        + Sync.RELATED_MODULE + " TEXT," + Sync.DATE_MODIFIED
+                                        + " TEXT" + ");");
+    }
+
+    private static void createAclRolesTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + ACL_ROLES_TABLE_NAME + " (" + ACLRoleColumns.ID
+                                        + " INTEGER PRIMARY KEY," + ACLRoleColumns.ROLE_ID
+                                        + " INTEGER," + ACLRoleColumns.NAME + " TEXT,"
+                                        + ACLRoleColumns.TYPE + " TEXT,"
+                                        + ACLRoleColumns.DESCRIPTION + " TEXT" + ");");
+    }
+
+    private static void createAclActionsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + ACL_ACTIONS_TABLE_NAME + " (" + ACLActionColumns.ID
+                                        + " INTEGER PRIMARY KEY," + ACLActionColumns.ACTION_ID
+                                        + " INTEGER ," + ACLActionColumns.NAME + " INTEGER,"
+                                        + ACLActionColumns.CATEGORY + " TEXT,"
+                                        + ACLActionColumns.ACLACCESS + " TEXT,"
+                                        + ACLActionColumns.ACLTYPE + " TEXT,"
+                                        + ACLActionColumns.ROLE_ID + " INTEGER" + ");");
     }
 
     public String[] getModuleProjections(String moduleName) {
