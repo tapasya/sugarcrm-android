@@ -82,6 +82,10 @@ public class Util {
 
     public static final String ROW_ID = "row_id";
 
+    public static final String EXCLUDE_DELETED_ITEMS = "0";
+    
+    public static final String INCLUDE_DELETED_ITEMS = "1";
+    
     public static final String DELETED_ITEM = "1";
 
     public static final String CASE_ID = "case_id";

@@ -100,7 +100,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     // inserts with a relationship
                     if (mLinkFieldName != null) {
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
-                        RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), 0);
+                        RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
                         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                             Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
                                                             + status.getFailedCount()
