@@ -280,9 +280,10 @@ public class ContactListActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        // TODO
+
+        String beanId = cursor.getString(1);
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
-            Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
+            Log.d(LOG_TAG, "beanId:" + beanId);
 
         if (mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
@@ -290,7 +291,7 @@ public class ContactListActivity extends ListActivity {
         mModuleUri = mDbHelper.getModuleUri(mModuleName);
         Uri deleteUri = Uri.withAppendedPath(mModuleUri, cursor.getString(0));
         getContentResolver().registerContentObserver(deleteUri, false, new DeleteContentObserver(new Handler()));
-        ServiceHelper.startServiceForDelete(getBaseContext(), deleteUri, mModuleName, cursor.getString(1));
+        ServiceHelper.startServiceForDelete(getBaseContext(), deleteUri, mModuleName, beanId);
         // getContentResolver().delete(mModuleUri, SugarCRMContent.RECORD_ID, new String[] {
         // cursor.getString(0) });
         // detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
