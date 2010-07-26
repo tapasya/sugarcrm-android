@@ -9,12 +9,15 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
+import com.imaginea.android.sugarcrm.sync.SyncRecord;
 import com.imaginea.android.sugarcrm.util.RelationshipStatus;
 import com.imaginea.android.sugarcrm.util.RestUtil;
+import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * UpdateServiceTask
@@ -165,11 +168,20 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 if (serverUpdated) {
                     // add updatedBeanId to the values map
                     values.put(SugarCRMContent.SUGAR_BEAN_ID, updatedBeanId);
+                    Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
+                    Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
                 } else {
-                    // we do not have a beanId to add to our valueMap
+                    /*
+                     * we do not have a beanId to add to our valueMap. we add a randomly generated
+                     * beanId -with prefix "Sync" only for debugging purposes, do not use to
+                     * distinguish with sync and normal operations
+                     */
+                    values.put(SugarCRMContent.SUGAR_BEAN_ID, "Sync" + UUID.randomUUID());
+                    Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
+                    Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
+                    insertSyncRecord(insertResultUri);
                 }
-                Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
-                Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
+
                 break;
 
             case Util.UPDATE:
@@ -177,6 +189,9 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
                 updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
+                if (!serverUpdated) {
+                    updateSyncRecord();
+                }
                 break;
 
             case Util.DELETE:
@@ -188,6 +203,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                         values.put(key, mUpdateNameValueMap.get(key));
                     }
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
+                    updateSyncRecord();
                 }
                 break;
 
@@ -202,14 +218,47 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 }
             }
 
-            if (!serverUpdated) {
-                // update the sync table
-
-            }
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
         return null;
+    }
+
+    private void updateSyncRecord() throws SugarCrmException {
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
+        long syncId = Long.parseLong(mUri.getPathSegments().get(1));
+        SyncRecord rec = dbHelper.getSyncRecord(syncId, mModuleName);
+        if (rec == null)
+            insertSyncRecord(mUri);
+        else {
+            // if record is found, there is nothing to update unless related items are set
+            SyncRecord record = new SyncRecord();
+            record.syncId = syncId;
+            record.syncCommand = mCommand;
+            record.moduleName = mLinkFieldName != null ? mParentModuleName : mModuleName;
+            record.relatedModuleName = mModuleName;
+            dbHelper.updateSyncRecord(record);
+        }
+    }
+
+    private void insertSyncRecord(Uri insertUri) throws SugarCrmException {
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
+        SyncRecord record = new SyncRecord();
+        record.syncId = Long.parseLong(insertUri.getPathSegments().get(1));
+        record.syncCommand = mCommand;
+        record.moduleName = mLinkFieldName != null ? mParentModuleName : mModuleName;
+        record.relatedModuleName = mModuleName;
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+            debug(record);
+        dbHelper.insertSyncRecord(record);
+    }
+
+    private void debug(SyncRecord record) {
+        Log.d(LOG_TAG, "Sync id:" + record._id);
+        Log.d(LOG_TAG, "Sync command:" + record.syncCommand);
+        Log.d(LOG_TAG, "Module name:" + record.moduleName);
+        Log.d(LOG_TAG, "Related Module Name:" + record.relatedModuleName);
+        Log.d(LOG_TAG, "Sync command:" + (record.syncCommand == 1 ? "INSERT" : "UPDATE/DELETE"));
     }
 
     @Override
