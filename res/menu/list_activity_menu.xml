@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
-  xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:id="@+id/home"
+  	xmlns:android="http://schemas.android.com/apk/res/android">
+  	<item android:id="@+id/home"
   		android:icon="@drawable/menu_home"
         android:title="@string/home"         
 		/>
-  <item android:id="@+id/search"
+  	<item android:id="@+id/search"
   		android:icon="@android:drawable/ic_menu_search"
         android:title="@string/search"         
 		/>
-  <item android:id="@+id/addItem"
+  	<item android:id="@+id/addItem"
   		android:icon="@android:drawable/ic_menu_add"
         android:title="@string/addItem"         
+		/>
+	<item android:id="@+id/sort"  		
+        android:title="@string/sort"         
 		/>
 </menu>
