@@ -2,11 +2,14 @@ package com.imaginea.android.sugarcrm.util;
 
 import static com.imaginea.android.sugarcrm.RestUtilConstants.ENTRY_LIST;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.JSON_EXCEPTION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RECORDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATIONSHIP_LIST;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SugarBean {
@@ -26,16 +29,50 @@ public class SugarBean {
         try {
             JSONObject responseObj = new JSONObject(jsonResponse);
             JSONArray entryListJson = responseObj.getJSONArray(ENTRY_LIST);
-
-            // TODO: relationship_list also has to be looked at
-            // JSONArray mRelationshipListJson = responseObj.getJSONArray(RELATIONSHIP_LIST);
+            JSONArray relationshipListJson = responseObj.getJSONArray(RELATIONSHIP_LIST);
 
             JSONObject jsonObject = (JSONObject) entryListJson.get(0);
             setBeanId(jsonObject.get("id").toString());
             String nameValueList = jsonObject.get("name_value_list").toString();
             setEntryList(SBParseHelper.getNameValuePairs(nameValueList));
+            
+            Map<String, SugarBean[]> relationshipList = getRelationshipBeans(relationshipListJson);
+            setRelationshipList(relationshipList);
         } catch (JSONException e) {
             throw new SugarCrmException(JSON_EXCEPTION, e.getMessage());
+        }
+    }
+    
+    private Map<String, SugarBean[]> getRelationshipBeans(JSONArray mRelationshipListJson) throws SugarCrmException {
+        Map<String, SugarBean[]> relationshipList = new HashMap<String, SugarBean[]>();
+        try {
+            JSONArray relationshipJson = mRelationshipListJson.getJSONArray(0);
+            if (relationshipJson.length() != 0) {
+                for (int i = 0; i < relationshipJson.length(); i++) {
+                    JSONObject relationshipModule = relationshipJson.getJSONObject(i);
+                    String linkFieldName = relationshipModule.getString("name");
+                    String recordsJson = relationshipModule.get(RECORDS).toString();
+                    SugarBean[] sugarBeans = getSugarBeans(recordsJson);
+                    relationshipList.put(linkFieldName, sugarBeans);
+                }
+            }
+        } catch (JSONException jsone) {
+            throw new SugarCrmException(jsone.getMessage());
+        }
+        return relationshipList;
+    }
+    
+    private SugarBean[] getSugarBeans(String recordsJson) throws SugarCrmException {
+        try {
+            JSONArray recordsArray = new JSONArray(recordsJson);
+            SugarBean[] sugarBeans = new SugarBean[recordsArray.length()];
+            for (int i = 0; i < recordsArray.length(); i++) {
+                sugarBeans[i] = new SugarBean();
+                sugarBeans[i].setEntryList(SBParseHelper.getNameValuePairs(recordsArray.get(i).toString()));
+            }
+            return sugarBeans;
+        } catch (JSONException e) {
+            throw new SugarCrmException(e.getMessage());
         }
     }
 
