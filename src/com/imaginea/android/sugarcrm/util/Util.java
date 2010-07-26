@@ -60,9 +60,9 @@ public class Util {
     public static final int NEW_ORPHAN_MODE = 2;
 
     public static final int NEW_RELATIONSHIP_MODE = 3;
-    
+
     public static final int ASSIGNED_ITEMS_MODE = 4;
-    
+
     public static final int LIST_MODE = 5;
 
     // constants for settings / Preferences
@@ -83,9 +83,9 @@ public class Util {
     public static final String ROW_ID = "row_id";
 
     public static final String EXCLUDE_DELETED_ITEMS = "0";
-    
+
     public static final String INCLUDE_DELETED_ITEMS = "1";
-    
+
     public static final String DELETED_ITEM = "1";
 
     public static final String CASE_ID = "case_id";
@@ -104,6 +104,23 @@ public class Util {
     public static final String CALLS = "Calls";
 
     public static final String CASES = "Cases";
+
+    public static final int GET = 0;
+    
+    public static final int INSERT = 1;
+
+    public static final int UPDATE = 2;
+
+    public static final int DELETE = 3;
+
+    // sync constants
+    // RECORD_ID (_id) of the module that needs to be synced
+    public static final String SYNC_ID = "sync_id";
+
+    // The sync command - INSERT, DELETE, UPDATE
+    public static final String SYNC_COMMAND = "sync_cmd";
+    
+    public static final String RELATED_MODULE = "related_module";
 
     private static final String LOG_TAG = Util.class.getSimpleName();
 
