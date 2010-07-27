@@ -14,8 +14,12 @@ import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActions;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoles;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
 import com.imaginea.android.sugarcrm.util.Module;
+import com.imaginea.android.sugarcrm.util.RelationshipStatus;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
@@ -23,11 +27,13 @@ import com.imaginea.android.sugarcrm.util.Util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,17 +47,16 @@ import java.util.Set;
 public class SugarSyncManager {
 
     public static int mTotalRecords;
-    
+
     private static DatabaseHelper databaseHelper;
 
-    // TODO - change the BEAN_ID into sugarContetn
-    private static String mSelection = Contacts.BEAN_ID + "=?";
+    private static String mSelection = SugarCRMContent.SUGAR_BEAN_ID + "=?";
 
     private static String mBeanIdField = Contacts.BEAN_ID;
 
-    private static String mQuery = "";// new String[] {};
+    private static String mQuery = "";
 
-    // TODO - link field names
+    // for every module, linkName to field Array is retrieved from db cache and then cleared
     private static Map<String, List<String>> mLinkNameToFieldsArray = new HashMap<String, List<String>>();
 
     /**
@@ -76,7 +81,8 @@ public class SugarSyncManager {
      *            The name of the module to sync
      */
     public static synchronized void syncModulesData(Context context, String account,
-                                    String sessionId, String moduleName, SyncResult syncResult) throws SugarCrmException {
+                                    String sessionId, String moduleName, SyncResult syncResult)
+                                    throws SugarCrmException {
         long userId;
         long rawId = 0;
         final ContentResolver resolver = context.getContentResolver();
@@ -135,8 +141,9 @@ public class SugarSyncManager {
                     Log.v(LOG_TAG, "beanId/rawid:" + beandIdValue + "/" + rawId);
                 if (rawId != 0) {
                     if (!sBean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
+                        // TODO - check teh changes from sync table and mark them for merge
+                        // conflicts
                         // update module Item
-
                         updateModuleItem(context, resolver, account, moduleName, sBean, rawId, batchOperation);
                     } else {
                         // delete module item - never delete the item here, just update the deleted
@@ -295,9 +302,10 @@ public class SugarSyncManager {
                                     SugarBean sBean, SugarBean relatedBean, String moduleName,
                                     String relationModuleName, BatchOperation batchOperation) {
         // Put the data in the contacts provider
-        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
             Log.v(LOG_TAG, "In addRelatedModuleItem");
-        Log.v(LOG_TAG, " addRelatedModuleItem Rawid:" + rawId);
+            Log.v(LOG_TAG, " addRelatedModuleItem Rawid:" + rawId);
+        }
         final SugarCRMOperations moduleItemOp = SugarCRMOperations.createNewRelatedModuleItem(context, moduleName, relationModuleName, accountName, rawId, sBean, relatedBean, batchOperation);
         moduleItemOp.addRelatedSugarBean(sBean, relatedBean);
 
@@ -325,7 +333,7 @@ public class SugarSyncManager {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateModuleItem");
         Uri contentUri = databaseHelper.getModuleUri(moduleName);
-        String[] projections = DatabaseHelper.getModuleProjections(moduleName);
+        String[] projections = databaseHelper.getModuleProjections(moduleName);
         Uri uri = ContentUris.withAppendedId(contentUri, rawId);
         // TODO - is this query resolver needed to query here
         final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(rawId) }, null);
@@ -343,7 +351,7 @@ public class SugarSyncManager {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateRelatedModuleItem");
         Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
-        String[] projections = DatabaseHelper.getModuleProjections(relatedModuleName);
+        String[] projections = databaseHelper.getModuleProjections(relatedModuleName);
         Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
         Log.v(LOG_TAG, "updateRelatedModuleItem URI:" + uri.toString());
         // TODO - is this query resolver needed to query here
@@ -434,7 +442,6 @@ public class SugarSyncManager {
                 // TODO: check if the module is already there in the db. make the rest call
                 // only if it isn't
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-                // TODO use a constant and remove this as we start from the login screen
                 String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
                 Module module = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
                 moduleFieldsInfo.add(module);
@@ -451,5 +458,189 @@ public class SugarSyncManager {
         }
         databaseHelper.close();
         databaseHelper = null;
+    }
+
+    /**
+     * syncOutgoingModuleData, should be only run after incoming changes are synced and the sync
+     * status flag is set for the modules that have merge conflicts
+     * 
+     * @param context
+     * @param account
+     * @param sessionId
+     * @param moduleName
+     * @param syncResult
+     * @throws SugarCrmException
+     */
+    public static synchronized void syncOutgoingModuleData(Context context, String account,
+                                    String sessionId, String moduleName, SyncResult syncResult)
+                                    throws SugarCrmException {
+        if (databaseHelper == null)
+            databaseHelper = new DatabaseHelper(context);
+        // get outgoing items with no merge conflicts
+        Cursor cursor = databaseHelper.getSyncRecordsToSync(moduleName);
+        int num = cursor.getCount();
+
+        String selectFields[] = databaseHelper.getModuleProjections(moduleName);
+
+        for (int i = 0; i < num; i++) {
+            int command = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
+            long syncId = cursor.getLong(Sync.SYNC_ID_COLUMN);
+            String relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
+
+            syncOutgoingModuleItem(context, sessionId, moduleName, relatedModuleName, command, syncId, selectFields);
+        }
+        databaseHelper.close();
+        databaseHelper = null;
+        // databaseHelper.getS
+    }
+
+    private static void syncOutgoingModuleItem(Context context, String sessionId,
+                                    String moduleName, String relatedModuleName, int command,
+                                    long syncId, String[] selectedFields) throws SugarCrmException {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
+        String updatedBeanId = null;
+
+        Uri uri = ContentUris.withAppendedId(databaseHelper.getModuleUri(relatedModuleName), syncId);
+
+        Map<String, String> moduleItemValues = new LinkedHashMap<String, String>();
+        Cursor cursor = context.getContentResolver().query(uri, selectedFields, null, null, null);
+        String relatedModuleLinkedFieldName;
+        relatedModuleLinkedFieldName = databaseHelper.getLinkfieldName(relatedModuleName);
+        String beanId = null;
+
+        switch (command) {
+        case Util.INSERT:
+
+            // discard the RECORD_ID at column index -0 and the random Sync BeanId we generated
+
+            for (int i = 2; i < selectedFields.length; i++) {
+                moduleItemValues.put(selectedFields[i], cursor.getString(cursor.getColumnIndex(selectedFields[i])));
+            }
+            // inserts with a relationship
+            if (relatedModuleLinkedFieldName != null) {
+
+                // TODO - get the parents beanId - requires change to sync table
+                beanId = "";
+                updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+                RelationshipStatus status = RestUtil.setRelationship(url, sessionId, moduleName, beanId, relatedModuleLinkedFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                    Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
+                                                    + status.getFailedCount() + " deleted: "
+                                                    + status.getDeletedCount());
+                }
+
+                if (status.getCreatedCount() >= 1) {
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                        Log.i(LOG_TAG, "Relationship is also set!");
+                    }
+                } else {
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                        Log.i(LOG_TAG, "setRelationship failed!");
+                    }
+                }
+            } else {
+                // insert case for an orphan module add without any relationship, the
+                // updatedBeanId is actually a new beanId returned by server
+                updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+                if (updatedBeanId != null) {
+                    if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                        Log.v(LOG_TAG, "Sync--insert bean on server successful");
+                    }
+                    // TODO- delete the sync record
+                } else {
+                    // we keep the item with last sync_failure date - status
+                }
+
+            }
+            break;
+
+        // make the same calls for update and delete as delete only changes the DELETED flag
+        // to 1
+        case Util.UPDATE:
+            beanId = cursor.getString(cursor.getColumnIndex(SugarCRMContent.SUGAR_BEAN_ID));
+            moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
+            updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+            if (beanId.equals(updatedBeanId)) {
+                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                    Log.v(LOG_TAG, "sync --updated server successful");
+                }
+                // TODO- delete the sync record
+            } else {
+                // we keep the item with last sync_failure date - status
+            }
+
+            break;
+        case Util.DELETE:
+            beanId = cursor.getString(cursor.getColumnIndex(SugarCRMContent.SUGAR_BEAN_ID));
+            moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
+            moduleItemValues.put(ModuleFields.DELETED, Util.DELETED_ITEM);
+            updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+            if (beanId.equals(updatedBeanId)) {
+                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                    Log.v(LOG_TAG, "sync --delete server successful");
+                }
+                // TODO- delete the sync record
+            } else {
+                // we keep the item with last sync_failure date - status
+            }
+
+            break;
+        }
+        cursor.close();
+
+    }
+
+    public synchronized static void syncAclAccess(Context context, String account, String sessionId) {
+        try {
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+            // TODO use a constant and remove this as we start from the login screen
+            String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
+            HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
+
+            String[] userSelectFields = { ModuleFields.ID };
+            if (databaseHelper == null)
+                databaseHelper = new DatabaseHelper(context);
+            String moduleName = Util.USERS;
+            String aclLinkNameField = databaseHelper.getLinkfieldName(Util.ACLROLES);
+            linkNameToFieldsArray.put(aclLinkNameField, Arrays.asList(ACLRoles.INSERT_PROJECTION));
+
+            String actionsLinkNameField = databaseHelper.getLinkfieldName(Util.ACLACTIONS);
+            HashMap<String, List<String>> linkNameToFieldsArrayForActions = new HashMap<String, List<String>>();
+            linkNameToFieldsArrayForActions.put(actionsLinkNameField, Arrays.asList(ACLActions.INSERT_PROJECTION));
+
+            // TODO: get the user name from Account Manager
+            // String userName = SugarCrmSettings.getUsername(getContext());
+
+            // this gives the user bean for the logged in user along with the acl roles associated
+            SugarBean[] userBeans = RestUtil.getEntryList(url, sessionId, moduleName, "Users.user_name='"
+                                            + account + "'", "", "", userSelectFields, linkNameToFieldsArray, "", "");
+            // userBeans always contains only one bean as we use getEntryList with the logged in
+            // user name as the query parameter
+            for (SugarBean userBean : userBeans) {
+                // get the acl roles
+                SugarBean[] roleBeans = userBean.getRelationshipBeans(aclLinkNameField);
+                List<String> roleIds = new ArrayList<String>();
+                // get the beanIds of the roles that are inserted
+                if (roleBeans != null) {
+                    roleIds = databaseHelper.insertRoles(roleBeans);
+                }
+
+                // get the acl actions for each roleId
+                for (String roleId : roleIds) {
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+                        Log.d(LOG_TAG, "roleId - " + roleId);
+
+                    // get the aclRole along with the acl actions associated
+                    SugarBean roleBean = RestUtil.getEntry(url, sessionId, Util.ACLROLES, roleId, ACLRoles.INSERT_PROJECTION, linkNameToFieldsArrayForActions);
+                    SugarBean[] roleRelationBeans = roleBean.getRelationshipBeans(actionsLinkNameField);
+                    if (roleRelationBeans != null) {
+                        databaseHelper.insertActions(roleId, roleRelationBeans);
+                    }
+                }
+            }
+        } catch (SugarCrmException sce) {
+            // Log.e(TAG, "" + sce.getMessage());
+        }
     }
 }

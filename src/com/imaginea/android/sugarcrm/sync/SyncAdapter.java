@@ -84,29 +84,37 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             DatabaseHelper databaseHelper = new DatabaseHelper(mContext);
             List<String> moduleList = databaseHelper.getUserModules();
             databaseHelper.close();
-            
+
             // TODO - this should have been taken care during the first login
             if (moduleList == null)
                 moduleList = RestUtil.getAvailableModules(url, sessionId);
-            
+
             // TODO run this list through our local DB and see if any changes have happened and sync
             // those modules and module fields
             SugarSyncManager.syncModules(mContext, account.name, sessionId);
+            SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
             // TODO - dynamically determine the relationships and get the values
             Collections.sort(moduleList);
             for (String moduleName : moduleList) {
-                Log.i(LOG_TAG, "Syncing Module:" + moduleName);
+                Log.i(LOG_TAG, "Syncing Incoming Module Data:" + moduleName);
 
                 // TODO - should be catch SugarCRMException and allow processing other modules and
                 // fail completely
                 SugarSyncManager.syncModulesData(mContext, account.name, sessionId, moduleName, syncResult);
-            }
 
-           
+                /*
+                 * at this point we are done with identifying the merge conflicts in the sync table
+                 * for incoming module data; the remaining un-synced items in the sync table for
+                 * that module can be published to the server now.
+                 */
+                Log.i(LOG_TAG, "Syncing Outgoing Module Data:" + moduleName);
+                SugarSyncManager.syncOutgoingModuleData(mContext, account.name, sessionId, moduleName, syncResult);
+
+            }
 
             // update the last synced date.
             mLastUpdated = new Date();
-            // do not use  sync result status to notify, notify module specific comprehensive stats
+            // do not use sync result status to notify, notify module specific comprehensive stats
             mContext.getApplicationContext();
             String msg = mContext.getString(R.string.syncMessage);
             Util.notify(mContext, mContext.getApplicationContext().getPackageName(), ContactListActivity.class, R.string.syncSuccess, R.string.syncSuccess, String.format(msg, SugarSyncManager.mTotalRecords));
