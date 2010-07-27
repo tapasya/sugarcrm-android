@@ -81,6 +81,7 @@ public class CRMSyncTestingBase extends SyncBaseInstrumentation {
         ContentValues m = new ContentValues();
         m.put(ModuleFields.ID, getBeanId());
         m.put(ModuleFields.NAME, getMockAccountName());
+        m.put(ModuleFields.DELETED, Util.NEW_ITEM);
         // TODO - date modified - long or string
         Uri url = mResolver.insert(mAccountsUri, m);
 
