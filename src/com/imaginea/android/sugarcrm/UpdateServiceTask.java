@@ -42,6 +42,8 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
     private String mLinkFieldName;
 
+    private DatabaseHelper mDbHelper;
+
     /*
      * represents either delete or update, for local database operations, is always an update on the
      * remote server side
@@ -54,7 +56,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     public UpdateServiceTask(Context context, Intent intent) {
         super(context);
         mContext = context;
-
+        mDbHelper = new DatabaseHelper(context);
         Bundle extras = intent.getExtras();
         mUri = intent.getData();
         mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
@@ -63,9 +65,9 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         }
 
         if (mUri.getPathSegments().size() == 3) {
-            DatabaseHelper dbHelper = new DatabaseHelper(context);
+
             mParentModuleName = mUri.getPathSegments().get(0);
-            mLinkFieldName = dbHelper.getLinkfieldName(mUri.getPathSegments().get(2));
+            mLinkFieldName = mDbHelper.getLinkfieldName(mUri.getPathSegments().get(2));
             if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                 Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : "
                                                 + mLinkFieldName);
@@ -189,9 +191,10 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
                 updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
-                if (!serverUpdated) {
+                if (!serverUpdated && updatedRows > 0) {
                     updateSyncRecord();
                 }
+                sendUpdateStatus(updatedRows);
                 break;
 
             case Util.DELETE:
@@ -199,50 +202,51 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     updatedRows = mContext.getContentResolver().delete(mUri, null, null);
                 } else {
                     // this will update just the delete column, sets it to 1
-                    for (String key : mUpdateNameValueMap.keySet()) {
-                        values.put(key, mUpdateNameValueMap.get(key));
-                    }
+                    values.put(ModuleFields.DELETED, Util.DELETED_ITEM);
+                    // for (String key : mUpdateNameValueMap.keySet()) {
+                    // values.put(key, mUpdateNameValueMap.get(key));
+                    // }
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
-                    updateSyncRecord();
+                    if (updatedRows > 0)
+                        updateSyncRecord();
                 }
+                sendUpdateStatus(updatedRows);
+
                 break;
 
-            }
-
-            // pass the success/failure msg to activity
-            if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
-                if (updatedRows > 0) {
-                    Log.v(LOG_TAG, "update successful");
-                } else {
-                    Log.v(LOG_TAG, "update failed");
-                }
             }
 
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
+        mDbHelper.close();
         return null;
     }
 
+    private void sendUpdateStatus(int updatedRows) {
+
+        // pass the success/failure msg to activity
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+            if (updatedRows > 0) {
+                Log.v(LOG_TAG, "update successful");
+            } else {
+                Log.v(LOG_TAG, "update failed");
+            }
+        }
+    }
+
     private void updateSyncRecord() throws SugarCrmException {
-        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         long syncId = Long.parseLong(mUri.getPathSegments().get(1));
-        SyncRecord rec = dbHelper.getSyncRecord(syncId, mModuleName);
+        SyncRecord rec = mDbHelper.getSyncRecord(syncId, mModuleName);
+        debug(rec);
         if (rec == null)
             insertSyncRecord(mUri);
-        else {
-            // if record is found, there is nothing to update unless related items are set
-            SyncRecord record = new SyncRecord();
-            record.syncId = syncId;
-            record.syncCommand = mCommand;
-            record.moduleName = mLinkFieldName != null ? mParentModuleName : mModuleName;
-            record.relatedModuleName = mModuleName;
-            dbHelper.updateSyncRecord(record);
+        else {           
+            mDbHelper.updateSyncRecord(rec);            
         }
     }
 
     private void insertSyncRecord(Uri insertUri) throws SugarCrmException {
-        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SyncRecord record = new SyncRecord();
         record.syncId = Long.parseLong(insertUri.getPathSegments().get(1));
         record.syncCommand = mCommand;
@@ -250,11 +254,16 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         record.relatedModuleName = mModuleName;
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             debug(record);
-        dbHelper.insertSyncRecord(record);
+        mDbHelper.insertSyncRecord(record);
     }
 
     private void debug(SyncRecord record) {
-        Log.d(LOG_TAG, "Sync id:" + record._id);
+        if (record == null) {
+            Log.d(LOG_TAG, "Sync Record is null");
+            return;
+        }
+        Log.d(LOG_TAG, " id:" + record._id);
+        Log.d(LOG_TAG, "Sync id:" + record.syncId);
         Log.d(LOG_TAG, "Sync command:" + record.syncCommand);
         Log.d(LOG_TAG, "Module name:" + record.moduleName);
         Log.d(LOG_TAG, "Related Module Name:" + record.relatedModuleName);
