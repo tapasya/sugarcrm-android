@@ -113,6 +113,8 @@ public class Util {
 
     public static final String ACLROLES = "ACLRoles";
 
+    public static final String ACLACTIONS = "ACLActions";
+
     public static final String STATUS = "Status";
 
     // CRUD constants
