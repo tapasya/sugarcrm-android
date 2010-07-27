@@ -106,6 +106,10 @@ public class Util {
     public static final String CALLS = "Calls";
 
     public static final String CASES = "Cases";
+    
+    public static final String USERS = "Users";
+    
+    public static final String ACLROLES = "ACLRoles";
 
     public static final int GET = 0;
     
