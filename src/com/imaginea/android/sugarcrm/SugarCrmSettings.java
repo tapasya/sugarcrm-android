@@ -32,15 +32,7 @@ public class SugarCrmSettings extends PreferenceActivity {
     public static String getUsername(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_USERNAME, context.getString(R.string.defaultUser));
     }
-
-    public static String getPassword(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_PASSWORD, context.getString(R.string.defaultPwd));
-    }
-
-    public static boolean isPasswordSaved(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Util.PREF_REMEMBER_PASSWORD, false);
-    }
-
+    
     /**
      * gets SugarCRM RestUrl, on production it returns empty url, if debuggable is set to "false" in
      * the manifest file.
@@ -70,7 +62,6 @@ public class SugarCrmSettings extends PreferenceActivity {
         savedSettings.clear();
         savedSettings.put(Util.PREF_REST_URL, getSugarRestUrl(context));
         savedSettings.put(Util.PREF_USERNAME, getUsername(context));
-        savedSettings.put(Util.PREF_PASSWORD, getPassword(context));
     }
 
     /**
@@ -91,10 +82,6 @@ public class SugarCrmSettings extends PreferenceActivity {
                 return true;
             }
 
-            if (!getPassword(context).equals(savedSettings.get(Util.PREF_PASSWORD))) {
-                return true;
-            }
-
             return false;
         } finally {
             savedSettings.clear();
@@ -111,9 +98,7 @@ public class SugarCrmSettings extends PreferenceActivity {
         // TODO: onChange of settings, session has to be invalidated
         Log.i(LOG_TAG, "url - " + getSugarRestUrl(SugarCrmSettings.this));
         Log.i(LOG_TAG, "username - " + getUsername(SugarCrmSettings.this));
-        Log.i(LOG_TAG, "password - " + getPassword(SugarCrmSettings.this));
-        Log.i(LOG_TAG, "pwdSaved - " + isPasswordSaved(SugarCrmSettings.this));
-
+        
         // invalidate the session if the current settings changes
         if (currentSettingsChanged(SugarCrmSettings.this)) {
             SugarCrmApp app = ((SugarCrmApp) getApplicationContext());

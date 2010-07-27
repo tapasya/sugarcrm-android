@@ -11,17 +11,4 @@
 		android:summary="@string/userSummary"
 		android:defaultValue="@string/defaultUser" />
 		
-	<CheckBoxPreference android:key="rememberPwd"
-            android:title="@string/rememberPassword" 
-            android:defaultValue="false"/>
-            
-	<EditTextPreference android:key="pwd"
-		android:title="@string/password" 
-		android:password="true"
-		android:summary="@string/pwdSummary" 
-		android:defaultValue="@string/defaultPwd"
-		android:dependency="rememberPwd" />
-	
-	
-		
 </PreferenceScreen>
