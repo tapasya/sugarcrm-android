@@ -141,6 +141,20 @@ public interface RestUtilConstants {
 
     public static final String RELATIONSHIP = "relationship";
 
+    public static final String ACCESS = "access";
+
+    public static final String DELETE = "delete";
+
+    public static final String EDIT = "edit";
+
+    public static final String EXPORT = "export";
+
+    public static final String IMPORT = "import";
+
+    public static final String LIST = "list";
+
+    public static final String VIEW = "view";
+
     // Exceptions
     public static final String EXCEPTION = "Exception";
 
