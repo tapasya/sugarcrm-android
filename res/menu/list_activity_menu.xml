@@ -13,7 +13,8 @@
   		android:icon="@android:drawable/ic_menu_add"
         android:title="@string/addItem"         
 		/>
-	<item android:id="@+id/sort"  		
+	<item android:id="@+id/sort"  
+		android:icon="@android:drawable/ic_menu_sort_by_size"		
         android:title="@string/sort"         
 		/>
 </menu>
