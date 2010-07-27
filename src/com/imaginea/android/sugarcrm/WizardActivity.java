@@ -90,19 +90,16 @@ public class WizardActivity extends Activity {
 
         final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardActivity.this);
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
-        final String pwd = SugarCrmSettings.getPassword(WizardActivity.this).toString();
-        final boolean isPwdRemembered = SugarCrmSettings.isPasswordSaved(WizardActivity.this);
-        Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n pwd - " + pwd
-                                        + "\n rememberedPwd - " + isPwdRemembered);
+        Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n");
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        // if the password is already saved
-        if (isPwdRemembered && !TextUtils.isEmpty(restUrl)) {
-            Log.i(LOG_TAG, "Password is remembered!");
-            wizardState = Util.URL_USER_PWD_AVAILABLE;
-
-            mAuthTask = new AuthenticationTask();
-            mAuthTask.execute(usr, pwd, isPwdRemembered);
+        // if the user is not connected to the network
+        if (!Util.isNetworkOn(getBaseContext())) {
+            wizardState = Util.OFFLINE_MODE;
+            Log.i(LOG_TAG, "In OFFLINE mode!");
+            // directly send him to dashboard if the user is not connected to the network
+            setResult(RESULT_OK);
+            finish();
         } else {
 
             // if the REST url is not available
@@ -202,7 +199,6 @@ public class WizardActivity extends Activity {
     public void handleLogin(View view) {
         String usr = ((EditText) flipper.findViewById(R.id.loginUsername)).getText().toString();
         String pwd = ((EditText) flipper.findViewById(R.id.loginPassword)).getText().toString();
-        boolean rememberPwd = ((CheckBox) flipper.findViewById(R.id.loginRememberPwd)).isChecked();
 
         TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
         String msg = "";
@@ -211,7 +207,7 @@ public class WizardActivity extends Activity {
             tv.setText(msg);
         } else {
             mAuthTask = new AuthenticationTask();
-            mAuthTask.execute(usr, pwd, rememberPwd);
+            mAuthTask.execute(usr, pwd);
         }
 
     }
@@ -348,8 +344,6 @@ public class WizardActivity extends Activity {
 
         private String pwd;
 
-        private boolean rememberPwd;
-
         boolean hasExceptions = false;
 
         private String sceDesc;
@@ -362,7 +356,6 @@ public class WizardActivity extends Activity {
              */
             usr = args[0].toString();
             pwd = args[1].toString();
-            rememberPwd = Boolean.valueOf(args[2].toString());
             String url = SugarCrmSettings.getSugarRestUrl(getBaseContext());
 
             String sessionId = null;
@@ -465,10 +458,6 @@ public class WizardActivity extends Activity {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(WizardActivity.this);
                 Editor editor = sp.edit();
                 editor.putString(Util.PREF_USERNAME, usr);
-                if (rememberPwd) {
-                    editor.putString(Util.PREF_PASSWORD, pwd);
-                    editor.putBoolean(Util.PREF_REMEMBER_PASSWORD, true);
-                }
                 editor.commit();
 
                 if (wizardState != Util.URL_USER_PWD_AVAILABLE) {

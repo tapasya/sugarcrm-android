@@ -134,19 +134,15 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
         final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardAuthActivity.this);
         final String usr = SugarCrmSettings.getUsername(WizardAuthActivity.this).toString();
-        final String pwd = SugarCrmSettings.getPassword(WizardAuthActivity.this).toString();
-        final boolean isPwdRemembered = SugarCrmSettings.isPasswordSaved(WizardAuthActivity.this);
-        Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n pwd - " + pwd
-                                        + "\n rememberedPwd - " + isPwdRemembered);
+        Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n");
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        // if the password is already saved
-        if (isPwdRemembered && !TextUtils.isEmpty(restUrl)) {
-            Log.i(LOG_TAG, "Password is remembered!");
-            wizardState = Util.URL_USER_PWD_AVAILABLE;
-
-            mAuthTask = new AuthenticationTask();
-            mAuthTask.execute(usr, pwd, isPwdRemembered);
+        // if the user is not connected to the network
+        if (!Util.isNetworkOn(getBaseContext())) {
+            wizardState = Util.OFFLINE_MODE;
+            // directly send him to dashboard if the user is not connected to the network 
+            setResult(RESULT_OK);
+            finish();
         } else {
 
             // if the REST url is not available
@@ -246,7 +242,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
     public void handleLogin(View view) {
         String usr = ((EditText) flipper.findViewById(R.id.loginUsername)).getText().toString();
         String pwd = ((EditText) flipper.findViewById(R.id.loginPassword)).getText().toString();
-        boolean rememberPwd = ((CheckBox) flipper.findViewById(R.id.loginRememberPwd)).isChecked();
+        // boolean rememberPwd = ((CheckBox)
+        // flipper.findViewById(R.id.loginRememberPwd)).isChecked();
 
         TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
         String msg = "";
@@ -255,7 +252,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             tv.setText(msg);
         } else {
             mAuthTask = new AuthenticationTask();
-            mAuthTask.execute(usr, pwd, rememberPwd);
+            mAuthTask.execute(usr, pwd); // rememberPwd);
         }
 
     }
@@ -392,7 +389,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
         private String pwd;
 
-        private boolean rememberPwd;
+        //
+        // private boolean rememberPwd;
 
         boolean hasExceptions = false;
 
@@ -412,8 +410,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             // TODO this settings are important - make it cleaner later to use the same variables
             mUsername = usr;
             pwd = args[1].toString();
-            mPassword = pwd;
-            rememberPwd = Boolean.valueOf(args[2].toString());
             String url = SugarCrmSettings.getSugarRestUrl(getBaseContext());
 
             String sessionId = null;
@@ -495,10 +491,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(WizardAuthActivity.this);
                 Editor editor = sp.edit();
                 editor.putString(Util.PREF_USERNAME, usr);
-                if (rememberPwd) {
-                    editor.putString(Util.PREF_PASSWORD, pwd);
-                    editor.putBoolean(Util.PREF_REMEMBER_PASSWORD, true);
-                }
                 editor.commit();
 
                 if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
