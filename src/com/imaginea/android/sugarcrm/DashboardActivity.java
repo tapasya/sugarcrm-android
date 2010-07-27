@@ -45,7 +45,6 @@ public class DashboardActivity extends Activity {
         TextView tv = (TextView) findViewById(R.id.headerText);
         tv.setText(R.string.home);
         mDashboard = (GridView) findViewById(R.id.dashboard);
-      
 
         mDashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {

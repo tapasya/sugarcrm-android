@@ -35,15 +35,16 @@ public class SugarBean {
             setBeanId(jsonObject.get("id").toString());
             String nameValueList = jsonObject.get("name_value_list").toString();
             setEntryList(SBParseHelper.getNameValuePairs(nameValueList));
-            
+
             Map<String, SugarBean[]> relationshipList = getRelationshipBeans(relationshipListJson);
             setRelationshipList(relationshipList);
         } catch (JSONException e) {
             throw new SugarCrmException(JSON_EXCEPTION, e.getMessage());
         }
     }
-    
-    private Map<String, SugarBean[]> getRelationshipBeans(JSONArray mRelationshipListJson) throws SugarCrmException {
+
+    private Map<String, SugarBean[]> getRelationshipBeans(JSONArray mRelationshipListJson)
+                                    throws SugarCrmException {
         Map<String, SugarBean[]> relationshipList = new HashMap<String, SugarBean[]>();
         try {
             JSONArray relationshipJson = mRelationshipListJson.getJSONArray(0);
@@ -61,7 +62,7 @@ public class SugarBean {
         }
         return relationshipList;
     }
-    
+
     private SugarBean[] getSugarBeans(String recordsJson) throws SugarCrmException {
         try {
             JSONArray recordsArray = new JSONArray(recordsJson);

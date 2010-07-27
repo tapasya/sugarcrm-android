@@ -29,7 +29,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
     // TODO - remove this
     private String mSessionId;
 
-    private String mModuleName;    
+    private String mModuleName;
 
     private String[] mSelectFields;
 
@@ -38,7 +38,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
     private String mMaxResults = "0";
 
     private Uri mUri;
-    
+
     private String mQuery = "", mOrderBy = "";
 
     private String mOffset = "0";

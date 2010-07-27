@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -283,7 +282,7 @@ public class AccountDetailsActivity extends Activity {
             String title = "";
             List<String> titleFields = Arrays.asList(mDbHelper.getModuleListSelections(mModuleName));
 
-            if(!isCancelled())
+            if (!isCancelled())
                 mCursor.moveToFirst();
 
             LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -301,9 +300,9 @@ public class AccountDetailsActivity extends Activity {
             // ROW_ID and BEAN_ID
             for (int i = 2; i < detailsProjection.length - 2; i++) {
                 // if the task gets cancelled
-                if(isCancelled())
+                if (isCancelled())
                     break;
-                
+
                 String fieldName = detailsProjection[i];
                 int columnIndex = mCursor.getColumnIndex(fieldName);
                 if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {

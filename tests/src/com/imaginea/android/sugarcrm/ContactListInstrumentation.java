@@ -8,31 +8,30 @@ import android.view.KeyEvent;
  * Instrumentation class for Contacts List launch performance testing.
  */
 public class ContactListInstrumentation extends
-		ActivityInstrumentationTestCase2<ContactListActivity> {
+                                ActivityInstrumentationTestCase2<ContactListActivity> {
 
-	public static final String LOG_TAG = "ContactListInstrumentation";
+    public static final String LOG_TAG = "ContactListInstrumentation";
 
-	public ContactListInstrumentation() {
-		super(ContactListActivity.class);
-	}
+    public ContactListInstrumentation() {
+        super(ContactListActivity.class);
+    }
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		final ContactListActivity a = getActivity();
-		// ensure a valid handle to the activity has been returned
-		assertNotNull(a);
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        final ContactListActivity a = getActivity();
+        // ensure a valid handle to the activity has been returned
+        assertNotNull(a);
 
-	}
+    }
 
-	/**
-	 * The name 'test preconditions' is a convention to signal that if this test
-	 * doesn't pass, the test case was not set up properly and it might explain
-	 * any and all failures in other tests. This is not guaranteed to run before
-	 * other tests, as junit uses reflection to find the tests.
-	 */
-	@MediumTest
-	public void testPreconditions() {
+    /**
+     * The name 'test preconditions' is a convention to signal that if this test doesn't pass, the
+     * test case was not set up properly and it might explain any and all failures in other tests.
+     * This is not guaranteed to run before other tests, as junit uses reflection to find the tests.
+     */
+    @MediumTest
+    public void testPreconditions() {
 
-	}
+    }
 }

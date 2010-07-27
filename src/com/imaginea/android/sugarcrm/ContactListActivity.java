@@ -507,7 +507,7 @@ public class ContactListActivity extends ListActivity {
 
         if (mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
-        
+
         Cursor cursor = (Cursor) getListAdapter().getItem(info.position);
         if (cursor == null) {
             // For some reason the requested item isn't available, do nothing
@@ -515,9 +515,9 @@ public class ContactListActivity extends ListActivity {
         }
         int index = cursor.getColumnIndex(ModuleFields.CREATED_BY_NAME);
         String ownerName = cursor.getString(index);
-        
+
         menu.add(1, R.string.view, 2, R.string.view).setEnabled(mDbHelper.isAclEnabled(mModuleName, RestUtilConstants.VIEW, ownerName));
-        menu.add(2, R.string.edit, 3, R.string.edit).setEnabled(mDbHelper.isAclEnabled(mModuleName, RestUtilConstants.EDIT,ownerName));
+        menu.add(2, R.string.edit, 3, R.string.edit).setEnabled(mDbHelper.isAclEnabled(mModuleName, RestUtilConstants.EDIT, ownerName));
         menu.add(3, R.string.delete, 4, R.string.delete).setEnabled(mDbHelper.isAclEnabled(mModuleName, RestUtilConstants.DELETE, ownerName));
 
         // TODO disable options based on acl actions for the module

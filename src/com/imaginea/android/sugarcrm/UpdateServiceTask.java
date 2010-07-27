@@ -241,8 +241,8 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         debug(rec);
         if (rec == null)
             insertSyncRecord(mUri);
-        else {           
-            mDbHelper.updateSyncRecord(rec);            
+        else {
+            mDbHelper.updateSyncRecord(rec);
         }
     }
 
