@@ -85,6 +85,10 @@ public class ContactListActivity extends ListActivity {
 
     private int MODE = Util.LIST_MODE;
 
+    private String mSelections = ModuleFields.DELETED + "=?";
+
+    private String[] mSelectionArgs = new String[] { Util.EXCLUDE_DELETED_ITEMS };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,7 +142,7 @@ public class ContactListActivity extends ListActivity {
         // if the parentModuleName is not null, then it is the list of relationship beans
         // String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
 
-        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), mSelections, mSelectionArgs, mDbHelper.getModuleSortOrder(mModuleName));
 
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
