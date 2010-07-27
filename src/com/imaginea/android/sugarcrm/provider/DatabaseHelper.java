@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
+import com.imaginea.android.sugarcrm.RestUtilConstants;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActionColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoleColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
@@ -690,21 +691,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ModuleField getModuleField(String moduleName, String fieldName) {
         SQLiteDatabase db = getReadableDatabase();
+        ModuleField moduleField = null;
+
         String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
         Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
-        cursor.moveToFirst();
-        String moduleId = cursor.getString(0);
+        int num = cursor.getCount();
+        if (num > 0) {
+            cursor.moveToFirst();
+            String moduleId = cursor.getString(0);
+            cursor.close();
+
+            selection = "(" + ModuleFieldColumns.MODULE_ID + "=" + moduleId + " AND "
+                                            + ModuleFieldColumns.NAME + "='" + fieldName + "')";
+            cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
+            cursor.moveToFirst();
+
+            if (cursor.getCount() > 0)
+                moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
+
+                                                : false);
+        }
         cursor.close();
 
-        selection = "(" + ModuleFieldColumns.MODULE_ID + "=" + moduleId + " AND "
-                                        + ModuleFieldColumns.NAME + "='" + fieldName + "')";
-        cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
-        cursor.moveToFirst();
-        ModuleField moduleField = null;
-        if (cursor.getCount() > 0)
-            moduleField = new ModuleField(cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.NAME)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.TYPE)), cursor.getString(cursor.getColumnIndex(ModuleFieldColumns.LABEL)), cursor.getInt(cursor.getColumnIndex(ModuleFieldColumns.IS_REQUIRED)) == 1 ? true
-                                            : false);
-        cursor.close();
         db.close();
 
         return moduleField;
@@ -832,20 +840,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return
      */
     public SyncRecord getSyncRecord(long syncId, String moduleName) {
-
+        SyncRecord record = null;
         SQLiteDatabase db = getReadableDatabase();
-        String selection = Util.SYNC_ID + "=?" + " AND " + ModuleColumns.MODULE_NAME + "=?";
+        String selection = Util.SYNC_ID + "=?" + " AND " + RestUtilConstants.MODULE + "=?";
         String selectionArgs[] = new String[] { "" + syncId, moduleName };
         Cursor cursor = db.query(SYNC_TABLE_NAME, Sync.DETAILS_PROJECTION, selection, selectionArgs, null, null, null);
-        cursor.moveToFirst();
-        SyncRecord record = new SyncRecord();
-        record._id = cursor.getLong(Sync.ID_COLUMN);
-        record.syncId = cursor.getLong(Sync.SYNC_ID_COLUMN);
-        record.syncCommand = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
-        record.moduleName = cursor.getString(Sync.MODULE_NAME_COLUMN);
-        record.relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
+        int num = cursor.getCount();
+
+        if (num > 0) {
+            cursor.moveToFirst();
+            record = new SyncRecord();
+            record._id = cursor.getLong(Sync.ID_COLUMN);
+            record.syncId = cursor.getLong(Sync.SYNC_ID_COLUMN);
+            record.syncCommand = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
+            record.moduleName = cursor.getString(Sync.MODULE_NAME_COLUMN);
+            record.relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
+        }
         cursor.close();
         db.close();
+
         return record;
 
     }
@@ -861,13 +874,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(SyncColumns.ID, record._id);
+        // values.put(SyncColumns.ID, record._id);
         values.put(SyncColumns.SYNC_ID, record.syncId);
         // values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
         values.put(SyncColumns.MODULE, record.moduleName);
         values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
 
-        long rowId = db.insert(SYNC_TABLE_NAME, "", values);
+        long rowId = db.update(SYNC_TABLE_NAME, values, Sync.ID + "=?", new String[] { ""
+                                        + record._id });
         if (rowId < 0)
             throw new SugarCrmException("FAILED to update sync record!");
         return rowId;
@@ -877,7 +891,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(SyncColumns.ID, record._id);
+        // values.put(SyncColumns.ID, record._id);
         values.put(SyncColumns.SYNC_ID, record.syncId);
         values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
         values.put(SyncColumns.MODULE, record.moduleName);
