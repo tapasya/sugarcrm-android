@@ -46,7 +46,7 @@ public class EditDetailsActivity extends Activity {
     private Uri mIntentUri;
 
     private DatabaseHelper mDbHelper;
-    
+
     private LoadContentTask mTask;
 
     /** Called when the activity is first created. */
@@ -94,12 +94,14 @@ public class EditDetailsActivity extends Activity {
 
         mSelectFields = mDbHelper.getModuleProjections(mModuleName);
 
-        /*if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
-        }*/
+        /*
+         * if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) { mCursor =
+         * getContentResolver().query(getIntent().getData(), mSelectFields, null, null,
+         * mDbHelper.getModuleSortOrder(mModuleName)); }
+         */
         // startManagingCursor(mCursor);
-        //setContents();
-        
+        // setContents();
+
         mTask = new LoadContentTask();
         mTask.execute(null);
     }
@@ -107,12 +109,12 @@ public class EditDetailsActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        
+
         if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
             mTask.cancel(true);
         }
     }
-    
+
     class LoadContentTask extends AsyncTask<Object, Object, Object> {
 
         int staticRowsCount;
@@ -120,9 +122,9 @@ public class EditDetailsActivity extends Activity {
         final int STATIC_ROW = 1;
 
         final int DYNAMIC_ROW = 2;
-        
+
         final int SAVE_BUTTON = 3;
-        
+
         final int INPUT_TYPE = 4;
 
         LoadContentTask() {
@@ -135,7 +137,7 @@ public class EditDetailsActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            
+
             TextView tv = (TextView) findViewById(R.id.headerText);
             if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                 tv.setText(String.format(getString(R.string.editDetailsHeader), mModuleName));
@@ -170,12 +172,12 @@ public class EditDetailsActivity extends Activity {
                 valueView.setText((String) values[5]);
                 mDetailsTable.addView(editRow);
                 break;
-                
+
             case INPUT_TYPE:
-                valueView = (EditText)values[1];
-                valueView.setInputType((Integer)values[2]);
+                valueView = (EditText) values[1];
+                valueView.setInputType((Integer) values[2]);
                 break;
-                
+
             }
         }
 
@@ -216,7 +218,7 @@ public class EditDetailsActivity extends Activity {
                 break;
             case Util.FETCH_SUCCESS:
                 // set visibility for the SAVE button
-                findViewById(R.id.save).setVisibility(View.VISIBLE);                
+                findViewById(R.id.save).setVisibility(View.VISIBLE);
                 break;
             default:
 
@@ -231,7 +233,7 @@ public class EditDetailsActivity extends Activity {
                 mDbHelper = new DatabaseHelper(getBaseContext());
 
             if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                if(!isCancelled()){
+                if (!isCancelled()) {
                     mCursor.moveToFirst();
                     mSugarBeanId = mCursor.getString(1); // beanId has columnIndex 1
                 }
@@ -245,9 +247,9 @@ public class EditDetailsActivity extends Activity {
             // ROW_ID and BEAN_ID
             for (int i = 2; i < detailsProjection.length - 2; i++) {
                 // if the task gets cancelled
-                if(isCancelled())
+                if (isCancelled())
                     break;
-                
+
                 String fieldName = detailsProjection[i];
 
                 // get the attributes of the moduleField
@@ -283,36 +285,35 @@ public class EditDetailsActivity extends Activity {
                 if (staticRowsCount < i - 2) {
                     command = DYNAMIC_ROW;
                 }
-                
+
                 if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                     String value = mCursor.getString(mCursor.getColumnIndex(fieldName));
                     if (!TextUtils.isEmpty(value)) {
                         publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, value);
-                    } else{
+                    } else {
                         publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, "");
                     }
                     setInputType(editTextForValue, moduleField);
-                    
-                } else{
+
+                } else {
                     publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, "");
                 }
             }
-            
+
         }
-        
+
         /*
          * takes care of basic validation automatically for some fields
          */
         private void setInputType(TextView editTextForValue, ModuleField moduleField) {
-            if(Log.isLoggable(TAG,Log.VERBOSE))
+            if (Log.isLoggable(TAG, Log.VERBOSE))
                 Log.v(TAG, "ModuleField type:" + moduleField.getType());
-            if (moduleField.getType().equals("phone")){
-                //editTextForValue.setInputType(InputType.TYPE_CLASS_PHONE);
+            if (moduleField.getType().equals("phone")) {
+                // editTextForValue.setInputType(InputType.TYPE_CLASS_PHONE);
                 publishProgress(INPUT_TYPE, editTextForValue, InputType.TYPE_CLASS_PHONE);
             }
         }
     }
-    
 
     /**
      * on click listener for saving a module item
@@ -333,8 +334,8 @@ public class EditDetailsActivity extends Activity {
                                             && ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
                 continue;
 
-            //EditText editText = (EditText) mDetailsTable.findViewById(i);
-            EditText editText = (EditText)((ViewGroup)mDetailsTable.getChildAt(i-2)).getChildAt(1);
+            // EditText editText = (EditText) mDetailsTable.findViewById(i);
+            EditText editText = (EditText) ((ViewGroup) mDetailsTable.getChildAt(i - 2)).getChildAt(1);
             Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
 
             // TODO: validation
@@ -346,8 +347,10 @@ public class EditDetailsActivity extends Activity {
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
             ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId), mModuleName, mSugarBeanId, modifiedValues);
         } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+            modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
             ServiceHelper.startServiceForInsert(getBaseContext(), mIntentUri, mModuleName, modifiedValues);
         } else if (MODE == Util.NEW_ORPHAN_MODE) {
+            modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
             ServiceHelper.startServiceForInsert(getBaseContext(), mDbHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
         }
 
@@ -376,5 +379,5 @@ public class EditDetailsActivity extends Activity {
         }
         // return false;
     }
-    
+
 }
