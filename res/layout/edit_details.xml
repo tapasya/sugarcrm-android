@@ -8,9 +8,8 @@
     <TextView android:id="@+id/accountName"
 		android:layout_height="wrap_content" 
 		android:layout_width="fill_parent"
-		android:layout_below="@id/header"
-		android:gravity="center"
-		style="@style/header_text_label"/>
+		android:layout_below="@id/header"		
+		style="@style/header_2_text_label"/>
     <ScrollView 
 		android:layout_width="fill_parent" 
 		android:layout_height="fill_parent"
