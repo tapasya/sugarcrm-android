@@ -598,7 +598,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + Sync.SYNC_ID + " INTEGER ," + Sync.SYNC_COMMAND
                                         + " INTEGER," + Sync.MODULE + " TEXT,"
                                         + Sync.RELATED_MODULE + " TEXT," + Sync.DATE_MODIFIED
-                                        + " TEXT" + ");");
+                                        + " TEXT," + Sync.SYNC_STATUS + " INTEGER" + ");");
     }
 
     private static void createAclRolesTable(SQLiteDatabase db) {
@@ -948,12 +948,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             record.syncCommand = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
             record.moduleName = cursor.getString(Sync.MODULE_NAME_COLUMN);
             record.relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
+            record.status = cursor.getInt(Sync.STATUS_COLUMN);
         }
         cursor.close();
         db.close();
 
         return record;
 
+    }
+
+    /**
+     * gets the unsynced sync records from the sync table
+     * 
+     * @param moduleName
+     * @return
+     */
+    public Cursor getSyncRecords(String moduleName, int status) {
+        SQLiteDatabase db = getReadableDatabase();
+        String selection = RestUtilConstants.MODULE + "=?" + " AND " + Util.STATUS + "=?";
+        String selectionArgs[] = new String[] { moduleName, "" + status };
+
+        Cursor cursor = db.query(DatabaseHelper.SYNC_TABLE_NAME, Sync.DETAILS_PROJECTION, selection, selectionArgs, null, null, null);
+        return cursor;
+    }
+
+    public Cursor getConflictingSyncRecords(String moduleName) {
+        return getSyncRecords(moduleName, Util.CONFLICTS);
+    }
+
+    public Cursor getSyncRecordsToSync(String moduleName) {
+        return getSyncRecords(moduleName, Util.UNSYNCED);
     }
 
     /**
@@ -1000,23 +1024,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         for (SugarBean actionBean : roleRelationBeans) {
-            
+
             ContentValues values = new ContentValues();
             String[] aclActionFields = ACLActions.INSERT_PROJECTION;
             for (int i = 0; i < aclActionFields.length; i++) {
-                if(Log.isLoggable(TAG, Log.DEBUG))
+                if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, actionBean.getFieldValue(aclActionFields[i]));
-                
+
                 values.put(aclActionFields[i], actionBean.getFieldValue(aclActionFields[i]));
             }
-            
+
             // get the row id of the role
             String selection = ACLRoleColumns.ROLE_ID + "='" + roleId + "'";
             Cursor cursor = db.query(DatabaseHelper.ACL_ROLES_TABLE_NAME, ACLRoles.DETAILS_PROJECTION, selection, null, null, null, null);
             cursor.moveToFirst();
             int roleRowId = cursor.getInt(0);
             cursor.close();
-            
+
             values.put(ACLActionColumns.ROLE_ID, roleRowId);
             db.insert(DatabaseHelper.ACL_ACTIONS_TABLE_NAME, "", values);
         }
@@ -1025,17 +1049,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-
     public List<String> insertRoles(SugarBean[] roleBeans) {
         List<String> roleIds = new ArrayList<String>();
         SQLiteDatabase db = getWritableDatabase();
-        for(int i=0; i<roleBeans.length; i++){
+        for (int i = 0; i < roleBeans.length; i++) {
             ContentValues values = new ContentValues();
-            for(String fieldName : ACLRoles.INSERT_PROJECTION){
-                if(Log.isLoggable(TAG, Log.DEBUG))
+            for (String fieldName : ACLRoles.INSERT_PROJECTION) {
+                if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, fieldName + " : " + roleBeans[i].getFieldValue(fieldName));
-                
-                if(fieldName.equals(ModuleFields.ID)){
+
+                if (fieldName.equals(ModuleFields.ID)) {
                     roleIds.add(roleBeans[i].getFieldValue(fieldName));
                 }
                 values.put(fieldName, roleBeans[i].getFieldValue(fieldName));

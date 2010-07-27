@@ -619,6 +619,8 @@ public final class SugarCRMContent {
 
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
 
+        public String SYNC_STATUS = Util.STATUS;
+
     }
 
     public static final class Sync implements SyncColumns {
@@ -636,13 +638,17 @@ public final class SugarCRMContent {
 
         public static final int RELATED_MODULE_NAME_COLUMN = 4;
 
+        public static final int MODIFIED_DATE_COLUMN = 5;
+
+        public static final int STATUS_COLUMN = 6;
+
         /**
          * The default sort order for this table
          */
         public static final String DEFAULT_SORT_ORDER = ModuleFields.DATE_MODIFIED + " DESC";
 
         public static final String[] DETAILS_PROJECTION = { ID, SYNC_ID, SYNC_COMMAND, MODULE,
-                RELATED_MODULE, DATE_MODIFIED };
+                RELATED_MODULE, DATE_MODIFIED, SYNC_STATUS };
 
     }
 
@@ -687,7 +693,8 @@ public final class SugarCRMContent {
     }
 
     public static final class ACLActions implements ACLActionColumns {
-        public static final String[] INSERT_PROJECTION = { ACTION_ID, NAME, CATEGORY, ACLACCESS, ACLTYPE };
+        public static final String[] INSERT_PROJECTION = { ACTION_ID, NAME, CATEGORY, ACLACCESS,
+                ACLTYPE };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, ACTION_ID, NAME, CATEGORY,
                 ACLACCESS, ACLTYPE };
