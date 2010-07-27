@@ -10,7 +10,9 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Messenger;
 import android.os.PowerManager;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
@@ -67,6 +69,8 @@ public class SugarService extends Service {
     public static int mStatus = 0;
 
     private static int mRecentStartId;
+
+    private static Messenger mMessenger;
 
     // constants for syncing
     // public static final String SERVICECMD = "com.imaginea.android.synccommand";
@@ -410,6 +414,63 @@ public class SugarService extends Service {
     private void releaseWakeLock() {
         if (mWakeLock != null && mWakeLock.isHeld()) {
             mWakeLock.release();
+        }
+    }
+
+    /**
+     * We only register one Messenger as only one Activity is connected to us at given time.modify
+     * to add to a list if we need multiple activity support -?? this will never happen in current
+     * android architecture; will happen if single screen holds two activities ???
+     * 
+     * @param messenger
+     */
+    public static void registerMessenger(Messenger messenger) {
+
+        // messengerList.add(messenger);
+        mMessenger = messenger;
+    }
+
+    /**
+     * keeping the messenger in case we go ahead with multiple listeners
+     * Activities should unregister in onPause and register in onResume so that they continue to receive messages specific to them,
+     * further filtering can be done while sending messages so that unwanted messages are not sent. 
+     * 
+     * @param messenger
+     */
+    public static void unregisterMessenger(Messenger messenger) {
+        mMessenger = null;
+    }
+
+    /**
+     * messages will be sent to the activity or any component that is currently registered with this
+     * service made static so can directly call this to display the status of the
+     * 
+     * @param what
+     * @param obj
+     */
+    public static synchronized void sendMessage(int what, Object obj) {
+
+        if (mMessenger == null) {
+            if (Log.isLoggable(TAG, Log.VERBOSE))
+                Log.v(TAG, "Messenger is null ");
+            return;
+        }
+        try {
+            if (mMessenger != null) {
+                if (Log.isLoggable(TAG, Log.VERBOSE))
+                    Log.v(TAG, "Sending Message using Messenger" + mMessenger.toString());
+                Message message = Message.obtain();
+                message.what = what;
+                message.obj = obj;
+                mMessenger.send(message);
+            }
+        } catch (RemoteException e) {
+            // This should hopefullly not happen ? as we are not remote but
+            // using it within
+            // same process - but some error message needs to be sent to UI
+            // -
+            // TBD
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 }
