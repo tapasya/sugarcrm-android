@@ -21,7 +21,7 @@ public final class SugarCRMContent {
     public static final String SUGAR_BEAN_ID = ModuleFields.ID;
 
     public static final String MODULE_ROW_ID = "module_id";
-    
+
     public static final String ROLE_ROW_ID = "role_id";
 
     public static final class Accounts implements AccountsColumns {
@@ -34,7 +34,8 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = NAME + " ASC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, EMAIL1, CREATED_BY_NAME };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, EMAIL1,
+                CREATED_BY_NAME };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME };
 
@@ -45,7 +46,8 @@ public final class SugarCRMContent {
                 BILLING_ADDRESS_POSTALCODE, BILLING_ADDRESS_COUNTRY, SHIPPING_ADDRESS_STREET,
                 SHIPPING_ADDRESS_STREET_2, SHIPPING_ADDRESS_STREET_3, SHIPPING_ADDRESS_STREET_4,
                 SHIPPING_ADDRESS_CITY, SHIPPING_ADDRESS_STATE, SHIPPING_ADDRESS_POSTALCODE,
-                SHIPPING_ADDRESS_COUNTRY, ASSIGNED_USER_NAME, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
+                SHIPPING_ADDRESS_COUNTRY, ASSIGNED_USER_NAME, CREATED_BY_NAME, DATE_ENTERED,
+                DATE_MODIFIED, DELETED };
 
     }
 
@@ -111,7 +113,7 @@ public final class SugarCRMContent {
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
 
         public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
-        
+
         public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
 
     }
@@ -155,8 +157,8 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME,
-                LAST_NAME, ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, CREATED_BY_NAME, DATE_ENTERED,
-                DATE_MODIFIED, DELETED, ACCOUNT_ID  };
+                LAST_NAME, ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, CREATED_BY_NAME,
+                DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
 
     }
 
@@ -189,7 +191,7 @@ public final class SugarCRMContent {
         public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
 
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
-        
+
         public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
     }
 
@@ -254,13 +256,15 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME, CREATED_BY_NAME };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
+                CREATED_BY_NAME };
 
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME,
                 LAST_NAME, LEAD_SOURCE, PHONE_WORK, PHONE_FAX, EMAIL1, ACCOUNT_NAME, TITLE,
-                ASSIGNED_USER_NAME, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
+                ASSIGNED_USER_NAME, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED,
+                ACCOUNT_ID };
 
     }
 
@@ -296,7 +300,7 @@ public final class SugarCRMContent {
         public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
 
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
-        
+
         public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
     }
 
@@ -310,13 +314,15 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, OPPORTUNITY_TYPE, CREATED_BY_NAME };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME,
+                OPPORTUNITY_TYPE, CREATED_BY_NAME };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
                 AMOUNT, DATE_CLOSED, OPPORTUNITY_TYPE, LEAD_SOURCE, SALES_STAGE, CAMPAIGN_NAME,
-                PROBABILITY, ASSIGNED_USER_NAME, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
+                PROBABILITY, ASSIGNED_USER_NAME, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED,
+                DELETED, ACCOUNT_ID };
 
     }
 
@@ -395,8 +401,8 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { NAME, PRIORITY, DATE_MODIFIED };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER,
-                PRIORITY, ASSIGNED_USER_NAME, STATUS, DESCRIPTION, RESOLUTION, CREATED_BY_NAME, DATE_ENTERED,
-                DATE_MODIFIED, DELETED };
+                PRIORITY, ASSIGNED_USER_NAME, STATUS, DESCRIPTION, RESOLUTION, CREATED_BY_NAME,
+                DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
 
@@ -424,7 +430,7 @@ public final class SugarCRMContent {
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
 
         public String DELETED = ModuleFields.DELETED;
-        
+
         public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
 
     }
@@ -439,13 +445,14 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = START_DATE + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE, CREATED_BY_NAME };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
+                CREATED_BY_NAME };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
-                DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME, DESCRIPTION, CREATED_BY_NAME, DATE_ENTERED,
-                DATE_MODIFIED, DELETED };
+                DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME, DESCRIPTION, CREATED_BY_NAME,
+                DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
 
@@ -473,7 +480,7 @@ public final class SugarCRMContent {
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
 
         public String DELETED = ModuleFields.DELETED;
-        
+
         public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
 
     }
@@ -488,7 +495,8 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = START_DATE + " DESC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE, CREATED_BY_NAME };
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
+                CREATED_BY_NAME };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
 
@@ -524,7 +532,7 @@ public final class SugarCRMContent {
         public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
 
         public String DELETED = ModuleFields.DELETED;
-        
+
         public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
 
     }
@@ -651,6 +659,8 @@ public final class SugarCRMContent {
     }
 
     public static final class ACLRoles implements ACLRoleColumns {
+        public static final String[] INSERT_PROJECTION = { SUGAR_BEAN_ID, NAME, TYPE, DESCRIPTION };
+
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, SUGAR_BEAN_ID, NAME, TYPE,
                 DESCRIPTION };
 
@@ -672,11 +682,13 @@ public final class SugarCRMContent {
         public String ACLACCESS = "aclaccess";
 
         public String ACLTYPE = "acltype";
-        
+
         public String ROLE_ID = ROLE_ROW_ID;
     }
 
     public static final class ACLActions implements ACLActionColumns {
+        public static final String[] INSERT_PROJECTION = { ACTION_ID, NAME, CATEGORY, ACLACCESS, ACLTYPE };
+
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, ACTION_ID, NAME, CATEGORY,
                 ACLACCESS, ACLTYPE };
 
