@@ -10,4 +10,6 @@ public class SyncRecord {
     public String moduleName;
 
     public String relatedModuleName;
+
+    public int status;
 }
