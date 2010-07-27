@@ -15,6 +15,7 @@ import com.imaginea.android.sugarcrm.SugarCrmSettings;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActionColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActions;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoleColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoles;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
@@ -42,6 +43,7 @@ import com.imaginea.android.sugarcrm.util.ACLConstants;
 import com.imaginea.android.sugarcrm.util.LinkField;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 
@@ -994,4 +996,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
+    public void insertActions(String roleId, SugarBean[] roleRelationBeans) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        for (SugarBean actionBean : roleRelationBeans) {
+            
+            ContentValues values = new ContentValues();
+            String[] aclActionFields = ACLActions.INSERT_PROJECTION;
+            for (int i = 0; i < aclActionFields.length; i++) {
+                if(Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, actionBean.getFieldValue(aclActionFields[i]));
+                
+                values.put(aclActionFields[i], actionBean.getFieldValue(aclActionFields[i]));
+            }
+            
+            // get the row id of the role
+            String selection = ACLRoleColumns.ROLE_ID + "='" + roleId + "'";
+            Cursor cursor = db.query(DatabaseHelper.ACL_ROLES_TABLE_NAME, ACLRoles.DETAILS_PROJECTION, selection, null, null, null, null);
+            cursor.moveToFirst();
+            int roleRowId = cursor.getInt(0);
+            cursor.close();
+            
+            values.put(ACLActionColumns.ROLE_ID, roleRowId);
+            db.insert(DatabaseHelper.ACL_ACTIONS_TABLE_NAME, "", values);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
+
+    public List<String> insertRoles(SugarBean[] roleBeans) {
+        List<String> roleIds = new ArrayList<String>();
+        SQLiteDatabase db = getWritableDatabase();
+        for(int i=0; i<roleBeans.length; i++){
+            ContentValues values = new ContentValues();
+            for(String fieldName : ACLRoles.INSERT_PROJECTION){
+                if(Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, fieldName + " : " + roleBeans[i].getFieldValue(fieldName));
+                
+                if(fieldName.equals(ModuleFields.ID)){
+                    roleIds.add(roleBeans[i].getFieldValue(fieldName));
+                }
+                values.put(fieldName, roleBeans[i].getFieldValue(fieldName));
+            }
+            db.insert(DatabaseHelper.ACL_ROLES_TABLE_NAME, "", values);
+        }
+        db.close();
+        return roleIds;
+    }
 }
