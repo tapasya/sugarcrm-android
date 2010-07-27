@@ -87,6 +87,8 @@ public class Util {
     public static final String INCLUDE_DELETED_ITEMS = "1";
 
     public static final String DELETED_ITEM = "1";
+    
+    public static final String NEW_ITEM = "0";
 
     public static final String CASE_ID = "case_id";
 
