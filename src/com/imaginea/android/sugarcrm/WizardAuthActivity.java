@@ -138,48 +138,73 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // if the user is not connected to the network
-        if (!Util.isNetworkOn(getBaseContext())) {
-            wizardState = Util.OFFLINE_MODE;
-            // directly send him to dashboard if the user is not connected to the network 
-            setResult(RESULT_OK);
-            finish();
-        } else {
+        // if (!Util.isNetworkOn(getBaseContext())) {
+        // wizardState = Util.OFFLINE_MODE;
+        // // directly send him to dashboard if the user is not connected to the network
+        // setResult(RESULT_OK);
+        // finish();
+        // } else {
 
-            // if the REST url is not available
-            if (TextUtils.isEmpty(restUrl)) {
-                Log.i(LOG_TAG, "REST URL is not available!");
-                wizardState = Util.URL_NOT_AVAILABLE;
+        // if the REST url is not available
+        if (TextUtils.isEmpty(restUrl)) {
+            //TODO: must be connected to the network to configure the REST URL
+            Log.i(LOG_TAG, "REST URL is not available!");
+            wizardState = Util.URL_NOT_AVAILABLE;
 
-                setFlipper();
-                mHeaderTextView.setText(R.string.sugarCrmUrlHeader);
-                // inflate both url layout and username_password layout
-                for (int layout : STEPS) {
-                    View step = mInflater.inflate(layout, this.flipper, false);
-                    this.flipper.addView(step);
-                }
-            } else {
-                // if the username is not available
-                if (TextUtils.isEmpty(usr)) {
-                    Log.i(LOG_TAG, "REST URL is available but not the username!");
-                    wizardState = Util.URL_AVAILABLE;
-
-                    setFlipper();
-                    View loginView = inflateLoginView();
-
-                } else {
-                    Log.i(LOG_TAG, "REST URL and username are available!");
-                    wizardState = Util.URL_USER_AVAILABLE;
-
-                    setFlipper();
-                    View loginView = inflateLoginView();
-
-                    EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
-                    editTextUser.setText(mUsername);
-                }
-                mHeaderTextView.setText(R.string.login);
+            setFlipper();
+            mHeaderTextView.setText(R.string.sugarCrmUrlHeader);
+            // inflate both url layout and username_password layout
+            for (int layout : STEPS) {
+                View step = mInflater.inflate(layout, this.flipper, false);
+                this.flipper.addView(step);
             }
             this.updateButtons(wizardState);
+        } else {
+            // if the username is not available
+            if (TextUtils.isEmpty(usr)) {
+                //TODO: must be connected to the network to configure the SugarCRM account
+                Log.i(LOG_TAG, "REST URL is available but not the username!");
+                wizardState = Util.URL_AVAILABLE;
+
+                setFlipper();
+                View loginView = inflateLoginView();
+                this.updateButtons(wizardState);
+
+            } else {
+                Log.i(LOG_TAG, "REST URL and username are available!");
+                wizardState = Util.URL_USER_AVAILABLE;
+
+                // if the user is not connected to the network : OFFLINE mode
+                if (!Util.isNetworkOn(getBaseContext())) {
+                    wizardState = Util.OFFLINE_MODE;
+                    // directly send him to dashboard if the user is not connected to the network
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    AccountManager accountManager = AccountManager.get(getBaseContext());
+                    Account[] accounts = accountManager.getAccountsByType(Util.ACCOUNT_TYPE);
+                    Account userAccount = null;
+                    for(Account account : accounts){
+                        Log.i(LOG_TAG, "i) " + account.name + " " + accountManager.getPassword(account));
+                        if(account.name.equals(usr)){
+                            userAccount = account;
+                            break;
+                        }
+                    }
+                    setFlipper();
+                    mAuthTask = new AuthenticationTask();
+                    String pwd = accountManager.getPassword(userAccount);
+                    Log.i(LOG_TAG, " " + usr + " " + pwd);
+                    mAuthTask.execute(usr, pwd);
+                    
+//                    View loginView = inflateLoginView();
+//                    EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
+//                    editTextUser.setText(mUsername);
+//                    mHeaderTextView.setText(R.string.login);
+                }
+            }
         }
+        // }
 
     }
 
@@ -409,13 +434,13 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             usr = args[0].toString();
             // TODO this settings are important - make it cleaner later to use the same variables
             mUsername = usr;
-            pwd = args[1].toString();
+            mPassword = args[1].toString();
             String url = SugarCrmSettings.getSugarRestUrl(getBaseContext());
 
             String sessionId = null;
 
             try {
-                sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
+                sessionId = RestUtil.loginToSugarCRM(url, usr, mPassword);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
                 // check moduleNames for null
                 mDbHelper = new DatabaseHelper(getBaseContext());
@@ -520,9 +545,10 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             public void onClick(DialogInterface dialog, int whichButton) {
                 /* User clicked OK so do some stuff */
                 EditText etPwd = ((EditText) loginView.findViewById(R.id.loginPassword));
-//                boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.loginRememberPwd)).isChecked();
-//                mAuthTask = new AuthenticationTask();
-//                mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
+                // boolean rememberPwd = ((CheckBox)
+                // loginView.findViewById(R.id.loginRememberPwd)).isChecked();
+                // mAuthTask = new AuthenticationTask();
+                // mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
