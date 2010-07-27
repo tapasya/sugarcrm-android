@@ -43,13 +43,15 @@ public class Util {
     public static final int FETCH_SUCCESS = 2;
 
     // WIZARD: states
-    public static final int URL_NOT_AVAILABLE = 0;
+    public static final int OFFLINE_MODE = 0;
+    
+    public static final int URL_NOT_AVAILABLE = 1;
 
-    public static final int URL_AVAILABLE = 1;
+    public static final int URL_AVAILABLE = 2;
 
-    public static final int URL_USER_AVAILABLE = 2;
+    public static final int URL_USER_AVAILABLE = 3;
 
-    public static final int URL_USER_PWD_AVAILABLE = 3;
+    public static final int URL_USER_PWD_AVAILABLE = 4;
 
     // View modes : EDIT / NEW
 
