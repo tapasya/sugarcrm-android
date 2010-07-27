@@ -6,7 +6,7 @@
 		
 	<style name="header_text_label">	              
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:textStyle">bold</item>  
         <item name="android:paddingLeft">10dip</item>
         <item name="android:paddingTop">10dip</item>  
