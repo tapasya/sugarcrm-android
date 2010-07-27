@@ -11,7 +11,9 @@ import android.util.Log;
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.R;
 import com.imaginea.android.sugarcrm.RestUtilConstants;
+import com.imaginea.android.sugarcrm.SugarCrmSettings;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActionColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActions;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoleColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColumns;
@@ -36,6 +38,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColum
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.SyncColumns;
 import com.imaginea.android.sugarcrm.sync.SyncRecord;
+import com.imaginea.android.sugarcrm.util.ACLConstants;
 import com.imaginea.android.sugarcrm.util.LinkField;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
@@ -58,7 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 21;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -124,6 +127,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<String> billingAddressGroup = new ArrayList<String>();
 
     private static List<String> shippingAddressGroup = new ArrayList<String>();
+
+    private Map<String, Map<String, Integer>> accessMap = new HashMap<String, Map<String, Integer>>();
+
+    private Context mContext;
 
     static {
 
@@ -206,6 +213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
     @Override
@@ -236,6 +244,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // create sync tables
         createSyncTable(db);
+
     }
 
     void dropAccountsTable(SQLiteDatabase db) {
@@ -299,7 +308,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     void dropSyncTable(SQLiteDatabase db) {
-        db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_CASES_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + SYNC_TABLE_NAME);
     }
 
     void dropAclRolesTable(SQLiteDatabase db) {
@@ -341,6 +350,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropAccountsCasesTable(db);
         dropContactsOpportunitiesTable(db);
         dropContactsCasesTable(db);
+
+        dropSyncTable(db);
     }
 
     private static void createAccountsTable(SQLiteDatabase db) {
@@ -373,6 +384,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + AccountsColumns.SHIPPING_ADDRESS_POSTALCODE + " TEXT,"
                                         + AccountsColumns.SHIPPING_ADDRESS_COUNTRY + " TEXT,"
                                         + AccountsColumns.ASSIGNED_USER_NAME + " TEXT,"
+                                        + AccountsColumns.CREATED_BY_NAME + " TEXT,"
                                         + AccountsColumns.DATE_ENTERED + " TEXT,"
                                         + AccountsColumns.DATE_MODIFIED + " TEXT,"
                                         + AccountsColumns.DELETED + " INTEGER," + " UNIQUE("
@@ -391,6 +403,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsColumns.EMAIL1 + " TEXT,"
                                         + ContactsColumns.CREATED_BY + " TEXT,"
                                         + ContactsColumns.MODIFIED_BY_NAME + " TEXT,"
+                                        + ContactsColumns.CREATED_BY_NAME + " TEXT,"
                                         + ContactsColumns.DATE_ENTERED + " TEXT,"
                                         + ContactsColumns.DATE_MODIFIED + " TEXT,"
                                         + ContactsColumns.DELETED + " INTEGER,"
@@ -407,9 +420,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + LeadsColumns.LEAD_SOURCE + " TEXT," + LeadsColumns.EMAIL1
                                         + " TEXT," + LeadsColumns.PHONE_WORK + " TEXT,"
                                         + LeadsColumns.PHONE_FAX + " TEXT,"
-
                                         + LeadsColumns.ACCOUNT_NAME + " TEXT," + LeadsColumns.TITLE
                                         + " TEXT," + LeadsColumns.ASSIGNED_USER_NAME + " TEXT,"
+                                        + LeadsColumns.CREATED_BY_NAME + " TEXT,"
                                         + LeadsColumns.DATE_ENTERED + " TEXT,"
                                         + LeadsColumns.DATE_MODIFIED + " TEXT,"
                                         + LeadsColumns.DELETED + " INTEGER,"
@@ -456,8 +469,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + Cases.CASE_NUMBER + " TEXT," + Cases.PRIORITY + " TEXT,"
                                         + Cases.ASSIGNED_USER_NAME + " TEXT," + Cases.STATUS
                                         + " TEXT," + Cases.DESCRIPTION + " TEXT,"
-                                        + Cases.RESOLUTION + " TEXT," + Cases.DATE_ENTERED
-                                        + " TEXT," + Cases.DATE_MODIFIED + " TEXT," + Cases.DELETED
+                                        + Cases.RESOLUTION + " TEXT," + Cases.CREATED_BY_NAME
+                                        + " TEXT," + Cases.DATE_ENTERED + " TEXT,"
+                                        + Cases.DATE_MODIFIED + " TEXT," + Cases.DELETED
                                         + " INTEGER," + " UNIQUE(" + Cases.BEAN_ID + ")" + ");");
     }
 
@@ -468,8 +482,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + Calls.STATUS + " TEXT," + Calls.START_DATE + " TEXT,"
                                         + Calls.DURATION_HOURS + " TEXT," + Calls.DURATION_MINUTES
                                         + " TEXT," + Calls.ASSIGNED_USER_NAME + " TEXT,"
-                                        + Calls.DESCRIPTION + " TEXT," + Calls.DATE_ENTERED
-                                        + " TEXT," + Calls.DATE_MODIFIED + " TEXT," + Calls.DELETED
+                                        + Calls.DESCRIPTION + " TEXT," + Calls.CREATED_BY_NAME
+                                        + " TEXT," + Calls.DATE_ENTERED + " TEXT,"
+                                        + Calls.DATE_MODIFIED + " TEXT," + Calls.DELETED
                                         + " INTEGER," + " UNIQUE(" + Calls.BEAN_ID + ")" + ");");
     }
 
@@ -482,9 +497,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " TEXT," + Meetings.DURATION_HOURS + " TEXT,"
                                         + Meetings.DURATION_MINUTES + " TEXT,"
                                         + Meetings.ASSIGNED_USER_NAME + " TEXT,"
-                                        + Meetings.DESCRIPTION + " TEXT," + Meetings.DATE_ENTERED
-                                        + " TEXT," + Meetings.DATE_MODIFIED + " TEXT,"
-                                        + Meetings.DELETED + " INTEGER," + " UNIQUE("
+                                        + Meetings.DESCRIPTION + " TEXT,"
+                                        + Meetings.CREATED_BY_NAME + " TEXT,"
+                                        + Meetings.DATE_ENTERED + " TEXT," + Meetings.DATE_MODIFIED
+                                        + " TEXT," + Meetings.DELETED + " INTEGER," + " UNIQUE("
                                         + Meetings.BEAN_ID + ")" + ");");
     }
 
@@ -601,6 +617,81 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ACLActionColumns.ACLACCESS + " TEXT,"
                                         + ACLActionColumns.ACLTYPE + " TEXT,"
                                         + ACLActionColumns.ROLE_ID + " INTEGER" + ");");
+    }
+
+    private void setAclAccessMap() {
+        // get the module list
+        List<String> moduleNames = getModuleList();
+
+        SQLiteDatabase db = getReadableDatabase();
+        for (String moduleName : moduleNames) {
+            String selection = "(" + ACLActionColumns.CATEGORY + "= '" + moduleName + "')";
+            Cursor cursor = db.query(DatabaseHelper.ACL_ACTIONS_TABLE_NAME, ACLActions.DETAILS_PROJECTION, selection, null, null, null, null);
+            cursor.moveToFirst();
+            Log.i(TAG, moduleName + " cursor.getCount() : " + cursor.getCount());
+            // access map for each module
+            Map<String, Integer> moduleAccessMap = new HashMap<String, Integer>();
+            for (int i = 0; i < cursor.getCount(); i++) {
+                String name = cursor.getString(2);
+                String category = cursor.getString(3);
+                int aclAccess = cursor.getInt(4);
+                String aclType = cursor.getString(5);
+
+                moduleAccessMap.put(name, aclAccess);
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, name + " " + category + " " + aclAccess + " " + aclType);
+
+                cursor.moveToNext();
+            }
+            accessMap.put(moduleName, moduleAccessMap);
+            cursor.close();
+        }
+    }
+
+    private Map<String, Map<String, Integer>> getAclAccessMap() {
+        if (accessMap != null && accessMap.size() != 0) {
+            return accessMap;
+        } else {
+            setAclAccessMap();
+            return accessMap;
+        }
+    }
+
+    public boolean isAclEnabled(String moduleName, String name) {
+        return isAclEnabled(moduleName, name, null);
+    }
+
+    public boolean isAclEnabled(String moduleName, String name, String ownerName) {
+        int aclAccess = getAclAccessMap().get(moduleName).get(name);
+        switch (aclAccess) {
+        case ACLConstants.ACL_ALLOW_ADMIN:
+            break;
+        case ACLConstants.ACL_ALLOW_ADMIN_DEV:
+            break;
+        case ACLConstants.ACL_ALLOW_ALL:
+            return true;
+        case ACLConstants.ACL_ALLOW_DEFAULT:
+            break;
+        case ACLConstants.ACL_ALLOW_DEV:
+            break;
+        case ACLConstants.ACL_ALLOW_DISABLED:
+            return false;
+        case ACLConstants.ACL_ALLOW_ENABLED:
+            return true;
+        case ACLConstants.ACL_ALLOW_NONE:
+            return false;
+        case ACLConstants.ACL_ALLOW_NORMAL:
+            break;
+        case ACLConstants.ACL_ALLOW_OWNER:
+            if (ownerName != null) {
+                // TODO: get the user name from Account Manager
+                String userName = SugarCrmSettings.getUsername(mContext);
+                return userName.equals(ownerName) ? true : false;
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String[] getModuleProjections(String moduleName) {
