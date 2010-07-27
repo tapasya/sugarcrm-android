@@ -193,6 +193,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         linkfieldNames.put(Util.CASES, "cases");
         linkfieldNames.put(Util.CALLS, "calls");
         linkfieldNames.put(Util.MEETINGS, "meetings");
+        linkfieldNames.put(Util.ACLROLES, "aclroles");
+        linkfieldNames.put(Util.ACLACTIONS, "actions");
 
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET);
         billingAddressGroup.add(ModuleFields.BILLING_ADDRESS_STREET_2);
