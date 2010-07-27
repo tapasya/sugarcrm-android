@@ -487,11 +487,9 @@ public class WizardActivity extends Activity {
             public void onClick(DialogInterface dialog, int whichButton) {
                 /* User clicked OK so do some stuff */
                 EditText etPwd = ((EditText) loginView.findViewById(R.id.loginPassword));
-                boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.loginRememberPwd)).isChecked();
-
-                mAuthTask = new AuthenticationTask();
-                mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
-
+//                boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.loginRememberPwd)).isChecked();
+//                mAuthTask = new AuthenticationTask();
+//                mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
