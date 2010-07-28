@@ -41,8 +41,13 @@ import java.util.Set;
 /**
  * Class for managing sugar crm sync related mOperations. should be capable of updating the
  * SyncStats in SyncResult object.
+ * <ul>
+ * <li>Syncs Modules</li>
+ * <li>Syncs AclAccess data</li>
+ * <li>Syncs Module Data and Relationship Data</li>
+ * </ul>
  * 
- * //TODO - pushing changes to server, as well as handling statistics of SyncResult, Merge conflicts
+ * //TODO - handling statistics of SyncResult, Merge conflicts
  */
 public class SugarSyncManager {
 
@@ -198,22 +203,25 @@ public class SugarSyncManager {
                                     String moduleName, SugarBean bean, BatchOperation batchOperation) {
         String[] relationships = databaseHelper.getModuleRelationshipItems(moduleName);
         if (relationships == null) {
-            Log.v(LOG_TAG, "relationships is null");
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                Log.v(LOG_TAG, "relationships is null");
             return;
         }
         String beandIdValue = bean.getFieldValue(mBeanIdField);
-        Log.v(LOG_TAG, "syncRelationshipsData: beanId:" + beandIdValue);
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, "syncRelationshipsData: beanId:" + beandIdValue);
 
         long rawId = lookupRawId(context.getContentResolver(), moduleName, beandIdValue);
-        Log.v(LOG_TAG, "syncRelationshipsData: RawId:" + rawId);
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, "syncRelationshipsData: RawId:" + rawId);
         for (String relation : relationships) {
             String linkFieldName = databaseHelper.getLinkfieldName(relation);
             // for a particular module-link field name
             SugarBean[] relationshipBeans = bean.getRelationshipBeans(linkFieldName);
             // Log.v(LOG_TAG, "linkFieldName:" + linkFieldName);
             if (relationshipBeans == null || relationshipBeans.length == 0) {
-                // if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
-                Log.v(LOG_TAG, "relationship beans is null or empty");
+                if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+                    Log.v(LOG_TAG, "relationship beans is null or empty");
                 continue;
             }
             for (SugarBean relationbean : relationshipBeans) {
@@ -353,7 +361,8 @@ public class SugarSyncManager {
         Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
         String[] projections = databaseHelper.getModuleProjections(relatedModuleName);
         Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
-        Log.v(LOG_TAG, "updateRelatedModuleItem URI:" + uri.toString());
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+            Log.v(LOG_TAG, "updateRelatedModuleItem URI:" + uri.toString());
         // TODO - is this query resolver needed to query here
         final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(relationRawId) }, null);
         // TODO - do something here with cursor
@@ -430,10 +439,22 @@ public class SugarSyncManager {
      * @param account
      * @param sessionId
      */
-    public static synchronized void syncModules(Context context, String account, String sessionId) {
+    public static synchronized void syncModules(Context context, String account, String sessionId)
+                                    throws SugarCrmException {
         if (databaseHelper == null)
             databaseHelper = new DatabaseHelper(context);
-        List<String> userModules = databaseHelper.getModuleList();
+        List<String> userModules = databaseHelper.getUserModules();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
+
+        try {
+            if (userModules == null)
+                userModules = RestUtil.getAvailableModules(url, sessionId);
+
+            databaseHelper.setUserModules(userModules);
+        } catch (SugarCrmException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
 
         Set<Module> moduleFieldsInfo = new HashSet<Module>();
         for (String moduleName : userModules) {
@@ -441,8 +462,6 @@ public class SugarSyncManager {
             try {
                 // TODO: check if the module is already there in the db. make the rest call
                 // only if it isn't
-                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-                String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
                 Module module = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
                 moduleFieldsInfo.add(module);
                 Log.i(LOG_TAG, "loaded module fields for : " + moduleName);
@@ -479,15 +498,16 @@ public class SugarSyncManager {
         // get outgoing items with no merge conflicts
         Cursor cursor = databaseHelper.getSyncRecordsToSync(moduleName);
         int num = cursor.getCount();
-
+        Log.d(LOG_TAG, "UNSYNCD Item count:" + num);
+        Log.d(LOG_TAG, "UNSYNCD Column count:" + cursor.getColumnCount());
         String selectFields[] = databaseHelper.getModuleProjections(moduleName);
-
+        cursor.moveToFirst();
         for (int i = 0; i < num; i++) {
-            int command = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
+            long syncRecordId = cursor.getLong(Sync.ID_COLUMN);
             long syncId = cursor.getLong(Sync.SYNC_ID_COLUMN);
+            int command = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
             String relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
-
-            syncOutgoingModuleItem(context, sessionId, moduleName, relatedModuleName, command, syncId, selectFields);
+            syncOutgoingModuleItem(context, sessionId, moduleName, relatedModuleName, command, syncRecordId, syncId, selectFields);
         }
         cursor.close();
         databaseHelper.close();
@@ -497,7 +517,8 @@ public class SugarSyncManager {
 
     private static void syncOutgoingModuleItem(Context context, String sessionId,
                                     String moduleName, String relatedModuleName, int command,
-                                    long syncId, String[] selectedFields) throws SugarCrmException {
+                                    long syncRecordId, long syncId, String[] selectedFields)
+                                    throws SugarCrmException {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
         String updatedBeanId = null;
@@ -509,6 +530,11 @@ public class SugarSyncManager {
         String relatedModuleLinkedFieldName;
         relatedModuleLinkedFieldName = databaseHelper.getLinkfieldName(relatedModuleName);
         String beanId = null;
+        cursor.moveToFirst();
+        if (cursor.getCount() == 0) {
+            Log.w(LOG_TAG, "No module data found for the module:" + relatedModuleName);
+            return;
+        }
 
         switch (command) {
         case Util.INSERT:
@@ -545,12 +571,14 @@ public class SugarSyncManager {
                 // updatedBeanId is actually a new beanId returned by server
                 updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
                 if (updatedBeanId != null) {
-                    if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                    int count = databaseHelper.deleteSyncRecord(syncRecordId);
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                         Log.v(LOG_TAG, "Sync--insert bean on server successful");
+                        Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
                     }
-                    // TODO- delete the sync record
+
                 } else {
-                    // we keep the item with last sync_failure date - status
+                    // TODO - we keep the item with last sync_failure date - status
                 }
 
             }
@@ -563,12 +591,13 @@ public class SugarSyncManager {
             moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
             updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
             if (beanId.equals(updatedBeanId)) {
-                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                int count = databaseHelper.deleteSyncRecord(syncRecordId);
+                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                     Log.v(LOG_TAG, "sync --updated server successful");
+                    Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
                 }
-                // TODO- delete the sync record
             } else {
-                // we keep the item with last sync_failure date - status
+                // TODO - we keep the item with last sync_failure date - status
             }
 
             break;
@@ -578,12 +607,13 @@ public class SugarSyncManager {
             moduleItemValues.put(ModuleFields.DELETED, Util.DELETED_ITEM);
             updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
             if (beanId.equals(updatedBeanId)) {
-                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                int count = databaseHelper.deleteSyncRecord(syncRecordId);
+                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                     Log.v(LOG_TAG, "sync --delete server successful");
+                    Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
                 }
-                // TODO- delete the sync record
             } else {
-                // we keep the item with last sync_failure date - status
+                // TODO- we keep the item with last sync_failure date - status
             }
 
             break;
@@ -592,6 +622,13 @@ public class SugarSyncManager {
 
     }
 
+    /**
+     * syncAclAccess
+     * 
+     * @param context
+     * @param account
+     * @param sessionId
+     */
     public synchronized static void syncAclAccess(Context context, String account, String sessionId) {
         try {
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -641,7 +678,7 @@ public class SugarSyncManager {
                 }
             }
         } catch (SugarCrmException sce) {
-            // Log.e(TAG, "" + sce.getMessage());
+            Log.e(LOG_TAG, "" + sce.getMessage());
         }
     }
 }
