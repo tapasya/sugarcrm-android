@@ -468,7 +468,7 @@ public final class SugarCRMContent {
 
         public String STATUS = ModuleFields.STATUS;
 
-        public String START_DATE = ModuleFields.START_DATE;
+        public String START_DATE = ModuleFields.DATE_START;
 
         public String DURATION_HOURS = ModuleFields.DURATION_HOURS;
 
@@ -520,7 +520,7 @@ public final class SugarCRMContent {
 
         public String LOCATION = ModuleFields.LOCATION;
 
-        public String START_DATE = ModuleFields.START_DATE;
+        public String START_DATE = ModuleFields.DATE_START;
 
         public String DURATION_HOURS = ModuleFields.DURATION_HOURS;
 
