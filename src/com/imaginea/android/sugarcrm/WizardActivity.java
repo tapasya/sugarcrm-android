@@ -23,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -487,9 +486,10 @@ public class WizardActivity extends Activity {
             public void onClick(DialogInterface dialog, int whichButton) {
                 /* User clicked OK so do some stuff */
                 EditText etPwd = ((EditText) loginView.findViewById(R.id.loginPassword));
-//                boolean rememberPwd = ((CheckBox) loginView.findViewById(R.id.loginRememberPwd)).isChecked();
-//                mAuthTask = new AuthenticationTask();
-//                mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
+                // boolean rememberPwd = ((CheckBox)
+                // loginView.findViewById(R.id.loginRememberPwd)).isChecked();
+                // mAuthTask = new AuthenticationTask();
+                // mAuthTask.execute(usr, etPwd.getText().toString(), rememberPwd);
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
