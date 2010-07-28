@@ -136,14 +136,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
         Account userAccount = getAccount(usr);
 
-        // if the user is not connected to the network
-        // if (!Util.isNetworkOn(getBaseContext())) {
-        // wizardState = Util.OFFLINE_MODE;
-        // // directly send him to dashboard if the user is not connected to the network
-        // setResult(RESULT_OK);
-        // finish();
-        // } else {
-
         // if the REST url is not available
         if (TextUtils.isEmpty(restUrl) || userAccount == null) {
             // TODO: must be connected to the network to configure the REST URL
@@ -182,10 +174,13 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 } else {
 
                     setFlipper();
-                    mAuthTask = new AuthenticationTask();
-                    String pwd = mAccountManager.getPassword(userAccount);
+
+                    mHeaderTextView.setText(R.string.login);
+
                     // never print the password
                     Log.i(LOG_TAG, " user name is " + usr);
+                    String pwd = mAccountManager.getPassword(userAccount);
+                    mAuthTask = new AuthenticationTask();
                     mAuthTask.execute(usr, pwd);
 
                     // View loginView = inflateLoginView();
@@ -431,15 +426,10 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
         private String sceDesc;
 
-        // TODO: remove this moduleNames from here and use the one from DB
-        // reference to the module names
-        private String[] moduleNames = { "Accounts", "Contacts", "Leads", "Opportunities" };
-
         @Override
         protected Object doInBackground(Object... args) {
             /*
-             * arg[0] : String - username arg[1] : String - password arg[2] : boolean -
-             * rememberPassword
+             * arg[0] : String - username arg[1] : String - password
              */
             usr = args[0].toString();
             // TODO this settings are important - make it cleaner later to use the same variables
@@ -508,7 +498,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     setFlipper();
                     View loginView = inflateLoginView();
 
-                    next.setText("Sign In");
+                    next.setText(getString(R.string.signIn));
                     next.setVisibility(View.VISIBLE);
 
                     EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
