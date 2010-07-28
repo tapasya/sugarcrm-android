@@ -22,13 +22,13 @@
 		android:capitalize="none" 
 		android:autoText="false"
 		android:inputType="textUri"
-		android:text="@string/sampleRestUrl" />
+		android:text="@string/defaultUrl" />
 	<TextView 
 		android:id="@+id/wizardUrlStatus" 
 		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:textStyle="bold" 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
-		android:text="@string/sampleRestUrl" />
+		android:text="@string/defaultUrl" />
 		
 </LinearLayout>
