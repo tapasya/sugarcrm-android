@@ -82,7 +82,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 sessionId = RestUtil.loginToSugarCRM(url, account.name, password);
             }
             DatabaseHelper databaseHelper = new DatabaseHelper(mContext);
-            List<String> moduleList = databaseHelper.getUserModules();
+            List<String> moduleList = databaseHelper.getModuleList();
             databaseHelper.close();
 
             // TODO - this should have been taken care during the first login
