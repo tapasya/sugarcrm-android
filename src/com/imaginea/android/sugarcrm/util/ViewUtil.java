@@ -1,6 +1,5 @@
 package com.imaginea.android.sugarcrm.util;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.widget.Toast;
@@ -14,22 +13,45 @@ import android.widget.Toast;
  */
 public class ViewUtil {
 
+    /**
+     * handle to a progress dialog used by all the activities
+     */
+    private static ProgressDialog mProgressDialog;
+
     private static final String LOG_TAG = "ViewUtil";
 
     /**
-     * get ProgressBar
+     * show ProgressDialog
      * 
      * @param context
-     * @param message
-     * @return
+     * @param startMsg
      */
-    public static Dialog getProgressBar(Context context, String message) {
-        final ProgressDialog dialog = new ProgressDialog(context);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setMessage(message);
-        // dialog.setIndeterminate(true);
-        dialog.setCancelable(true);
-        return dialog;
+    public static void showProgressDialog(Context context, String startMsg) {
+        showProgressDialog(context, startMsg, true);
+    }
+
+    /**
+     * show ProgressDialog
+     * 
+     * @param context
+     * @param startMsg
+     * @param indeterminate
+     */
+    public static void showProgressDialog(Context context, String startMsg, boolean indeterminate) {
+        mProgressDialog = new ProgressDialog(context);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(indeterminate);
+        // mProgressDialog.setMax(100);
+        mProgressDialog.setMessage(startMsg);
+        mProgressDialog.show();
+    }
+
+    /**
+     * cancel ProgressBar
+     */
+    public static void cancelProgressDialog() {
+        if (mProgressDialog != null)
+            mProgressDialog.cancel();
     }
 
     /**
