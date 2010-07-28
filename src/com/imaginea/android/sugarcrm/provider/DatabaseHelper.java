@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 24;
+    private static final int DATABASE_VERSION = 25;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -602,7 +602,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + Sync.SYNC_ID + " INTEGER ," + Sync.SYNC_COMMAND
                                         + " INTEGER," + Sync.MODULE + " TEXT,"
                                         + Sync.RELATED_MODULE + " TEXT," + Sync.DATE_MODIFIED
-                                        + " TEXT," + Sync.SYNC_STATUS + " INTEGER" + ");");
+                                        + " TEXT," + Sync.SYNC_STATUS + " INTEGER," + " UNIQUE("
+                                        + Sync.SYNC_ID + "," + Sync.MODULE + ","
+                                        + Sync.RELATED_MODULE + ")" + ");");
     }
 
     private static void createAclRolesTable(SQLiteDatabase db) {
@@ -1037,6 +1039,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
         values.put(SyncColumns.MODULE, record.moduleName);
         values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
+        values.put(SyncColumns.SYNC_STATUS, record.status);
 
         long rowId = db.update(SYNC_TABLE_NAME, values, Sync.ID + "=?", new String[] { ""
                                         + record._id });
@@ -1054,11 +1057,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
         values.put(SyncColumns.MODULE, record.moduleName);
         values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
+        values.put(SyncColumns.SYNC_STATUS, record.status);
 
         long rowId = db.insert(SYNC_TABLE_NAME, "", values);
         if (rowId < 0)
             throw new SugarCrmException("FAILED to insert sync record!");
         return rowId;
+    }
+
+    /**
+     * deletes a syncrecord based on the syncRecdordId (_id)
+     * 
+     * @param syncRecordId
+     * @return
+     */
+    public int deleteSyncRecord(long syncRecordId) {
+        SQLiteDatabase db = getWritableDatabase();
+        // String accountId = uri.getPathSegments().get(1);
+        int count = db.delete(DatabaseHelper.SYNC_TABLE_NAME, Sync.ID + "=" + syncRecordId, null);
+        // + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+        // : ""), whereArgs);
+        return count;
     }
 
     public void insertActions(String roleId, SugarBean[] roleRelationBeans) {
