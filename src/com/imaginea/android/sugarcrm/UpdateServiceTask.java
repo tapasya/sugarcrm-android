@@ -252,6 +252,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         record.syncCommand = mCommand;
         record.moduleName = mLinkFieldName != null ? mParentModuleName : mModuleName;
         record.relatedModuleName = mModuleName;
+        record.status = Util.UNSYNCED;
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             debug(record);
         mDbHelper.insertSyncRecord(record);
@@ -268,6 +269,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         Log.d(LOG_TAG, "Module name:" + record.moduleName);
         Log.d(LOG_TAG, "Related Module Name:" + record.relatedModuleName);
         Log.d(LOG_TAG, "Sync command:" + (record.syncCommand == 1 ? "INSERT" : "UPDATE/DELETE"));
+        Log.d(LOG_TAG, "Sync Status:" + (record.status == Util.UNSYNCED ? "UNSYNCHD" : "CONFLICTS"));
     }
 
     @Override
