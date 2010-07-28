@@ -672,7 +672,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean isAclEnabled(String moduleName, String name, String ownerName) {
-        int aclAccess = getAclAccessMap().get(moduleName).get(name);
+        Map<String, Map<String, Integer>> aclAccessMap = getAclAccessMap();
+        // TODO - checkk if syncd ACLRoles and Actions succesfully- if no roles are given to a user,
+        // then we give access to the entire application
+        if (aclAccessMap.size() == 0)
+            return true;
+        int aclAccess = aclAccessMap.get(moduleName).get(name);
         switch (aclAccess) {
         case ACLConstants.ACL_ALLOW_ADMIN:
             break;
