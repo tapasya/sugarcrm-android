@@ -41,7 +41,6 @@
 
 	<!-- Wizard -->
 	<string name="restUrl">REST Url</string>
-	<string name="sampleRestUrl">http://192.168.1.83/sugarcrm/service/v2/rest.php</string>
 	<string name="wizard_url_status_message">REST Url</string>
 	
 	<string name="cancel">cancel</string>
