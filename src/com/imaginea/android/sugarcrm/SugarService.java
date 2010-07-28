@@ -431,9 +431,10 @@ public class SugarService extends Service {
     }
 
     /**
-     * keeping the messenger in case we go ahead with multiple listeners
-     * Activities should unregister in onPause and register in onResume so that they continue to receive messages specific to them,
-     * further filtering can be done while sending messages so that unwanted messages are not sent. 
+     * keeping the messenger in case we go ahead with multiple listeners Activities should
+     * unregister in onPause and register in onResume so that they continue to receive messages
+     * specific to them, further filtering can be done while sending messages so that unwanted
+     * messages are not sent.
      * 
      * @param messenger
      */

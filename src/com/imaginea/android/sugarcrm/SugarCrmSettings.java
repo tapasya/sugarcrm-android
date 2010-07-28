@@ -32,7 +32,7 @@ public class SugarCrmSettings extends PreferenceActivity {
     public static String getUsername(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_USERNAME, context.getString(R.string.defaultUser));
     }
-    
+
     /**
      * gets SugarCRM RestUrl, on production it returns empty url, if debuggable is set to "false" in
      * the manifest file.
@@ -98,7 +98,7 @@ public class SugarCrmSettings extends PreferenceActivity {
         // TODO: onChange of settings, session has to be invalidated
         Log.i(LOG_TAG, "url - " + getSugarRestUrl(SugarCrmSettings.this));
         Log.i(LOG_TAG, "username - " + getUsername(SugarCrmSettings.this));
-        
+
         // invalidate the session if the current settings changes
         if (currentSettingsChanged(SugarCrmSettings.this)) {
             SugarCrmApp app = ((SugarCrmApp) getApplicationContext());
