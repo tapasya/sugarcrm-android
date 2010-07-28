@@ -114,7 +114,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
 
-        app = ((SugarCrmApp) getApplicationContext());
+        app = (SugarCrmApp) getApplication();
         if (app.getSessionId() != null) {
             setResult(RESULT_OK);
             finish();
