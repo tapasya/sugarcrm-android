@@ -122,6 +122,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static HashMap<String, HashMap<String, ModuleField>> moduleFields;
 
+    private static HashMap<String, HashMap<String, LinkField>> linkFields;
+
     private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
 
     private static final HashMap<String, String> linkfieldNames = new HashMap<String, String>();
@@ -609,9 +611,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " INTEGER PRIMARY KEY," + ACLRoleColumns.ROLE_ID
                                         + " INTEGER," + ACLRoleColumns.NAME + " TEXT,"
                                         + ACLRoleColumns.TYPE + " TEXT,"
-                                        + ACLRoleColumns.DESCRIPTION + " TEXT," 
-                                        + " UNIQUE(" + ACLRoleColumns.ROLE_ID + ")"
-                                        + ");");
+                                        + ACLRoleColumns.DESCRIPTION + " TEXT," + " UNIQUE("
+                                        + ACLRoleColumns.ROLE_ID + ")" + ");");
     }
 
     private static void createAclActionsTable(SQLiteDatabase db) {
@@ -622,9 +623,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ACLActionColumns.CATEGORY + " TEXT,"
                                         + ACLActionColumns.ACLACCESS + " TEXT,"
                                         + ACLActionColumns.ACLTYPE + " TEXT,"
-                                        + ACLActionColumns.ROLE_ID + " INTEGER," 
-                                        + " UNIQUE(" + ACLActionColumns.ACTION_ID + ")"
-                                        + ");");
+                                        + ACLActionColumns.ROLE_ID + " INTEGER," + " UNIQUE("
+                                        + ACLActionColumns.ACTION_ID + ")" + ");");
     }
 
     private void setAclAccessMap() {
@@ -831,6 +831,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String moduleId = cursor.getString(0);
         cursor.close();
 
+        // name of the module field is the key and ModuleField is the value
         HashMap<String, ModuleField> fieldNameVsModuleField = new HashMap<String, ModuleField>();
         selection = ModuleFieldColumns.MODULE_ID + "=" + moduleId;
         cursor = db.query(MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
@@ -846,6 +847,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         moduleFields.put(moduleName, fieldNameVsModuleField);
         return fieldNameVsModuleField;
+    }
+
+    public Map<String, LinkField> getLinkFields(String moduleName) {
+        if (linkFields != null) {
+            HashMap<String, LinkField> map = linkFields.get(moduleName);
+            if (map != null && map.size() > 0)
+                return map;
+        } else
+            linkFields = new HashMap<String, HashMap<String, LinkField>>();
+        SQLiteDatabase db = getReadableDatabase();
+        String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
+        Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, selection, null, null, null, null);
+        cursor.moveToFirst();
+        String moduleId = cursor.getString(0);
+        cursor.close();
+
+        // name of the link field is the key and LinkField is the value
+        HashMap<String, LinkField> nameVsLinkField = new HashMap<String, LinkField>();
+        selection = LinkFieldColumns.MODULE_ID + "=" + moduleId;
+        cursor = db.query(LINK_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.LinkFields.DETAILS_PROJECTION, selection, null, null, null, null);
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            String name = cursor.getString(1);
+            LinkField linkField = new LinkField(name, cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5));
+            cursor.moveToNext();
+            nameVsLinkField.put(name, linkField);
+        }
+        cursor.close();
+        db.close();
+        linkFields.put(moduleName, nameVsLinkField);
+        return nameVsLinkField;
     }
 
     /*
