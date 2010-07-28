@@ -38,6 +38,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.SyncColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Users;
 import com.imaginea.android.sugarcrm.sync.SyncRecord;
 import com.imaginea.android.sugarcrm.util.ACLConstants;
 import com.imaginea.android.sugarcrm.util.LinkField;
@@ -54,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 /**
  * This class helps open, create, and upgrade the database file.
@@ -96,6 +98,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String LINK_FIELDS_TABLE_NAME = "link_fields";
 
     public static final String SYNC_TABLE_NAME = "sync_table";
+
+    public static final String USERS_TABLE_NAME = "users";
 
     public static final String ACL_ROLES_TABLE_NAME = "acl_roles";
 
@@ -237,6 +241,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createModuleFieldsTable(db);
         createLinkFieldsTable(db);
 
+        createUsersTable(db);
         createAclRolesTable(db);
         createAclActionsTable(db);
 
@@ -317,6 +322,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + SYNC_TABLE_NAME);
     }
 
+    void dropUsersTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
+    }
+
     void dropAclRolesTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACL_ROLES_TABLE_NAME);
     }
@@ -347,6 +356,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropModuleFieldsTable(db);
         dropLinkFieldsTable(db);
 
+        dropUsersTable(db);
         dropAclRolesTable(db);
         dropAclActionsTable(db);
 
@@ -607,6 +617,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + Sync.RELATED_MODULE + ")" + ");");
     }
 
+    private static void createUsersTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + USERS_TABLE_NAME + " (" + Users.ID + " INTEGER PRIMARY KEY,"
+                                        + Users.USER_ID + " INTEGER," + Users.USER_NAME + " TEXT,"
+                                        + Users.FIRST_NAME + " TEXT," + Users.LAST_NAME + " TEXT,"
+                                        + " UNIQUE(" + Users.USER_NAME + ")" + ");");
+    }
+
     private static void createAclRolesTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + ACL_ROLES_TABLE_NAME + " (" + ACLRoleColumns.ID
@@ -677,10 +694,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // TODO - checkk if syncd ACLRoles and Actions succesfully- if no roles are given to a user,
         // then we give access to the entire application
         if (aclAccessMap.size() == 0)
-            return true;              
+            return true;
         Map<String, Integer> moduleAccessMap = aclAccessMap.get(moduleName);
-       // if (moduleAccessMap == null || moduleAccessMap.size() == 0)
-         //   return true;
+        // if (moduleAccessMap == null || moduleAccessMap.size() == 0)
+        // return true;
         int aclAccess = moduleAccessMap.get(name);
         switch (aclAccess) {
         case ACLConstants.ACL_ALLOW_ADMIN:
@@ -918,14 +935,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(ModuleColumns.MODULE_NAME, moduleName);
             long rowId = db.insert(MODULES_TABLE_NAME, "", values);
-            if (rowId <= 0)
+            if (rowId <= 0) {
                 hasFailed = true;
+                break;
+            }
         }
-        if (hasFailed)
-            throw new SugarCrmException("FAILED to insert user modules!");
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
+
+        if (hasFailed) {
+            db.endTransaction();
+            db.close();
+            throw new SugarCrmException("FAILED to insert Modules!");
+        } else {
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.close();
+        }
     }
 
     public void setModuleFieldsInfo(Set<Module> moduleFieldsInfo) throws SugarCrmException {
@@ -952,28 +976,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 values.put(ModuleFieldColumns.IS_REQUIRED, moduleField.isRequired());
                 values.put(ModuleFieldColumns.MODULE_ID, moduleId);
                 long rowId = db.insert(MODULE_FIELDS_TABLE_NAME, "", values);
-                if (rowId <= 0)
+                if (rowId <= 0) {
                     hasFailed = true;
+                    break;
+                }
             }
 
-            List<LinkField> linkFields = module.getLinkFields();
-            for (LinkField linkField : linkFields) {
-                ContentValues values = new ContentValues();
-                values.put(LinkFieldColumns.NAME, linkField.getName());
-                values.put(LinkFieldColumns.TYPE, linkField.getType());
-                values.put(LinkFieldColumns.RELATIONSHIP, linkField.getRelationship());
-                values.put(LinkFieldColumns.MODULE, linkField.getModule());
-                values.put(LinkFieldColumns.BEAN_NAME, linkField.getBeanName());
-                values.put(ModuleFieldColumns.MODULE_ID, moduleId);
-                long rowId = db.insert(LINK_FIELDS_TABLE_NAME, "", values);
-                if (rowId < 0)
-                    hasFailed = true;
+            if (!hasFailed) {
+                List<LinkField> linkFields = module.getLinkFields();
+                for (LinkField linkField : linkFields) {
+                    ContentValues values = new ContentValues();
+                    values.put(LinkFieldColumns.NAME, linkField.getName());
+                    values.put(LinkFieldColumns.TYPE, linkField.getType());
+                    values.put(LinkFieldColumns.RELATIONSHIP, linkField.getRelationship());
+                    values.put(LinkFieldColumns.MODULE, linkField.getModule());
+                    values.put(LinkFieldColumns.BEAN_NAME, linkField.getBeanName());
+                    values.put(ModuleFieldColumns.MODULE_ID, moduleId);
+                    long rowId = db.insert(LINK_FIELDS_TABLE_NAME, "", values);
+                    if (rowId < 0) {
+                        hasFailed = true;
+                        break;
+                    }
+                }
             }
-            if (hasFailed)
+
+            if (hasFailed) {
+                db.endTransaction();
+                db.close();
                 throw new SugarCrmException("FAILED to insert module fields!");
-            db.setTransactionSuccessful();
-            db.endTransaction();
-            db.close();
+            } else {
+                db.setTransactionSuccessful();
+                db.endTransaction();
+                db.close();
+            }
         }
     }
 
@@ -1089,7 +1124,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
-    public void insertActions(String roleId, SugarBean[] roleRelationBeans) {
+    public void insertActions(String roleId, SugarBean[] roleRelationBeans)
+                                    throws SugarCrmException {
+        boolean hasFailed = false;
+
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         for (SugarBean actionBean : roleRelationBeans) {
@@ -1111,14 +1149,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
 
             values.put(ACLActionColumns.ROLE_ID, roleRowId);
-            db.insert(DatabaseHelper.ACL_ACTIONS_TABLE_NAME, "", values);
+            long rowId = db.insert(ACL_ACTIONS_TABLE_NAME, "", values);
+            if (rowId < 0) {
+                hasFailed = true;
+                break;
+            }
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
+        if (hasFailed) {
+            db.endTransaction();
+            db.close();
+            throw new SugarCrmException("FAILED to insert ACL Actions!");
+        } else {
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.close();
+        }
     }
 
-    public List<String> insertRoles(SugarBean[] roleBeans) {
+    public List<String> insertRoles(SugarBean[] roleBeans) throws SugarCrmException {
+        boolean hasFailed = false;
+
         List<String> roleIds = new ArrayList<String>();
         SQLiteDatabase db = getWritableDatabase();
         for (int i = 0; i < roleBeans.length; i++) {
@@ -1132,9 +1182,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
                 values.put(fieldName, roleBeans[i].getFieldValue(fieldName));
             }
-            db.insert(DatabaseHelper.ACL_ROLES_TABLE_NAME, "", values);
+            long rowId = db.insert(ACL_ROLES_TABLE_NAME, "", values);
+            if (rowId < 0) {
+                hasFailed = true;
+                break;
+            }
         }
-        db.close();
+
+        if (hasFailed) {
+            db.close();
+            throw new SugarCrmException("FAILED to insert ACL Roles!");
+        } else {
+            db.close();
+        }
+
         return roleIds;
+    }
+
+    // key : userName value: userValues
+    public void insertUsers(Map<String, Map<String, String>> usersList) throws SugarCrmException {
+        boolean hasFailed = false;
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        for (Entry<String, Map<String, String>> entry : usersList.entrySet()) {
+            String userName = entry.getKey();
+            ContentValues values = new ContentValues();
+            Map<String, String> userListValues = entry.getValue();
+            for (Entry<String, String> userEntry : userListValues.entrySet()) {
+                values.put(userEntry.getKey(), userEntry.getValue());
+            }
+            long rowId = db.insert(USERS_TABLE_NAME, "", values);
+            if (rowId < 0) {
+                hasFailed = true;
+                break;
+            }
+        }
+        if (hasFailed) {
+            db.endTransaction();
+            db.close();
+            throw new SugarCrmException("FAILED to insert Users!");
+        } else {
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.close();
+        }
     }
 }
