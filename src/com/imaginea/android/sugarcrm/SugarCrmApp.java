@@ -13,7 +13,7 @@ public class SugarCrmApp extends Application {
     /*
      * sessionId is obtained after successful login into the Sugar CRM instance Now, sessionId will
      * be available to the entire application Access the sessionId from any part of the application
-     * as follows : SugarCrmApp app = ((SugarCrmApp) getApplicationContext()); app.getSessionId();
+     * as follows : SugarCrmApp app = ((SugarCrmApp) getApplication()); app.getSessionId();
      */
     private String mSessionId;
 
