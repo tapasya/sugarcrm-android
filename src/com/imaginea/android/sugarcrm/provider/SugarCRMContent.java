@@ -1,5 +1,6 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import android.app.SearchManager;
 import android.net.Uri;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
@@ -38,6 +39,8 @@ public final class SugarCRMContent {
                 CREATED_BY_NAME };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME };
+        
+        public static final String[] SEARCH_PROJECTION = { RECORD_ID, NAME + " AS " + (SearchManager.SUGGEST_COLUMN_TEXT_1), RECORD_ID + " AS " + (SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID)};
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, PARENT_NAME,
                 PHONE_OFFICE, PHONE_FAX, EMAIL1, WEBSITE, EMPLOYEES, TICKER_SYMBOL, ANNUAL_REVENUE,
