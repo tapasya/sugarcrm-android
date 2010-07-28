@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 23;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -844,6 +844,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return fieldNameVsModuleField;
     }
 
+    /*
+     * gives all the available user modules
+     */
     public List<String> getUserModules() {
         SQLiteDatabase db = getReadableDatabase();
         moduleList = new ArrayList<String>();
