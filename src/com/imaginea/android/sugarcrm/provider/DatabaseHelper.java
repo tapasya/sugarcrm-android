@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 24;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -609,7 +609,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " INTEGER PRIMARY KEY," + ACLRoleColumns.ROLE_ID
                                         + " INTEGER," + ACLRoleColumns.NAME + " TEXT,"
                                         + ACLRoleColumns.TYPE + " TEXT,"
-                                        + ACLRoleColumns.DESCRIPTION + " TEXT" + ");");
+                                        + ACLRoleColumns.DESCRIPTION + " TEXT" 
+                                        + " UNIQUE(" + ACLRoleColumns.ROLE_ID + ")"
+                                        + ");");
     }
 
     private static void createAclActionsTable(SQLiteDatabase db) {
@@ -620,7 +622,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ACLActionColumns.CATEGORY + " TEXT,"
                                         + ACLActionColumns.ACLACCESS + " TEXT,"
                                         + ACLActionColumns.ACLTYPE + " TEXT,"
-                                        + ACLActionColumns.ROLE_ID + " INTEGER" + ");");
+                                        + ACLActionColumns.ROLE_ID + " INTEGER" 
+                                        + " UNIQUE(" + ACLActionColumns.ACTION_ID + ")"
+                                        + ");");
     }
 
     private void setAclAccessMap() {
