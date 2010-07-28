@@ -299,6 +299,9 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
     protected void onPause() {
         super.onPause();
         Log.i(LOG_TAG, "onPause");
+        if (mAuthTask != null && mAuthTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mAuthTask.cancel(true);
+        }
     }
 
     @Override
