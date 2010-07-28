@@ -653,7 +653,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 cursor.moveToNext();
             }
-            accessMap.put(moduleName, moduleAccessMap);
+            if (moduleAccessMap.size() > 0)
+                accessMap.put(moduleName, moduleAccessMap);
             cursor.close();
         }
     }
@@ -676,8 +677,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // TODO - checkk if syncd ACLRoles and Actions succesfully- if no roles are given to a user,
         // then we give access to the entire application
         if (aclAccessMap.size() == 0)
-            return true;
-        int aclAccess = aclAccessMap.get(moduleName).get(name);
+            return true;              
+        Map<String, Integer> moduleAccessMap = aclAccessMap.get(moduleName);
+       // if (moduleAccessMap == null || moduleAccessMap.size() == 0)
+         //   return true;
+        int aclAccess = moduleAccessMap.get(name);
         switch (aclAccess) {
         case ACLConstants.ACL_ALLOW_ADMIN:
             break;
