@@ -79,6 +79,9 @@ public class GenerateModuleFieldsTest extends RestAPITest {
         
         moduleFields = RestUtil.getModuleFields(url, mSessionId, "ACLActions", fields).getModuleFields();
         addToModuleFieldList(moduleFields);
+        
+        moduleFields = RestUtil.getModuleFields(url, mSessionId, "Users", fields).getModuleFields();
+        addToModuleFieldList(moduleFields);
 
         for (Iterator iterator = moduleFields.iterator(); iterator.hasNext();) {
             ModuleField field = (ModuleField) iterator.next();
