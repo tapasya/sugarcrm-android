@@ -387,10 +387,18 @@ public class ContactListActivity extends ListActivity {
         mModuleFields = mDbHelper.getModuleListSelections(mModuleName);
         // get the module fields for the module
         Map<String, ModuleField> map = mDbHelper.getModuleFields(mModuleName);
+        if (map == null) {
+            Log.w(LOG_TAG, "Cannot prepare Options as Map is null for module:" + mModuleName);
+            return false;
+        }
         mModuleFieldsChoice = new String[mModuleFields.length];
         for (int i = 0; i < mModuleFields.length; i++) {
             // add the module field label to be displayed in the choice menu
-            mModuleFieldsChoice[i] = map.get(mModuleFields[i]).getLabel();
+            ModuleField modField = map.get(mModuleFields[i]);
+            if (modField != null)
+                mModuleFieldsChoice[i] = modField.getLabel();
+            else
+                mModuleFieldsChoice[i] = "";
             if (mModuleFieldsChoice[i].indexOf(":") > 0) {
                 mModuleFieldsChoice[i] = mModuleFieldsChoice[i].substring(0, mModuleFieldsChoice[i].length() - 1);
             }
