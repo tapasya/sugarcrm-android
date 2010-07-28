@@ -83,7 +83,7 @@ public class WizardActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
 
-        app = ((SugarCrmApp) getApplicationContext());
+        app = ((SugarCrmApp) getApplication());
         if (app.getSessionId() != null) {
             setResult(RESULT_OK);
             finish();
@@ -93,15 +93,6 @@ public class WizardActivity extends Activity {
         final String usr = SugarCrmSettings.getUsername(WizardActivity.this).toString();
         Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n");
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        // if the user is not connected to the network
-        // if (!Util.isNetworkOn(getBaseContext())) {
-        // wizardState = Util.OFFLINE_MODE;
-        // Log.i(LOG_TAG, "In OFFLINE mode!");
-        // // directly send him to dashboard if the user is not connected to the network
-        // setResult(RESULT_OK);
-        // finish();
-        // } else {
 
         // if the REST url is not available
         if (TextUtils.isEmpty(restUrl)) {
@@ -151,9 +142,12 @@ public class WizardActivity extends Activity {
                         }
                     }
                     setFlipper();
-                    mAuthTask = new AuthenticationTask();
+                    mHeaderTextView.setText(R.string.login);
+
+                    // never print the password
+                    Log.i(LOG_TAG, " user name is " + usr);
                     String pwd = accountManager.getPassword(userAccount);
-                    Log.i(LOG_TAG, " " + usr + " " + pwd);
+                    mAuthTask = new AuthenticationTask();
                     mAuthTask.execute(usr, pwd);
 
                     // View loginView = inflateLoginView();
@@ -377,8 +371,7 @@ public class WizardActivity extends Activity {
         @Override
         protected Object doInBackground(Object... args) {
             /*
-             * arg[0] : String - username arg[1] : String - password arg[2] : boolean -
-             * rememberPassword
+             * arg[0] : String - username arg[1] : String - password
              */
             usr = args[0].toString();
             pwd = args[1].toString();
@@ -390,48 +383,27 @@ public class WizardActivity extends Activity {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, pwd);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
 
-                DatabaseHelper openHelper = new DatabaseHelper(getBaseContext());
-                SQLiteDatabase db;
-
                 // check moduleNames for null
-                db = openHelper.getReadableDatabase();
+                mDbHelper = new DatabaseHelper(getBaseContext());
                 List<String> userModules = mDbHelper.getUserModules();
                 Log.i(LOG_TAG, "userModules : size - " + userModules.size());
                 if (userModules == null || userModules.size() == 0) {
                     userModules = RestUtil.getAvailableModules(url, sessionId);
-                    db = openHelper.getWritableDatabase();
                     try {
                         mDbHelper.setUserModules(userModules);
                     } catch (SugarCrmException sce) {
+                        Log.e(LOG_TAG, sce.getMessage(), sce);
                         // TODO
                     }
                 }
                 Log.i(LOG_TAG, "loaded user modules");
 
-                // TODO: getModuleFieldsInfo
-                Set<Module> moduleFieldsInfo = new HashSet<Module>();
-                for (String moduleName : userModules) {
-                    String[] fields = {};
-                    try {
-                        // TODO: check if the module is already there in the db. make the rest call
-                        // only if it isn't
-                        Module module = RestUtil.getModuleFields(url, sessionId, moduleName, fields);
-                        moduleFieldsInfo.add(module);
-                        Log.i(LOG_TAG, "loaded module fields for : " + moduleName);
-                    } catch (SugarCrmException sce) {
-                        Log.e(LOG_TAG, "failed to load module fields for : " + moduleName);
-                    }
-                }
-                db = openHelper.getWritableDatabase();
-                try {
-                    mDbHelper.setModuleFieldsInfo(moduleFieldsInfo);
-                } catch (SugarCrmException sce) {
-                    // TODO
-                }
-
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
+            } finally {
+                if (mDbHelper != null)
+                    mDbHelper.close();
             }
 
             return sessionId;
