@@ -314,4 +314,46 @@ public interface ModuleFields {
 
     public static final String ACLACCESS = "aclaccess";
 
+    public static final String PWD_LAST_CHANGED = "pwd_last_changed";
+
+    public static final String SYSTEM_GENERATED_PASSWORD = "system_generated_password";
+
+    public static final String IS_GROUP = "is_group";
+
+    public static final String ADDRESS_COUNTRY = "address_country";
+
+    public static final String ADDRESS_CITY = "address_city";
+
+    public static final String EXTERNAL_AUTH_ONLY = "external_auth_only";
+
+    public static final String EMPLOYEE_STATUS = "employee_status";
+
+    public static final String ADDRESS_POSTALCODE = "address_postalcode";
+
+    public static final String MESSENGER_ID = "messenger_id";
+
+    public static final String RECEIVE_NOTIFICATIONS = "receive_notifications";
+
+    public static final String AUTHENTICATE_ID = "authenticate_id";
+
+    public static final String PORTAL_ONLY = "portal_only";
+
+    public static final String REPORTS_TO_NAME = "reports_to_name";
+
+    public static final String ADDRESS_STATE = "address_state";
+
+    public static final String USER_HASH = "user_hash";
+
+    public static final String USER_NAME = "user_name";
+
+    public static final String SUGAR_LOGIN = "sugar_login";
+
+    public static final String IS_ADMIN = "is_admin";
+
+    public static final String MESSENGER_TYPE = "messenger_type";
+
+    public static final String USER_PREFERENCES = "user_preferences";
+
+    public static final String ADDRESS_STREET = "address_street";
+
 }
