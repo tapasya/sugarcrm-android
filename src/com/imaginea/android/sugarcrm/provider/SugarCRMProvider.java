@@ -1,5 +1,6 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -86,6 +87,8 @@ public class SugarCRMProvider extends ContentProvider {
 
     private static final int OPPORTUNITY_CONTACT = 22;
 
+    private static final int SEARCH = 23;
+
     private static final UriMatcher sUriMatcher;
 
     private static final String TAG = "SugarCRMProvider";
@@ -116,6 +119,11 @@ public class SugarCRMProvider extends ContentProvider {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 
         switch (sUriMatcher.match(uri)) {
+        case SEARCH:
+            String query = uri.getLastPathSegment().toLowerCase();
+            selection = ModuleFields.NAME + " LIKE '%" + query + "%'";
+            c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.SEARCH_PROJECTION, selection, selectionArgs, null, null, null);
+            break;
         case ACCOUNT:
             c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
             break;
@@ -935,6 +943,9 @@ public class SugarCRMProvider extends ContentProvider {
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, "Search" + "/"
+                                        + SearchManager.SUGGEST_URI_PATH_QUERY + "/*", SEARCH);
+
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS, ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/#", ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#", ACCOUNT_ID);
