@@ -191,7 +191,7 @@ public class WizardActivity extends Activity {
                     if (TextUtils.isEmpty(url)) {
                         tv.setText(getString(R.string.validFieldMsg)
                                                         + " REST url \n\n"
-                                                        + getBaseContext().getString(R.string.sampleRestUrl));
+                                                        + getBaseContext().getString(R.string.defaultUrl));
                     } else {
                         mUrlTask = new UrlValidationTask();
                         mUrlTask.execute(url);
@@ -324,7 +324,7 @@ public class WizardActivity extends Activity {
                 tv.setText("Invalid Url : "
                                                 + sceDesc
                                                 + "\n\n Please check the url you have entered! \n\n"
-                                                + getBaseContext().getString(R.string.sampleRestUrl));
+                                                + getBaseContext().getString(R.string.defaultUrl));
             } else {
                 if (isValidUrl) {
                     tv.setText("VALID URL");
@@ -339,7 +339,7 @@ public class WizardActivity extends Activity {
                 } else {
                     tv.setText("Invalid Url : "
                                                     + "\n\n Please check the url you have entered! \n\n"
-                                                    + getBaseContext().getString(R.string.sampleRestUrl));
+                                                    + getBaseContext().getString(R.string.defaultUrl));
                 }
             }
 
