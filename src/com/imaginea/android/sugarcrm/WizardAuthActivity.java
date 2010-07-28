@@ -147,7 +147,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
         // if the REST url is not available
         if (TextUtils.isEmpty(restUrl)) {
-            //TODO: must be connected to the network to configure the REST URL
+            // TODO: must be connected to the network to configure the REST URL
             Log.i(LOG_TAG, "REST URL is not available!");
             wizardState = Util.URL_NOT_AVAILABLE;
 
@@ -162,7 +162,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         } else {
             // if the username is not available
             if (TextUtils.isEmpty(usr)) {
-                //TODO: must be connected to the network to configure the SugarCRM account
+                // TODO: must be connected to the network to configure the SugarCRM account
                 Log.i(LOG_TAG, "REST URL is available but not the username!");
                 wizardState = Util.URL_AVAILABLE;
 
@@ -184,9 +184,10 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     AccountManager accountManager = AccountManager.get(getBaseContext());
                     Account[] accounts = accountManager.getAccountsByType(Util.ACCOUNT_TYPE);
                     Account userAccount = null;
-                    for(Account account : accounts){
-                        Log.i(LOG_TAG, "i) " + account.name + " " + accountManager.getPassword(account));
-                        if(account.name.equals(usr)){
+                    for (Account account : accounts) {
+                        Log.i(LOG_TAG, "i) " + account.name + " "
+                                                        + accountManager.getPassword(account));
+                        if (account.name.equals(usr)) {
                             userAccount = account;
                             break;
                         }
@@ -196,11 +197,12 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     String pwd = accountManager.getPassword(userAccount);
                     Log.i(LOG_TAG, " " + usr + " " + pwd);
                     mAuthTask.execute(usr, pwd);
-                    
-//                    View loginView = inflateLoginView();
-//                    EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
-//                    editTextUser.setText(mUsername);
-//                    mHeaderTextView.setText(R.string.login);
+
+                    // View loginView = inflateLoginView();
+                    // EditText editTextUser = (EditText)
+                    // loginView.findViewById(R.id.loginUsername);
+                    // editTextUser.setText(mUsername);
+                    // mHeaderTextView.setText(R.string.login);
                 }
             }
         }
