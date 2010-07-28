@@ -1,7 +1,6 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -29,8 +28,6 @@ public class SearchActivity extends ListActivity {
     private View mEmpty;
 
     private Menu mMenu;
-
-    private ProgressDialog progressDialog;
 
     private String mQuery = null;
 
@@ -66,6 +63,15 @@ public class SearchActivity extends ListActivity {
                 Log.d(TAG, "query - " + mQuery);
             }
             showResults(mQuery);
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            // handles a click on a search suggestion; launches activity to show the bean
+            Intent detailIntent = new Intent(this, AccountDetailsActivity.class);
+            Log.i(TAG, "view uri - " + intent.getData());
+            detailIntent.putExtra(Util.ROW_ID, intent.getData().getLastPathSegment());
+            detailIntent.putExtra(RestUtilConstants.MODULE_NAME, Util.ACCOUNTS);
+            detailIntent.setData(intent.getData());
+            startActivity(detailIntent);
+            finish();
         }
     }
 
