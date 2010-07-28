@@ -120,9 +120,10 @@ public class SugarCRMProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
         case SEARCH:
-            /*String query = uri.getLastPathSegment().toLowerCase();
-            selection = ModuleFields.NAME + " LIKE '%" + query + "%'";
-            c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.SEARCH_PROJECTION, selection, selectionArgs, null, null, null);*/
+            String query = uri.getLastPathSegment().toLowerCase();
+            // selection = ModuleFields.NAME + " LIKE '%" + query + "%'";
+            selection = ModuleFields.NAME + " ='" + query + "'";
+            c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.SEARCH_PROJECTION, selection, selectionArgs, null, null, null);
             break;
         case ACCOUNT:
             c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
