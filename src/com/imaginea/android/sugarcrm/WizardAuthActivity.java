@@ -5,7 +5,6 @@ import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -36,6 +34,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMProvider;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
+import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -104,8 +103,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     private Menu mMenu;
 
-    private ProgressDialog progressDialog;
-
     private TextView mHeaderTextView;
 
     private static final String LOG_TAG = "WizardAuthActivity";
@@ -137,6 +134,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n");
         mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        Account userAccount = getAccount(usr);
+
         // if the user is not connected to the network
         // if (!Util.isNetworkOn(getBaseContext())) {
         // wizardState = Util.OFFLINE_MODE;
@@ -146,7 +145,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         // } else {
 
         // if the REST url is not available
-        if (TextUtils.isEmpty(restUrl)) {
+        if (TextUtils.isEmpty(restUrl) || userAccount == null) {
             // TODO: must be connected to the network to configure the REST URL
             Log.i(LOG_TAG, "REST URL is not available!");
             wizardState = Util.URL_NOT_AVAILABLE;
@@ -161,7 +160,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             this.updateButtons(wizardState);
         } else {
             // if the username is not available
-            if (TextUtils.isEmpty(usr)) {
+            if (TextUtils.isEmpty(usr) || userAccount == null) {
                 // TODO: must be connected to the network to configure the SugarCRM account
                 Log.i(LOG_TAG, "REST URL is available but not the username!");
                 wizardState = Util.URL_AVAILABLE;
@@ -181,21 +180,12 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     setResult(RESULT_OK);
                     finish();
                 } else {
-                    AccountManager accountManager = AccountManager.get(getBaseContext());
-                    Account[] accounts = accountManager.getAccountsByType(Util.ACCOUNT_TYPE);
-                    Account userAccount = null;
-                    for (Account account : accounts) {
-                        Log.i(LOG_TAG, "i) " + account.name + " "
-                                                        + accountManager.getPassword(account));
-                        if (account.name.equals(usr)) {
-                            userAccount = account;
-                            break;
-                        }
-                    }
+
                     setFlipper();
                     mAuthTask = new AuthenticationTask();
-                    String pwd = accountManager.getPassword(userAccount);
-                    Log.i(LOG_TAG, " " + usr + " " + pwd);
+                    String pwd = mAccountManager.getPassword(userAccount);
+                    // never print the password
+                    Log.i(LOG_TAG, " user name is " + usr);
                     mAuthTask.execute(usr, pwd);
 
                     // View loginView = inflateLoginView();
@@ -208,6 +198,21 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         }
         // }
 
+    }
+
+    private Account getAccount(String userName) {
+
+        Account[] accounts = mAccountManager.getAccountsByType(Util.ACCOUNT_TYPE);
+        Account userAccount = null;
+        for (Account account : accounts) {
+            // never print the password
+            Log.i(LOG_TAG, "user name is " + account.name);
+            if (account.name.equals(userName)) {
+                userAccount = account;
+                break;
+            }
+        }
+        return userAccount;
     }
 
     private View inflateLoginView() {
@@ -235,7 +240,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     if (TextUtils.isEmpty(url)) {
                         tv.setText(getString(R.string.validFieldMsg)
                                                         + " REST url \n\n"
-                                                        + getBaseContext().getString(R.string.sampleRestUrl));
+                                                        + getBaseContext().getString(R.string.defaultUrl));
                     } else {
                         mUrlTask = new UrlValidationTask();
                         mUrlTask.execute(url);
@@ -370,7 +375,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 tv.setText("Invalid Url : "
                                                 + sceDesc
                                                 + "\n\n Please check the url you have entered! \n\n"
-                                                + getBaseContext().getString(R.string.sampleRestUrl));
+                                                + getBaseContext().getString(R.string.defaultUrl));
             } else {
                 if (isValidUrl) {
                     tv.setText("VALID URL");
@@ -385,7 +390,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 } else {
                     tv.setText("Invalid Url : "
                                                     + "\n\n Please check the url you have entered! \n\n"
-                                                    + getBaseContext().getString(R.string.sampleRestUrl));
+                                                    + getBaseContext().getString(R.string.defaultUrl));
                 }
             }
 
@@ -481,7 +486,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                progressDialog = ProgressDialog.show(WizardAuthActivity.this, "Sugar CRM", "Authenticating...", true, true);
+                ViewUtil.showProgressDialog(WizardAuthActivity.this, getString(R.string.authenticatingMsg));
             }
         }
 
@@ -495,7 +500,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
                     TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
                     tv.setText(sceDesc);
-                    progressDialog.cancel();
+                    ViewUtil.cancelProgressDialog();
                 } else {
                     setFlipper();
                     View loginView = inflateLoginView();
@@ -521,7 +526,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 editor.commit();
 
                 if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                    progressDialog.cancel();
+                    ViewUtil.cancelProgressDialog();
                 }
                 onAuthenticationResult(true);
                 setResult(RESULT_OK);
