@@ -609,7 +609,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + " INTEGER PRIMARY KEY," + ACLRoleColumns.ROLE_ID
                                         + " INTEGER," + ACLRoleColumns.NAME + " TEXT,"
                                         + ACLRoleColumns.TYPE + " TEXT,"
-                                        + ACLRoleColumns.DESCRIPTION + " TEXT" 
+                                        + ACLRoleColumns.DESCRIPTION + " TEXT," 
                                         + " UNIQUE(" + ACLRoleColumns.ROLE_ID + ")"
                                         + ");");
     }
@@ -622,7 +622,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ACLActionColumns.CATEGORY + " TEXT,"
                                         + ACLActionColumns.ACLACCESS + " TEXT,"
                                         + ACLActionColumns.ACLTYPE + " TEXT,"
-                                        + ACLActionColumns.ROLE_ID + " INTEGER" 
+                                        + ACLActionColumns.ROLE_ID + " INTEGER," 
                                         + " UNIQUE(" + ACLActionColumns.ACTION_ID + ")"
                                         + ");");
     }
