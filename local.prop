@@ -9,6 +9,7 @@ log.tag.Authenticator=VERBOSE
 log.tag.BatchOperation=INFO
 log.tag.ContactListActivity=VERBOSE
 log.tag.DatabaseHelper=VERBOSE
+log.tag.EditDetailsActivity=VERBOSE
 log.tag.EntryListServiceTask=VERBOSE
 log.tag.ModuleFieldsParser=INFO
 log.tag.RestUtil=INFO
@@ -16,11 +17,12 @@ log.tag.SBParser=INFO
 log.tag.SearchActivity=VERBOSE
 log.tag.SugarCRMProvider=INFO
 log.tag.SugarService=VERBOSE
-log.tag.SugarSyncManager=VERBOSE
+log.tag.SugarSyncManager=DEBUG
 log.tag.SyncAdapter=VERBOSE
 log.tag.UpdateServiceTask=VERBOSE
 log.tag.WizardActivity=VERBOSE
 log.tag.WizardAuthActivity=VERBOSE
 
-# system tags
-log.tag.Resources=INFO
+# test tags
+log.tag.ACLApiTest=DEBUG
+log.tag.ContactsApiTest=DEBUG
