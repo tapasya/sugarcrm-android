@@ -457,7 +457,9 @@ public class SugarSyncManager {
         }
 
         Set<Module> moduleFieldsInfo = new HashSet<Module>();
-        for (String moduleName : userModules) {
+        // exclude the modules now that are not part of the supported modules for user
+        List<String> moduleList = databaseHelper.getModuleList();
+        for (String moduleName : moduleList) {
             String[] fields = {};
             try {
                 // TODO: check if the module is already there in the db. make the rest call
@@ -499,7 +501,7 @@ public class SugarSyncManager {
         Cursor cursor = databaseHelper.getSyncRecordsToSync(moduleName);
         int num = cursor.getCount();
         Log.d(LOG_TAG, "UNSYNCD Item count:" + num);
-        Log.d(LOG_TAG, "UNSYNCD Column count:" + cursor.getColumnCount());
+        // Log.d(LOG_TAG, "UNSYNCD Column count:" + cursor.getColumnCount());
         String selectFields[] = databaseHelper.getModuleProjections(moduleName);
         cursor.moveToFirst();
         for (int i = 0; i < num; i++) {
@@ -527,8 +529,11 @@ public class SugarSyncManager {
 
         Map<String, String> moduleItemValues = new LinkedHashMap<String, String>();
         Cursor cursor = context.getContentResolver().query(uri, selectedFields, null, null, null);
-        String relatedModuleLinkedFieldName;
-        relatedModuleLinkedFieldName = databaseHelper.getLinkfieldName(relatedModuleName);
+        String relatedModuleLinkedFieldName = null;
+        // we are storing the same values for moduleName and related moduleName - if there is no
+        // relationship
+        if (!relatedModuleName.equals(moduleName))
+            relatedModuleLinkedFieldName = databaseHelper.getLinkfieldName(relatedModuleName);
         String beanId = null;
         cursor.moveToFirst();
         if (cursor.getCount() == 0) {
