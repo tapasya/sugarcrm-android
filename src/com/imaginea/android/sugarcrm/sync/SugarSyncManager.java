@@ -489,6 +489,7 @@ public class SugarSyncManager {
 
             syncOutgoingModuleItem(context, sessionId, moduleName, relatedModuleName, command, syncId, selectFields);
         }
+        cursor.close();
         databaseHelper.close();
         databaseHelper = null;
         // databaseHelper.getS
