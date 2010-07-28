@@ -481,7 +481,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                progressDialog = ProgressDialog.show(WizardAuthActivity.this, "Sugar CRM", "Processing", true, true);
+                progressDialog = ProgressDialog.show(WizardAuthActivity.this, "Sugar CRM", "Authenticating...", true, true);
             }
         }
 
