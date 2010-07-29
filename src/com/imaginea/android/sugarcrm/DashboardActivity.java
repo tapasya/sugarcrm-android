@@ -3,7 +3,9 @@ package com.imaginea.android.sugarcrm;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +42,7 @@ public class DashboardActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Class wizardActivity = WizardDetector.getClass(getBaseContext());
-        startActivityForResult(new Intent(this, wizardActivity), 0);
+        startActivityForResult(new Intent(this, wizardActivity), Util.LOGIN_REQUEST_CODE);
 
         setContentView(R.layout.dashboard_activity);
         TextView tv = (TextView) findViewById(R.id.headerText);
@@ -51,7 +54,7 @@ public class DashboardActivity extends Activity {
                 // invoke the corresponding activity when the item in the GridView is clicked
                 Intent myIntent;
                 String moduleName = mModuleNames.get(position);
-                if (moduleName.equals("Settings")) {
+                if (moduleName.equals(getString(R.string.settings))) {
                     myIntent = new Intent(DashboardActivity.this, SugarCrmSettings.class);
                 } else {
                     myIntent = new Intent(DashboardActivity.this, ContactListActivity.class);
@@ -61,21 +64,42 @@ public class DashboardActivity extends Activity {
                 DashboardActivity.this.startActivity(myIntent);
             }
         });
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_CANCELED)
-            finish();
-        else {
+        switch (requestCode) {
+        case Util.LOGIN_REQUEST_CODE:
+            if (resultCode == RESULT_CANCELED) {
+                finish();
+                return;
+            }
+            if (resultCode == RESULT_OK) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(DashboardActivity.this);
+                boolean metaDataSyncCompleted = prefs.getBoolean(Util.SYNC_METADATA_COMPLETED, false);
+                if (!metaDataSyncCompleted) {
+                    startActivityForResult(new Intent(this, SyncConfigActivity.class), Util.SYNC_DATA_REQUEST_CODE);
+                } else
+                    showDashboard();
+            }
+            break;
+
+        case Util.SYNC_DATA_REQUEST_CODE:
+            // whatever is the result code, we take the user to dashboard
             // we have the module list after the login, so get them and store
-            mModuleNames = mDbHelper.getModuleList();
-            mModuleNames.add("Settings");
-            Collections.sort(mModuleNames);
-            mDashboard.setAdapter(new AppsAdapter(this));
+            showDashboard();
+            break;
+        default:
+            break;
         }
+    }
+
+    void showDashboard() {
+        mModuleNames = mDbHelper.getModuleList();
+        mModuleNames.add("Settings");
+        Collections.sort(mModuleNames);
+        mDashboard.setAdapter(new AppsAdapter(this));
     }
 
     public class AppsAdapter extends BaseAdapter {
