@@ -40,8 +40,9 @@
         <activity android:name=".SugarCrmSettings" android:label="@string/settings"
         	 android:theme="@android:style/Theme.Light">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.imaginea.android.sugarcrm.settings" />                
                 <category android:name="android.intent.category.PREFERENCE" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         
