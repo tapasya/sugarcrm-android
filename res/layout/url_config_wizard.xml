@@ -7,26 +7,22 @@
 	android:orientation="vertical">
 	
 	<TextView 
-		android:textAppearance="?android:attr/textAppearanceSmall"
-		android:textStyle="bold" 
+		style="@style/text_label"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
 		android:text="@string/restUrl" />
 	<EditText 
 		android:id="@+id/wizardUrl" 
+		style="@style/edit_text_layout"
 		android:singleLine="true"
 		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content"
-		android:minWidth="250dip" 
-		android:scrollHorizontally="true"
-		android:capitalize="none" 
-		android:autoText="false"
+		android:layout_height="wrap_content"		
+		android:scrollHorizontally="true"		
 		android:inputType="textUri"
 		android:text="@string/defaultUrl" />
 	<TextView 
 		android:id="@+id/wizardUrlStatus" 
-		android:textAppearance="?android:attr/textAppearanceSmall"
-		android:textStyle="bold" 
+		style="@style/text_label"		
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
 		android:text="@string/defaultUrl" />
