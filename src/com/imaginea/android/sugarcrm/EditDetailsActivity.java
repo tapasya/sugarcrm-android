@@ -242,15 +242,20 @@ public class EditDetailsActivity extends Activity {
             LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
+            Map<String, String> fieldsExcludedForEdit = mDbHelper.getFieldsExcludedForEdit();
 
-            // iterating from the 3rd element as the first two columns in the detail projection are
-            // ROW_ID and BEAN_ID
-            for (int i = 2; i < detailsProjection.length - 2; i++) {
+            int rowsCount = 0;
+            for (int i = 0; i < detailsProjection.length; i++) {
                 // if the task gets cancelled
                 if (isCancelled())
                     break;
 
                 String fieldName = detailsProjection[i];
+
+                // if the field name is excluded in details screen, skip it
+                if (fieldsExcludedForEdit.containsKey(fieldName)) {
+                    continue;
+                }
 
                 // get the attributes of the moduleField
                 ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
@@ -264,8 +269,8 @@ public class EditDetailsActivity extends Activity {
                 TextView textViewForLabel;
                 EditText editTextForValue;
                 // first two columns in the detail projection are ROW_ID and BEAN_ID
-                if (staticRowsCount > i - 2) {
-                    tableRow = (ViewGroup) mDetailsTable.getChildAt(i - 2);
+                if (staticRowsCount > rowsCount) {
+                    tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
                     textViewForLabel = (TextView) tableRow.getChildAt(0);
                     editTextForValue = (EditText) tableRow.getChildAt(1);
                 } else {
@@ -282,7 +287,7 @@ public class EditDetailsActivity extends Activity {
                 }
 
                 int command = STATIC_ROW;
-                if (staticRowsCount < i - 2) {
+                if (staticRowsCount < rowsCount) {
                     command = DYNAMIC_ROW;
                 }
 
@@ -298,6 +303,7 @@ public class EditDetailsActivity extends Activity {
                 } else {
                     publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, "");
                 }
+                rowsCount++;
             }
 
         }
@@ -327,21 +333,32 @@ public class EditDetailsActivity extends Activity {
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
             modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
 
-        for (int i = 2; i < detailsProjection.length - 2; i++) {
+        Map<String, String> fieldsExcludedForEdit = mDbHelper.getFieldsExcludedForEdit();
+        int rowsCount = 0;
+
+        for (int i = 0; i < detailsProjection.length; i++) {
+
+            String fieldName = detailsProjection[i];
+
+            // if the field name is excluded in details screen, skip it
+            if (fieldsExcludedForEdit.containsKey(fieldName)) {
+                continue;
+            }
 
             // do not display account_name field, i.e. user cannot modify the account name
             if (!mModuleName.equals(getString(R.string.accounts))
-                                            && ModuleFields.ACCOUNT_NAME.equals(detailsProjection[i]))
+                                            && ModuleFields.ACCOUNT_NAME.equals(fieldName))
                 continue;
 
             // EditText editText = (EditText) mDetailsTable.findViewById(i);
-            EditText editText = (EditText) ((ViewGroup) mDetailsTable.getChildAt(i - 2)).getChildAt(1);
-            Log.i(TAG, detailsProjection[i] + " : " + editText.getText().toString());
+            EditText editText = (EditText) ((ViewGroup) mDetailsTable.getChildAt(rowsCount)).getChildAt(1);
+            Log.i(TAG, fieldName + " : " + editText.getText().toString());
 
             // TODO: validation
 
             // add the fieldName : fieldValue in the ContentValues
-            modifiedValues.put(detailsProjection[i], editText.getText().toString());
+            modifiedValues.put(fieldName, editText.getText().toString());
+            rowsCount++;
         }
 
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {

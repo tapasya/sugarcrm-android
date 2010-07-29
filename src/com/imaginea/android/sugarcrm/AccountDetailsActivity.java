@@ -293,17 +293,23 @@ public class AccountDetailsActivity extends Activity {
 
             String value = "";
             Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
+            Map<String, String> fieldsExcludedForDetails = mDbHelper.getFieldsExcludedForDetails();
 
             // LinearLayout tableRow = (LinearLayout)inflater.inflate(R.layout.table_row, null);
 
-            // iterating from the 3rd element as the first two columns in the detail projection are
-            // ROW_ID and BEAN_ID
-            for (int i = 2; i < detailsProjection.length - 2; i++) {
+            int rowsCount = 0;
+            for (int i = 0; i < detailsProjection.length; i++) {
                 // if the task gets cancelled
                 if (isCancelled())
                     break;
 
                 String fieldName = detailsProjection[i];
+
+                // if the field name is excluded in details screen, skip it
+                if (fieldsExcludedForDetails.containsKey(fieldName)) {
+                    continue;
+                }
+
                 int columnIndex = mCursor.getColumnIndex(fieldName);
                 if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                     Log.d(LOG_TAG, "Col:" + columnIndex + " moduleName : " + mModuleName
@@ -319,8 +325,8 @@ public class AccountDetailsActivity extends Activity {
                 TextView textViewForLabel;
                 TextView textViewForValue;
                 // first two columns in the detail projection are ROW_ID and BEAN_ID
-                if (staticRowsCount > i - 2) {
-                    tableRow = (ViewGroup) mDetailsTable.getChildAt(i - 2);
+                if (staticRowsCount > rowsCount) {
+                    tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
                     textViewForLabel = (TextView) tableRow.getChildAt(0);
                     textViewForValue = (TextView) tableRow.getChildAt(1);
                 } else {
@@ -364,7 +370,7 @@ public class AccountDetailsActivity extends Activity {
                     textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
 
                 int command = STATIC_ROW;
-                if (staticRowsCount < i - 2) {
+                if (staticRowsCount < rowsCount) {
                     command = DYNAMIC_ROW;
                 }
 
@@ -377,6 +383,7 @@ public class AccountDetailsActivity extends Activity {
                 }
 
                 // mDetailsTable.addView(tableRow);
+                rowsCount++;
 
             }
         }
