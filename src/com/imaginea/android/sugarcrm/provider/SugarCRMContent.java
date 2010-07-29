@@ -752,12 +752,14 @@ public final class SugarCRMContent {
         public String GROUP_ID = "group_id";
 
         public String MODULE_FIELD_ID = "module_field_id";
+        
+        public String MODULE_ID = "module_id";
     }
 
     public static final class ModuleFieldSortOrder implements ModuleFieldSortOrderColumns {
-        public static final String[] INSERT_PROJECTION = { FIELD_SORT_ID, GROUP_ID, MODULE_FIELD_ID };
+        public static final String[] INSERT_PROJECTION = { FIELD_SORT_ID, GROUP_ID, MODULE_FIELD_ID, MODULE_ID };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, FIELD_SORT_ID, GROUP_ID,
-                MODULE_FIELD_ID };
+                MODULE_FIELD_ID, MODULE_ID };
     }
 }

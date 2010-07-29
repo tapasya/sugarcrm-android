@@ -70,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 28;
+    private static final int DATABASE_VERSION = 29;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -703,7 +703,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ModuleFieldSortOrderColumns.ID + " INTEGER PRIMARY KEY,"
                                         + ModuleFieldSortOrderColumns.FIELD_SORT_ID + " INTEGER,"
                                         + ModuleFieldSortOrderColumns.GROUP_ID + " INTEGER,"
-                                        + ModuleFieldSortOrderColumns.MODULE_FIELD_ID + " INTEGER"
+                                        + ModuleFieldSortOrderColumns.MODULE_FIELD_ID + " INTEGER,"
+                                        + ModuleFieldSortOrderColumns.MODULE_ID + " INTEGER"
                                         + ");");
     }
 
