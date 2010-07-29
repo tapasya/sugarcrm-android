@@ -50,6 +50,9 @@ import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1305,5 +1308,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
             db.close();
         }
+    }
+
+    /**
+     * executes SQL statements from a SQL file name present in assets folder
+     * 
+     * @param fileName
+     */
+    public void executeSQLFromFile(String fileName) throws SugarCrmException {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            InputStream is = mContext.getAssets().open(fileName);
+            db.beginTransaction();
+            /*
+             * Use the openFileInput() method the ActivityContext provides. Again for security
+             * reasons with openFileInput(...)
+             */
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String sql;
+            while ((sql = br.readLine()) != null) {
+                db.execSQL(sql);
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "read from file: " + sql);
+            }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        } catch (Exception e) {
+            throw new SugarCrmException("FAILED to execute SQL from file");
+        }
+        db.close();
+
     }
 }
