@@ -3,6 +3,7 @@ package com.imaginea.android.sugarcrm;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.content.ContentResolver;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.text.format.Time;
@@ -10,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
+
+import com.imaginea.android.sugarcrm.provider.SugarCRMProvider;
+import com.imaginea.android.sugarcrm.util.Util;
 
 /**
  * SyncConfigActivity
@@ -49,6 +53,22 @@ public class SyncConfigActivity extends Activity {
         mEndTime = new Time();
 
         populateWhen();
+
+    }
+
+    /**
+     * starts sync for all the modules in the background
+     * 
+     * @param v
+     */
+    public void startSync(View v) {
+        Bundle extras = new Bundle();
+        // extras.putInt(key, value)
+        extras.putBoolean(ContentResolver.SYNC_EXTRAS_IGNORE_SETTINGS, true);
+        extras.putInt(Util.SYNC_TYPE, Util.SYNC_MODULES_DATA);
+        SugarCrmApp app = (SugarCrmApp) getApplication();
+        final String usr = SugarCrmSettings.getUsername(SyncConfigActivity.this).toString();
+        ContentResolver.requestSync(app.getAccount(usr), SugarCRMProvider.AUTHORITY, extras);
 
     }
 
