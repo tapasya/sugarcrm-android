@@ -140,6 +140,21 @@ public class Util {
 
     public static final String RELATED_MODULE = "related_module";
 
+    // Sync operations
+    public static final String SYNC_TYPE = "sync_type";
+
+    public static final int SYNC_MODULE_META_DATA = 0;
+
+    public static final int SYNC_ACL_ACCESS_META_DATA = 1;
+
+    public static final int SYNC_MODULES_DATA = 2;
+
+    public static final int SYNC_MODULE_DATA = 3;
+
+    public static final int SYNC_ALL_META_DATA = 4;
+
+    public static final int SYNC_ALL = 5;
+
     private static final String LOG_TAG = Util.class.getSimpleName();
 
     // calculate the MD5 hash of a string
