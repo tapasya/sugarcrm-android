@@ -684,7 +684,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + MODULE_FIELDS_GROUP_TABLE_NAME + " ("
                                         + ModuleFieldGroupColumns.ID + " INTEGER PRIMARY KEY,"
                                         + ModuleFieldGroupColumns.TITLE + " TEXT,"
-                                        + ModuleFieldGroupColumns.GROUP_ID + " INTEGER," + ");");
+                                        + ModuleFieldGroupColumns.GROUP_ID + " INTEGER" + ");");
     }
 
     private void setAclAccessMap() {
