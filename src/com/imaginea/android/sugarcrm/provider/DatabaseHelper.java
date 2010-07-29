@@ -67,7 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 26;
+    private static final int DATABASE_VERSION = 27;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -145,6 +145,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<String> durationGroup = new ArrayList<String>();
 
     private Map<String, Map<String, Integer>> accessMap = new HashMap<String, Map<String, Integer>>();
+
+    private static Map<String, String> fieldsExcludedForEdit = new HashMap<String, String>();
+
+    private static Map<String, String> fieldsExcludedForDetails = new HashMap<String, String>();
 
     private Context mContext;
 
@@ -230,6 +234,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         durationGroup.add(ModuleFields.DURATION_HOURS);
         durationGroup.add(ModuleFields.DURATION_MINUTES);
+
+        // add a field name to the map if a module field in detail projection is to be excluded
+        fieldsExcludedForEdit.put(SugarCRMContent.RECORD_ID, SugarCRMContent.RECORD_ID);
+        fieldsExcludedForEdit.put(SugarCRMContent.SUGAR_BEAN_ID, SugarCRMContent.SUGAR_BEAN_ID);
+        fieldsExcludedForEdit.put(ModuleFields.DELETED, ModuleFields.DELETED);
+        fieldsExcludedForEdit.put(ModuleFields.ACCOUNT_ID, ModuleFields.ACCOUNT_ID);
+        fieldsExcludedForEdit.put(ModuleFields.DATE_ENTERED, ModuleFields.DATE_ENTERED);
+        fieldsExcludedForEdit.put(ModuleFields.DATE_MODIFIED, ModuleFields.DATE_MODIFIED);
+        fieldsExcludedForEdit.put(ModuleFields.CREATED_BY, ModuleFields.CREATED_BY);
+        fieldsExcludedForEdit.put(ModuleFields.CREATED_BY_NAME, ModuleFields.CREATED_BY_NAME);
+        fieldsExcludedForEdit.put(ModuleFields.MODIFIED_USER_ID, ModuleFields.MODIFIED_USER_ID);
+        fieldsExcludedForEdit.put(ModuleFields.MODIFIED_BY_NAME, ModuleFields.MODIFIED_BY_NAME);
+
+        // add a field name to the map if a module field in detail projection is to be excluded in
+        // details screen
+        fieldsExcludedForDetails.put(SugarCRMContent.RECORD_ID, SugarCRMContent.RECORD_ID);
+        fieldsExcludedForDetails.put(SugarCRMContent.SUGAR_BEAN_ID, SugarCRMContent.SUGAR_BEAN_ID);
+        fieldsExcludedForDetails.put(ModuleFields.DELETED, ModuleFields.DELETED);
+        fieldsExcludedForDetails.put(ModuleFields.ACCOUNT_ID, ModuleFields.ACCOUNT_ID);
     }
 
     public DatabaseHelper(Context context) {
@@ -381,6 +404,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropUsersTable(db);
         dropAclRolesTable(db);
         dropAclActionsTable(db);
+
+        dropModuleFieldsGroupTable(db);
+        dropModuleFieldsSortOrderTable(db);
 
         // drop join tables
         dropAccountsContactsTable(db);
@@ -674,9 +700,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ModuleFieldSortOrderColumns.ID + " INTEGER PRIMARY KEY,"
                                         + ModuleFieldSortOrderColumns.ITEM_SORT_ID + " INTEGER,"
                                         + ModuleFieldSortOrderColumns.GROUP_ID + " INTEGER,"
-                                        + ModuleFieldSortOrderColumns.MODULE_FIELD_ID + " INTEGER,"
-                                        + " UNIQUE(" + ModuleFieldSortOrderColumns.ITEM_SORT_ID
-                                        + ")" + ");");
+                                        + ModuleFieldSortOrderColumns.MODULE_FIELD_ID + " INTEGER"
+                                        + ");");
     }
 
     private static void createModuleFieldsGroupTable(SQLiteDatabase db) {
@@ -696,7 +721,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String selection = "(" + ACLActionColumns.CATEGORY + "= '" + moduleName + "')";
             Cursor cursor = db.query(DatabaseHelper.ACL_ACTIONS_TABLE_NAME, ACLActions.DETAILS_PROJECTION, selection, null, null, null, null);
             cursor.moveToFirst();
-            Log.i(TAG, moduleName + " cursor.getCount() : " + cursor.getCount());
+
             // access map for each module
             Map<String, Integer> moduleAccessMap = new HashMap<String, Integer>();
             for (int i = 0; i < cursor.getCount(); i++) {
@@ -769,6 +794,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return true;
+    }
+
+    public Map<String, String> getFieldsExcludedForEdit() {
+        return fieldsExcludedForEdit;
+    }
+
+    public Map<String, String> getFieldsExcludedForDetails() {
+        return fieldsExcludedForDetails;
     }
 
     public String[] getModuleProjections(String moduleName) {
