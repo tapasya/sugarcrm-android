@@ -70,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 27;
+    private static final int DATABASE_VERSION = 28;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -701,7 +701,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE " + MODULE_FIELDS_SORT_ORDER_TABLE_NAME + " ("
                                         + ModuleFieldSortOrderColumns.ID + " INTEGER PRIMARY KEY,"
-                                        + ModuleFieldSortOrderColumns.ITEM_SORT_ID + " INTEGER,"
+                                        + ModuleFieldSortOrderColumns.FIELD_SORT_ID + " INTEGER,"
                                         + ModuleFieldSortOrderColumns.GROUP_ID + " INTEGER,"
                                         + ModuleFieldSortOrderColumns.MODULE_FIELD_ID + " INTEGER"
                                         + ");");
