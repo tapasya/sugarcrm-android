@@ -40,12 +40,16 @@
 	<string name="signIn">Sign in</string>
 	<string name="validFieldMsg">Please enter a valid </string>
 	<string name="authenticatingMsg">Authenticating\u2026</string>
+	<string name="configureAppMsg">Configuring application\u2026</string>
 
+	<string name="appNotConfigMsg">Application did not configure cleanly, please try again !!!</string>
 	<!-- Wizard -->
 	<string name="restUrl">REST Url</string>
 	<string name="wizard_url_status_message">REST Url</string>
 	
 	<string name="cancel">cancel</string>
+	<string name="finish">Finish</string>
+	<string name="next">Next</string>
 
 	<!-- Details Screen Context Menu-->
 	<string name="options">Options</string>
@@ -89,4 +93,5 @@
     <string name="descending">Descending</string>
     <string name="ascending">Ascending</string>
     <string name="sortBy">Sort by</string>
+    <string name="syncNow">Sync Now</string>
 </resources>
