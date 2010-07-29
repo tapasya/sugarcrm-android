@@ -157,6 +157,9 @@ public class Util {
 
     public static final int SYNC_ALL = 5;
 
+    public static final String PREF_SYNC_START_TIME = "syncStart";
+    
+    public static final String PREF_SYNC_END_TIME = "syncEnd";
     // sub Activity request codes
     public static final int LOGIN_REQUEST_CODE = 0;
 
