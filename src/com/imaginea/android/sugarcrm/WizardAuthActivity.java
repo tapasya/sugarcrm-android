@@ -429,6 +429,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         private Semaphore resultWait = new Semaphore(0);
 
         SharedPreferences prefs;
+        
+        Object syncHandler;
 
         @Override
         protected void onPreExecute() {
@@ -547,6 +549,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             boolean metaDataSyncCompleted = pref.getBoolean(Util.SYNC_METADATA_COMPLETED, false);
             if (metaDataSyncCompleted) {
                 resultWait.release();
+               ContentResolver.removeStatusChangeListener(syncHandler);
             }
             // else {
             // hasExceptions = true;
@@ -566,7 +569,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             // ContentResolver.addStatusChangeListener(ContentResolver.SYNC_OBSERVER_TYPE_PENDING,
             // this);
             // TODO -this is API - level 8 - using 2 for testing
-            ContentResolver.addStatusChangeListener(2, this);
+            syncHandler = ContentResolver.addStatusChangeListener(2, this);
         }
     }
 
