@@ -1,0 +1,12 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/appName" />
+    <PreferenceScreen
+         android:key="sugarAccountSettings"
+         android:title="@string/settings"
+         android:summary="@string/settingsSummary">
+         <intent
+             android:action="com.imaginea.android.sugarcrm.settings"
+             android:targetPackage="com.imaginea.android.sugarcrm"
+             android:targetClass="com.imaginea.android.sugarcrm.SugarCrmSettings" />
+     </PreferenceScreen>
+ </PreferenceScreen>
