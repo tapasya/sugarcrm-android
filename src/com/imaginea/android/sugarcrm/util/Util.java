@@ -143,6 +143,8 @@ public class Util {
     // Sync operations
     public static final String SYNC_TYPE = "sync_type";
 
+    public static final String SYNC_METADATA_COMPLETED = "metadata";
+
     public static final int SYNC_MODULE_META_DATA = 0;
 
     public static final int SYNC_ACL_ACCESS_META_DATA = 1;
@@ -154,6 +156,13 @@ public class Util {
     public static final int SYNC_ALL_META_DATA = 4;
 
     public static final int SYNC_ALL = 5;
+
+    // sub Activity request codes
+    public static final int LOGIN_REQUEST_CODE = 0;
+
+    public static final int SYNC_DATA_REQUEST_CODE = 1;
+
+    public static final String SQL_FILE = "sortOrderAndGroup.sql";
 
     private static final String LOG_TAG = Util.class.getSimpleName();
 
