@@ -439,7 +439,7 @@ public class SugarSyncManager {
      * @param account
      * @param sessionId
      */
-    public static synchronized void syncModules(Context context, String account, String sessionId)
+    public static synchronized boolean syncModules(Context context, String account, String sessionId)
                                     throws SugarCrmException {
         if (databaseHelper == null)
             databaseHelper = new DatabaseHelper(context);
@@ -448,12 +448,13 @@ public class SugarSyncManager {
         String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
 
         try {
-            if (userModules == null)
+            if (userModules == null || userModules.size() == 0)
                 userModules = RestUtil.getAvailableModules(url, sessionId);
-
+            Log.i(LOG_TAG, "userModules : " + userModules.size());
             databaseHelper.setUserModules(userModules);
         } catch (SugarCrmException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
+            return false;
         }
 
         Set<Module> moduleFieldsInfo = new HashSet<Module>();
@@ -473,12 +474,13 @@ public class SugarSyncManager {
         }
         try {
             databaseHelper.setModuleFieldsInfo(moduleFieldsInfo);
+            return true;
         } catch (SugarCrmException sce) {
             Log.e(LOG_TAG, sce.getMessage(), sce);
-            // TODO
         }
         databaseHelper.close();
         databaseHelper = null;
+        return false;
     }
 
     /**
@@ -634,8 +636,11 @@ public class SugarSyncManager {
      * @param account
      * @param sessionId
      */
-    public synchronized static void syncAclAccess(Context context, String account, String sessionId) {
+    public synchronized static boolean syncAclAccess(Context context, String account,
+                                    String sessionId) {
         try {
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+                Log.d(LOG_TAG, "Sync Acl Access");
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
             // TODO use a constant and remove this as we start from the login screen
             String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
@@ -682,8 +687,10 @@ public class SugarSyncManager {
                     }
                 }
             }
+            return true;
         } catch (SugarCrmException sce) {
             Log.e(LOG_TAG, "" + sce.getMessage());
         }
+        return false;
     }
 }
