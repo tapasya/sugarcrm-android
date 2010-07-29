@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.ContentResolver;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.view.View;
@@ -36,6 +38,8 @@ public class SyncConfigActivity extends Activity {
 
     private Time mEndTime;
 
+    public static final long THREE_MONTHS = 3 * 30 * 24 * 60 * 60 * 1000;
+
     public static final String TAG = SyncConfigActivity.class.getSimpleName();
 
     @Override
@@ -49,9 +53,16 @@ public class SyncConfigActivity extends Activity {
         mStartDateButton = (Button) findViewById(R.id.start_date);
         mEndDateButton = (Button) findViewById(R.id.end_date);
 
+        long time = System.currentTimeMillis();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        long startTime = pref.getLong(Util.PREF_SYNC_START_TIME, time);
+        long endTime = pref.getLong(Util.PREF_SYNC_END_TIME, time - THREE_MONTHS);
         mStartTime = new Time();
+        mStartTime.set(startTime);
         mEndTime = new Time();
-
+        mEndTime.set(endTime);
+        setDate(mStartDateButton, mStartTime.normalize(true));
+        setDate(mEndDateButton, mEndTime.normalize(true));
         populateWhen();
 
     }
@@ -136,7 +147,10 @@ public class SyncConfigActivity extends Activity {
 
             setDate(mStartDateButton, startMillis);
             setDate(mEndDateButton, endMillis);
-
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            pref.edit().putLong(Util.PREF_SYNC_START_TIME, startMillis);
+            pref.edit().putLong(Util.PREF_SYNC_END_TIME, endMillis);
+            pref.edit().commit();
         }
     }
 
