@@ -1,9 +1,13 @@
 package com.imaginea.android.sugarcrm;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.imaginea.android.sugarcrm.util.Util;
 
 public class SugarCrmApp extends Application {
 
@@ -33,6 +37,28 @@ public class SugarCrmApp extends Application {
             }
         }
         return mSessionId;
+    }
+
+    /**
+     * returns the Account associated with the current user name
+     * 
+     * @param userName
+     * @return
+     */
+    public Account getAccount(String userName) {
+
+        AccountManager accountManager = AccountManager.get(this);
+        Account[] accounts = accountManager.getAccountsByType(Util.ACCOUNT_TYPE);
+        Account userAccount = null;
+        for (Account account : accounts) {
+            // never print the password
+            // Log.i(LOG_TAG, "user name is " + account.name);
+            if (account.name.equals(userName)) {
+                userAccount = account;
+                break;
+            }
+        }
+        return userAccount;
     }
 
     public void setSessionId(String mSessionId) {
