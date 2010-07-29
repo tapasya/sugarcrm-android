@@ -87,7 +87,9 @@ public class SugarCRMProvider extends ContentProvider {
 
     private static final int OPPORTUNITY_CONTACT = 22;
 
-    private static final int SEARCH = 23;
+    private static final int USERS = 23;
+
+    private static final int SEARCH = 24;
 
     private static final UriMatcher sUriMatcher;
 
@@ -380,7 +382,9 @@ public class SugarCRMProvider extends ContentProvider {
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.MEETINGS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
-
+        case USERS:
+            c = db.query(DatabaseHelper.USERS_TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+            break;
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -983,6 +987,8 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CASES, CASE);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CASES + "/#", CASE_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CASES + "/#/#", CASE);
+
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.USERS, USERS);
 
         // sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans/#", SUGAR_BEAN_ID);
 
