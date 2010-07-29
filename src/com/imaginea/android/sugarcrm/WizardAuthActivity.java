@@ -5,11 +5,13 @@ import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SyncStatusObserver;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -43,7 +45,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.concurrent.Semaphore;
 
 /**
  * WizardAuthActivity, same as Wizard Activity, but with account manager integration works only with
@@ -103,11 +105,11 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     private Menu mMenu;
 
+    private ProgressDialog mProgressDialog;
+
     private TextView mHeaderTextView;
 
-    private static final String LOG_TAG = "WizardAuthActivity";
-
-    private DatabaseHelper mDbHelper;
+    private static final String LOG_TAG = WizardAuthActivity.class.getSimpleName();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -156,7 +158,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 // TODO: must be connected to the network to configure the SugarCRM account
                 Log.i(LOG_TAG, "REST URL is available but not the username!");
                 wizardState = Util.URL_AVAILABLE;
-
                 setFlipper();
                 View loginView = inflateLoginView();
                 this.updateButtons(wizardState);
@@ -320,14 +321,15 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
          */
         if (flipper.getCurrentView().getId() == R.id.urlStep) {
             prev.setVisibility(View.INVISIBLE);
-            next.setText("Next");
+            next.setText(getString(R.string.next));
             next.setVisibility(View.VISIBLE);
         } else if (flipper.getCurrentView().getId() == R.id.signInStep) {
+            mHeaderTextView.setText(R.string.login);
             if (flipper.getChildCount() == 2) {
                 prev.setVisibility(View.VISIBLE);
-                next.setText("Finish");
+                next.setText(R.string.finish);
             } else {
-                next.setText("Sign In");
+                next.setText(getString(R.string.signIn));
             }
             next.setVisibility(View.VISIBLE);
         }
@@ -414,17 +416,36 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
     }
 
     // Task to authenticate
-    class AuthenticationTask extends AsyncTask<Object, Void, Object> {
+    class AuthenticationTask extends AsyncTask<Object, Object, Object> implements
+                                    SyncStatusObserver {
         private String usr;
 
         private String pwd;
 
-        //
-        // private boolean rememberPwd;
-
         boolean hasExceptions = false;
 
         private String sceDesc;
+
+        private Semaphore resultWait = new Semaphore(0);
+
+        SharedPreferences prefs;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            prefs = PreferenceManager.getDefaultSharedPreferences(WizardAuthActivity.this);
+            if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
+                mProgressDialog = ViewUtil.getProgressDialog(WizardAuthActivity.this, getString(R.string.authenticatingMsg), true);
+                mProgressDialog.show();
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Object... values) {
+            super.onProgressUpdate(values);
+            String msg = (String) values[0];
+            mProgressDialog.setMessage(msg);
+        }
 
         @Override
         protected Object doInBackground(Object... args) {
@@ -442,27 +463,26 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             try {
                 sessionId = RestUtil.loginToSugarCRM(url, usr, mPassword);
                 Log.i(LOG_TAG, "SessionId - " + sessionId);
-                // check moduleNames for null
-                mDbHelper = new DatabaseHelper(getBaseContext());
-                List<String> userModules = mDbHelper.getUserModules();
-                Log.i(LOG_TAG, "userModules : size - " + userModules.size());
-                if (userModules == null || userModules.size() == 0) {
-                    userModules = RestUtil.getAvailableModules(url, sessionId);
-                    try {
-                        mDbHelper.setUserModules(userModules);
-                    } catch (SugarCrmException sce) {
-                        Log.e(LOG_TAG, sce.getMessage(), sce);
-                        // TODO
-                    }
+                onAuthenticationResult(true);
+                boolean metaDataSyncCompleted = prefs.getBoolean(Util.SYNC_METADATA_COMPLETED, false);
+                if (!metaDataSyncCompleted) {
+                    // sync meta-data - modules and acl roles and actions for a user
+                    publishProgress(getString(R.string.configureAppMsg));
+                    startMetaDataSync();
+                    DatabaseHelper databaseHelper = new DatabaseHelper(getBaseContext());
+                    databaseHelper.executeSQLFromFile(Util.SQL_FILE);
+                    // TODO - note , we need a mechanism to release the lock incase the metadata
+                    // sync never happens, or its gets killed.
+                    resultWait.acquire();
                 }
-                Log.i(LOG_TAG, "loaded user modules");
 
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
-            } finally {
-                if (mDbHelper != null)
-                    mDbHelper.close();
+            } catch (InterruptedException ie) {
+                hasExceptions = true;
+                sceDesc = ie.getMessage();
+                Log.e(LOG_TAG, ie.getMessage(), ie);
             }
             // test Account manager code
 
@@ -476,14 +496,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                ViewUtil.showProgressDialog(WizardAuthActivity.this, getString(R.string.authenticatingMsg));
-            }
-        }
-
-        @Override
         protected void onPostExecute(Object sessionId) {
             super.onPostExecute(sessionId);
             if (isCancelled())
@@ -493,7 +505,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
                     TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
                     tv.setText(sceDesc);
-                    ViewUtil.cancelProgressDialog();
+                    mProgressDialog.cancel();
                 } else {
                     setFlipper();
                     View loginView = inflateLoginView();
@@ -510,22 +522,51 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
             } else {
 
-                // save the sessionId in the application context after the succesful login
+                // save the sessionId in the application context after the successful login
                 app.setSessionId(sessionId.toString());
 
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(WizardAuthActivity.this);
-                Editor editor = sp.edit();
+                Editor editor = prefs.edit();
                 editor.putString(Util.PREF_USERNAME, usr);
                 editor.commit();
 
                 if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                    ViewUtil.cancelProgressDialog();
+                    mProgressDialog.cancel();
                 }
-                onAuthenticationResult(true);
+
                 setResult(RESULT_OK);
                 finish();
             }
+        }
 
+        @Override
+        public void onStatusChanged(int which) {
+            Log.d(LOG_TAG, "onStatusChanged:" + which);
+            Log.d(LOG_TAG, "unlockThread:release lock permits available:"
+                                            + resultWait.availablePermits());
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            boolean metaDataSyncCompleted = pref.getBoolean(Util.SYNC_METADATA_COMPLETED, false);
+            if (metaDataSyncCompleted) {
+                resultWait.release();
+            }
+            // else {
+            // hasExceptions = true;
+            // sceDesc = getString(R.string.appNotConfigMsg);
+            // }
+        }
+
+        private void startMetaDataSync() {
+            Log.d(LOG_TAG, "startMetaDataSync");
+            Bundle extras = new Bundle();
+            // extras.putInt(key, value)
+            extras.putBoolean(ContentResolver.SYNC_EXTRAS_IGNORE_SETTINGS, true);
+            extras.putInt(Util.SYNC_TYPE, Util.SYNC_ALL_META_DATA);
+            SugarCrmApp app = (SugarCrmApp) getApplication();
+            final String usr = SugarCrmSettings.getUsername(WizardAuthActivity.this).toString();
+            ContentResolver.requestSync(app.getAccount(usr), SugarCRMProvider.AUTHORITY, extras);
+            // ContentResolver.addStatusChangeListener(ContentResolver.SYNC_OBSERVER_TYPE_PENDING,
+            // this);
+            // TODO -this is API - level 8 - using 2 for testing
+            ContentResolver.addStatusChangeListener(2, this);
         }
     }
 
@@ -657,8 +698,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         final Intent intent = new Intent();
         intent.putExtra(AccountManager.KEY_BOOLEAN_RESULT, result);
         setAccountAuthenticatorResult(intent.getExtras());
-        setResult(RESULT_OK, intent);
-        finish();
+        // setResult(RESULT_OK, intent);
+        // finish();
     }
 
     /**
@@ -690,7 +731,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             intent.putExtra(AccountManager.KEY_AUTHTOKEN, mAuthtoken);
         }
         setAccountAuthenticatorResult(intent.getExtras());
-        setResult(RESULT_OK, intent);
-        finish();
+        // setResult(RESULT_OK, intent);
+        // finish();
     }
 }
