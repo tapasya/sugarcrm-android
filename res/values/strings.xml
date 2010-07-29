@@ -27,7 +27,9 @@
 	<string name="accounts">Accounts</string>
 	<string name="leads">Leads</string>
 	<string name="opportunities">Opportunities</string>
-	<string name="settings">Settings</string>
+	
+	<string name="settings">Settings</string>	
+	<string name="settingsSummary">Change the Sugar Crm URL</string>
 
 	<!-- Login Module -->
 	<string name="sugarCrmUrlHeader">Sugar CRM REST URL</string>
