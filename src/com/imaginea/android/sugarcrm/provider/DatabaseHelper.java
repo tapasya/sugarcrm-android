@@ -108,7 +108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ACL_ACTIONS_TABLE_NAME = "acl_actions";
 
     public static final String MODULE_FIELDS_SORT_ORDER_TABLE_NAME = "module_fields_sort_order";
-    
+
     public static final String MODULE_FIELDS_GROUP_TABLE_NAME = "module_fields_group";
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
@@ -141,7 +141,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<String> billingAddressGroup = new ArrayList<String>();
 
     private static List<String> shippingAddressGroup = new ArrayList<String>();
-    
+
     private static List<String> durationGroup = new ArrayList<String>();
 
     private Map<String, Map<String, Integer>> accessMap = new HashMap<String, Map<String, Integer>>();
@@ -227,7 +227,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STATE);
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_POSTALCODE);
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_COUNTRY);
-        
+
         durationGroup.add(ModuleFields.DURATION_HOURS);
         durationGroup.add(ModuleFields.DURATION_MINUTES);
     }
@@ -255,7 +255,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createUsersTable(db);
         createAclRolesTable(db);
         createAclActionsTable(db);
-        
+
         createModuleFieldsSortOrderTable(db);
         createModuleFieldsGroupTable(db);
 
@@ -347,15 +347,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropAclActionsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACL_ACTIONS_TABLE_NAME);
     }
-    
+
     void dropModuleFieldsSortOrderTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_SORT_ORDER_TABLE_NAME);
     }
-    
+
     void dropModuleFieldsGroupTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_GROUP_TABLE_NAME);
     }
-    
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -857,8 +856,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<String> getShippingAddressGroup() {
         return shippingAddressGroup;
     }
-    
-    public List<String> getDurationGroup(){
+
+    public List<String> getDurationGroup() {
         return durationGroup;
     }
 
