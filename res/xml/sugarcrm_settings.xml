@@ -11,4 +11,11 @@
 		android:summary="@string/userSummary"
 		android:defaultValue="@string/defaultUser" />
 		
+	<PreferenceScreen android:key="syncSettings"
+         android:title="@string/syncFilters"
+         android:summary="@string/syncSummary">
+         <intent            
+             android:targetPackage="com.imaginea.android.sugarcrm"
+             android:targetClass="com.imaginea.android.sugarcrm.SyncConfigActivity" />
+     </PreferenceScreen>
 </PreferenceScreen>
