@@ -39,8 +39,10 @@ public final class SugarCRMContent {
                 CREATED_BY_NAME };
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME };
-        
-        public static final String[] SEARCH_PROJECTION = { RECORD_ID, NAME + " AS " + (SearchManager.SUGGEST_COLUMN_TEXT_1), RECORD_ID + " AS " + (SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID)};
+
+        public static final String[] SEARCH_PROJECTION = { RECORD_ID,
+                NAME + " AS " + (SearchManager.SUGGEST_COLUMN_TEXT_1),
+                RECORD_ID + " AS " + (SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID) };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, PARENT_NAME,
                 PHONE_OFFICE, PHONE_FAX, EMAIL1, WEBSITE, EMPLOYEES, TICKER_SYMBOL, ANNUAL_REVENUE,
@@ -706,5 +708,56 @@ public final class SugarCRMContent {
          * The default sort order for this table
          */
         public static final String DEFAULT_SORT_ORDER = NAME + " ASC";
+    }
+
+    public interface UserColumns {
+        public String ID = RECORD_ID;
+
+        public String USER_ID = ModuleFields.ID;
+
+        public String USER_NAME = ModuleFields.USER_NAME;
+
+        public String FIRST_NAME = ModuleFields.FIRST_NAME;
+
+        public String LAST_NAME = ModuleFields.LAST_NAME;
+    }
+
+    public static final class Users implements UserColumns {
+        public static final String[] INSERT_PROJECTION = { USER_ID, USER_NAME, FIRST_NAME,
+                LAST_NAME };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, USER_ID, USER_NAME,
+                FIRST_NAME, LAST_NAME };
+    }
+
+    public interface ModuleFieldGroupColumns {
+        public String ID = RECORD_ID;
+
+        public String TITLE = "title";
+
+        public String GROUP_ID = "group_id";
+    }
+
+    public static final class ModuleFieldGroups implements ModuleFieldGroupColumns {
+        public static final String[] INSERT_PROJECTION = { TITLE, GROUP_ID };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, TITLE, GROUP_ID };
+    }
+
+    public interface ModuleFieldSortOrderColumns {
+        public String ID = RECORD_ID;
+
+        public String ITEM_SORT_ID = "item_id";
+
+        public String GROUP_ID = "group_id";
+
+        public String MODULE_FIELD_ID = "module_field_id";
+    }
+
+    public static final class ModuleFieldSortOrder implements ModuleFieldSortOrderColumns {
+        public static final String[] INSERT_PROJECTION = { ITEM_SORT_ID, GROUP_ID, MODULE_FIELD_ID };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, ITEM_SORT_ID, GROUP_ID,
+                MODULE_FIELD_ID };
     }
 }

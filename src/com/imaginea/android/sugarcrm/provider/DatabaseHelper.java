@@ -33,6 +33,8 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.LinkFieldColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Meetings;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldGroupColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldSortOrderColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
@@ -105,6 +107,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String ACL_ACTIONS_TABLE_NAME = "acl_actions";
 
+    public static final String MODULE_FIELDS_SORT_ORDER_TABLE_NAME = "module_fields_sort_order";
+    
+    public static final String MODULE_FIELDS_GROUP_TABLE_NAME = "module_fields_group";
+
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     private String[] defaultSupportedModules = { Util.ACCOUNTS, Util.CONTACTS, Util.LEADS,
@@ -135,6 +141,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<String> billingAddressGroup = new ArrayList<String>();
 
     private static List<String> shippingAddressGroup = new ArrayList<String>();
+    
+    private static List<String> durationGroup = new ArrayList<String>();
 
     private Map<String, Map<String, Integer>> accessMap = new HashMap<String, Map<String, Integer>>();
 
@@ -219,6 +227,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_STATE);
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_POSTALCODE);
         shippingAddressGroup.add(ModuleFields.SHIPPING_ADDRESS_COUNTRY);
+        
+        durationGroup.add(ModuleFields.DURATION_HOURS);
+        durationGroup.add(ModuleFields.DURATION_MINUTES);
     }
 
     public DatabaseHelper(Context context) {
@@ -244,6 +255,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createUsersTable(db);
         createAclRolesTable(db);
         createAclActionsTable(db);
+        
+        createModuleFieldsSortOrderTable(db);
+        createModuleFieldsGroupTable(db);
 
         // create join tables
 
@@ -333,6 +347,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropAclActionsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + ACL_ACTIONS_TABLE_NAME);
     }
+    
+    void dropModuleFieldsSortOrderTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_SORT_ORDER_TABLE_NAME);
+    }
+    
+    void dropModuleFieldsGroupTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_GROUP_TABLE_NAME);
+    }
+    
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -638,12 +661,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE " + ACL_ACTIONS_TABLE_NAME + " (" + ACLActionColumns.ID
                                         + " INTEGER PRIMARY KEY," + ACLActionColumns.ACTION_ID
-                                        + " INTEGER ," + ACLActionColumns.NAME + " INTEGER,"
+                                        + " INTEGER," + ACLActionColumns.NAME + " INTEGER,"
                                         + ACLActionColumns.CATEGORY + " TEXT,"
                                         + ACLActionColumns.ACLACCESS + " TEXT,"
                                         + ACLActionColumns.ACLTYPE + " TEXT,"
                                         + ACLActionColumns.ROLE_ID + " INTEGER," + " UNIQUE("
                                         + ACLActionColumns.ACTION_ID + ")" + ");");
+    }
+
+    private static void createModuleFieldsSortOrderTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + MODULE_FIELDS_SORT_ORDER_TABLE_NAME + " ("
+                                        + ModuleFieldSortOrderColumns.ID + " INTEGER PRIMARY KEY,"
+                                        + ModuleFieldSortOrderColumns.ITEM_SORT_ID + " INTEGER,"
+                                        + ModuleFieldSortOrderColumns.GROUP_ID + " INTEGER,"
+                                        + ModuleFieldSortOrderColumns.MODULE_FIELD_ID + " INTEGER,"
+                                        + " UNIQUE(" + ModuleFieldSortOrderColumns.ITEM_SORT_ID
+                                        + ")" + ");");
+    }
+
+    private static void createModuleFieldsGroupTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + MODULE_FIELDS_GROUP_TABLE_NAME + " ("
+                                        + ModuleFieldGroupColumns.ID + " INTEGER PRIMARY KEY,"
+                                        + ModuleFieldGroupColumns.TITLE + " TEXT,"
+                                        + ModuleFieldGroupColumns.GROUP_ID + " INTEGER," + ");");
     }
 
     private void setAclAccessMap() {
@@ -814,6 +856,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<String> getShippingAddressGroup() {
         return shippingAddressGroup;
+    }
+    
+    public List<String> getDurationGroup(){
+        return durationGroup;
     }
 
     public ModuleField getModuleField(String moduleName, String fieldName) {
