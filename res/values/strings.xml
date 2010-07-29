@@ -30,6 +30,7 @@
 	
 	<string name="settings">Settings</string>	
 	<string name="settingsSummary">Change the Sugar Crm URL</string>
+	<string name="syncSummary">Select Sync Filters and start a Sync</string>
 
 	<!-- Login Module -->
 	<string name="sugarCrmUrlHeader">Sugar CRM REST URL</string>
