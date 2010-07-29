@@ -59,7 +59,14 @@
                 android:gravity="left|center_vertical"
                 style="?android:attr/textAppearanceMedium"/>                
 
-        </LinearLayout>     
+        </LinearLayout>    
+         <Button android:id="@+id/startSync"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"               
+                android:gravity="left|center_vertical"
+                android:onClick="startSync"
+                android:text="@string/syncNow"
+                style="?android:attr/textAppearanceMedium"/>   
     </LinearLayout>
    </ScrollView>   
 </LinearLayout>
