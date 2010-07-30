@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
@@ -80,7 +81,14 @@ public class SyncConfigActivity extends Activity {
         SugarCrmApp app = (SugarCrmApp) getApplication();
         final String usr = SugarCrmSettings.getUsername(SyncConfigActivity.this).toString();
         ContentResolver.requestSync(app.getAccount(usr), SugarCRMProvider.AUTHORITY, extras);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
+        long startMillis = mStartTime.toMillis(false /* use isDst */);
+        long endMillis = mEndTime.toMillis(false /* use isDst */);
+        Editor editor = pref.edit();
+        editor.putLong(Util.PREF_SYNC_START_TIME, startMillis);
+        editor.putLong(Util.PREF_SYNC_END_TIME, endMillis);
+        editor.commit();
     }
 
     private void populateWhen() {
@@ -148,9 +156,10 @@ public class SyncConfigActivity extends Activity {
             setDate(mStartDateButton, startMillis);
             setDate(mEndDateButton, endMillis);
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            pref.edit().putLong(Util.PREF_SYNC_START_TIME, startMillis);
-            pref.edit().putLong(Util.PREF_SYNC_END_TIME, endMillis);
-            pref.edit().commit();
+            Editor editor = pref.edit();
+            editor.putLong(Util.PREF_SYNC_START_TIME, startMillis);
+            editor.putLong(Util.PREF_SYNC_END_TIME, endMillis);
+            editor.commit();
         }
     }
 
