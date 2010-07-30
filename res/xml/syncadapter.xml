@@ -6,5 +6,5 @@
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
     android:contentAuthority="com.imaginea.sugarcrm.provider"
     android:accountType="com.imaginea.android.sugarcrm"
-    android:supportsUploading="false"
+    android:supportsUploading="true"    
 />
