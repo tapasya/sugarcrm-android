@@ -2,6 +2,8 @@ package com.imaginea.android.sugarcrm.util;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 /**
@@ -103,6 +105,26 @@ public class ViewUtil {
      */
     public static void showFormattedToast(Context context, int id, Object... args) {
         Toast.makeText(context, String.format(context.getString(id), args), Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * dismissVirtualKeyboard
+     * 
+     * @param context
+     * @param view
+     */
+    public static void dismissVirtualKeyboard(Context context, View view) {
+
+        InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        // if(inputManager.isActive(view))
+        inputManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+        // inputManager.showSoftInput(ourCanvasInstance, 0);
+        // inputManager.hideSoftInputFromInputMethod(this, 0);
+        // && inputManager.isFullscreenMode()
+        // if(inputManager.isActive())
+        // {
+        // inputManager.toggleSoftInput(0, 0);
+        // }
     }
 
 }
