@@ -99,7 +99,7 @@ public class ContactListActivity extends ListActivity {
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
-        mModuleName = "Contacts";
+        mModuleName = Util.CONTACTS;
         if (extras != null) {
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
         }
@@ -186,7 +186,6 @@ public class ContactListActivity extends ListActivity {
 
         public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
             super(context, layout, c, from, to);
-
         }
 
         @Override
