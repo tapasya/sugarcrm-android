@@ -2,6 +2,7 @@ package com.imaginea.android.sugarcrm.sync;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SyncResult;
@@ -146,9 +147,6 @@ public class SugarSyncManager {
                     Log.v(LOG_TAG, "beanId/rawid:" + beandIdValue + "/" + rawId);
                 if (rawId != 0) {
                     if (!sBean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
-                        // TODO - check teh changes from sync table and mark them for merge
-                        // conflicts
-                        // update module Item
                         updateModuleItem(context, resolver, account, moduleName, sBean, rawId, batchOperation);
                     } else {
                         // delete module item - never delete the item here, just update the deleted
@@ -200,7 +198,8 @@ public class SugarSyncManager {
      * @param batchOperation
      */
     public static void syncRelationshipsData(Context context, String account, String sessionId,
-                                    String moduleName, SugarBean bean, BatchOperation batchOperation) {
+                                    String moduleName, SugarBean bean, BatchOperation batchOperation)
+                                    throws SugarCrmException {
         String[] relationships = databaseHelper.getModuleRelationshipItems(moduleName);
         if (relationships == null) {
             if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
@@ -337,25 +336,35 @@ public class SugarSyncManager {
      */
     private static void updateModuleItem(Context context, ContentResolver resolver,
                                     String accountName, String moduleName, SugarBean sBean,
-                                    long rawId, BatchOperation batchOperation) {
+                                    long rawId, BatchOperation batchOperation)
+                                    throws SugarCrmException {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateModuleItem");
         Uri contentUri = databaseHelper.getModuleUri(moduleName);
         String[] projections = databaseHelper.getModuleProjections(moduleName);
         Uri uri = ContentUris.withAppendedId(contentUri, rawId);
-        // TODO - is this query resolver needed to query here
-        final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(rawId) }, null);
-        // TODO - do something here with cursor
-        c.close();
-        final SugarCRMOperations moduleItemOp = SugarCRMOperations.updateExistingModuleItem(context, moduleName, sBean, rawId, batchOperation);
-        moduleItemOp.updateSugarBean(sBean, uri);
+        // check the changes from server and mark them for merge in sync table
+        SyncRecord syncRecord = databaseHelper.getSyncRecord(rawId, moduleName);
+        if (syncRecord != null) {
+            ContentValues values = new ContentValues();
+            values.put(Sync.SYNC_STATUS, Util.SYNC_CONFLICTS);
+            databaseHelper.updateSyncRecord(syncRecord._id, values);
+        } else {
+
+            final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(rawId) }, null);
+            // TODO - do something here with cursor, create update only for values that have changed
+            c.close();
+            final SugarCRMOperations moduleItemOp = SugarCRMOperations.updateExistingModuleItem(context, moduleName, sBean, rawId, batchOperation);
+            moduleItemOp.updateSugarBean(sBean, uri);
+        }
 
     }
 
     private static void updateRelatedModuleItem(Context context, ContentResolver resolver,
                                     String accountName, String moduleName,
                                     String relatedModuleName, SugarBean relatedBean,
-                                    long relationRawId, BatchOperation batchOperation) {
+                                    long relationRawId, BatchOperation batchOperation)
+                                    throws SugarCrmException {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateRelatedModuleItem");
         Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
@@ -363,12 +372,20 @@ public class SugarSyncManager {
         Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "updateRelatedModuleItem URI:" + uri.toString());
-        // TODO - is this query resolver needed to query here
-        final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(relationRawId) }, null);
-        // TODO - do something here with cursor
-        c.close();
-        final SugarCRMOperations moduleItemOp = SugarCRMOperations.updateExistingModuleItem(context, relatedModuleName, relatedBean, relationRawId, batchOperation);
-        moduleItemOp.updateSugarBean(relatedBean, uri);
+        // check the changes from server and mark them for merge in sync table
+        SyncRecord syncRecord = databaseHelper.getSyncRecord(relationRawId, moduleName, relatedModuleName);
+        if (syncRecord != null) {
+            ContentValues values = new ContentValues();
+            values.put(Sync.SYNC_STATUS, Util.SYNC_CONFLICTS);
+            databaseHelper.updateSyncRecord(syncRecord._id, values);
+        } else {
+            // TODO - is this query resolver needed to query here
+            final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(relationRawId) }, null);
+            // TODO - do something here with cursor
+            c.close();
+            final SugarCRMOperations moduleItemOp = SugarCRMOperations.updateExistingModuleItem(context, relatedModuleName, relatedBean, relationRawId, batchOperation);
+            moduleItemOp.updateSugarBean(relatedBean, uri);
+        }
 
     }
 
