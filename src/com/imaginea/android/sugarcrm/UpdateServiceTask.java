@@ -77,17 +77,6 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         debug();
     }
 
-    void debug() {
-        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-            Log.d(LOG_TAG, "size : " + mUri.getPathSegments().size());
-            Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : "
-                                            + mLinkFieldName);
-        }
-        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-            Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
-        }
-    }
-
     @Override
     protected Object doInBackground(Object... params) {
         int updatedRows = 0;
@@ -225,7 +214,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
                     Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
                     insertSyncRecord(insertResultUri);
-                }               
+                }
                 break;
 
             case Util.UPDATE:
@@ -235,7 +224,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                 if (!serverUpdated && updatedRows > 0) {
                     updateSyncRecord();
-                }               
+                }
                 break;
 
             case Util.DELETE:
@@ -250,7 +239,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                     if (updatedRows > 0)
                         updateSyncRecord();
-                }               
+                }
                 break;
 
             }
@@ -283,15 +272,15 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
             }
         } else {
             // pass the success/failure msg to activity
-            if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
-                if (updatedRows > 0) {
-                    Log.v(LOG_TAG, "update successful");
-                    SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.serverUpdateSuccess), getCommandStr()));
-                } else {
-                    SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.updateFailed), getCommandStr()));
-                    Log.v(LOG_TAG, "update failed");
-                }
+
+            if (updatedRows > 0) {
+                Log.v(LOG_TAG, "update successful");
+                SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.serverUpdateSuccess), getCommandStr()));
+            } else {
+                SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.updateFailed), getCommandStr()));
+                Log.v(LOG_TAG, "update failed");
             }
+
         }
     }
 
@@ -349,6 +338,17 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         Log.d(LOG_TAG, "Related Module Name:" + record.relatedModuleName);
         Log.d(LOG_TAG, "Sync command:" + (record.syncCommand == 1 ? "INSERT" : "UPDATE/DELETE"));
         Log.d(LOG_TAG, "Sync Status:" + (record.status == Util.UNSYNCED ? "UNSYNCHD" : "CONFLICTS"));
+    }
+
+    private void debug() {
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+            Log.d(LOG_TAG, "size : " + mUri.getPathSegments().size());
+            Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : "
+                                            + mLinkFieldName);
+        }
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+            Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
+        }
     }
 
     @Override
