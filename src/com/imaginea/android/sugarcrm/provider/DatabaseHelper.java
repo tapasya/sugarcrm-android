@@ -34,6 +34,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Meetings;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldGroupColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldSortOrder;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldSortOrderColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
@@ -46,6 +47,7 @@ import com.imaginea.android.sugarcrm.util.ACLConstants;
 import com.imaginea.android.sugarcrm.util.LinkField;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.ModuleFieldBean;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -57,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 29;
+    private static final int DATABASE_VERSION = 30;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -282,8 +285,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createAclRolesTable(db);
         createAclActionsTable(db);
 
-        createModuleFieldsSortOrderTable(db);
-        createModuleFieldsGroupTable(db);
+        /*
+         * createModuleFieldsSortOrderTable(db); createModuleFieldsGroupTable(db);
+         */
 
         // create join tables
 
@@ -408,8 +412,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropAclRolesTable(db);
         dropAclActionsTable(db);
 
-        dropModuleFieldsGroupTable(db);
-        dropModuleFieldsSortOrderTable(db);
+        /*
+         * dropModuleFieldsGroupTable(db); dropModuleFieldsSortOrderTable(db);
+         */
 
         // drop join tables
         dropAccountsContactsTable(db);
@@ -1149,6 +1154,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return getSyncRecords(moduleName, Util.UNSYNCED);
     }
 
+    public Map<String, ModuleFieldBean> getModuleProjectionInOrder(String moduleName) {
+        int moduleId = getModuleId(moduleName);
+
+        Map<String, ModuleFieldBean> moduleFieldMap = new LinkedHashMap<String, ModuleFieldBean>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        String selection = ModuleFieldSortOrderColumns.MODULE_ID + "=" + moduleId + "";
+        // using the DETAILS_PROJECTION here to select the columns
+        Cursor cursor = db.query(DatabaseHelper.MODULE_FIELDS_SORT_ORDER_TABLE_NAME, ModuleFieldSortOrder.DETAILS_PROJECTION, selection, null, null, null, ModuleFieldSortOrder.DEFAULT_SORT_ORDER);
+        cursor.moveToFirst();
+        // iterating through the module_fields_sort_order table in the ascending sort order
+        for (int i = 0; i < cursor.getCount(); i++) {
+            int sortId = cursor.getInt(1);
+            int groupId = cursor.getInt(2);
+            int moduleFieldId = cursor.getInt(3);
+
+            // get the module field details from the module_fields table for the moduleFieldId
+            selection = ModuleFieldColumns.ID + "=" + moduleFieldId + "";
+            Cursor moduleFieldCursor = db.query(DatabaseHelper.MODULE_FIELDS_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleField.DETAILS_PROJECTION, selection, null, null, null, null);
+            moduleFieldCursor.moveToFirst();
+            String moduleFieldName = moduleFieldCursor.getString(1);
+            ModuleField moduleFieldObj = new ModuleField(moduleFieldName, moduleFieldCursor.getString(3), moduleFieldCursor.getString(2), moduleFieldCursor.getInt(4) == 1 ? true
+                                            : false);
+            moduleFieldCursor.close();
+
+            // create ModuleFieldBean to store the ModuleField, its sortOrder and groupId
+            ModuleFieldBean moduleFieldBean = new ModuleFieldBean(moduleFieldObj, moduleFieldId, sortId, groupId);
+            moduleFieldMap.put(moduleFieldName, moduleFieldBean);
+
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+
+        return moduleFieldMap;
+    }
+
+    /*
+     * get the moduleId given the name of the module
+     */
+    private int getModuleId(String moduleName) {
+        SQLiteDatabase db = getReadableDatabase();
+        String selection = ModuleColumns.MODULE_NAME + "='" + moduleName + "'";
+        // using the DETAILS_PROJECTION here to select the columns
+        Cursor cursor = db.query(DatabaseHelper.MODULES_TABLE_NAME, com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules.DETAILS_PROJECTION, selection, null, null, null, null);
+        cursor.moveToFirst();
+        int moduleId = cursor.getInt(0);
+        cursor.close();
+        db.close();
+
+        return moduleId;
+    }
+
     /**
      * // TODO - when do we update ?? - not required -??
      * 
@@ -1341,6 +1399,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             throw new SugarCrmException("FAILED to execute SQL from file");
         }
         db.close();
-
     }
+
 }
