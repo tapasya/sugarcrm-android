@@ -660,12 +660,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static void createSyncTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + SYNC_TABLE_NAME + " (" + Sync.ID + " INTEGER PRIMARY KEY,"
-                                        + Sync.SYNC_ID + " INTEGER ," + Sync.SYNC_COMMAND
-                                        + " INTEGER," + Sync.MODULE + " TEXT,"
-                                        + Sync.RELATED_MODULE + " TEXT," + Sync.DATE_MODIFIED
-                                        + " TEXT," + Sync.SYNC_STATUS + " INTEGER," + " UNIQUE("
-                                        + Sync.SYNC_ID + "," + Sync.MODULE + ","
-                                        + Sync.RELATED_MODULE + ")" + ");");
+                                        + Sync.SYNC_ID + " INTEGER ," + Sync.SYNC_RELATED_ID
+                                        + " INTEGER ," + Sync.SYNC_COMMAND + " INTEGER,"
+                                        + Sync.MODULE + " TEXT," + Sync.RELATED_MODULE + " TEXT,"
+                                        + Sync.DATE_MODIFIED + " TEXT," + Sync.SYNC_STATUS
+                                        + " INTEGER," + " UNIQUE(" + Sync.SYNC_ID + ","
+                                        + Sync.MODULE + "," + Sync.RELATED_MODULE + ")" + ");");
     }
 
     private static void createUsersTable(SQLiteDatabase db) {
@@ -704,8 +704,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ModuleFieldSortOrderColumns.FIELD_SORT_ID + " INTEGER,"
                                         + ModuleFieldSortOrderColumns.GROUP_ID + " INTEGER,"
                                         + ModuleFieldSortOrderColumns.MODULE_FIELD_ID + " INTEGER,"
-                                        + ModuleFieldSortOrderColumns.MODULE_ID + " INTEGER"
-                                        + ");");
+                                        + ModuleFieldSortOrderColumns.MODULE_ID + " INTEGER" + ");");
     }
 
     private static void createModuleFieldsGroupTable(SQLiteDatabase db) {
@@ -1114,6 +1113,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             record = new SyncRecord();
             record._id = cursor.getLong(Sync.ID_COLUMN);
             record.syncId = cursor.getLong(Sync.SYNC_ID_COLUMN);
+            record.syncRelatedId = cursor.getLong(Sync.SYNC_RELATED_ID_COLUMN);
             record.syncCommand = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
             record.moduleName = cursor.getString(Sync.MODULE_NAME_COLUMN);
             record.relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
@@ -1162,6 +1162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         // values.put(SyncColumns.ID, record._id);
         values.put(SyncColumns.SYNC_ID, record.syncId);
+        values.put(SyncColumns.SYNC_RELATED_ID, record.syncRelatedId);
         // values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
         values.put(SyncColumns.MODULE, record.moduleName);
         values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
@@ -1180,6 +1181,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         // values.put(SyncColumns.ID, record._id);
         values.put(SyncColumns.SYNC_ID, record.syncId);
+        values.put(SyncColumns.SYNC_RELATED_ID, record.syncRelatedId);
         values.put(SyncColumns.SYNC_COMMAND, record.syncCommand);
         values.put(SyncColumns.MODULE, record.moduleName);
         values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
