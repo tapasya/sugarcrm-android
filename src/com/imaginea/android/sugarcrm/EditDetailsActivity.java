@@ -391,6 +391,7 @@ public class EditDetailsActivity extends Activity {
         }
 
         // finish();
+        ViewUtil.dismissVirtualKeyboard(getBaseContext(), v);
     }
 
     @Override
@@ -429,6 +430,7 @@ public class EditDetailsActivity extends Activity {
             case R.id.status:
                 Log.d(TAG, "Display Status");
                 ViewUtil.makeToast(getBaseContext(), (String) message.obj);
+                finish();
                 break;
             }
         }
