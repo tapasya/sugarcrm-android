@@ -474,6 +474,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     // sync meta-data - modules and acl roles and actions for a user
                     publishProgress(getString(R.string.configureAppMsg));
                     startMetaDataSync();
+                    // TODO - commenting the 2 lines below as the group table logic is not needed
+                    // for this release
                     DatabaseHelper databaseHelper = new DatabaseHelper(getBaseContext());
                     databaseHelper.executeSQLFromFile(Util.SQL_FILE);
                     // TODO - note , we need a mechanism to release the lock incase the metadata
