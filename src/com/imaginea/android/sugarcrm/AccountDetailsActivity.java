@@ -20,12 +20,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
-import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.ModuleFieldBean;
 import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * AccountDetailsActivity
@@ -184,6 +185,8 @@ public class AccountDetailsActivity extends Activity {
 
         final int DYNAMIC_ROW = 3;
 
+        final int GROUP_TITLE = 4;
+
         LoadContentTask() {
             mDetailsTable = (ViewGroup) findViewById(R.id.accountDetalsTable);
 
@@ -201,31 +204,37 @@ public class AccountDetailsActivity extends Activity {
         protected void onProgressUpdate(Object... values) {
             super.onProgressUpdate(values);
 
+            int rowCount = (Integer) values[1];
             switch ((Integer) values[0]) {
 
             case HEADER:
-                TextView titleView = (TextView) values[1];
-                titleView.setText((String) values[2]);
+                TextView titleView = (TextView) values[2];
+                titleView.setText((String) values[3]);
                 break;
-
+            case GROUP_TITLE:
+                // to update the group title
+                TextView groupTitle = new TextView(getBaseContext());
+                groupTitle.setText((String) values[2]);
+                mDetailsTable.addView(groupTitle, rowCount);
+                break;
             case STATIC_ROW:
-                View detailRow = (View) values[1];
+                View detailRow = (View) values[2];
                 detailRow.setVisibility(View.VISIBLE);
 
-                TextView labelView = (TextView) values[2];
-                labelView.setText((String) values[3]);
-                TextView valueView = (TextView) values[4];
-                valueView.setText((String) values[5]);
+                TextView labelView = (TextView) values[3];
+                labelView.setText((String) values[4]);
+                TextView valueView = (TextView) values[5];
+                valueView.setText((String) values[6]);
                 break;
 
             case DYNAMIC_ROW:
-                detailRow = (View) values[1];
+                detailRow = (View) values[2];
                 detailRow.setVisibility(View.VISIBLE);
 
-                labelView = (TextView) values[2];
-                labelView.setText((String) values[3]);
-                valueView = (TextView) values[4];
-                valueView.setText((String) values[5]);
+                labelView = (TextView) values[3];
+                labelView.setText((String) values[4]);
+                valueView = (TextView) values[5];
+                valueView.setText((String) values[6]);
                 mDetailsTable.addView(detailRow);
                 break;
             }
@@ -273,7 +282,7 @@ public class AccountDetailsActivity extends Activity {
 
         private void setContents() {
 
-            String[] detailsProjection = mSelectFields;
+            // String[] detailsProjection = mSelectFields;
 
             if (mDbHelper == null)
                 mDbHelper = new DatabaseHelper(getBaseContext());
@@ -292,18 +301,32 @@ public class AccountDetailsActivity extends Activity {
             // List<String> shippingAddressGroup = mDbHelper.getShippingAddressGroup();
 
             String value = "";
-            Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
+            // Map<String, ModuleField> fieldNameVsModuleField =
+            // mDbHelper.getModuleFields(mModuleName);
+
+            /*
+             * map to get the ModuleFieldBean for a given field name. ModuleFieldBean gives the
+             * sortOrder, groupOrder and ModuleField
+             */
+            Map<String, ModuleFieldBean> fieldNameVsModuleFieldBean = mDbHelper.getModuleProjectionInOrder(mModuleName);
             Map<String, String> fieldsExcludedForDetails = mDbHelper.getFieldsExcludedForDetails();
 
             // LinearLayout tableRow = (LinearLayout)inflater.inflate(R.layout.table_row, null);
 
             int rowsCount = 0;
-            for (int i = 0; i < detailsProjection.length; i++) {
+            int groupId = 0;
+            // for (int i = 0; i < detailsProjection.length; i++) {
+            /*
+             * Iterating through the entries in the fieldNameVsModuleFieldBean map as they are
+             * already sorted according to the sort order
+             */
+            for (Entry<String, ModuleFieldBean> entry : fieldNameVsModuleFieldBean.entrySet()) {
+
                 // if the task gets cancelled
                 if (isCancelled())
                     break;
 
-                String fieldName = detailsProjection[i];
+                String fieldName = entry.getKey();
 
                 // if the field name is excluded in details screen, skip it
                 if (fieldsExcludedForDetails.containsKey(fieldName)) {
@@ -318,27 +341,21 @@ public class AccountDetailsActivity extends Activity {
 
                 String tempValue = mCursor.getString(columnIndex);
 
-                // get the attributes of the moduleField
-                ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
-
-                ViewGroup tableRow;
-                TextView textViewForLabel;
-                TextView textViewForValue;
-                // first two columns in the detail projection are ROW_ID and BEAN_ID
-                if (staticRowsCount > rowsCount) {
-                    tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
-                    textViewForLabel = (TextView) tableRow.getChildAt(0);
-                    textViewForValue = (TextView) tableRow.getChildAt(1);
-                } else {
-                    tableRow = (ViewGroup) inflater.inflate(R.layout.table_row, null);
-                    textViewForLabel = (TextView) tableRow.getChildAt(0);
-                    textViewForValue = (TextView) tableRow.getChildAt(1);
-                }
+                // get the ModuleFieldBean
+                ModuleFieldBean moduleFieldBean = fieldNameVsModuleFieldBean.get(fieldName);
+                /*
+                 * get the group Id of the module field. fieldGroupId is 0 by default if the field
+                 * is not in any group
+                 */
+                int fieldGroupId = moduleFieldBean.getGroupId();
+                Log.i(LOG_TAG, "fieldName - " + fieldName + " sortid - "
+                                                + moduleFieldBean.getFieldSortId() + " groupId - "
+                                                + fieldGroupId);
 
                 // set the title
                 if (titleFields.contains(fieldName)) {
                     title = title + tempValue + " ";
-                    publishProgress(HEADER, textViewForTitle, title);
+                    publishProgress(HEADER, rowsCount, textViewForTitle, title);
                     continue;
                 }
 
@@ -365,25 +382,57 @@ public class AccountDetailsActivity extends Activity {
                 // value = tempValue;
                 // }
 
-                value = tempValue;
-                if (moduleField.getType().equals("phone"))
+                int command = staticRowsCount < rowsCount ? DYNAMIC_ROW : STATIC_ROW;
+
+                ViewGroup tableRow;
+                TextView textViewForLabel;
+                TextView textViewForValue;
+
+                /*
+                 * rowCount is only incremented if the field is not in a group or only if a new
+                 * group starts. This way all the fields in a group will be updated to the same row
+                 */
+                // a new group starts
+                if (fieldGroupId > groupId) {
+                    // TODO: get the title of the group and publish it to the UI
+                    // publishProgress(GROUP_TITLE, rowsCount, tempValue);
+                    groupId = fieldGroupId;
+                    rowsCount++;
+                    value = "";
+                } else if (fieldGroupId < groupId || fieldGroupId == 0) {
+                    groupId = 0;
+                    rowsCount++;
+                } else {
+                    // CASE : fieldGroupId == groupId
+
+                }
+
+                if (staticRowsCount > rowsCount) {
+                    tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
+                    textViewForLabel = (TextView) tableRow.getChildAt(0);
+                    textViewForValue = (TextView) tableRow.getChildAt(1);
+                } else {
+                    tableRow = (ViewGroup) inflater.inflate(R.layout.table_row, null);
+                    textViewForLabel = (TextView) tableRow.getChildAt(0);
+                    textViewForValue = (TextView) tableRow.getChildAt(1);
+                }
+
+                // if its is a group
+                if (groupId != 0 && fieldGroupId == groupId) {
+                    value = value + (tempValue != null ? tempValue + " " : " ");
+                    Log.i(LOG_TAG, " " + value);
+                } else if (groupId == 0) {
+                    value = tempValue;
+                }
+
+                if (moduleFieldBean.getModuleField().getType().equals("phone"))
                     textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
 
-                int command = STATIC_ROW;
-                if (staticRowsCount < rowsCount) {
-                    command = DYNAMIC_ROW;
-                }
-
                 if (!TextUtils.isEmpty(value)) {
-                    // textViewForValue.setText(value);
-                    publishProgress(command, tableRow, textViewForLabel, moduleField.getLabel(), textViewForValue, value);
+                    publishProgress(command, rowsCount, tableRow, textViewForLabel, moduleFieldBean.getModuleField().getLabel(), textViewForValue, value);
                 } else {
-                    // textViewForValue.setText(R.string.notAvailable);
-                    publishProgress(command, tableRow, textViewForLabel, moduleField.getLabel(), textViewForValue, getString(R.string.notAvailable));
+                    publishProgress(command, rowsCount, tableRow, textViewForLabel, moduleFieldBean.getModuleField().getLabel(), textViewForValue, getString(R.string.notAvailable));
                 }
-
-                // mDetailsTable.addView(tableRow);
-                rowsCount++;
 
             }
         }
