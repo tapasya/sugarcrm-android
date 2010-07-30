@@ -225,8 +225,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
                     Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
                     insertSyncRecord(insertResultUri);
-                }
-                sendUpdateStatus(netOn, serverUpdated, updatedRows);
+                }               
                 break;
 
             case Util.UPDATE:
@@ -236,8 +235,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                 if (!serverUpdated && updatedRows > 0) {
                     updateSyncRecord();
-                }
-                sendUpdateStatus(netOn, serverUpdated, updatedRows);
+                }               
                 break;
 
             case Util.DELETE:
@@ -252,9 +250,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                     if (updatedRows > 0)
                         updateSyncRecord();
-                }
-                sendUpdateStatus(netOn, serverUpdated, updatedRows);
-
+                }               
                 break;
 
             }
@@ -264,6 +260,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
             sendUpdateStatus(netOn, serverUpdated, updatedRows);
         }
         mDbHelper.close();
+        sendUpdateStatus(netOn, serverUpdated, updatedRows);
         return null;
     }
 
@@ -318,6 +315,9 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         if (rec == null)
             insertSyncRecord(mUri);
         else {
+            if (mUri.getPathSegments().size() == 3) {
+                rec.syncRelatedId = Long.parseLong(mUri.getPathSegments().get(3));
+            }
             mDbHelper.updateSyncRecord(rec);
         }
     }
@@ -325,6 +325,9 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     private void insertSyncRecord(Uri insertUri) throws SugarCrmException {
         SyncRecord record = new SyncRecord();
         record.syncId = Long.parseLong(insertUri.getPathSegments().get(1));
+        if (mUri.getPathSegments().size() == 3) {
+            record.syncRelatedId = Long.parseLong(insertUri.getPathSegments().get(3));
+        }
         record.syncCommand = mCommand;
         record.moduleName = mLinkFieldName != null ? mParentModuleName : mModuleName;
         record.relatedModuleName = mModuleName;
