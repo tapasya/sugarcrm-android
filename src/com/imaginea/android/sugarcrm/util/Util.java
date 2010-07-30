@@ -134,6 +134,7 @@ public class Util {
     // sync constants
     // RECORD_ID (_id) of the module that needs to be synced
     public static final String SYNC_ID = "sync_id";
+    public static final String SYNC_RELATED_ID = "sync_related_id";
 
     // The sync command - INSERT, DELETE, UPDATE
     public static final String SYNC_COMMAND = "sync_cmd";

@@ -4,6 +4,8 @@ public class SyncRecord {
     public long _id;
 
     public long syncId;
+    
+    public long syncRelatedId;
 
     public int syncCommand;
 
