@@ -84,6 +84,17 @@ public class ViewUtil {
     }
 
     /**
+     * helper method to display a toast specified by the resource id (strings.xml)
+     * 
+     * @param context
+     * @param resid
+     */
+    public static void makeToast(Context context, CharSequence str) {
+        Toast toast = Toast.makeText(context, str, Toast.LENGTH_LONG);
+        toast.show();
+    }
+
+    /**
      * showFormattedToast
      * 
      * @param context
