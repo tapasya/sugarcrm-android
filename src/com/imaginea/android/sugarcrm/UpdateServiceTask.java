@@ -1,8 +1,10 @@
 package com.imaginea.android.sugarcrm;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,6 +46,8 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
     private DatabaseHelper mDbHelper;
 
+    private static String mSelection = SugarCRMContent.RECORD_ID + "=?";
+
     /*
      * represents either delete or update, for local database operations, is always an update on the
      * remote server side
@@ -59,84 +63,90 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         mDbHelper = new DatabaseHelper(context);
         Bundle extras = intent.getExtras();
         mUri = intent.getData();
+        // current module being updated/inserted/deleted
         mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
-        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-            Log.d(LOG_TAG, "size : " + mUri.getPathSegments().size());
-        }
 
         if (mUri.getPathSegments().size() == 3) {
-
             mParentModuleName = mUri.getPathSegments().get(0);
-            mLinkFieldName = mDbHelper.getLinkfieldName(mUri.getPathSegments().get(2));
-            if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : "
-                                                + mLinkFieldName);
-            }
+            String relatedModuleName = mUri.getPathSegments().get(2);
+            mLinkFieldName = mDbHelper.getLinkfieldName(relatedModuleName);
         }
         mBeanId = extras.getString(RestUtilConstants.BEAN_ID);
         mUpdateNameValueMap = (Map<String, String>) extras.getSerializable(RestUtilConstants.NAME_VALUE_LIST);
         mCommand = extras.getInt(Util.COMMAND);
+        debug();
+    }
 
-        /*
-         * Log.d(LOG_TAG, "mUri - " + mUri); Log.d(LOG_TAG, "mParentModuleName - " +
-         * mParentModuleName); Log.d(LOG_TAG, "mModuleName - " + mModuleName); Log.d(LOG_TAG,
-         * "mBeanId - " + mBeanId);
-         */
+    void debug() {
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+            Log.d(LOG_TAG, "size : " + mUri.getPathSegments().size());
+            Log.d(LOG_TAG, "mParentModuleName : " + mParentModuleName + " linkFieldName : "
+                                            + mLinkFieldName);
+        }
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+            Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
+        }
     }
 
     @Override
     protected Object doInBackground(Object... params) {
+        int updatedRows = 0;
+        boolean serverUpdated = false;
+        // get network status
+        boolean netOn = Util.isNetworkOn(mContext);
         try {
 
             String sessionId = ((SugarCrmApp) SugarCrmApp.app).getSessionId();
 
             String url = SugarCrmSettings.getSugarRestUrl(mContext);
-            // Check network is on
-            String updatedBeanId = null;
+
             ContentValues values = new ContentValues();
-            int updatedRows = 0;
-            boolean serverUpdated = false;
-            if (Util.isNetworkOn(mContext)) {
-                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                    Log.i(LOG_TAG, "linkFieldName : " + mLinkFieldName);
-                }
+            String updatedBeanId = null;
+            // Check network is on
+            if (netOn) {
+
                 switch (mCommand) {
                 case Util.INSERT:
                     // inserts with a relationship
                     if (mLinkFieldName != null) {
-                        updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
-                        RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
-                        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                            Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
-                                                            + status.getFailedCount()
-                                                            + " deleted: "
-                                                            + status.getDeletedCount());
-                        }
 
-                        if (status.getCreatedCount() >= 1) {
+                        updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                        if (updatedBeanId != null) {
+                            // get the parent beanId
+                            String rowId = mUri.getPathSegments().get(1);
+                            mBeanId = lookupBeanId(mParentModuleName, rowId);
+                            RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
                             if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                                Log.i(LOG_TAG, "Relationship is also set!");
+                                Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
+                                                                + status.getFailedCount()
+                                                                + "deleted: "
+                                                                + status.getDeletedCount());
                             }
+
+                            if (status.getCreatedCount() >= 1) {
+                                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                                    Log.i(LOG_TAG, "Relationship is also set!");
+                                }
+                                serverUpdated = true;
+                            } else {
+                                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                                    Log.i(LOG_TAG, "setRelationship failed!");
+                                }
+                                serverUpdated = false;
+                            }
+
                         } else {
-                            if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                                Log.i(LOG_TAG, "setRelationship failed!");
-                            }
+                            serverUpdated = false;
                         }
                     } else {
                         // insert case for an orphan module add without any relationship, the
                         // updatedBeanId is actually a new beanId returned by server
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         if (updatedBeanId != null) {
-                            if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
-                                Log.v(LOG_TAG, "insert bean on server successful");
-                            }
                             serverUpdated = true;
                         } else {
                             serverUpdated = false;
                         }
-                        // TODO:
-                        // If the update fails when the network is ON, display the message in the
-                        // activity
                     }
                     break;
 
@@ -144,22 +154,55 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 // to 1
                 case Util.UPDATE:
                 case Util.DELETE:
-                    mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
-                    updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
-                    if (mBeanId.equals(updatedBeanId)) {
-                        if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
-                            Log.v(LOG_TAG, "updated server successful");
+
+                    String serverUpdatedBeanId = null;
+                    if (mLinkFieldName != null) {
+                        String rowId = mUri.getPathSegments().get(1);
+                        mBeanId = lookupBeanId(mParentModuleName, rowId);
+
+                        // related BeanId
+                        rowId = mUri.getPathSegments().get(3);
+                        updatedBeanId = lookupBeanId(mModuleName, rowId);
+
+                        serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                        if (serverUpdatedBeanId.equals(updatedBeanId)) {
+                            RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                            if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                                Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
+                                                                + status.getFailedCount()
+                                                                + " deleted: "
+                                                                + status.getDeletedCount());
+                            }
+
+                            if (status.getCreatedCount() >= 1) {
+                                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                                    Log.i(LOG_TAG, "Relationship is also set!");
+                                }
+                                serverUpdated = true;
+                            } else {
+                                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                                    Log.i(LOG_TAG, "setRelationship failed!");
+                                }
+                                serverUpdated = false;
+                            }
+                        } else {
+                            // a new bean was created instead of sending back the same updated bean
+                            serverUpdated = false;
                         }
-                        serverUpdated = true;
                     } else {
-                        serverUpdated = false;
+                        String rowId = mUri.getPathSegments().get(1);
+                        mBeanId = lookupBeanId(mModuleName, rowId);
+                        mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
+                        updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                        if (mBeanId.equals(updatedBeanId)) {
+
+                            serverUpdated = true;
+                        } else {
+                            serverUpdated = false;
+                        }
                     }
-                    // TODO:
-                    // If the update fails when the network is ON, display the message in the
-                    // activity
                     break;
                 }
-
             }
 
             switch (mCommand) {
@@ -183,7 +226,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
                     insertSyncRecord(insertResultUri);
                 }
-
+                sendUpdateStatus(netOn, serverUpdated, updatedRows);
                 break;
 
             case Util.UPDATE:
@@ -194,7 +237,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 if (!serverUpdated && updatedRows > 0) {
                     updateSyncRecord();
                 }
-                sendUpdateStatus(updatedRows);
+                sendUpdateStatus(netOn, serverUpdated, updatedRows);
                 break;
 
             case Util.DELETE:
@@ -210,7 +253,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     if (updatedRows > 0)
                         updateSyncRecord();
                 }
-                sendUpdateStatus(updatedRows);
+                sendUpdateStatus(netOn, serverUpdated, updatedRows);
 
                 break;
 
@@ -218,20 +261,53 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
+            sendUpdateStatus(netOn, serverUpdated, updatedRows);
         }
         mDbHelper.close();
         return null;
     }
 
-    private void sendUpdateStatus(int updatedRows) {
+    private void sendUpdateStatus(boolean netOn, boolean serverUpdated, int updatedRows) {
 
-        // pass the success/failure msg to activity
-        if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
-            if (updatedRows > 0) {
-                Log.v(LOG_TAG, "update successful");
+        // If the update fails when the network is ON, display the message in the
+        // activity
+        if (netOn) {
+
+            if (!serverUpdated) {
+                SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.serverUpdateFailed), getCommandStr()));
+                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                    Log.v(LOG_TAG, "update to server failed");
+                }
             } else {
-                Log.v(LOG_TAG, "update failed");
+                if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                    Log.v(LOG_TAG, "updated server successful");
+                }
+                SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.serverUpdateSuccess), getCommandStr()));
             }
+        } else {
+            // pass the success/failure msg to activity
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                if (updatedRows > 0) {
+                    Log.v(LOG_TAG, "update successful");
+                    SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.serverUpdateSuccess), getCommandStr()));
+                } else {
+                    SugarService.sendMessage(R.id.status, String.format(mContext.getString(R.string.updateFailed), getCommandStr()));
+                    Log.v(LOG_TAG, "update failed");
+                }
+            }
+        }
+    }
+
+    private String getCommandStr() {
+        switch (mCommand) {
+        case Util.INSERT:
+            return mContext.getString(R.string.insert);
+        case Util.UPDATE:
+            return mContext.getString(R.string.update);
+        case Util.DELETE:
+            return mContext.getString(R.string.delete);
+        default:
+            return "";
         }
     }
 
@@ -275,5 +351,28 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
+    }
+
+    /**
+     * Returns the beanId id , or null if the item is not found.
+     * 
+     */
+    private String lookupBeanId(String moduleName, String rowId) {
+        ContentResolver resolver = mContext.getContentResolver();
+        String beanId = null;
+        Uri contentUri = mDbHelper.getModuleUri(moduleName);
+        String[] projection = new String[] { SugarCRMContent.SUGAR_BEAN_ID };
+
+        final Cursor c = resolver.query(contentUri, projection, mSelection, new String[] { rowId }, null);
+        try {
+            if (c.moveToFirst()) {
+                beanId = c.getString(0);
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return beanId;
     }
 }
