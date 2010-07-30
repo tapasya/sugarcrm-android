@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>    
+<resources>
 	<!-- Application name -->
 	<string name="appName">iCRM- Android</string>
-	<string name="appProviderDesc">Provider for Accounts, Contacts, Leads, Opportunities and other modules of Sugar CRM</string>
+	<string name="appProviderDesc">Provider for Accounts, Contacts, Leads,
+		Opportunities and other modules of Sugar CRM</string>
 
-	<string name="home">Home</string>	
+	<string name="home">Home</string>
 
 	<!-- Sugar CRM Settings  -->
 	<string name="userSummary">The username you use to log in to Sugar</string>
@@ -27,8 +28,8 @@
 	<string name="accounts">Accounts</string>
 	<string name="leads">Leads</string>
 	<string name="opportunities">Opportunities</string>
-	
-	<string name="settings">Settings</string>	
+
+	<string name="settings">Settings</string>
 	<string name="settingsSummary">Change the Sugar Crm URL</string>
 	<string name="syncSummary">Select Sync Filters and start a Sync</string>
 
@@ -43,11 +44,12 @@
 	<string name="authenticatingMsg">Authenticating\u2026</string>
 	<string name="configureAppMsg">Configuring application\u2026</string>
 
-	<string name="appNotConfigMsg">Application did not configure cleanly, please try again !!!</string>
+	<string name="appNotConfigMsg">Application did not configure cleanly, please try
+		again !!!</string>
 	<!-- Wizard -->
 	<string name="restUrl">REST Url</string>
 	<string name="wizard_url_status_message">REST Url</string>
-	
+
 	<string name="cancel">cancel</string>
 	<string name="finish">Finish</string>
 	<string name="next">Next</string>
@@ -59,26 +61,26 @@
 	<string name="delete">Delete</string>
 	<string name="call">Call</string>
 	<string name="email">Email</string>
-	
+
 	<!-- Contacts Details -->
 	<string name="addContact">Add Contact</string>
 	<string name="contactDetails">Contact Details</string>
-	
+
 	<string name="editDetails">Edit details</string>
-	
+
 	<string name="notAvailable">Not Available</string>
 	<string name="loadFailed">Load failed</string>
-	
+
 	<!-- Search -->
 	<string name="searchHint">Search SugarCRM</string>
 	<string name="search">Search</string>
-	
+
 	<!-- Menu items - not present above-->
 	<string name="addItem">Add</string>
 	<string name="related">Related</string>
-	
+
 	<string name="noResults">No results found</string>
-	
+
 	<string name="syncFilters">Sync Filters</string>
 	<string name="dateFilters">Date Filters</string>
 	<string name="startDate">Start Date</string>
@@ -88,11 +90,18 @@
 	<string name="save">Save</string>
 	<string name="deleteAlert">Are you sure you want to delete?</string>
 	<string name="syncSuccess">Sync Successful</string>
-	<string name="syncFailed">Sync Failed</string>	
-	<string name="syncMessage">Synced  %d records</string>				
+	<string name="syncFailed">Sync Failed</string>
+	<string name="syncMessage">Synced %d records</string>
 	<string name="sort">Sort</string>
-    <string name="descending">Descending</string>
-    <string name="ascending">Ascending</string>
-    <string name="sortBy">Sort by</string>
-    <string name="syncNow">Sync Now</string>
+	<string name="descending">Descending</string>
+	<string name="ascending">Ascending</string>
+	<string name="sortBy">Sort by</string>
+	<string name="syncNow">Sync Now</string>
+
+	<string name="updateFailed">Failed to %s</string>
+	<string name="serverUpdateFailed">Failed to %s on the server</string>
+	<string name="serverUpdateSuccess">%s successful</string>
+	<string name="insert">Insert</string>
+	<string name="update">Update</string>
+
 </resources>
