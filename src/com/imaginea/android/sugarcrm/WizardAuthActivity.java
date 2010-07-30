@@ -117,78 +117,81 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         setContentView(R.layout.splash);
 
         app = (SugarCrmApp) getApplication();
+        Log.i(LOG_TAG, "    SessionId is present: " + app.getSessionId());
         if (app.getSessionId() != null) {
             setResult(RESULT_OK);
             finish();
-        }
-
-        mAccountManager = AccountManager.get(this);
-        final Intent intent = getIntent();
-        mUsername = intent.getStringExtra(Util.PREF_USERNAME);
-        mAuthtokenType = intent.getStringExtra(PARAM_AUTHTOKEN_TYPE);
-        mRequestNewAccount = mUsername == null;
-        mConfirmCredentials = intent.getBooleanExtra(PARAM_CONFIRMCREDENTIALS, false);
-
-        Log.i(LOG_TAG, "    request new: " + mRequestNewAccount);
-
-        final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardAuthActivity.this);
-        final String usr = SugarCrmSettings.getUsername(WizardAuthActivity.this).toString();
-        Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n");
-        mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        Account userAccount = getAccount(usr);
-
-        // if the REST url is not available
-        if (TextUtils.isEmpty(restUrl) || userAccount == null) {
-            // TODO: must be connected to the network to configure the REST URL
-            Log.i(LOG_TAG, "REST URL is not available!");
-            wizardState = Util.URL_NOT_AVAILABLE;
-
-            setFlipper();
-            mHeaderTextView.setText(R.string.sugarCrmUrlHeader);
-            // inflate both url layout and username_password layout
-            for (int layout : STEPS) {
-                View step = mInflater.inflate(layout, this.flipper, false);
-                this.flipper.addView(step);
-            }
-            this.updateButtons(wizardState);
         } else {
-            // if the username is not available
-            if (TextUtils.isEmpty(usr) || userAccount == null) {
-                // TODO: must be connected to the network to configure the SugarCRM account
-                Log.i(LOG_TAG, "REST URL is available but not the username!");
-                wizardState = Util.URL_AVAILABLE;
+
+            mAccountManager = AccountManager.get(this);
+            final Intent intent = getIntent();
+            mUsername = intent.getStringExtra(Util.PREF_USERNAME);
+            mAuthtokenType = intent.getStringExtra(PARAM_AUTHTOKEN_TYPE);
+            mRequestNewAccount = mUsername == null;
+            mConfirmCredentials = intent.getBooleanExtra(PARAM_CONFIRMCREDENTIALS, false);
+
+            Log.i(LOG_TAG, "    request new: " + mRequestNewAccount);
+
+            final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardAuthActivity.this);
+            final String usr = SugarCrmSettings.getUsername(WizardAuthActivity.this).toString();
+            Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n");
+            mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            Account userAccount = getAccount(usr);
+
+            // if the REST url is not available
+            if (TextUtils.isEmpty(restUrl) || userAccount == null) {
+                // TODO: must be connected to the network to configure the REST URL
+                Log.i(LOG_TAG, "REST URL is not available!");
+                wizardState = Util.URL_NOT_AVAILABLE;
+
                 setFlipper();
-                View loginView = inflateLoginView();
+                mHeaderTextView.setText(R.string.sugarCrmUrlHeader);
+                // inflate both url layout and username_password layout
+                for (int layout : STEPS) {
+                    View step = mInflater.inflate(layout, this.flipper, false);
+                    this.flipper.addView(step);
+                }
                 this.updateButtons(wizardState);
-
             } else {
-                Log.i(LOG_TAG, "REST URL and username are available!");
-                wizardState = Util.URL_USER_AVAILABLE;
-
-                // if the user is not connected to the network : OFFLINE mode
-                if (!Util.isNetworkOn(getBaseContext())) {
-                    wizardState = Util.OFFLINE_MODE;
-                    // directly send him to dashboard if the user is not connected to the network
-                    setResult(RESULT_OK);
-                    finish();
-                } else {
-
+                // if the username is not available
+                if (TextUtils.isEmpty(usr) || userAccount == null) {
+                    // TODO: must be connected to the network to configure the SugarCRM account
+                    Log.i(LOG_TAG, "REST URL is available but not the username!");
+                    wizardState = Util.URL_AVAILABLE;
                     setFlipper();
+                    View loginView = inflateLoginView();
+                    this.updateButtons(wizardState);
 
-                    mHeaderTextView.setText(R.string.login);
+                } else {
+                    Log.i(LOG_TAG, "REST URL and username are available!");
+                    wizardState = Util.URL_USER_AVAILABLE;
 
-                    // never print the password
-                    Log.i(LOG_TAG, " user name is " + usr);
-                    String pwd = mAccountManager.getPassword(userAccount);
-                    mAuthTask = new AuthenticationTask();
-                    mAuthTask.execute(usr, pwd);
+                    // if the user is not connected to the network : OFFLINE mode
+                    if (!Util.isNetworkOn(getBaseContext())) {
+                        wizardState = Util.OFFLINE_MODE;
+                        // directly send him to dashboard if the user is not connected to the
+                        // network
+                        setResult(RESULT_OK);
+                        finish();
+                    } else {
 
-                    // View loginView = inflateLoginView();
-                    // EditText editTextUser = (EditText)
-                    // loginView.findViewById(R.id.loginUsername);
-                    // editTextUser.setText(mUsername);
-                    // mHeaderTextView.setText(R.string.login);
+                        setFlipper();
+
+                        mHeaderTextView.setText(R.string.login);
+
+                        // never print the password
+                        Log.i(LOG_TAG, " user name is " + usr);
+                        String pwd = mAccountManager.getPassword(userAccount);
+                        mAuthTask = new AuthenticationTask();
+                        mAuthTask.execute(usr, pwd);
+
+                        // View loginView = inflateLoginView();
+                        // EditText editTextUser = (EditText)
+                        // loginView.findViewById(R.id.loginUsername);
+                        // editTextUser.setText(mUsername);
+                        // mHeaderTextView.setText(R.string.login);
+                    }
                 }
             }
         }
@@ -429,7 +432,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         private Semaphore resultWait = new Semaphore(0);
 
         SharedPreferences prefs;
-        
+
         Object syncHandler;
 
         @Override
@@ -532,9 +535,11 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 editor.commit();
 
                 if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
+                    Log.d(LOG_TAG, "Cancelling progress bar which is showing:"
+                                                    + mProgressDialog.isShowing());
                     mProgressDialog.cancel();
                 }
-
+                mProgressDialog = null;
                 setResult(RESULT_OK);
                 finish();
             }
@@ -549,7 +554,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             boolean metaDataSyncCompleted = pref.getBoolean(Util.SYNC_METADATA_COMPLETED, false);
             if (metaDataSyncCompleted) {
                 resultWait.release();
-               ContentResolver.removeStatusChangeListener(syncHandler);
+                ContentResolver.removeStatusChangeListener(syncHandler);
             }
             // else {
             // hasExceptions = true;
