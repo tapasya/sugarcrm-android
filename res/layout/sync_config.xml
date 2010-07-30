@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
                 android:gravity="left|center_vertical"
-                style="?android:attr/textAppearanceMedium"/>              
+                style="@style/button_style"/>              
 
         </LinearLayout>   
         <TextView android:id="@+id/what_label"
@@ -56,17 +56,18 @@
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
-                android:gravity="left|center_vertical"
-                style="?android:attr/textAppearanceMedium"/>                
+                style="@style/button_style"
+                
+                android:gravity="left|center_vertical"/>                
 
         </LinearLayout>    
          <Button android:id="@+id/startSync"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"               
-                android:gravity="left|center_vertical"
+                android:gravity="center_vertical"
                 android:onClick="startSync"
                 android:text="@string/syncNow"
-                style="?android:attr/textAppearanceMedium"/>   
+                style="@style/button_style"/>   
     </LinearLayout>
    </ScrollView>   
 </LinearLayout>
