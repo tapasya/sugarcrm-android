@@ -129,7 +129,7 @@ public class Util {
     // sync status
     public static final int UNSYNCED = 0;
 
-    public static final int CONFLICTS = 1;
+    public static final int SYNC_CONFLICTS = 1;
 
     // sync constants
     // RECORD_ID (_id) of the module that needs to be synced
