@@ -7,6 +7,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
+import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,6 +52,10 @@ public class EditDetailsActivity extends Activity {
     private DatabaseHelper mDbHelper;
 
     private LoadContentTask mTask;
+
+    private Messenger mMessenger;
+
+    private StatusHandler mStatusHandler;
 
     /** Called when the activity is first created. */
     @Override
@@ -109,10 +117,21 @@ public class EditDetailsActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-
+        SugarService.unregisterMessenger(mMessenger);
         if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
             mTask.cancel(true);
         }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mMessenger == null) {
+            mStatusHandler = new StatusHandler();
+            mMessenger = new Messenger(mStatusHandler);
+        }
+        SugarService.registerMessenger(mMessenger);
     }
 
     class LoadContentTask extends AsyncTask<Object, Object, Object> {
@@ -371,7 +390,7 @@ public class EditDetailsActivity extends Activity {
             ServiceHelper.startServiceForInsert(getBaseContext(), mDbHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
         }
 
-        finish();
+        // finish();
     }
 
     @Override
@@ -397,4 +416,21 @@ public class EditDetailsActivity extends Activity {
         // return false;
     }
 
+    /*
+     * Status Handler, Handler updates the screen based on messages sent by the SugarService or any
+     * tasks
+     */
+    private class StatusHandler extends Handler {
+        StatusHandler() {
+        }
+
+        public void handleMessage(Message message) {
+            switch (message.what) {
+            case R.id.status:
+                Log.d(TAG, "Display Status");
+                ViewUtil.makeToast(getBaseContext(), (String) message.obj);
+                break;
+            }
+        }
+    }
 }
