@@ -1106,10 +1106,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return
      */
     public SyncRecord getSyncRecord(long syncId, String moduleName) {
+        // TODO -currently we are storing module name in both the fields in database if only orphans
+        // are involved, if related items
+        // if DB is switched to use null, then change this
+        String relatedModuleName = moduleName;
+        return getSyncRecord(syncId, moduleName, relatedModuleName);
+    }
+
+    /**
+     * get a Sync record given syncId and moduleName
+     * 
+     * @param syncId
+     * @param moduleName
+     * @return
+     */
+    public SyncRecord getSyncRecord(long syncId, String moduleName, String relatedModuleName) {
         SyncRecord record = null;
         SQLiteDatabase db = getReadableDatabase();
-        String selection = Util.SYNC_ID + "=?" + " AND " + RestUtilConstants.MODULE + "=?";
-        String selectionArgs[] = new String[] { "" + syncId, moduleName };
+        String selection = Util.SYNC_ID + "=?" + " AND " + RestUtilConstants.MODULE + "=?"
+                                        + " AND " + Util.RELATED_MODULE + "=?";
+        String selectionArgs[] = new String[] { "" + syncId, moduleName, relatedModuleName };
         Cursor cursor = db.query(SYNC_TABLE_NAME, Sync.DETAILS_PROJECTION, selection, selectionArgs, null, null, null);
         int num = cursor.getCount();
 
@@ -1147,7 +1163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getConflictingSyncRecords(String moduleName) {
-        return getSyncRecords(moduleName, Util.CONFLICTS);
+        return getSyncRecords(moduleName, Util.SYNC_CONFLICTS);
     }
 
     public Cursor getSyncRecordsToSync(String moduleName) {
@@ -1214,7 +1230,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return
      * @throws SugarCrmException
      */
-    public long updateSyncRecord(SyncRecord record) throws SugarCrmException {
+    public int updateSyncRecord(SyncRecord record) throws SugarCrmException {
 
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -1226,8 +1242,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(SyncColumns.RELATED_MODULE, record.relatedModuleName);
         values.put(SyncColumns.SYNC_STATUS, record.status);
 
-        long rowId = db.update(SYNC_TABLE_NAME, values, Sync.ID + "=?", new String[] { ""
+        int rowId = db.update(SYNC_TABLE_NAME, values, Sync.ID + "=?", new String[] { ""
                                         + record._id });
+        if (rowId < 0)
+            throw new SugarCrmException("FAILED to update sync record!");
+        return rowId;
+    }
+
+    /**
+     * updateSyncRecord
+     * 
+     * @param syncRecordId
+     * @param values
+     * @return
+     */
+    public int updateSyncRecord(long syncRecordId, ContentValues values) throws SugarCrmException {
+        SQLiteDatabase db = getWritableDatabase();
+        int rowId = db.update(SYNC_TABLE_NAME, values, Sync.ID + "=?", new String[] { ""
+                                        + syncRecordId });
         if (rowId < 0)
             throw new SugarCrmException("FAILED to update sync record!");
         return rowId;
