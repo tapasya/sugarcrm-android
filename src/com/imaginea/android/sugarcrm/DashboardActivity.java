@@ -77,8 +77,8 @@ public class DashboardActivity extends Activity {
             }
             if (resultCode == RESULT_OK) {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(DashboardActivity.this);
-                boolean metaDataSyncCompleted = prefs.getBoolean(Util.SYNC_METADATA_COMPLETED, false);
-                if (!metaDataSyncCompleted) {
+                Long syncScreenCheck = prefs.getLong(Util.PREF_SYNC_START_TIME, 0L);
+                if (syncScreenCheck ==0L) {
                     startActivityForResult(new Intent(this, SyncConfigActivity.class), Util.SYNC_DATA_REQUEST_CODE);
                 } else
                     showDashboard();
