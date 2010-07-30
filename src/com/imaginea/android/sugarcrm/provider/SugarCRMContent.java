@@ -616,6 +616,8 @@ public final class SugarCRMContent {
 
         public String SYNC_ID = Util.SYNC_ID;
 
+        public String SYNC_RELATED_ID = Util.SYNC_RELATED_ID;
+
         public String SYNC_COMMAND = Util.SYNC_COMMAND;
 
         public String MODULE = RestUtilConstants.MODULE;
@@ -637,23 +639,25 @@ public final class SugarCRMContent {
 
         public static final int SYNC_ID_COLUMN = 1;
 
-        public static final int SYNC_COMMAND_COLUMN = 2;
+        public static final int SYNC_RELATED_ID_COLUMN = 2;
 
-        public static final int MODULE_NAME_COLUMN = 3;
+        public static final int SYNC_COMMAND_COLUMN = 3;
 
-        public static final int RELATED_MODULE_NAME_COLUMN = 4;
+        public static final int MODULE_NAME_COLUMN = 4;
 
-        public static final int MODIFIED_DATE_COLUMN = 5;
+        public static final int RELATED_MODULE_NAME_COLUMN = 5;
 
-        public static final int STATUS_COLUMN = 6;
+        public static final int MODIFIED_DATE_COLUMN = 6;
+
+        public static final int STATUS_COLUMN = 7;
 
         /**
          * The default sort order for this table
          */
         public static final String DEFAULT_SORT_ORDER = ModuleFields.DATE_MODIFIED + " DESC";
 
-        public static final String[] DETAILS_PROJECTION = { ID, SYNC_ID, SYNC_COMMAND, MODULE,
-                RELATED_MODULE, DATE_MODIFIED, SYNC_STATUS };
+        public static final String[] DETAILS_PROJECTION = { ID, SYNC_ID, SYNC_RELATED_ID,
+                SYNC_COMMAND, MODULE, RELATED_MODULE, DATE_MODIFIED, SYNC_STATUS };
 
     }
 
@@ -752,12 +756,13 @@ public final class SugarCRMContent {
         public String GROUP_ID = "group_id";
 
         public String MODULE_FIELD_ID = "module_field_id";
-        
+
         public String MODULE_ID = "module_id";
     }
 
     public static final class ModuleFieldSortOrder implements ModuleFieldSortOrderColumns {
-        public static final String[] INSERT_PROJECTION = { FIELD_SORT_ID, GROUP_ID, MODULE_FIELD_ID, MODULE_ID };
+        public static final String[] INSERT_PROJECTION = { FIELD_SORT_ID, GROUP_ID,
+                MODULE_FIELD_ID, MODULE_ID };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, FIELD_SORT_ID, GROUP_ID,
                 MODULE_FIELD_ID, MODULE_ID };
