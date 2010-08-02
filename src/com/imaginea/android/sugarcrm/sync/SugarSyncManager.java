@@ -526,9 +526,10 @@ public class SugarSyncManager {
         for (int i = 0; i < num; i++) {
             long syncRecordId = cursor.getLong(Sync.ID_COLUMN);
             long syncId = cursor.getLong(Sync.SYNC_ID_COLUMN);
+            long syncRelatedId = cursor.getLong(Sync.SYNC_RELATED_ID_COLUMN);
             int command = cursor.getInt(Sync.SYNC_COMMAND_COLUMN);
             String relatedModuleName = cursor.getString(Sync.RELATED_MODULE_NAME_COLUMN);
-            syncOutgoingModuleItem(context, sessionId, moduleName, relatedModuleName, command, syncRecordId, syncId, selectFields);
+            syncOutgoingModuleItem(context, sessionId, moduleName, relatedModuleName, command, syncRecordId, syncRelatedId, syncId, selectFields);
         }
         cursor.close();
         databaseHelper.close();
@@ -538,8 +539,8 @@ public class SugarSyncManager {
 
     private static void syncOutgoingModuleItem(Context context, String sessionId,
                                     String moduleName, String relatedModuleName, int command,
-                                    long syncRecordId, long syncId, String[] selectedFields)
-                                    throws SugarCrmException {
+                                    long syncRecordId, long syncRelatedId, long syncId,
+                                    String[] selectedFields) throws SugarCrmException {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
         String updatedBeanId = null;
@@ -551,8 +552,10 @@ public class SugarSyncManager {
         String relatedModuleLinkedFieldName = null;
         // we are storing the same values for moduleName and related moduleName - if there is no
         // relationship
-        if (!relatedModuleName.equals(moduleName))
+        if (!relatedModuleName.equals(moduleName)) {
             relatedModuleLinkedFieldName = databaseHelper.getLinkfieldName(relatedModuleName);
+            uri = ContentUris.withAppendedId(uri, syncRelatedId);
+        }
         String beanId = null;
         cursor.moveToFirst();
         if (cursor.getCount() == 0) {
@@ -582,8 +585,11 @@ public class SugarSyncManager {
                 }
 
                 if (status.getCreatedCount() >= 1) {
+                    int count = databaseHelper.deleteSyncRecord(syncRecordId);
                     if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                         Log.i(LOG_TAG, "Relationship is also set!");
+                        Log.v(LOG_TAG, "Sync--insert bean on server successful");
+                        Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
                     }
                 } else {
                     if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
@@ -611,35 +617,114 @@ public class SugarSyncManager {
         // make the same calls for update and delete as delete only changes the DELETED flag
         // to 1
         case Util.UPDATE:
-            beanId = cursor.getString(cursor.getColumnIndex(SugarCRMContent.SUGAR_BEAN_ID));
-            moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
-            updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
-            if (beanId.equals(updatedBeanId)) {
-                int count = databaseHelper.deleteSyncRecord(syncRecordId);
-                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                    Log.v(LOG_TAG, "sync --updated server successful");
-                    Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
+
+            if (relatedModuleLinkedFieldName != null) {
+                String rowId = syncId + "";
+                String parentBeanId = databaseHelper.lookupBeanId(moduleName, rowId);
+
+                // related BeanId
+
+                beanId = cursor.getString(cursor.getColumnIndex(SugarCRMContent.SUGAR_BEAN_ID));
+                moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
+
+                String serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+                if (serverUpdatedBeanId.equals(beanId)) {
+                    RelationshipStatus status = RestUtil.setRelationship(url, sessionId, moduleName, parentBeanId, relatedModuleLinkedFieldName, new String[] { beanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                        Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
+                                                        + status.getFailedCount() + " deleted: "
+                                                        + status.getDeletedCount());
+                    }
+
+                    if (status.getCreatedCount() >= 1) {
+                        int count = databaseHelper.deleteSyncRecord(syncRecordId);
+                        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                            Log.i(LOG_TAG, "Relationship is also set!");
+                            Log.v(LOG_TAG, "sync --updated server successful");
+                            Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
+                        }
+
+                    } else {
+                        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                            Log.i(LOG_TAG, "setRelationship failed!");
+                        }
+                        // TODO - we keep the item with last sync_failure date - status
+                    }
+                } else {
+                    // a new bean was created instead of sending back the same updated bean
+                    // TODO - we keep the item with last sync_failure date - status
                 }
             } else {
-                // TODO - we keep the item with last sync_failure date - status
-            }
+                beanId = cursor.getString(cursor.getColumnIndex(SugarCRMContent.SUGAR_BEAN_ID));
+                moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
+                updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+                if (beanId.equals(updatedBeanId)) {
 
+                    int count = databaseHelper.deleteSyncRecord(syncRecordId);
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                        Log.v(LOG_TAG, "sync --updated server successful");
+                        Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
+                    }
+                } else {
+                    // TODO - we keep the item with last sync_failure date - status
+                }
+            }
             break;
+
         case Util.DELETE:
             beanId = cursor.getString(cursor.getColumnIndex(SugarCRMContent.SUGAR_BEAN_ID));
             moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
             moduleItemValues.put(ModuleFields.DELETED, Util.DELETED_ITEM);
-            updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
-            if (beanId.equals(updatedBeanId)) {
-                int count = databaseHelper.deleteSyncRecord(syncRecordId);
-                if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                    Log.v(LOG_TAG, "sync --delete server successful");
-                    Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
+
+            if (relatedModuleLinkedFieldName != null) {
+                String rowId = syncId + "";
+                String parentBeanId = databaseHelper.lookupBeanId(moduleName, rowId);
+
+                // related BeanId
+
+                moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
+                String serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+                if (serverUpdatedBeanId.equals(updatedBeanId)) {
+                    RelationshipStatus status = RestUtil.setRelationship(url, sessionId, moduleName, parentBeanId, relatedModuleLinkedFieldName, new String[] { beanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                        Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
+                                                        + status.getFailedCount() + " deleted: "
+                                                        + status.getDeletedCount());
+                    }
+
+                    if (status.getCreatedCount() >= 1) {
+                        int count = databaseHelper.deleteSyncRecord(syncRecordId);
+                        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                            Log.i(LOG_TAG, "Relationship is also set!");
+                            Log.v(LOG_TAG, "sync --updated server successful");
+                            Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
+                        }
+
+                    } else {
+                        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                            Log.i(LOG_TAG, "setRelationship failed!");
+                        }
+                        // TODO - we keep the item with last sync_failure date - status
+                    }
+                } else {
+                    // a new bean was created instead of sending back the same updated bean
+                    // TODO - we keep the item with last sync_failure date - status
                 }
             } else {
-                // TODO- we keep the item with last sync_failure date - status
-            }
+                beanId = cursor.getString(cursor.getColumnIndex(SugarCRMContent.SUGAR_BEAN_ID));
+                moduleItemValues.put(SugarCRMContent.SUGAR_BEAN_ID, beanId);
+                updatedBeanId = RestUtil.setEntry(url, sessionId, relatedModuleName, moduleItemValues);
+                if (beanId.equals(updatedBeanId)) {
 
+                    int count = databaseHelper.deleteSyncRecord(syncRecordId);
+                    if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
+                        Log.v(LOG_TAG, "sync --updated server successful");
+                        Log.v(LOG_TAG, "Sync--record deleted:" + (count > 0 ? true : false));
+                    }
+                } else {
+                    // TODO - we keep the item with last sync_failure date - status
+                }
+            }
             break;
         }
         cursor.close();
