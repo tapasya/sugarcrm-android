@@ -323,6 +323,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
          * "urlView Id : " + R.id.urlStep); Log.i(LOG_TAG, "signInView Id : " + R.id.signInStep);
          */
         if (flipper.getCurrentView().getId() == R.id.urlStep) {
+            ((TextView) findViewById(R.id.wizardUrlStatus)).setText(String.format(getString(R.string.urlDesc), getString(R.string.defaultUrl)));
             prev.setVisibility(View.INVISIBLE);
             next.setText(getString(R.string.next));
             next.setVisibility(View.VISIBLE);
@@ -476,8 +477,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     startMetaDataSync();
                     // TODO - commenting the 2 lines below as the group table logic is not needed
                     // for this release
-                    DatabaseHelper databaseHelper = new DatabaseHelper(getBaseContext());
-                    databaseHelper.executeSQLFromFile(Util.SQL_FILE);
+                    // DatabaseHelper databaseHelper = new DatabaseHelper(getBaseContext());
+                    // databaseHelper.executeSQLFromFile(Util.SQL_FILE);
                     // TODO - note , we need a mechanism to release the lock incase the metadata
                     // sync never happens, or its gets killed.
                     resultWait.acquire();
