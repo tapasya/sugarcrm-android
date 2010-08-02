@@ -200,6 +200,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put(Util.CASES, Cases.CONTENT_URI);
         moduleUris.put(Util.CALLS, Calls.CONTENT_URI);
         moduleUris.put(Util.MEETINGS, Meetings.CONTENT_URI);
+        moduleUris.put(Util.USERS, Users.CONTENT_URI);
 
         // TODO - complete this list
         moduleRelationshipItems.put(Util.ACCOUNTS, new String[] { Util.CONTACTS,
