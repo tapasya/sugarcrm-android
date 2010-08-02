@@ -1,5 +1,6 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -158,6 +159,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private Context mContext;
 
+    private static String mSelection = SugarCRMContent.RECORD_ID + "=?";
+    
     static {
 
         // Icons projection
@@ -205,12 +208,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // TODO - complete this list
         moduleRelationshipItems.put(Util.ACCOUNTS, new String[] { Util.CONTACTS,
                 Util.OPPORTUNITIES, Util.CASES });
-        moduleRelationshipItems.put(Util.CONTACTS, new String[] { Util.LEADS, Util.OPPORTUNITIES });
-        moduleRelationshipItems.put(Util.LEADS, new String[] { Util.OPPORTUNITIES, Util.CONTACTS });
-        moduleRelationshipItems.put(Util.OPPORTUNITIES, new String[] { Util.LEADS, Util.CONTACTS });
-        moduleRelationshipItems.put(Util.CASES, new String[] { Util.CONTACTS });
-        moduleRelationshipItems.put(Util.CALLS, new String[] { Util.CONTACTS });
-        moduleRelationshipItems.put(Util.MEETINGS, new String[] { Util.CONTACTS });
+        // TODO - leads removed from CONTACTS relationship and vice versa
+        moduleRelationshipItems.put(Util.CONTACTS, new String[] { Util.OPPORTUNITIES });
+        // TODO -
+        // moduleRelationshipItems.put(Util.LEADS, new String[] { Util.OPPORTUNITIES});
+        moduleRelationshipItems.put(Util.OPPORTUNITIES, new String[] { Util.CONTACTS });
+        // TODO -
+        // moduleRelationshipItems.put(Util.CASES, new String[] { Util.CONTACTS });
+        // moduleRelationshipItems.put(Util.CALLS, new String[] { Util.CONTACTS });
+        // moduleRelationshipItems.put(Util.MEETINGS, new String[] { Util.CONTACTS });
 
         linkfieldNames.put(Util.CONTACTS, "contacts");
         linkfieldNames.put(Util.LEADS, "leads");
@@ -1434,4 +1440,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Returns the beanId id , or null if the item is not found.
+     * 
+     */
+    public String lookupBeanId(String moduleName, String rowId) {
+        ContentResolver resolver = mContext.getContentResolver();
+        String beanId = null;
+        Uri contentUri = getModuleUri(moduleName);
+        String[] projection = new String[] { SugarCRMContent.SUGAR_BEAN_ID };
+
+        final Cursor c = resolver.query(contentUri, projection, mSelection, new String[] { rowId }, null);
+        try {
+            if (c.moveToFirst()) {
+                beanId = c.getString(0);
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return beanId;
+    }
 }
