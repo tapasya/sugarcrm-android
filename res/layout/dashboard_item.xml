@@ -9,14 +9,16 @@
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
 				android:src="@drawable/contacts"
-				android:gravity="center">
+				android:layout_centerHorizontal="true">
 	</ImageView>
 	<TextView android:text="@string/contacts" 
 				android:id="@+id/moduleName" 
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content"
-				android:maxWidth="120dip"
+				android:maxWidth="80dip"
+				android:ellipsize="marquee"
 				android:layout_below="@id/moduleImage"							
-				android:gravity="center">
+				android:layout_centerInParent="true"
+				android:scrollHorizontally="true">
 	</TextView>	
 </RelativeLayout>
