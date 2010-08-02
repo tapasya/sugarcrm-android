@@ -115,7 +115,7 @@
     <property name="external.libs.absolute.dir" location="${external.libs.dir}" />
 
     <!-- Directory for the native libraries -->
-    <property name="native.libs.dir" value="libs" />
+    <property name="native.libs.dir" value="lib" />
     <property name="native.libs.absolute.dir" location="${native.libs.dir}" />
 
     <!-- Output directories -->
