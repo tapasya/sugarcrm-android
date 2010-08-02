@@ -47,8 +47,8 @@
 	    android:id="@+id/loginStatusMsg"
 	    android:textAppearance="?android:attr/textAppearanceSmall"
 	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginBottom="5dip" />
+	    android:layout_height="wrap_content"	    
+	    style="@style/text_label"/>
 	<Button
            android:id="@+id/loginOk"
            android:layout_width="wrap_content"
