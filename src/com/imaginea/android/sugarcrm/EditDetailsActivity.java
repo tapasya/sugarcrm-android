@@ -480,7 +480,7 @@ public class EditDetailsActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.save:
-            saveModuleItem(null);
+            saveModuleItem(getCurrentFocus());
             return true;
         default:
             return true;
