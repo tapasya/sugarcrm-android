@@ -287,9 +287,9 @@ public class AccountDetailsActivity extends Activity {
 
             LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            // List<String> billingAddressGroup = mDbHelper.getBillingAddressGroup();
-
-            // List<String> shippingAddressGroup = mDbHelper.getShippingAddressGroup();
+            List<String> billingAddressGroup = mDbHelper.getBillingAddressGroup();
+            List<String> shippingAddressGroup = mDbHelper.getShippingAddressGroup();
+            List<String> durationGroup = mDbHelper.getDurationGroup();
 
             String value = "";
             Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
@@ -342,44 +342,68 @@ public class AccountDetailsActivity extends Activity {
                     continue;
                 }
 
-                // group billing address n shopping address
-                // if(moduleName.equals(getString(R.string.accounts))){
-                // if(moduleName.equals("Accounts")){
-                // if(billingAddressGroup.contains(fieldName)){
-                // if(!fieldName.equals(ModuleFields.BILLING_ADDRESS_COUNTRY)){
-                // continue;
-                // } else{
-                // textViewForLabel.setText("Billing Address:");
-                // }
-                // } else if(shippingAddressGroup.contains(fieldName)){
-                // if(!fieldName.equals(ModuleFields.SHIPPING_ADDRESS_COUNTRY)){
-                // continue;
-                // } else{
-                // textViewForLabel.setText("Shipping Address:");
-                // textViewForValue.setMaxLines(3);
-                // }
-                // }else{
-                // value = tempValue;
-                // }
-                // } else{
-                // value = tempValue;
-                // }
+                String label = moduleField.getLabel();
 
-                value = tempValue;
+                // check for the billing and shipping address groups only if the module is
+                // 'Accounts'
+                if (Util.ACCOUNTS.equals(mModuleName)) {
+                    if (billingAddressGroup.contains(fieldName)) {
+                        if (fieldName.equals(ModuleFields.BILLING_ADDRESS_STREET)) {
+                            // First field in the group
+                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
+                            continue;
+                        } else if (fieldName.equals(ModuleFields.BILLING_ADDRESS_COUNTRY)) {
+                            // last field in the group
+
+                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
+                            label = getBaseContext().getString(R.string.billing_address);
+                        } else {
+                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
+                            continue;
+                        }
+                    } else if (shippingAddressGroup.contains(fieldName)) {
+                        if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_STREET)) {
+                            // First field in the group
+                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
+                            continue;
+                        } else if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_COUNTRY)) {
+                            // Last field in the group
+
+                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
+                            label = getBaseContext().getString(R.string.shipping_address);
+                        } else {
+
+                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
+                            continue;
+                        }
+                    } else {
+                        value = tempValue;
+                    }
+                } else if (durationGroup.contains(fieldName)) {
+                    if (fieldName.equals(ModuleFields.DURATION_HOURS)) {
+                        // First field in the group
+                        value = (!TextUtils.isEmpty(tempValue)) ? tempValue + "hr " : "";
+                        continue;
+                    } else if (fieldName.equals(ModuleFields.DURATION_MINUTES)) {
+                        // Last field in the group
+                        value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + "mins " : "");
+                        label = getBaseContext().getString(R.string.duration);
+                    }
+                } else {
+                    value = tempValue;
+                }
+
                 if (moduleField.getType().equals("phone"))
                     textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
 
                 int command = staticRowsCount < rowsCount ? DYNAMIC_ROW : STATIC_ROW;
 
                 if (!TextUtils.isEmpty(value)) {
-                    // textViewForValue.setText(value);
-                    publishProgress(command, tableRow, textViewForLabel, moduleField.getLabel(), textViewForValue, value);
+                    publishProgress(command, tableRow, textViewForLabel, label, textViewForValue, value);
                 } else {
-                    // textViewForValue.setText(R.string.notAvailable);
-                    publishProgress(command, tableRow, textViewForLabel, moduleField.getLabel(), textViewForValue, getString(R.string.notAvailable));
+                    publishProgress(command, tableRow, textViewForLabel, label, textViewForValue, getString(R.string.notAvailable));
                 }
 
-                // mDetailsTable.addView(tableRow);
                 rowsCount++;
 
             }
