@@ -45,7 +45,6 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     private String mLinkFieldName;
 
     private DatabaseHelper mDbHelper;
-   
 
     /*
      * represents either delete or update, for local database operations, is always an update on the
@@ -203,6 +202,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     values.put(SugarCRMContent.SUGAR_BEAN_ID, updatedBeanId);
                     Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
                     Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
+                    updatedRows = 1;
                 } else {
                     /*
                      * we do not have a beanId to add to our valueMap. we add a randomly generated
@@ -211,6 +211,9 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                      */
                     values.put(SugarCRMContent.SUGAR_BEAN_ID, "Sync" + UUID.randomUUID());
                     Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
+                    // after success ul insertion, we set the updatedRow to 1 so we dont get a fail
+                    // msg
+                    updatedRows = 1;
                     Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
                     insertSyncRecord(insertResultUri);
                 }
@@ -353,5 +356,5 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
-    }   
+    }
 }
