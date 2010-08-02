@@ -108,5 +108,10 @@
 	<string name="serverUpdateSuccess">%s successful</string>
 	<string name="insert">Insert</string>
 	<string name="update">Update</string>
+	
+	<!-- Titles for the groups -->
+	<string name="billing_address">Billing Address</string>
+    <string name="shipping_address">Shipping Address</string>
+    <string name="duration">Duration</string>
 
 </resources>
