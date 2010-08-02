@@ -13,7 +13,7 @@
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent"
     android:layout_marginLeft="20dip"
-  	android:layout_marginTop="30dip"
+  	android:layout_marginTop="20dip"
     android:columnWidth="90dip"
     android:numColumns="auto_fit"
     android:padding="20dip"
