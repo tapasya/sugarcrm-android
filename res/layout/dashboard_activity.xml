@@ -12,13 +12,13 @@
     
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent"
-    android:layout_marginLeft="20dip"
+    android:layout_marginLeft="10dip"
   	android:layout_marginTop="20dip"
     android:columnWidth="90dip"
     android:numColumns="auto_fit"
-    android:padding="20dip"
+    android:padding="10dip"
     android:verticalSpacing="20dip"
-    android:horizontalSpacing="10dip"
+    android:horizontalSpacing="5dip"
     android:stretchMode="columnWidth"
     android:gravity="center"
 />
