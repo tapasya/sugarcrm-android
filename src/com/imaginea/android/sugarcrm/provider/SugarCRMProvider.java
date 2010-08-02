@@ -246,12 +246,12 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case CONTACT_LEAD:
-
+            // TODO - this case is dubious - remove it later
+            // Bug - contactId being used as accountId
             selection = LeadsColumns.ACCOUNT_ID + " = ?";
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
 
-        // TODO - this case is dubious - remove it later
         case CONTACT_OPPORTUNITY:
 
             qb = new SQLiteQueryBuilder();
@@ -301,6 +301,8 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case LEAD_OPPORTUNITY:
+            // TODO - this case is dubious - remove it later
+         // Bug - contactId being used as accountId
             selection = OpportunitiesColumns.ACCOUNT_ID + " = ?";
             c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
@@ -717,6 +719,15 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
 
+        case ACCOUNT_LEAD:
+            accountId = uri.getPathSegments().get(1);
+            count = db.delete(DatabaseHelper.LEADS_TABLE_NAME, Accounts.ID
+                                            + "="
+                                            + accountId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
         case ACCOUNT_OPPORTUNITY:
             accountId = uri.getPathSegments().get(1);
             String opportunityId = uri.getPathSegments().get(3);
@@ -730,6 +741,7 @@ public class SugarCRMProvider extends ContentProvider {
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
+                  
 
         case CONTACT:
             count = db.delete(DatabaseHelper.CONTACTS_TABLE_NAME, where, whereArgs);
@@ -742,20 +754,7 @@ public class SugarCRMProvider extends ContentProvider {
 
                                             : ""), whereArgs);
             break;
-
-        case CONTACT_OPPORTUNITY:
-            contactId = uri.getPathSegments().get(1);
-            opportunityId = uri.getPathSegments().get(3);
-            count = db.delete(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, ContactsOpportunitiesColumns.CONTACT_ID
-                                            + "="
-                                            + contactId
-                                            + " AND "
-                                            + ContactsOpportunitiesColumns.OPPORTUNITY_ID
-                                            + "="
-                                            + opportunityId
-                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
-                                                                            : ""), whereArgs);
-            break;
+        
 
         case LEAD:
             count = db.delete(DatabaseHelper.LEADS_TABLE_NAME, where, whereArgs);
@@ -847,15 +846,79 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
 
+        case ACCOUNT_CONTACT:
+            accountId = uri.getPathSegments().get(1);
+            String contactId = uri.getPathSegments().get(3);
+            count = db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, values, AccountsContactsColumns.ACCOUNT_ID
+                                            + "="
+                                            + accountId
+                                            + " AND "
+                                            + AccountsContactsColumns.CONTACT_ID
+                                            + "="
+                                            + contactId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case ACCOUNT_LEAD:
+            accountId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.LEADS_TABLE_NAME, values, Accounts.ID
+                                            + "="
+                                            + accountId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case ACCOUNT_OPPORTUNITY:
+            accountId = uri.getPathSegments().get(1);
+            String opportunityId = uri.getPathSegments().get(3);
+            count = db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, values, AccountsOpportunitiesColumns.ACCOUNT_ID
+                                            + "="
+                                            + accountId
+                                            + " AND "
+                                            + AccountsOpportunitiesColumns.OPPORTUNITY_ID
+                                            + "="
+                                            + opportunityId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case ACCOUNT_CASE:
+            accountId = uri.getPathSegments().get(1);
+            String caseId = uri.getPathSegments().get(3);
+            count = db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, values, AccountsCasesColumns.ACCOUNT_ID
+                                            + "="
+                                            + accountId
+                                            + " AND "
+                                            + AccountsCasesColumns.CASE_ID
+                                            + "="
+                                            + caseId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
         case CONTACT:
             count = db.update(DatabaseHelper.CONTACTS_TABLE_NAME, values, where, whereArgs);
             break;
 
         case CONTACT_ID:
-            String contactId = uri.getPathSegments().get(1);
+            contactId = uri.getPathSegments().get(1);
             count = db.update(DatabaseHelper.CONTACTS_TABLE_NAME, values, Contacts.ID
                                             + "="
                                             + contactId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+
+        case CONTACT_OPPORTUNITY:
+            contactId = uri.getPathSegments().get(1);
+            opportunityId = uri.getPathSegments().get(3);
+            count = db.update(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, values, ContactsOpportunitiesColumns.CONTACT_ID
+                                            + "="
+                                            + contactId
+                                            + " AND "
+                                            + ContactsOpportunitiesColumns.OPPORTUNITY_ID
+                                            + "="
+                                            + opportunityId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
@@ -886,12 +949,26 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
 
+        case OPPORTUNITY_CONTACT:
+            opportunityId = uri.getPathSegments().get(1);
+             contactId = uri.getPathSegments().get(3);
+            count = db.update(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, values, ContactsOpportunitiesColumns.CONTACT_ID
+                                            + "="
+                                            + contactId
+                                            + " AND "
+                                            + ContactsOpportunitiesColumns.OPPORTUNITY_ID
+                                            + "="
+                                            + opportunityId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+            
         case CASE:
             count = db.update(DatabaseHelper.CASES_TABLE_NAME, values, where, whereArgs);
             break;
 
         case CASE_ID:
-            String caseId = uri.getPathSegments().get(1);
+            caseId = uri.getPathSegments().get(1);
             count = db.update(DatabaseHelper.CASES_TABLE_NAME, values, Cases.ID
                                             + "="
                                             + caseId
@@ -955,7 +1032,6 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/#", ACCOUNT);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#", ACCOUNT_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.CONTACTS, ACCOUNT_CONTACT);
-
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.LEADS, ACCOUNT_LEAD);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.OPPORTUNITIES, ACCOUNT_OPPORTUNITY);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.ACCOUNTS + "/#/" + Util.CASES, ACCOUNT_CASE);
@@ -979,6 +1055,7 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.MEETINGS, MEETING);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.MEETINGS + "/#", MEETING_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.MEETINGS + "/#/#", MEETING);
+  
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CALLS, CALL);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CALLS + "/#", CALL_ID);
