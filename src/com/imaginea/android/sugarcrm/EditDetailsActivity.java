@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.CursorAdapter;
 import android.widget.Filterable;
@@ -68,6 +69,14 @@ public class EditDetailsActivity extends Activity {
     private AutoSuggestAdapter mAccountAdapter;
 
     private AutoSuggestAdapter mUserAdapter;
+
+    private Cursor mAccountCursor;
+
+    private Cursor mUserCursor;
+
+    private String mSelectedAccountName;
+
+    private String mSelectedUserName;
 
     /** Called when the activity is first created. */
     @Override
@@ -134,6 +143,12 @@ public class EditDetailsActivity extends Activity {
             mTask.cancel(true);
         }
 
+        if (mAccountCursor != null)
+            mAccountCursor.close();
+
+        if (mUserCursor != null)
+            mUserCursor.close();
+
     }
 
     @Override
@@ -176,11 +191,11 @@ public class EditDetailsActivity extends Activity {
                 tv.setText(String.format(getString(R.string.newDetailsHeader), mModuleName));
             }
 
-            Cursor accountCursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, null, null, null);
-            mAccountAdapter = new AccountsSuggestAdapter(getBaseContext(), accountCursor);
+            mAccountCursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, null, null, null);
+            mAccountAdapter = new AccountsSuggestAdapter(getBaseContext(), mAccountCursor);
 
-            Cursor userCursor = getContentResolver().query(mDbHelper.getModuleUri(Util.USERS), Users.DETAILS_PROJECTION, null, null, null);
-            mUserAdapter = new UsersSuggestAdapter(getBaseContext(), userCursor);
+            mUserCursor = getContentResolver().query(mDbHelper.getModuleUri(Util.USERS), Users.DETAILS_PROJECTION, null, null, null);
+            mUserAdapter = new UsersSuggestAdapter(getBaseContext(), mUserCursor);
         }
 
         @Override
@@ -200,14 +215,14 @@ public class EditDetailsActivity extends Activity {
                 AutoCompleteTextView valueView = (AutoCompleteTextView) values[5];
                 valueView.setText((String) values[6]);
 
-                //set the adapter to auto-suggest
+                // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
                                                 && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
                     valueView.setAdapter(mAccountAdapter);
-                    Log.i(TAG, "setAccountAdapter");
+                    valueView.setOnItemClickListener(new AccountsClickedItemListener());
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
-                    Log.i(TAG, "setUserAdapter");
+                    valueView.setOnItemClickListener(new UsersClickedItemListener());
                 }
                 break;
 
@@ -226,12 +241,10 @@ public class EditDetailsActivity extends Activity {
                 if (!Util.ACCOUNTS.equals(mModuleName)
                                                 && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
                     valueView.setAdapter(mAccountAdapter);
-                    if(Log.isLoggable(TAG, Log.DEBUG))
-                        Log.d(TAG, "dynamic setAccountAdapter");
+                    valueView.setOnItemClickListener(new AccountsClickedItemListener());
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
-                    if(Log.isLoggable(TAG, Log.DEBUG))
-                     Log.i(TAG, "dynamic setUserAdapter");
+                    valueView.setOnItemClickListener(new UsersClickedItemListener());
                 }
 
                 mDetailsTable.addView(editRow);
@@ -308,7 +321,7 @@ public class EditDetailsActivity extends Activity {
             Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
             Map<String, String> fieldsExcludedForEdit = mDbHelper.getFieldsExcludedForEdit();
 
-            int rowsCount = 0;  // to keep track of number of rows being used
+            int rowsCount = 0; // to keep track of number of rows being used
             for (int i = 0; i < detailsProjection.length; i++) {
                 // if the task gets cancelled
                 if (isCancelled())
@@ -385,6 +398,7 @@ public class EditDetailsActivity extends Activity {
      * @param v
      */
     public void saveModuleItem(View v) {
+        boolean hasError = false;
         String[] detailsProjection = mSelectFields;
 
         Map<String, String> modifiedValues = new LinkedHashMap<String, String>();
@@ -403,28 +417,51 @@ public class EditDetailsActivity extends Activity {
                 continue;
             }
 
-            // EditText editText = (EditText) mDetailsTable.findViewById(i);
             AutoCompleteTextView editText = (AutoCompleteTextView) ((ViewGroup) mDetailsTable.getChildAt(rowsCount)).getChildAt(1);
-            Log.i(TAG, fieldName + " : " + editText.getText().toString());
+            String fieldValue = editText.getText().toString();
+            Log.i(TAG, fieldName + " : " + fieldValue);
 
             // TODO: validation
+
+            if (!Util.ACCOUNTS.equals(mModuleName) && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
+                if (mSelectedAccountName != null && fieldValue != null) {
+                    if (!mSelectedAccountName.equals(fieldValue)) {
+                        // account name is incorrect.
+                        hasError = true;
+                        // TODO : Set the background color to red
+                        editText.setBackgroundColor(R.color.blue);
+                    }
+                }
+            } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
+                if (mSelectedUserName != null && fieldValue != null) {
+                    if (!mSelectedUserName.equals(fieldValue)) {
+                        // user name is incorrect.
+                        hasError = true;
+                        // TODO : Set the background color to red
+                        editText.setBackgroundColor(R.color.blue);
+                    }
+                }
+            }
 
             // add the fieldName : fieldValue in the ContentValues
             modifiedValues.put(fieldName, editText.getText().toString());
             rowsCount++;
         }
 
-        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-            ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId), mModuleName, mSugarBeanId, modifiedValues);
-        } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
-            modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
-            ServiceHelper.startServiceForInsert(getBaseContext(), mIntentUri, mModuleName, modifiedValues);
-        } else if (MODE == Util.NEW_ORPHAN_MODE) {
-            modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
-            ServiceHelper.startServiceForInsert(getBaseContext(), mDbHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
-        }
+        if (!hasError) {
 
-        // finish();
+            if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId), mModuleName, mSugarBeanId, modifiedValues);
+            } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+                modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
+                ServiceHelper.startServiceForInsert(getBaseContext(), mIntentUri, mModuleName, modifiedValues);
+            } else if (MODE == Util.NEW_ORPHAN_MODE) {
+                modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
+                ServiceHelper.startServiceForInsert(getBaseContext(), mDbHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
+            }
+
+            // finish();
+        }
         ViewUtil.dismissVirtualKeyboard(getBaseContext(), v);
     }
 
@@ -462,7 +499,8 @@ public class EditDetailsActivity extends Activity {
         public void handleMessage(Message message) {
             switch (message.what) {
             case R.id.status:
-                Log.d(TAG, "Display Status");
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "Display Status");
                 ViewUtil.makeToast(getBaseContext(), (String) message.obj);
                 finish();
                 break;
@@ -491,14 +529,18 @@ public class EditDetailsActivity extends Activity {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            Log.i(TAG, "bindView : " + cursor.getString(2));
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "bindView : " + cursor.getString(2));
             ((TextView) ((LinearLayout) view).getChildAt(0)).setText(cursor.getString(2));
         }
 
         @Override
         public String convertToString(Cursor cursor) {
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "convertToString : " + cursor.getString(2));
             return cursor.getString(2);
         }
+
     }
 
     public static class AccountsSuggestAdapter extends AutoSuggestAdapter {
@@ -523,7 +565,8 @@ public class EditDetailsActivity extends Activity {
                 args = new String[] { constraint.toString().toUpperCase() + "*" };
             }
 
-            Log.i(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
 
             return mContent.query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, buffer == null ? null
                                             : buffer.toString(), args, Accounts.DEFAULT_SORT_ORDER);
@@ -552,10 +595,41 @@ public class EditDetailsActivity extends Activity {
                 args = new String[] { constraint.toString().toUpperCase() + "*" };
             }
 
-            Log.i(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
 
             return mContent.query(mDbHelper.getModuleUri(Util.USERS), Users.DETAILS_PROJECTION, buffer == null ? null
                                             : buffer.toString(), args, null);
+        }
+    }
+
+    public class AccountsClickedItemListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            try {
+                // Remembers the selected account name
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                mSelectedAccountName = cursor.getString(2);
+            } catch (Exception e) {
+                Log.e(TAG, "cannot get the clicked index " + position);
+            }
+
+        }
+    }
+
+    public class UsersClickedItemListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            try {
+                // Remembers the selected username
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                mSelectedUserName = cursor.getString(2);
+            } catch (Exception e) {
+                Log.e(TAG, "cannot get the clicked index " + position);
+            }
+
         }
     }
 }
