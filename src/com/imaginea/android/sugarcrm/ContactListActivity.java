@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.AlertDialog.Builder;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,11 +25,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
@@ -153,6 +157,8 @@ public class ContactListActivity extends ListActivity {
         else
             mAdapter = new GenericCursorAdapter(this, R.layout.contact_listitem, cursor, moduleSel, new int[] { android.R.id.text1 });
         setListAdapter(mAdapter);
+        // make the list filterable using the keyboard
+        mListView.setTextFilterEnabled(true);
 
         TextView tv1 = (TextView) (mEmpty.findViewById(R.id.mainText));
 
@@ -178,14 +184,17 @@ public class ContactListActivity extends ListActivity {
     /**
      * GenericCursorAdapter
      */
-    private final class GenericCursorAdapter extends SimpleCursorAdapter {
+    private final class GenericCursorAdapter extends SimpleCursorAdapter implements Filterable {
 
         private int realoffset = 0;
 
         private int limit = 20;
 
+        private ContentResolver mContent;
+
         public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
             super(context, layout, c, from, to);
+            mContent = context.getContentResolver();
         }
 
         @Override
@@ -226,6 +235,32 @@ public class ContactListActivity extends ListActivity {
                 // text.setTag(this);
             }
             return v;
+        }
+
+        @Override
+        public String convertToString(Cursor cursor) {
+            Log.i(LOG_TAG, "convertToString : " + cursor.getString(2));
+            return cursor.getString(2);
+        }
+
+        @Override
+        public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
+            if (getFilterQueryProvider() != null) {
+                return getFilterQueryProvider().runQuery(constraint);
+            }
+
+            StringBuilder buffer = null;
+            String[] args = null;
+            if (constraint != null) {
+                buffer = new StringBuilder();
+                buffer.append("UPPER(");
+                buffer.append(AccountsColumns.NAME);
+                buffer.append(") GLOB ?");
+                args = new String[] { constraint.toString().toUpperCase() + "*" };
+            }
+
+            return mContent.query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, buffer == null ? null
+                                            : buffer.toString(), args, Accounts.DEFAULT_SORT_ORDER);
         }
     }
 
