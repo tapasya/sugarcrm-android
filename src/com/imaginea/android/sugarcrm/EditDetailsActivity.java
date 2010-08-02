@@ -78,6 +78,10 @@ public class EditDetailsActivity extends Activity {
 
     private String mSelectedUserName;
 
+    private String mAccountName;
+
+    private String mUserName;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,6 +105,7 @@ public class EditDetailsActivity extends Activity {
         }
         // when the user comes from the relationships, intent.getData() won't be null
         mIntentUri = intent.getData();
+        Log.v(TAG, "uri - " + (mIntentUri != null ? mIntentUri : ""));
 
         if (intent.getData() != null && mRowId != null) {
             // TODO: this case is intentionally left as of now
@@ -114,6 +119,8 @@ public class EditDetailsActivity extends Activity {
         } else {
             MODE = Util.NEW_ORPHAN_MODE;
         }
+
+        Log.v(TAG, "mode - " + MODE);
 
         if (intent.getData() == null && MODE == Util.EDIT_ORPHAN_MODE) {
             intent.setData(Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId));
@@ -218,11 +225,32 @@ public class EditDetailsActivity extends Activity {
                 // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
                                                 && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
-                    valueView.setAdapter(mAccountAdapter);
-                    valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                    if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+                        if (mDbHelper == null)
+                            mDbHelper = new DatabaseHelper(getBaseContext());
+
+                        int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
+                        String selection = AccountsColumns.ID + "=" + accountRowId;
+                        Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                        cursor.moveToFirst();
+                        String accountName = cursor.getString(2);
+                        cursor.close();
+
+                        valueView.setText(accountName);
+                        valueView.setEnabled(false);
+                    } else if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                        mAccountName = (String) values[6];
+                    } else {
+                        valueView.setAdapter(mAccountAdapter);
+                        valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                    }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
+
+                    if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                        mUserName = (String) values[6];
+                    }
                 }
                 break;
 
@@ -240,11 +268,32 @@ public class EditDetailsActivity extends Activity {
                 // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
                                                 && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
-                    valueView.setAdapter(mAccountAdapter);
-                    valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                    if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+                        if (mDbHelper == null)
+                            mDbHelper = new DatabaseHelper(getBaseContext());
+
+                        int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
+                        String selection = AccountsColumns.ID + "=" + accountRowId;
+                        Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                        cursor.moveToFirst();
+                        String accountName = cursor.getString(2);
+                        cursor.close();
+
+                        valueView.setText(accountName);
+                        valueView.setEnabled(false);
+                    } else if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                        mAccountName = (String) values[6];
+                    } else {
+                        valueView.setAdapter(mAccountAdapter);
+                        valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                    }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
+
+                    if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                        mUserName = (String) values[6];
+                    }
                 }
 
                 mDetailsTable.addView(editRow);
@@ -425,11 +474,27 @@ public class EditDetailsActivity extends Activity {
 
             if (!Util.ACCOUNTS.equals(mModuleName) && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
                 if (mSelectedAccountName != null && fieldValue != null) {
+                    // check if the field value is the selected value
                     if (!mSelectedAccountName.equals(fieldValue)) {
                         // account name is incorrect.
                         hasError = true;
-                        // TODO : Set the background color to red
-                        editText.setBackgroundColor(R.color.blue);
+                        // set the background color to red
+                        editText.setBackgroundColor(getResources().getColor(R.color.red));
+                    }
+                } else if (fieldValue != null && mSelectedAccountName == null) {
+                    if (mAccountName != null) {
+                        // check if the account name is exactly as the actual account name
+                        if (!mAccountName.equals(fieldValue)) {
+                            hasError = true;
+                            // set the background color to red
+                            editText.setBackgroundColor(getResources().getColor(R.color.red));
+                        }
+                    } else {
+                        // if the user just enters some value
+
+                        hasError = true;
+                        // set the background color to red
+                        editText.setBackgroundColor(getResources().getColor(R.color.red));
                     }
                 }
             } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
@@ -437,8 +502,23 @@ public class EditDetailsActivity extends Activity {
                     if (!mSelectedUserName.equals(fieldValue)) {
                         // user name is incorrect.
                         hasError = true;
-                        // TODO : Set the background color to red
-                        editText.setBackgroundColor(R.color.blue);
+                        // set the background color to red
+                        editText.setBackgroundColor(getResources().getColor(R.color.red));
+                    }
+                } else if (fieldValue != null && mSelectedUserName == null) {
+                    if (mUserName != null) {
+                        // check if the username is exactly as the actual username
+                        if (!mUserName.equals(fieldValue)) {
+                            hasError = true;
+                            // set the background color to red
+                            editText.setBackgroundColor(getResources().getColor(R.color.red));
+                        }
+                    } else {
+                        // if the user just enters some value
+
+                        hasError = true;
+                        // set the background color to red
+                        editText.setBackgroundColor(getResources().getColor(R.color.red));
                     }
                 }
             }
