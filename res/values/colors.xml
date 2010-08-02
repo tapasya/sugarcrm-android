@@ -10,4 +10,5 @@
 	<color name="translucenter_dark">#bf000000</color>
 	<color name="bright_foreground_dark">#ffffffff</color>
 	<color name="blue">#4e8ccf</color>
+	<color name="red">#FF0000</color>
 </resources>
