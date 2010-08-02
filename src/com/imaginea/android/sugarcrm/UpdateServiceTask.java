@@ -45,8 +45,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     private String mLinkFieldName;
 
     private DatabaseHelper mDbHelper;
-
-    private static String mSelection = SugarCRMContent.RECORD_ID + "=?";
+   
 
     /*
      * represents either delete or update, for local database operations, is always an update on the
@@ -103,7 +102,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                         if (updatedBeanId != null) {
                             // get the parent beanId
                             String rowId = mUri.getPathSegments().get(1);
-                            mBeanId = lookupBeanId(mParentModuleName, rowId);
+                            mBeanId = mDbHelper.lookupBeanId(mParentModuleName, rowId);
                             RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
                             if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
                                 Log.i(LOG_TAG, "created: " + status.getCreatedCount() + " failed: "
@@ -147,11 +146,11 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     String serverUpdatedBeanId = null;
                     if (mLinkFieldName != null) {
                         String rowId = mUri.getPathSegments().get(1);
-                        mBeanId = lookupBeanId(mParentModuleName, rowId);
+                        mBeanId = mDbHelper.lookupBeanId(mParentModuleName, rowId);
 
                         // related BeanId
                         rowId = mUri.getPathSegments().get(3);
-                        updatedBeanId = lookupBeanId(mModuleName, rowId);
+                        updatedBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
 
                         serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         if (serverUpdatedBeanId.equals(updatedBeanId)) {
@@ -180,7 +179,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                         }
                     } else {
                         String rowId = mUri.getPathSegments().get(1);
-                        mBeanId = lookupBeanId(mModuleName, rowId);
+                        mBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
                         mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         if (mBeanId.equals(updatedBeanId)) {
@@ -354,28 +353,5 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
-    }
-
-    /**
-     * Returns the beanId id , or null if the item is not found.
-     * 
-     */
-    private String lookupBeanId(String moduleName, String rowId) {
-        ContentResolver resolver = mContext.getContentResolver();
-        String beanId = null;
-        Uri contentUri = mDbHelper.getModuleUri(moduleName);
-        String[] projection = new String[] { SugarCRMContent.SUGAR_BEAN_ID };
-
-        final Cursor c = resolver.query(contentUri, projection, mSelection, new String[] { rowId }, null);
-        try {
-            if (c.moveToFirst()) {
-                beanId = c.getString(0);
-            }
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-        return beanId;
-    }
+    }   
 }
