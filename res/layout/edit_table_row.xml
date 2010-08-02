@@ -11,8 +11,9 @@
 		android:maxLines="3"
 		android:inputType="textMultiLine"
 		style="@style/text_label" />
-	<EditText android:id="@+id/editRowValue"
+	<AutoCompleteTextView android:id="@+id/editRowValue"
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
+		android:completionThreshold="2"
 		style="@style/text_row_value"  />
 </LinearLayout>
