@@ -19,6 +19,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActions;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoles;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Users;
 import com.imaginea.android.sugarcrm.util.Module;
 import com.imaginea.android.sugarcrm.util.RelationshipStatus;
 import com.imaginea.android.sugarcrm.util.RestUtil;
@@ -38,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Class for managing sugar crm sync related mOperations. should be capable of updating the
@@ -759,9 +761,6 @@ public class SugarSyncManager {
             HashMap<String, List<String>> linkNameToFieldsArrayForActions = new HashMap<String, List<String>>();
             linkNameToFieldsArrayForActions.put(actionsLinkNameField, Arrays.asList(ACLActions.INSERT_PROJECTION));
 
-            // TODO: get the user name from Account Manager
-            // String userName = SugarCrmSettings.getUsername(getContext());
-
             // this gives the user bean for the logged in user along with the acl roles associated
             SugarBean[] userBeans = RestUtil.getEntryList(url, sessionId, moduleName, "Users.user_name='"
                                             + account + "'", "", "", userSelectFields, linkNameToFieldsArray, "", "");
@@ -794,5 +793,52 @@ public class SugarSyncManager {
             Log.e(LOG_TAG, "" + sce.getMessage());
         }
         return false;
+    }
+    
+    /**
+     * syncUsersList
+     * 
+     * @param context
+     * @param sessionId
+     */
+    public synchronized static boolean syncUsersList(Context context, String sessionId){
+        try {
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+                Log.d(LOG_TAG, "Sync Acl Access");
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+            // TODO use a constant and remove this as we start from the login screen
+            String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
+            
+            HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
+            SugarBean[] userBeans = RestUtil.getEntryList(url, sessionId, Util.USERS, null, null, "0", Users.INSERT_PROJECTION, linkNameToFieldsArray, null, "0");
+            
+            Map<String, Map<String, String>> usersMap = new TreeMap<String, Map<String, String>>();
+            for(SugarBean userBean : userBeans){
+                Map<String, String> userBeanValues = getUserBeanValues(userBean);
+                String userName = userBean.getFieldValue(ModuleFields.USER_NAME);
+                if(userBeanValues != null & userBeanValues.size() > 0)
+                    usersMap.put(userName, userBeanValues);
+            }
+            
+            if (databaseHelper == null)
+                databaseHelper = new DatabaseHelper(context);
+            databaseHelper.insertUsers(usersMap);
+            
+            return true;
+        } catch (SugarCrmException sce) {
+            Log.e(LOG_TAG, "" + sce.getMessage());
+        }
+        return false;
+    }
+    
+    private static Map<String, String> getUserBeanValues(SugarBean userBean) {
+        Map<String, String> userBeanValues = new TreeMap<String, String>();
+        for(String fieldName : Users.INSERT_PROJECTION){
+            String fieldValue = userBean.getFieldValue(fieldName);
+            userBeanValues.put(fieldName, fieldValue);
+        }
+        if(userBeanValues.size() > 0)
+            return userBeanValues;
+        return null;
     }
 }
