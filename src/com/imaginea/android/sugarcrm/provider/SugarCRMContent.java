@@ -727,6 +727,9 @@ public final class SugarCRMContent {
     }
 
     public static final class Users implements UserColumns {
+        public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+                                        + "/" + Util.USERS);
+
         public static final String[] INSERT_PROJECTION = { USER_ID, USER_NAME, FIRST_NAME,
                 LAST_NAME };
 
