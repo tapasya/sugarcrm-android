@@ -238,11 +238,12 @@ public class EditDetailsActivity extends Activity {
 
                         valueView.setText(accountName);
                         valueView.setEnabled(false);
-                    } else if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                        mAccountName = (String) values[6];
                     } else {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                    
+                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
+                            mAccountName = (String) values[6];
                     }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
@@ -281,11 +282,12 @@ public class EditDetailsActivity extends Activity {
 
                         valueView.setText(accountName);
                         valueView.setEnabled(false);
-                    } else if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                        mAccountName = (String) values[6];
                     } else {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                        
+                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
+                            mAccountName = (String) values[6];
                     }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
