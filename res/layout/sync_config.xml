@@ -51,23 +51,47 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
+          
 
             <Button android:id="@+id/end_date"
-                android:layout_width="0px"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
                 style="@style/button_style"
                 
                 android:gravity="left|center_vertical"/>                
 
-        </LinearLayout>    
+         </LinearLayout>  
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
          <Button android:id="@+id/startSync"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"               
+                android:layout_width="0dip"
+                android:layout_height="wrap_content" 
+                android:layout_weight="2"              
                 android:gravity="center_vertical"
                 android:onClick="startSync"
                 android:text="@string/syncNow"
-                style="@style/button_style"/>   
+                style="@style/button_style"/> 
+      	<Button android:id="@+id/syncLater"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"   
+                android:layout_weight="2"            
+                android:gravity="center_vertical"
+                android:onClick="syncLater"
+                android:text="@string/syncLater"
+                style="@style/button_style"/> 
+        <Button android:id="@+id/cancelSync"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"   
+                android:layout_weight="2"            
+                android:gravity="center_vertical"
+                android:onClick="cancelSync"
+                android:visibility="gone"
+                android:text="@string/syncCancel"
+                style="@style/button_style"/> 
+                </LinearLayout>  
     </LinearLayout>
    </ScrollView>   
 </LinearLayout>
