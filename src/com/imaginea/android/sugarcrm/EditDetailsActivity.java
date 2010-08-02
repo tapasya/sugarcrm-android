@@ -1,6 +1,7 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,10 +19,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
+import android.widget.CursorAdapter;
+import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.UserColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Users;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 import com.imaginea.android.sugarcrm.util.ViewUtil;
@@ -31,7 +39,7 @@ import java.util.Map;
 
 public class EditDetailsActivity extends Activity {
 
-    private final String TAG = "EditDetailsActivity";
+    private final static String TAG = "EditDetailsActivity";
 
     private int MODE = -1;
 
@@ -57,6 +65,10 @@ public class EditDetailsActivity extends Activity {
 
     private StatusHandler mStatusHandler;
 
+    private AutoSuggestAdapter mAccountAdapter;
+
+    private AutoSuggestAdapter mUserAdapter;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +82,7 @@ public class EditDetailsActivity extends Activity {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
 
-        mModuleName = "Contacts";
+        mModuleName = Util.CONTACTS;
         if (extras != null) {
             // i always get the module name
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
@@ -163,6 +175,12 @@ public class EditDetailsActivity extends Activity {
             } else if (MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE) {
                 tv.setText(String.format(getString(R.string.newDetailsHeader), mModuleName));
             }
+
+            Cursor accountCursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, null, null, null);
+            mAccountAdapter = new AccountsSuggestAdapter(getBaseContext(), accountCursor);
+
+            Cursor userCursor = getContentResolver().query(mDbHelper.getModuleUri(Util.USERS), Users.DETAILS_PROJECTION, null, null, null);
+            mUserAdapter = new UsersSuggestAdapter(getBaseContext(), userCursor);
         }
 
         @Override
@@ -172,28 +190,55 @@ public class EditDetailsActivity extends Activity {
             switch ((Integer) values[0]) {
 
             case STATIC_ROW:
-                View editRow = (View) values[1];
+                String fieldName = (String) values[1];
+
+                View editRow = (View) values[2];
                 editRow.setVisibility(View.VISIBLE);
 
-                TextView labelView = (TextView) values[2];
-                labelView.setText((String) values[3]);
-                EditText valueView = (EditText) values[4];
-                valueView.setText((String) values[5]);
+                TextView labelView = (TextView) values[3];
+                labelView.setText((String) values[4]);
+                AutoCompleteTextView valueView = (AutoCompleteTextView) values[5];
+                valueView.setText((String) values[6]);
+
+                //set the adapter to auto-suggest
+                if (!Util.ACCOUNTS.equals(mModuleName)
+                                                && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
+                    valueView.setAdapter(mAccountAdapter);
+                    Log.i(TAG, "setAccountAdapter");
+                } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
+                    valueView.setAdapter(mUserAdapter);
+                    Log.i(TAG, "setUserAdapter");
+                }
                 break;
 
             case DYNAMIC_ROW:
-                editRow = (View) values[1];
+                fieldName = (String) values[1];
+
+                editRow = (View) values[2];
                 editRow.setVisibility(View.VISIBLE);
 
-                labelView = (TextView) values[2];
-                labelView.setText((String) values[3]);
-                valueView = (EditText) values[4];
-                valueView.setText((String) values[5]);
+                labelView = (TextView) values[3];
+                labelView.setText((String) values[4]);
+                valueView = (AutoCompleteTextView) values[5];
+                valueView.setText((String) values[6]);
+
+                // set the adapter to auto-suggest
+                if (!Util.ACCOUNTS.equals(mModuleName)
+                                                && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
+                    valueView.setAdapter(mAccountAdapter);
+                    if(Log.isLoggable(TAG, Log.DEBUG))
+                        Log.d(TAG, "dynamic setAccountAdapter");
+                } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
+                    valueView.setAdapter(mUserAdapter);
+                    if(Log.isLoggable(TAG, Log.DEBUG))
+                     Log.i(TAG, "dynamic setUserAdapter");
+                }
+
                 mDetailsTable.addView(editRow);
                 break;
 
             case INPUT_TYPE:
-                valueView = (EditText) values[1];
+                valueView = (AutoCompleteTextView) values[1];
                 valueView.setInputType((Integer) values[2]);
                 break;
 
@@ -263,7 +308,7 @@ public class EditDetailsActivity extends Activity {
             Map<String, ModuleField> fieldNameVsModuleField = mDbHelper.getModuleFields(mModuleName);
             Map<String, String> fieldsExcludedForEdit = mDbHelper.getFieldsExcludedForEdit();
 
-            int rowsCount = 0;
+            int rowsCount = 0;  // to keep track of number of rows being used
             for (int i = 0; i < detailsProjection.length; i++) {
                 // if the task gets cancelled
                 if (isCancelled())
@@ -279,23 +324,17 @@ public class EditDetailsActivity extends Activity {
                 // get the attributes of the moduleField
                 ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
 
-                // do not display account_name field, i.e. user cannot modify the account name
-                if (!mModuleName.equals(getString(R.string.accounts))
-                                                && ModuleFields.ACCOUNT_NAME.equals(fieldName))
-                    continue;
-
                 ViewGroup tableRow;
                 TextView textViewForLabel;
-                EditText editTextForValue;
-                // first two columns in the detail projection are ROW_ID and BEAN_ID
+                AutoCompleteTextView editTextForValue;
                 if (staticRowsCount > rowsCount) {
                     tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
                     textViewForLabel = (TextView) tableRow.getChildAt(0);
-                    editTextForValue = (EditText) tableRow.getChildAt(1);
+                    editTextForValue = (AutoCompleteTextView) tableRow.getChildAt(1);
                 } else {
                     tableRow = (ViewGroup) inflater.inflate(R.layout.edit_table_row, null);
                     textViewForLabel = (TextView) tableRow.getChildAt(0);
-                    editTextForValue = (EditText) tableRow.getChildAt(1);
+                    editTextForValue = (AutoCompleteTextView) tableRow.getChildAt(1);
                 }
 
                 String label;
@@ -313,14 +352,14 @@ public class EditDetailsActivity extends Activity {
                 if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                     String value = mCursor.getString(mCursor.getColumnIndex(fieldName));
                     if (!TextUtils.isEmpty(value)) {
-                        publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, value);
+                        publishProgress(command, fieldName, tableRow, textViewForLabel, label, editTextForValue, value);
                     } else {
-                        publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, "");
+                        publishProgress(command, fieldName, tableRow, textViewForLabel, label, editTextForValue, "");
                     }
                     setInputType(editTextForValue, moduleField);
 
                 } else {
-                    publishProgress(command, tableRow, textViewForLabel, label, editTextForValue, "");
+                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, editTextForValue, "");
                 }
                 rowsCount++;
             }
@@ -364,13 +403,8 @@ public class EditDetailsActivity extends Activity {
                 continue;
             }
 
-            // do not display account_name field, i.e. user cannot modify the account name
-            if (!mModuleName.equals(getString(R.string.accounts))
-                                            && ModuleFields.ACCOUNT_NAME.equals(fieldName))
-                continue;
-
             // EditText editText = (EditText) mDetailsTable.findViewById(i);
-            EditText editText = (EditText) ((ViewGroup) mDetailsTable.getChildAt(rowsCount)).getChildAt(1);
+            AutoCompleteTextView editText = (AutoCompleteTextView) ((ViewGroup) mDetailsTable.getChildAt(rowsCount)).getChildAt(1);
             Log.i(TAG, fieldName + " : " + editText.getText().toString());
 
             // TODO: validation
@@ -433,6 +467,95 @@ public class EditDetailsActivity extends Activity {
                 finish();
                 break;
             }
+        }
+    }
+
+    public static class AutoSuggestAdapter extends CursorAdapter implements Filterable {
+        protected ContentResolver mContent;
+
+        protected DatabaseHelper mDbHelper;
+
+        public AutoSuggestAdapter(Context context, Cursor c) {
+            super(context, c);
+            mContent = context.getContentResolver();
+            mDbHelper = new DatabaseHelper(context);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            final LayoutInflater inflater = LayoutInflater.from(context);
+            final LinearLayout view = (LinearLayout) inflater.inflate(R.layout.autosuggest_list_item, parent, false);
+            ((TextView) view.getChildAt(0)).setText(cursor.getString(2));
+            return view;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            Log.i(TAG, "bindView : " + cursor.getString(2));
+            ((TextView) ((LinearLayout) view).getChildAt(0)).setText(cursor.getString(2));
+        }
+
+        @Override
+        public String convertToString(Cursor cursor) {
+            return cursor.getString(2);
+        }
+    }
+
+    public static class AccountsSuggestAdapter extends AutoSuggestAdapter {
+
+        public AccountsSuggestAdapter(Context context, Cursor c) {
+            super(context, c);
+        }
+
+        @Override
+        public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
+            if (getFilterQueryProvider() != null) {
+                return getFilterQueryProvider().runQuery(constraint);
+            }
+
+            StringBuilder buffer = null;
+            String[] args = null;
+            if (constraint != null) {
+                buffer = new StringBuilder();
+                buffer.append("UPPER(");
+                buffer.append(AccountsColumns.NAME);
+                buffer.append(") GLOB ?");
+                args = new String[] { constraint.toString().toUpperCase() + "*" };
+            }
+
+            Log.i(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
+
+            return mContent.query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, buffer == null ? null
+                                            : buffer.toString(), args, Accounts.DEFAULT_SORT_ORDER);
+        }
+    }
+
+    public static class UsersSuggestAdapter extends AutoSuggestAdapter {
+
+        public UsersSuggestAdapter(Context context, Cursor c) {
+            super(context, c);
+        }
+
+        @Override
+        public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
+            if (getFilterQueryProvider() != null) {
+                return getFilterQueryProvider().runQuery(constraint);
+            }
+
+            StringBuilder buffer = null;
+            String[] args = null;
+            if (constraint != null) {
+                buffer = new StringBuilder();
+                buffer.append("UPPER(");
+                buffer.append(UserColumns.USER_NAME);
+                buffer.append(") GLOB ?");
+                args = new String[] { constraint.toString().toUpperCase() + "*" };
+            }
+
+            Log.i(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
+
+            return mContent.query(mDbHelper.getModuleUri(Util.USERS), Users.DETAILS_PROJECTION, buffer == null ? null
+                                            : buffer.toString(), args, null);
         }
     }
 }
