@@ -30,11 +30,11 @@
 	<string name="opportunities">Opportunities</string>
 
 	<string name="settings">Settings</string>
-	<string name="settingsSummary">Change the Sugar Crm URL</string>
+	<string name="settingsSummary">Change the SUGARCRM URL</string>
 	<string name="syncSummary">Select Sync Filters and start a Sync</string>
 
 	<!-- Login Module -->
-	<string name="sugarCrmUrlHeader">Sugar CRM REST URL</string>
+	<string name="sugarCrmUrlHeader">SUGARCRM REST URL</string>
 	<string name="login">Login</string>
 	<string name="username">Username</string>
 	<string name="password">Password</string>
@@ -47,12 +47,15 @@
 	<string name="appNotConfigMsg">Application did not configure cleanly, please try
 		again !!!</string>
 	<!-- Wizard -->
-	<string name="restUrl">REST Url</string>
+	<string name="restUrl">Enter your SUGARCRM REST Url</string>
 	<string name="wizard_url_status_message">REST Url</string>
 
-	<string name="cancel">cancel</string>
+	<string name="back">Back</string>
+	<string name="cancel">Cancel</string>
 	<string name="finish">Finish</string>
 	<string name="next">Next</string>
+	<string name="urlDesc">Example: %s</string>
+	
 
 	<!-- Details Screen Context Menu-->
 	<string name="options">Options</string>
@@ -81,7 +84,7 @@
 
 	<string name="noResults">No results found</string>
 
-	<string name="syncFilters">Sync Filters</string>
+	<string name="syncSettings">Sync Settings</string>
 	<string name="dateFilters">Date Filters</string>
 	<string name="startDate">Start Date</string>
 	<string name="endDate">End Date</string>
@@ -97,6 +100,8 @@
 	<string name="ascending">Ascending</string>
 	<string name="sortBy">Sort by</string>
 	<string name="syncNow">Sync Now</string>
+	<string name="syncLater">Sync Later</string>
+	<string name="syncCancel">Cancel Sync</string>
 
 	<string name="updateFailed">Failed to %s</string>
 	<string name="serverUpdateFailed">Failed to %s on the server</string>
