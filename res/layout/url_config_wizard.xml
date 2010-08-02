@@ -6,10 +6,10 @@
 	android:layout_height="wrap_content"
 	android:orientation="vertical">
 	
-	<TextView 
-		style="@style/text_label"
+	<TextView 		
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
+		style="@style/text_label"		
 		android:text="@string/restUrl" />
 	<EditText 
 		android:id="@+id/wizardUrl" 
@@ -25,6 +25,6 @@
 		style="@style/text_label"		
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
-		android:text="@string/defaultUrl" />
+		android:text="@string/urlDesc" />
 		
 </LinearLayout>
