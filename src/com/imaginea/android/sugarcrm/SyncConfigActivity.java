@@ -39,7 +39,7 @@ public class SyncConfigActivity extends Activity {
 
     private Time mEndTime;
 
-    public static final long THREE_MONTHS = 3 * 30 * 24 * 60 * 60 * 1000;
+    public static final long THREE_MONTHS = 3 * 30 * 24 * 60 * 60 * 1000L;
 
     public static final String TAG = SyncConfigActivity.class.getSimpleName();
 
@@ -49,15 +49,15 @@ public class SyncConfigActivity extends Activity {
         // Setup layout
         setContentView(R.layout.sync_config);
         mHeaderTextView = (TextView) findViewById(R.id.headerText);
-        mHeaderTextView.setText(R.string.syncFilters);
+        mHeaderTextView.setText(R.string.syncSettings);
         // mTitleTextView = (TextView) findViewById(R.id.title);
         mStartDateButton = (Button) findViewById(R.id.start_date);
         mEndDateButton = (Button) findViewById(R.id.end_date);
 
         long time = System.currentTimeMillis();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        long startTime = pref.getLong(Util.PREF_SYNC_START_TIME, time);
-        long endTime = pref.getLong(Util.PREF_SYNC_END_TIME, time - THREE_MONTHS);
+        long startTime = pref.getLong(Util.PREF_SYNC_START_TIME, time - THREE_MONTHS);
+        long endTime = pref.getLong(Util.PREF_SYNC_END_TIME, time);
         mStartTime = new Time();
         mStartTime.set(startTime);
         mEndTime = new Time();
@@ -66,6 +66,12 @@ public class SyncConfigActivity extends Activity {
         setDate(mEndDateButton, mEndTime.normalize(true));
         populateWhen();
 
+        SugarCrmApp app = (SugarCrmApp) getApplication();
+        final String usr = SugarCrmSettings.getUsername(SyncConfigActivity.this).toString();
+        if (ContentResolver.isSyncActive(app.getAccount(usr), SugarCRMProvider.AUTHORITY)) {
+            findViewById(R.id.syncLater).setVisibility(View.GONE);
+            findViewById(R.id.cancelSync).setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -81,6 +87,10 @@ public class SyncConfigActivity extends Activity {
         SugarCrmApp app = (SugarCrmApp) getApplication();
         final String usr = SugarCrmSettings.getUsername(SyncConfigActivity.this).toString();
         ContentResolver.requestSync(app.getAccount(usr), SugarCRMProvider.AUTHORITY, extras);
+        savePrefs();
+    }
+
+    private void savePrefs() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         long startMillis = mStartTime.toMillis(false /* use isDst */);
@@ -89,6 +99,28 @@ public class SyncConfigActivity extends Activity {
         editor.putLong(Util.PREF_SYNC_START_TIME, startMillis);
         editor.putLong(Util.PREF_SYNC_END_TIME, endMillis);
         editor.commit();
+    }
+
+    /**
+     * cancel Sync
+     * 
+     * @param v
+     */
+    public void cancelSync(View v) {
+        SugarCrmApp app = (SugarCrmApp) getApplication();
+        final String usr = SugarCrmSettings.getUsername(SyncConfigActivity.this).toString();
+        ContentResolver.cancelSync(app.getAccount(usr), SugarCRMProvider.AUTHORITY);
+    }
+
+    /**
+     * sync Later, closes the activity
+     * 
+     * @param v
+     */
+    public void syncLater(View v) {
+        savePrefs();
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     private void populateWhen() {
