@@ -259,7 +259,7 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " DESC";
+        public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " ASC";
 
         public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME, LAST_NAME,
                 CREATED_BY_NAME };
@@ -317,7 +317,7 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = NAME + " DESC";
+        public static final String DEFAULT_SORT_ORDER = NAME + " ASC";
 
         public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME,
                 OPPORTUNITY_TYPE, CREATED_BY_NAME };
@@ -398,7 +398,7 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = DATE_MODIFIED + " DESC";
+        public static final String DEFAULT_SORT_ORDER = DATE_MODIFIED + " ASC";
 
         public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER,
                 PRIORITY, DATE_MODIFIED, CREATED_BY_NAME };
@@ -448,7 +448,7 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = START_DATE + " DESC";
+        public static final String DEFAULT_SORT_ORDER = START_DATE + " ASC";
 
         public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
                 CREATED_BY_NAME };
@@ -498,7 +498,7 @@ public final class SugarCRMContent {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = START_DATE + " DESC";
+        public static final String DEFAULT_SORT_ORDER = START_DATE + " ASC";
 
         public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
                 CREATED_BY_NAME };
