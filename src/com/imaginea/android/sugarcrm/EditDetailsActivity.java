@@ -241,7 +241,7 @@ public class EditDetailsActivity extends Activity {
                     } else {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
-                    
+
                         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
                             mAccountName = (String) values[6];
                     }
@@ -285,7 +285,7 @@ public class EditDetailsActivity extends Activity {
                     } else {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
-                        
+
                         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
                             mAccountName = (String) values[6];
                     }
@@ -313,7 +313,7 @@ public class EditDetailsActivity extends Activity {
         protected Object doInBackground(Object... params) {
             try {
                 if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                    mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
+                    mCursor = getContentResolver().query(Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
                 }
                 setContents();
             } catch (Exception e) {
@@ -456,9 +456,12 @@ public class EditDetailsActivity extends Activity {
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
             modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
 
+        // used for all the modules that has relationship with Accounts
+        String accountRowId = null;
+        Uri uri = mIntentUri;
+
         Map<String, String> fieldsExcludedForEdit = mDbHelper.getFieldsExcludedForEdit();
         int rowsCount = 0;
-
         for (int i = 0; i < detailsProjection.length; i++) {
 
             String fieldName = detailsProjection[i];
@@ -475,30 +478,74 @@ public class EditDetailsActivity extends Activity {
             // TODO: validation
 
             if (!Util.ACCOUNTS.equals(mModuleName) && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
-                if (mSelectedAccountName != null && fieldValue != null) {
-                    // check if the field value is the selected value
-                    if (!mSelectedAccountName.equals(fieldValue)) {
-                        // account name is incorrect.
-                        hasError = true;
-                        // set the background color to red
-                        editText.setBackgroundColor(getResources().getColor(R.color.red));
-                    }
-                } else if (fieldValue != null && mSelectedAccountName == null) {
-                    if (mAccountName != null) {
-                        // check if the account name is exactly as the actual account name
-                        if (!mAccountName.equals(fieldValue)) {
-                            hasError = true;
-                            // set the background color to red
-                            editText.setBackgroundColor(getResources().getColor(R.color.red));
-                        }
-                    } else {
-                        // if the user just enters some value
 
-                        hasError = true;
-                        // set the background color to red
-                        editText.setBackgroundColor(getResources().getColor(R.color.red));
+                if (!TextUtils.isEmpty(fieldValue)) {
+
+                    if (!TextUtils.isEmpty(mSelectedAccountName)) {
+
+                        // check if the field value is the selected value
+                        if (mSelectedAccountName.equals(fieldValue)) {
+                            // get the account id for the account name
+                            String selection = AccountsColumns.NAME + "='" + mSelectedAccountName
+                                                            + "'";
+                            Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                            cursor.moveToFirst();
+                            accountRowId = cursor.getString(0);
+                            cursor.close();
+
+                            uri = Uri.withAppendedPath(mDbHelper.getModuleUri(Util.ACCOUNTS), accountRowId);
+                            uri = Uri.withAppendedPath(uri, mModuleName);
+                        } else {
+                            // account name is incorrect.
+                            hasError = true;
+                            editText.setBackgroundColor(getResources().getColor(R.color.red));
+                            editText.setTextColor(R.color.white);
+                        }
+
+                    } else {
+                        // mSelectedAccountName is null
+
+                        if (MODE != Util.NEW_RELATIONSHIP_MODE) {
+                            // in NEW_RELATIONSHIP_MODE, the editText is disabled.
+
+                            if (!TextUtils.isEmpty(mAccountName)) {
+                                // if the user doesn't change the account name and it remains the
+                                // same
+
+                                if (fieldValue.equals(mAccountName)) {
+                                    // get the account id for the account name
+                                    String selection = AccountsColumns.NAME + "='" + mAccountName
+                                                                    + "'";
+                                    Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                                    cursor.moveToFirst();
+                                    accountRowId = cursor.getString(0);
+                                    cursor.close();
+
+                                    uri = Uri.withAppendedPath(mDbHelper.getModuleUri(Util.ACCOUNTS), accountRowId);
+                                    uri = Uri.withAppendedPath(uri, mModuleName);
+                                }
+                            } else {
+                                // if the user just enters some value without selecting from the
+                                // auto-suggest
+
+                                hasError = true;
+                                editText.setBackgroundColor(getResources().getColor(R.color.red));
+                                editText.setTextColor(R.color.white);
+                            }
+                        }
+                    }
+                } else {
+                    // fieldValue is null
+
+                    // if there was a relationship with an account earlier and if it has been
+                    // removed now
+                    if (!TextUtils.isEmpty(mAccountName)) {
+                        // uri = Uri.withAppendedPath(mDbHelper.getModuleUri(Util.ACCOUNTS),
+                        // accountRowId);
+                        uri = Uri.withAppendedPath(uri, mModuleName);
                     }
                 }
+
             } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                 if (mSelectedUserName != null && fieldValue != null) {
                     if (!mSelectedUserName.equals(fieldValue)) {
@@ -531,12 +578,19 @@ public class EditDetailsActivity extends Activity {
         }
 
         if (!hasError) {
-
-            if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                ServiceHelper.startServiceForUpdate(getBaseContext(), Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId), mModuleName, mSugarBeanId, modifiedValues);
+            if (MODE == Util.EDIT_ORPHAN_MODE) {
+                if (uri == null) {
+                    uri = Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId);
+                } else {
+                    uri = Uri.withAppendedPath(uri, mRowId);
+                }
+                ServiceHelper.startServiceForUpdate(getBaseContext(), uri, mModuleName, mSugarBeanId, modifiedValues);
+            } else if (MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                uri = Uri.withAppendedPath(uri, mRowId);
+                ServiceHelper.startServiceForUpdate(getBaseContext(), uri, mModuleName, mSugarBeanId, modifiedValues);
             } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
                 modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
-                ServiceHelper.startServiceForInsert(getBaseContext(), mIntentUri, mModuleName, modifiedValues);
+                ServiceHelper.startServiceForInsert(getBaseContext(), uri, mModuleName, modifiedValues);
             } else if (MODE == Util.NEW_ORPHAN_MODE) {
                 modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
                 ServiceHelper.startServiceForInsert(getBaseContext(), mDbHelper.getModuleUri(mModuleName), mModuleName, modifiedValues);
