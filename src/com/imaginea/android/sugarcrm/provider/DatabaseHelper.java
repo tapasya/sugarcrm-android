@@ -128,6 +128,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<String> moduleList;
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
+    
+    private static final HashMap<String, String[]> moduleListProjections = new HashMap<String, String[]>();
 
     private static final HashMap<String, String[]> moduleListSelections = new HashMap<String, String[]>();
 
@@ -182,6 +184,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleProjections.put(Util.CALLS, Calls.DETAILS_PROJECTION);
         moduleProjections.put(Util.MEETINGS, Meetings.DETAILS_PROJECTION);
 
+        // module list projections
+        moduleListProjections.put(Util.ACCOUNTS, Accounts.LIST_PROJECTION);
+        moduleListProjections.put(Util.CONTACTS, Contacts.LIST_PROJECTION);
+        moduleListProjections.put(Util.LEADS, Leads.LIST_PROJECTION);
+        moduleListProjections.put(Util.OPPORTUNITIES, Opportunities.LIST_PROJECTION);
+        moduleListProjections.put(Util.CASES, Cases.LIST_PROJECTION);
+        moduleListProjections.put(Util.CALLS, Calls.LIST_PROJECTION);
+        moduleListProjections.put(Util.MEETINGS, Meetings.LIST_PROJECTION);
+        
         // Module List Selections
         moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CONTACTS, Contacts.LIST_VIEW_PROJECTION);
@@ -194,6 +205,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Default sort orders
         moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.CONTACTS, Contacts.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.LEADS, Leads.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.OPPORTUNITIES, Opportunities.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.CASES, Cases.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.CALLS, Calls.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.MEETINGS, Meetings.DEFAULT_SORT_ORDER);
 
         // Content Uris
         moduleUris.put(Util.ACCOUNTS, Accounts.CONTENT_URI);
@@ -821,6 +837,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String[] getModuleProjections(String moduleName) {
         return moduleProjections.get(moduleName);
+    }
+    
+    public String[] getModuleListProjections(String moduleName) {
+        return moduleListProjections.get(moduleName);
     }
 
     public String[] getModuleListSelections(String moduleName) {
