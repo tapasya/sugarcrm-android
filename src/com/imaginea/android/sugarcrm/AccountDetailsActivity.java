@@ -143,6 +143,7 @@ public class AccountDetailsActivity extends Activity {
         inflater.inflate(R.menu.details_activity_menu, menu);
 
         SubMenu relationshipMenu = menu.addSubMenu(0, R.string.related, 0, getString(R.string.related));
+        relationshipMenu.setIcon(R.drawable.related);
         for (int i = 0; i < mRelationshipModules.length; i++) {
             relationshipMenu.add(0, Menu.FIRST + i, 0, mRelationshipModules[i]);
         }
