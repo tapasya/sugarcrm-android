@@ -14,7 +14,7 @@
           android:smallScreens="true"                   
           android:anyDensity="true" />
           
-    <application android:icon="@drawable/icon" 
+    <application android:icon="@drawable/applaunch" 
     	android:label="@string/appName" 
 	    android:name="SugarCrmApp"
 	    android:debuggable="true">
@@ -35,7 +35,7 @@
 			</intent-filter>
 			<meta-data android:name="android.app.default_searchable"
                android:value=".SearchActivity" />
-		</activity>			
+		</activity>
         
         <activity android:name=".SugarCrmSettings" android:label="@string/settings"
         	 android:theme="@android:style/Theme.Light">
@@ -70,7 +70,7 @@
 	        </intent-filter>
 	        <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
 	    </activity>
-               
+
         <activity android:name=".WizardActivity" 
 			android:label="@string/appName"
 			android:theme="@android:style/Theme.Light.NoTitleBar"
