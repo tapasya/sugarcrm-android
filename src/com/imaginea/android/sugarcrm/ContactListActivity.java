@@ -254,13 +254,14 @@ public class ContactListActivity extends ListActivity {
             if (constraint != null) {
                 buffer = new StringBuilder();
                 buffer.append("UPPER(");
-                buffer.append(AccountsColumns.NAME);
+                buffer.append(mDbHelper.getModuleListSelections(mModuleName)[0]);
                 buffer.append(") GLOB ?");
                 args = new String[] { constraint.toString().toUpperCase() + "*" };
             }
 
-            return mContent.query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, buffer == null ? null
-                                            : buffer.toString(), args, Accounts.DEFAULT_SORT_ORDER);
+            
+            return mContent.query(mDbHelper.getModuleUri(mModuleName), mDbHelper.getModuleListProjections(mModuleName), buffer == null ? null
+                                            : buffer.toString(), args, mDbHelper.getModuleSortOrder(mModuleName));
         }
     }
 
