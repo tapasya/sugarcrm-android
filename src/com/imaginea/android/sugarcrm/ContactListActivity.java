@@ -635,6 +635,11 @@ public class ContactListActivity extends ListActivity {
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
+    
+    public void showHome(View view) {
+        Intent homeIntent = new Intent(this, DashboardActivity.class);
+        startActivity(homeIntent);
+    }
 
     public void callNumber(int position) {
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
