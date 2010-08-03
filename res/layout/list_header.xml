@@ -10,11 +10,18 @@
 		android:layout_height="wrap_content"
 		style="@style/header_text_label" 				 		
 		/>
-		<ImageView 
+		<ImageView
+			android:id="@+id/filterImage" 
 			android:src="@drawable/icon"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:onClick="showAssignedItems" 
 			android:layout_toRightOf="@id/headerText"
-			android:layout_alignParentRight="true"/>   
+			android:layout_alignParentRight="true"/>
+		<ImageView 
+			android:src="@drawable/home"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="showHome" 
+			android:layout_toRightOf="@id/filterImage"/>   
 </RelativeLayout>
