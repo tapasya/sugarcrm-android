@@ -878,6 +878,8 @@ public class SugarCRMProvider extends ContentProvider {
                                                     + contactId;
                     //relationValues.put(AccountsContactsColumns.DELETED, "1");
                     //db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, relationValues, selection, null);
+                    //TODO: should it be delete / update ? 
+                    // if its just update, then the unique constraint doesn't allow to insert a new relationship
                     db.delete(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, selection, null);
                     Log.i(TAG, "deleted relation: contactId - "+ contactId + " oldAccountId - " + oldAccountId);
 
