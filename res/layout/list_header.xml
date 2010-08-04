@@ -35,7 +35,7 @@
 			android:src="@drawable/all_items_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:onClick="showAssignedItems"			
+			android:onClick="showAllItems"			
 			 />
 		  </LinearLayout>
 </RelativeLayout>
