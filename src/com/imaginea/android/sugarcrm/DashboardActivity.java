@@ -97,7 +97,7 @@ public class DashboardActivity extends Activity {
 
     void showDashboard() {
         mModuleNames = mDbHelper.getModuleList();
-        mModuleNames.add("Settings");
+        mModuleNames.add(getString(R.string.settings));
         Collections.sort(mModuleNames);
         mDashboard.setAdapter(new AppsAdapter(this));
     }
