@@ -186,8 +186,10 @@ public class SugarCRMProvider extends ContentProvider {
                                             + "." + AccountsOpportunitiesColumns.OPPORTUNITY_ID
                                             + "=" + DatabaseHelper.OPPORTUNITIES_TABLE_NAME + "."
                                             + Opportunities.ID;
-            Map<String, String> oppurtunityProjectionMap = getProjectionMap(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection);
-            qb.setProjectionMap(oppurtunityProjectionMap);
+            Map<String, String> opportunityProjectionMap = getProjectionMap(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection);
+            qb.setProjectionMap(opportunityProjectionMap);
+            
+            sortOrder = DatabaseHelper.OPPORTUNITIES_TABLE_NAME + "." + OpportunitiesColumns.NAME + " ASC";
             c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
 
             break;
@@ -212,6 +214,8 @@ public class SugarCRMProvider extends ContentProvider {
                                             + DatabaseHelper.CASES_TABLE_NAME + "." + Cases.ID;
             Map<String, String> casesProjectionMap = getProjectionMap(DatabaseHelper.CASES_TABLE_NAME, projection);
             qb.setProjectionMap(casesProjectionMap);
+            
+            sortOrder = DatabaseHelper.CASES_TABLE_NAME + "." + CasesColumns.NAME + " ASC";
             c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
 
             break;
@@ -267,8 +271,8 @@ public class SugarCRMProvider extends ContentProvider {
                                             + "." + ContactsOpportunitiesColumns.OPPORTUNITY_ID
                                             + "=" + DatabaseHelper.OPPORTUNITIES_TABLE_NAME + "."
                                             + Opportunities.ID;
-            oppurtunityProjectionMap = getProjectionMap(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection);
-            qb.setProjectionMap(oppurtunityProjectionMap);
+            opportunityProjectionMap = getProjectionMap(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection);
+            qb.setProjectionMap(opportunityProjectionMap);
             c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
 
             break;
@@ -350,8 +354,10 @@ public class SugarCRMProvider extends ContentProvider {
                                             + "." + ContactsOpportunitiesColumns.OPPORTUNITY_ID
                                             + "=" + DatabaseHelper.OPPORTUNITIES_TABLE_NAME + "."
                                             + Opportunities.ID;
-            oppurtunityProjectionMap = getProjectionMap(DatabaseHelper.CONTACTS_TABLE_NAME, projection);
-            qb.setProjectionMap(oppurtunityProjectionMap);
+            opportunityProjectionMap = getProjectionMap(DatabaseHelper.CONTACTS_TABLE_NAME, projection);
+            qb.setProjectionMap(opportunityProjectionMap);
+            
+            sortOrder = DatabaseHelper.CONTACTS_TABLE_NAME + "." + ContactsColumns.FIRST_NAME + " ASC";
             c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
 
             break;
