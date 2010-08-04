@@ -554,34 +554,32 @@ public class EditDetailsActivity extends Activity {
                     // if there was a relationship with an account earlier and if it has been
                     // removed now
                     if (!TextUtils.isEmpty(mAccountName)) {
-                        // uri = Uri.withAppendedPath(mDbHelper.getModuleUri(Util.ACCOUNTS),
-                        // accountRowId);
                         uri = Uri.withAppendedPath(uri, mModuleName);
                     }
                 }
 
             } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
-                if (mSelectedUserName != null && fieldValue != null) {
-                    if (!mSelectedUserName.equals(fieldValue)) {
-                        // user name is incorrect.
-                        hasError = true;
-                        // set the background color to red
-                        editText.setBackgroundColor(getResources().getColor(R.color.red));
-                    }
-                } else if (fieldValue != null && mSelectedUserName == null) {
-                    if (mUserName != null) {
-                        // check if the username is exactly as the actual username
-                        if (!mUserName.equals(fieldValue)) {
+                if (!TextUtils.isEmpty(fieldValue)) {
+                    if (!TextUtils.isEmpty(mSelectedUserName)) {
+                        // check if the field value is the selected value
+                        if (!mSelectedUserName.equals(fieldValue)) {
+                            // user name is incorrect.
                             hasError = true;
-                            // set the background color to red
-                            editText.setBackgroundColor(getResources().getColor(R.color.red));
+                            editText.setError(getString(R.string.userNameErrorMsg));
                         }
                     } else {
-                        // if the user just enters some value
+                        if (!TextUtils.isEmpty(mUserName)) {
+                            // check if the username is exactly as the actual username
+                            if (!mUserName.equals(fieldValue)) {
+                                hasError = true;
+                                editText.setError(getString(R.string.userNameErrorMsg));
+                            }
+                        } else {
+                            // if the user just enters some value
 
-                        hasError = true;
-                        // set the background color to red
-                        editText.setBackgroundColor(getResources().getColor(R.color.red));
+                            hasError = true;
+                            editText.setError(getString(R.string.userNameErrorMsg));
+                        }
                     }
                 }
             }
