@@ -220,7 +220,8 @@ public class EditDetailsActivity extends Activity {
                 TextView labelView = (TextView) values[3];
                 labelView.setText((String) values[4]);
                 AutoCompleteTextView valueView = (AutoCompleteTextView) values[5];
-                valueView.setText((String) values[6]);
+                String editTextValue = (String) values[6];
+                valueView.setText(editTextValue);
 
                 // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
@@ -243,14 +244,18 @@ public class EditDetailsActivity extends Activity {
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
 
                         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
-                            mAccountName = (String) values[6];
+                            if (!TextUtils.isEmpty(editTextValue)) {
+                                mAccountName = editTextValue;
+                            }
                     }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
 
                     if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                        mUserName = (String) values[6];
+                        if (!TextUtils.isEmpty(editTextValue)) {
+                            mUserName = editTextValue;
+                        }
                     }
                 }
                 break;
@@ -264,7 +269,8 @@ public class EditDetailsActivity extends Activity {
                 labelView = (TextView) values[3];
                 labelView.setText((String) values[4]);
                 valueView = (AutoCompleteTextView) values[5];
-                valueView.setText((String) values[6]);
+                editTextValue = (String) values[6];
+                valueView.setText(editTextValue);
 
                 // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
@@ -286,15 +292,20 @@ public class EditDetailsActivity extends Activity {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
 
-                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
-                            mAccountName = (String) values[6];
+                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                            if (!TextUtils.isEmpty(editTextValue)) {
+                                mAccountName = editTextValue;
+                            }
+                        }
                     }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
 
                     if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                        mUserName = (String) values[6];
+                        if (!TextUtils.isEmpty(editTextValue)) {
+                            mUserName = editTextValue;
+                        }
                     }
                 }
 
@@ -498,9 +509,7 @@ public class EditDetailsActivity extends Activity {
                         } else {
                             // account name is incorrect.
                             hasError = true;
-                            editText.setError("account name is incorrect");
-                            //editText.setBackgroundColor(getResources().getColor(R.color.red));
-                            //editText.setTextColor(R.color.white);
+                            editText.setError(getString(R.string.accountNameErrorMsg));
                         }
 
                     } else {
@@ -514,6 +523,7 @@ public class EditDetailsActivity extends Activity {
                                 // same
 
                                 if (fieldValue.equals(mAccountName)) {
+
                                     // get the account id for the account name
                                     String selection = AccountsColumns.NAME + "='" + mAccountName
                                                                     + "'";
@@ -524,14 +534,17 @@ public class EditDetailsActivity extends Activity {
 
                                     uri = Uri.withAppendedPath(mDbHelper.getModuleUri(Util.ACCOUNTS), accountRowId);
                                     uri = Uri.withAppendedPath(uri, mModuleName);
+                                } else {
+                                    // if the user just enters some value without selecting from the
+                                    // auto-suggest
+                                    hasError = true;
+                                    editText.setError(getString(R.string.accountNameErrorMsg));
                                 }
                             } else {
                                 // if the user just enters some value without selecting from the
                                 // auto-suggest
-
                                 hasError = true;
-                                editText.setBackgroundColor(getResources().getColor(R.color.red));
-                                editText.setTextColor(R.color.white);
+                                editText.setError(getString(R.string.accountNameErrorMsg));
                             }
                         }
                     }
