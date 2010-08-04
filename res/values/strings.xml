@@ -113,5 +113,9 @@
 	<string name="billing_address">Billing Address</string>
     <string name="shipping_address">Shipping Address</string>
     <string name="duration">Duration</string>
+    
+    <!-- Error messages for validations in EditDetailsActivity -->
+    <string name="accountNameErrorMsg">Account name has to be selected only from the auto-suggest drop down!</string>
+    <string name="userNameErrorMsg">User name has to be selected only from the auto-suggest drop down!</string>
 
 </resources>
