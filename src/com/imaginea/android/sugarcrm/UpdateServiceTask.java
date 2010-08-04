@@ -3,6 +3,8 @@ package com.imaginea.android.sugarcrm;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,6 +12,7 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.sync.SyncRecord;
 import com.imaginea.android.sugarcrm.util.RelationshipStatus;
 import com.imaginea.android.sugarcrm.util.RestUtil;
@@ -63,7 +66,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         // current module being updated/inserted/deleted
         mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
 
-        if (mUri.getPathSegments().size() == 3) {
+        if (mUri.getPathSegments().size() >= 3) {
             mParentModuleName = mUri.getPathSegments().get(0);
             String relatedModuleName = mUri.getPathSegments().get(2);
             mLinkFieldName = mDbHelper.getLinkfieldName(relatedModuleName);
@@ -94,7 +97,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 switch (mCommand) {
                 case Util.INSERT:
                     // inserts with a relationship
-                    if (!TextUtils.isEmpty(mLinkFieldName)) {
+                    if (mUri.getPathSegments().size() >= 3) {
 
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         if (updatedBeanId != null) {
@@ -138,22 +141,76 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
                 // make the same calls for update and delete as delete only changes the DELETED flag
                 // to 1
-                case Util.UPDATE:                    
-                case Util.DELETE:
-
+                case Util.UPDATE:
                     String serverUpdatedBeanId = null;
-                    // updates / deletes - relationship
-                    if (mLinkFieldName != null) {
+                    // updates - relationship
+                    if (mUri.getPathSegments().size() >= 3) {
                         String rowId = mUri.getPathSegments().get(1);
                         mBeanId = mDbHelper.lookupBeanId(mParentModuleName, rowId);
 
+                        String moduleName = mUri.getPathSegments().get(2);
                         // related BeanId
                         rowId = mUri.getPathSegments().get(3);
                         updatedBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
 
                         serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
-                        Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  serverUpdatedBeanId : " + serverUpdatedBeanId );
+                        if(Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  serverUpdatedBeanId : "
+                                                        + serverUpdatedBeanId);
                         if (serverUpdatedBeanId.equals(updatedBeanId)) {
+
+                            String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
+                            if (!TextUtils.isEmpty(accountName)) {
+                                // delete the relationship if there exists one
+                                /*
+                                 * get the bean_id of the old accountId and call the setRelationship
+                                 * with delete flasg as 1
+                                 */
+                                SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+                                String selection = mDbHelper.getAccountRelationsSelection(moduleName)
+                                                                + "=" + rowId;
+                                Cursor cursor = db.query(mDbHelper.getAccountRelationsTableName(moduleName), new String[] { ModuleFields.ACCOUNT_ID }, selection, null, null, null, null);
+                                cursor.moveToFirst();
+                                String accountRowId = cursor.getString(0);
+                                cursor.close();
+
+                                selection = AccountsColumns.ID + "=" + accountRowId;
+                                cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, new String[] { AccountsColumns.BEAN_ID }, selection, null, null, null, null);
+                                cursor.moveToFirst();
+                                String accountBeanId = cursor.getString(0);
+                                cursor.close();
+
+                                db.close();
+                                if(Log.isLoggable(TAG, Log.DEBUG))
+                                    Log.d(TAG, "updating delete flag for relationship with account bean id : "
+                                                                + accountBeanId
+                                                                + " linkFieldName : "
+                                                                + mDbHelper.getLinkfieldName(moduleName)
+                                                                + " bean Id : " + updatedBeanId);
+                                RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, accountBeanId, mDbHelper.getLinkfieldName(moduleName), new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.DELETED_ITEM);
+
+                                if (status.getCreatedCount() >= 1) {
+                                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                                        Log.d(TAG, "updating delete flag for relationship is also set!");
+                                    }
+                                    serverUpdated = true;
+                                } else {
+                                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                                        Log.d(TAG, "updating delete flag for relationship failed!");
+                                    }
+                                    serverUpdated = false;
+                                }
+                            }
+
+                            if(Log.isLoggable(TAG, Log.DEBUG)){
+                                Log.d(TAG, "updating relationship with parent module : "
+                                                            + mParentModuleName
+                                                            + " parent bean Id : " + mBeanId);
+                                Log.d(TAG, "updating relationship with link field name : "
+                                                            + mLinkFieldName
+                                                            + " updated bean Id : " + updatedBeanId);
+                            }
                             RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
                             if (Log.isLoggable(TAG, Log.DEBUG)) {
                                 Log.d(TAG, "created: " + status.getCreatedCount() + " failed: "
@@ -178,23 +235,36 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                             serverUpdated = false;
                         }
                     } else {
-                        Log.i(TAG, "update/delete orphan : uri - " + mUri);
-                        String rowId = mUri.getPathSegments().get(1);
+                        String rowId = mUri.getLastPathSegment();
                         mBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
                         mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         mUpdateNameValueMap.remove(SugarCRMContent.SUGAR_BEAN_ID);
-                        Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  mBeanId : " + mBeanId );
-                        
+                        if(Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  mBeanId : " + mBeanId);
+
                         if (mBeanId.equals(updatedBeanId)) {
-                            String accountName = (String)values.get(ModuleFields.ACCOUNT_NAME);
-                            String accountBeanId = mDbHelper.lookupBeanId(Util.ACCOUNTS, rowId);
-                            //RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
-                            //TODO:
                             serverUpdated = true;
                         } else {
                             serverUpdated = false;
                         }
+
+                    }
+                    break;
+                case Util.DELETE:
+                    String rowId = mUri.getPathSegments().get(1);
+                    mBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
+                    mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
+                    updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                    if(Log.isLoggable(TAG, Log.DEBUG))
+                        Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  mBeanId : " + mBeanId);
+
+                    mUpdateNameValueMap.remove(SugarCRMContent.SUGAR_BEAN_ID);
+
+                    if (mBeanId.equals(updatedBeanId)) {
+                        serverUpdated = true;
+                    } else {
+                        serverUpdated = false;
                     }
                     break;
                 }
@@ -202,7 +272,6 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
             switch (mCommand) {
             case Util.INSERT:
-                //TODO:  relationship or orphan
                 for (String key : mUpdateNameValueMap.keySet()) {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
@@ -220,7 +289,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                      */
                     values.put(SugarCRMContent.SUGAR_BEAN_ID, "Sync" + UUID.randomUUID());
                     Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
-                    // after success ul insertion, we set the updatedRow to 1 so we dont get a fail
+                    // after success url insertion, we set the updatedRow to 1 so we dont get a fail
                     // msg
                     updatedRows = 1;
                     Log.i(TAG, "insertResultURi - " + insertResultUri);
@@ -229,30 +298,24 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 break;
 
             case Util.UPDATE:
-                //TODO: relationship or orphan
-                
+
                 for (String key : mUpdateNameValueMap.keySet()) {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
                 updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
-                
+
                 if (!serverUpdated && updatedRows > 0) {
                     updateSyncRecord();
                 }
                 break;
 
             case Util.DELETE:
-                
-                //TODO: relationship or orphan
-                
+
                 if (serverUpdated) {
                     updatedRows = mContext.getContentResolver().delete(mUri, null, null);
                 } else {
                     // this will update just the delete column, sets it to 1
                     values.put(ModuleFields.DELETED, Util.DELETED_ITEM);
-                    // for (String key : mUpdateNameValueMap.keySet()) {
-                    // values.put(key, mUpdateNameValueMap.get(key));
-                    // }
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                     if (updatedRows > 0)
                         updateSyncRecord();
