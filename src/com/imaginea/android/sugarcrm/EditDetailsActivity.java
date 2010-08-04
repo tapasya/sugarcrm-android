@@ -498,8 +498,9 @@ public class EditDetailsActivity extends Activity {
                         } else {
                             // account name is incorrect.
                             hasError = true;
-                            editText.setBackgroundColor(getResources().getColor(R.color.red));
-                            editText.setTextColor(R.color.white);
+                            editText.setError("account name is incorrect");
+                            //editText.setBackgroundColor(getResources().getColor(R.color.red));
+                            //editText.setTextColor(R.color.white);
                         }
 
                     } else {
