@@ -142,10 +142,6 @@ public class ContactListActivity extends ListActivity {
         // when needed.
         // TODO - optimize this, if we sync up a dataset, then no need to run detail projection
         // here, just do a list projection
-
-        // if the parentModuleName is not null, then it is the list of relationship beans
-        // String parentModuleName = extras.getString(RestUtilConstants.PARENT_MODULE_NAME);
-
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), mSelections, mSelectionArgs, mDbHelper.getModuleSortOrder(mModuleName));
 
         // CRMContentObserver observer = new CRMContentObserver()
@@ -259,7 +255,6 @@ public class ContactListActivity extends ListActivity {
                 args = new String[] { constraint.toString().toUpperCase() + "*" };
             }
 
-            
             return mContent.query(mDbHelper.getModuleUri(mModuleName), mDbHelper.getModuleListProjections(mModuleName), buffer == null ? null
                                             : buffer.toString(), args, mDbHelper.getModuleSortOrder(mModuleName));
         }
@@ -635,7 +630,7 @@ public class ContactListActivity extends ListActivity {
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
-    
+
     public void showHome(View view) {
         Intent homeIntent = new Intent(this, DashboardActivity.class);
         startActivity(homeIntent);
