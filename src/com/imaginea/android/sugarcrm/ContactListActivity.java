@@ -631,6 +631,12 @@ public class ContactListActivity extends ListActivity {
         mAdapter.notifyDataSetChanged();
     }
 
+    public void showAllItems(View view) {
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
+        mAdapter.changeCursor(cursor);
+        mAdapter.notifyDataSetChanged();
+    }
+    
     public void showHome(View view) {
         Intent homeIntent = new Intent(this, DashboardActivity.class);
         startActivity(homeIntent);
