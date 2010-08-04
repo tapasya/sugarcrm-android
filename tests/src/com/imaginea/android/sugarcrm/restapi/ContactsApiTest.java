@@ -1,5 +1,7 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,14 +34,26 @@ public class ContactsApiTest extends RestAPITest {
 
     @SmallTest
     public void testGetAllModuleFields() throws Exception {
-
         // RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
     }
 
     @SmallTest
     public void testGetCustomModuleFields() throws Exception {
-
         // RestUtil.getModuleFields(url, mSessionId, moduleName, customFields);
+    }
+
+    @SmallTest
+    public void testEntriesByDate() throws Exception {
+        int offset = 0;
+        int maxResults = 20;
+        SugarBean[] sBeans = getSugarBeansFilterByDate(offset, maxResults);
+        int totalRuns = 1;
+        while (sBeans.length > 0) {
+            offset += 20;
+            sBeans = getSugarBeans(offset, maxResults);
+            totalRuns++;
+        }
+        Log.d(LOG_TAG, "Total Runs:" + totalRuns);
     }
 
     @SmallTest
@@ -87,6 +101,22 @@ public class ContactsApiTest extends RestAPITest {
     private SugarBean[] getSugarBeans(int offset, int maxResults) throws Exception {
         String query = "", orderBy = "";
 
+        int deleted = 0;
+
+        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset
+                                        + "", selectFields, linkNameToFieldsArray, maxResults + "", deleted
+                                        + "");
+        return sBeans;
+    }
+
+    private SugarBean[] getSugarBeansFilterByDate(int offset, int maxResults) throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        java.util.Date date = new java.util.Date();
+        date.setDate(date.getDate() - 1);
+
+        String query = moduleName + "." + ModuleFields.DATE_MODIFIED + ">'"
+                                        + dateFormat.format(date) + "'";
+        String orderBy = "";
         int deleted = 0;
 
         SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset
