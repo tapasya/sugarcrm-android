@@ -9,18 +9,33 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			style="@style/header_text_label" />
-		<ImageView
-			android:id="@+id/filterImage" 
-			android:src="@drawable/icon"
+		<LinearLayout android:id="@+id/toolBar"
+			android:orientation="horizontal"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:onClick="showAssignedItems" 
-			android:layout_toRightOf="@id/headerText" />
-		<ImageView 
+    		android:layout_height="wrap_content"
+    		android:layout_alignParentRight="true"
+    		android:layout_toRightOf="@id/headerText"
+    		android:layout_centerVertical="true">
+			
+		<ImageView android:id="@+id/home"
 			android:src="@drawable/home"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:onClick="showHome" 
-			android:layout_toRightOf="@id/filterImage"
-			android:layout_alignParentRight="true" />   
+			android:onClick="showHome" 							
+			/> 
+		<ImageView
+			android:id="@+id/filterImage" 
+			android:src="@drawable/my_items_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="showAssignedItems" 			
+			/>
+		<ImageView
+			android:id="@+id/allItems" 
+			android:src="@drawable/all_items_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="showAssignedItems"			
+			 />
+		  </LinearLayout>
 </RelativeLayout>
