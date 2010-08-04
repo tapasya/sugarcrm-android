@@ -128,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<String> moduleList;
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
-    
+
     private static final HashMap<String, String[]> moduleListProjections = new HashMap<String, String[]>();
 
     private static final HashMap<String, String[]> moduleListSelections = new HashMap<String, String[]>();
@@ -144,6 +144,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static HashMap<String, HashMap<String, LinkField>> linkFields;
 
     private static final HashMap<String, String[]> moduleRelationshipItems = new HashMap<String, String[]>();
+
+    private static final HashMap<String, String[]> relationshipTables = new HashMap<String, String[]>();
+
+    private static final HashMap<String, String> accountRelationsSelection = new HashMap<String, String>();
+
+    private static final HashMap<String, String> accountRelationsTableName = new HashMap<String, String>();
 
     private static final HashMap<String, String> linkfieldNames = new HashMap<String, String>();
 
@@ -162,7 +168,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private Context mContext;
 
     private static String mSelection = SugarCRMContent.RECORD_ID + "=?";
-    
+
     static {
 
         // Icons projection
@@ -192,7 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleListProjections.put(Util.CASES, Cases.LIST_PROJECTION);
         moduleListProjections.put(Util.CALLS, Calls.LIST_PROJECTION);
         moduleListProjections.put(Util.MEETINGS, Meetings.LIST_PROJECTION);
-        
+
         // Module List Selections
         moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CONTACTS, Contacts.LIST_VIEW_PROJECTION);
@@ -233,6 +239,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // moduleRelationshipItems.put(Util.CASES, new String[] { Util.CONTACTS });
         // moduleRelationshipItems.put(Util.CALLS, new String[] { Util.CONTACTS });
         // moduleRelationshipItems.put(Util.MEETINGS, new String[] { Util.CONTACTS });
+
+        // relationship tables for each module
+        relationshipTables.put(Util.CONTACTS, new String[] { ACCOUNTS_CONTACTS_TABLE_NAME,
+                CONTACTS_OPPORTUNITIES_TABLE_NAME });
+        relationshipTables.put(Util.LEADS, new String[] {});
+        relationshipTables.put(Util.OPPORTUNITIES, new String[] {
+                ACCOUNTS_OPPORTUNITIES_TABLE_NAME, CONTACTS_OPPORTUNITIES_TABLE_NAME });
+        relationshipTables.put(Util.CASES, new String[] { ACCOUNTS_CASES_TABLE_NAME });
+        relationshipTables.put(Util.CALLS, new String[] {});
+        relationshipTables.put(Util.MEETINGS, new String[] {});
+
+        // selection for the moduleName that has relationship with Accounts module
+        // moduleName vs  selection column name
+        accountRelationsSelection.put(Util.CONTACTS, ModuleFields.CONTACT_ID);
+        accountRelationsSelection.put(Util.OPPORTUNITIES, ModuleFields.OPPORTUNITY_ID);
+        accountRelationsSelection.put(Util.CASES, Util.CASE_ID);
+
+        // table name for the relationships with Accounts module
+        // moduleName vas relationship table name
+        accountRelationsTableName.put(Util.CONTACTS, ACCOUNTS_CONTACTS_TABLE_NAME);
+        accountRelationsTableName.put(Util.OPPORTUNITIES, ACCOUNTS_OPPORTUNITIES_TABLE_NAME);
+        accountRelationsTableName.put(Util.CASES, ACCOUNTS_CASES_TABLE_NAME);
 
         linkfieldNames.put(Util.CONTACTS, "contacts");
         linkfieldNames.put(Util.LEADS, "leads");
@@ -282,6 +310,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         fieldsExcludedForDetails.put(SugarCRMContent.SUGAR_BEAN_ID, SugarCRMContent.SUGAR_BEAN_ID);
         fieldsExcludedForDetails.put(ModuleFields.DELETED, ModuleFields.DELETED);
         fieldsExcludedForDetails.put(ModuleFields.ACCOUNT_ID, ModuleFields.ACCOUNT_ID);
+
     }
 
     public DatabaseHelper(Context context) {
@@ -838,7 +867,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String[] getModuleProjections(String moduleName) {
         return moduleProjections.get(moduleName);
     }
-    
+
     public String[] getModuleListProjections(String moduleName) {
         return moduleListProjections.get(moduleName);
     }
@@ -871,6 +900,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // TODO - get from DB
     public String[] getModuleRelationshipItems(String moduleName) {
         return moduleRelationshipItems.get(moduleName);
+    }
+
+    public String[] getRelationshipTables(String moduleName) {
+        return relationshipTables.get(moduleName);
+    }
+
+    public String getAccountRelationsSelection(String moduleName) {
+        return accountRelationsSelection.get(moduleName);
+    }
+
+    public String getAccountRelationsTableName(String moduleName) {
+        return accountRelationsTableName.get(moduleName);
     }
 
     public List<String> getModuleList() {
@@ -1481,5 +1522,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return beanId;
+    }
+
+    /**
+     * Returns the corresponding account beanId id , or null if the item is not found.
+     * 
+     */
+    public String lookupAccountBeanId(String moduleName, String rowId) {
+
+        if (moduleRelationshipItems.containsKey(moduleName)) {
+
+            ContentResolver resolver = mContext.getContentResolver();
+            String beanId = null;
+            Uri contentUri = getModuleUri(moduleName);
+            String[] projection = new String[] { SugarCRMContent.SUGAR_BEAN_ID };
+
+            final Cursor c = resolver.query(contentUri, projection, mSelection, new String[] { rowId }, null);
+            try {
+                if (c.moveToFirst()) {
+                    beanId = c.getString(0);
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+            return beanId;
+        }
+
+        return null;
     }
 }
