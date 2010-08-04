@@ -108,16 +108,9 @@ public class SugarCRMProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                                     String sortOrder) {
         Cursor c = null;
-        int size = uri.getPathSegments().size();
         String maxResultsLimit = null;
         String offset = null;
-        String module;
-
-        if (size == 3) {
-            offset = uri.getPathSegments().get(1);
-            maxResultsLimit = uri.getPathSegments().get(2);
-        }
-        // SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        
         // Get the database and run the query
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 
@@ -154,7 +147,10 @@ public class SugarCRMProvider extends ContentProvider {
                                             + DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME + "."
                                             + AccountsContactsColumns.CONTACT_ID + "="
                                             + DatabaseHelper.CONTACTS_TABLE_NAME + "."
-                                            + Contacts.ID;
+                                            + Contacts.ID + " AND " 
+                                            + DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME + "." 
+                                            + AccountsContactsColumns.DELETED + "=" 
+                                            + Util.NEW_ITEM;
             Map<String, String> contactsProjectionMap = getProjectionMap(DatabaseHelper.CONTACTS_TABLE_NAME, projection);
             qb.setProjectionMap(contactsProjectionMap);
             c = qb.query(db, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, sortOrder, "");
@@ -446,11 +442,10 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case ACCOUNT_CONTACT:
-            String parentModuleName = uri.getPathSegments().get(0);
             String accountId = uri.getPathSegments().get(1);
             String selection = AccountsColumns.ID + "=" + accountId;
 
-            Uri parentUri = mOpenHelper.getModuleUri(parentModuleName);
+            Uri parentUri = mOpenHelper.getModuleUri(Util.ACCOUNTS);
             Cursor cursor = query(parentUri, Accounts.DETAILS_PROJECTION, selection, null, null);
             boolean rowsPresent = cursor.moveToFirst();
             if (Log.isLoggable(TAG, Log.VERBOSE))
@@ -471,6 +466,7 @@ public class SugarCRMProvider extends ContentProvider {
                 ContentValues val2 = new ContentValues();
                 val2.put(AccountsContactsColumns.ACCOUNT_ID, accountId);
                 val2.put(AccountsContactsColumns.CONTACT_ID, rowId);
+                val2.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
                 // TODO - delete flag and date_modified
                 db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val2);
 
@@ -481,7 +477,7 @@ public class SugarCRMProvider extends ContentProvider {
         case ACCOUNT_LEAD:
             accountId = uri.getPathSegments().get(1);
             selection = AccountsColumns.ID + "=" + accountId;
-            cursor = query(mOpenHelper.getModuleUri("Accounts"), Accounts.DETAILS_PROJECTION, selection, null, null);
+            cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.DETAILS_PROJECTION, selection, null, null);
             cursor.moveToFirst();
             accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
             values.put(ModuleFields.ACCOUNT_ID, accountId);
@@ -497,11 +493,10 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case ACCOUNT_OPPORTUNITY:
-            parentModuleName = uri.getPathSegments().get(0);
             accountId = uri.getPathSegments().get(1);
             selection = AccountsColumns.ID + "=" + accountId;
 
-            cursor = query(mOpenHelper.getModuleUri(parentModuleName), Accounts.DETAILS_PROJECTION, selection, null, null);
+            cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.DETAILS_PROJECTION, selection, null, null);
             cursor.moveToFirst();
             accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
             // values.put(Contacts.ACCOUNT_ID, accountId);
@@ -524,11 +519,10 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case ACCOUNT_CASE:
-            parentModuleName = uri.getPathSegments().get(0);
             accountId = uri.getPathSegments().get(1);
             selection = AccountsColumns.ID + "=" + accountId;
 
-            // cursor = query(mOpenHelper.getModuleUri(parentModuleName),
+            // cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS),
             // Accounts.DETAILS_PROJECTION, selection, null, null);
             // cursor.moveToFirst();
             // accountName = cursor.getString(cursor.getColumnIndex(AccountsColumns.NAME));
@@ -570,12 +564,10 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case CONTACT_OPPORTUNITY:
-
-            parentModuleName = uri.getPathSegments().get(0);
             String contactId = uri.getPathSegments().get(1);
             selection = Contacts.ID + "=" + contactId;
 
-            // cursor = query(mOpenHelper.getModuleUri(parentModuleName),
+            // cursor = query(mOpenHelper.getModuleUri(Util.CONTACTS),
             // Contacts.DETAILS_PROJECTION, selection, null, null);
             // cursor.moveToFirst();
 
@@ -626,8 +618,6 @@ public class SugarCRMProvider extends ContentProvider {
             break;
 
         case OPPORTUNITY_CONTACT:
-
-            parentModuleName = uri.getPathSegments().get(0);
             String opportunityId = uri.getPathSegments().get(1);
             selection = Opportunities.ID + "=" + opportunityId;
 
@@ -752,8 +742,13 @@ public class SugarCRMProvider extends ContentProvider {
             contactId = uri.getPathSegments().get(1);
             count = db.delete(DatabaseHelper.CONTACTS_TABLE_NAME, Contacts.ID + "=" + contactId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
-
                                             : ""), whereArgs);
+            // delete all relationships
+            String[] tableNames = mOpenHelper.getRelationshipTables(Util.CONTACTS);
+            String whereClause = ModuleFields.CONTACT_ID + "=" + contactId;
+            for(String tableName : tableNames){
+                db.delete(tableName, whereClause, null);
+            }
             break;
 
         case LEAD:
@@ -876,12 +871,10 @@ public class SugarCRMProvider extends ContentProvider {
                     selection = AccountsContactsColumns.ACCOUNT_ID + "=" + oldAccountId + " AND "
                                                     + AccountsContactsColumns.CONTACT_ID + "="
                                                     + contactId;
-                    //relationValues.put(AccountsContactsColumns.DELETED, "1");
-                    //db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, relationValues, selection, null);
+                    relationValues.put(AccountsContactsColumns.DELETED, "1");
+                    db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, relationValues, selection, null);
                     //TODO: should it be delete / update ? 
-                    // if its just update, then the unique constraint doesn't allow to insert a new relationship
-                    db.delete(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, selection, null);
-                    Log.i(TAG, "deleted relation: contactId - "+ contactId + " oldAccountId - " + oldAccountId);
+                    Log.i(TAG, "updated deleted flag for the relation: contactId - "+ contactId + " oldAccountId - " + oldAccountId);
 
                     relationValues = new ContentValues();
                     relationValues.put(AccountsContactsColumns.ACCOUNT_ID, accountId);
@@ -948,16 +941,25 @@ public class SugarCRMProvider extends ContentProvider {
                                             + contactId
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
+            if(values.size() == 1){
+                //TODO: update the delete flag of all relationships
+                String[] tableNames = mOpenHelper.getRelationshipTables(Util.CONTACTS);
+                String whereClause = ModuleFields.CONTACT_ID + "=" + contactId;
+                for(String tableName : tableNames){
+                    db.update(tableName, values, whereClause, null);
+                }
+            } else{
+                String accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
+                if (TextUtils.isEmpty(accountName)) {
+                    // delete the relationship if there exists one
+    
+                    ContentValues relationValues = new ContentValues();
+                    selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
+                    relationValues.put(AccountsContactsColumns.DELETED, "1");
+                    db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, relationValues, selection, null);
+                }
+            }
             
-            String accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
-            if (TextUtils.isEmpty(accountName)) {
-                // delete the relationship if there exists one
-
-                ContentValues relationValues = new ContentValues();
-                selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
-                relationValues.put(AccountsContactsColumns.DELETED, "1");
-                db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, relationValues, selection, null);
-            } 
             break;
 
         case CONTACT_OPPORTUNITY:
