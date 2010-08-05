@@ -4,7 +4,8 @@
    android:orientation="vertical"
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent"
-  android:id="@+id/searchLayout">
+  	android:id="@+id/searchLayout">
+  	<include layout="@layout/header"/>
     <ListView android:id="@android:id/list"
         android:layout_width="fill_parent" 
         android:layout_height="0dip"
