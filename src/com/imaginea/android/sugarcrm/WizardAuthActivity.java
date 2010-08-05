@@ -31,7 +31,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMProvider;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
@@ -117,8 +116,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         setContentView(R.layout.splash);
 
         app = (SugarCrmApp) getApplication();
-        Log.i(LOG_TAG, "    SessionId is present: " + app.getSessionId());
-        if (app.getSessionId() != null) {
+        if (!TextUtils.isEmpty(app.getSessionId())) {
             setResult(RESULT_OK);
             finish();
         } else {
@@ -130,11 +128,11 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             mRequestNewAccount = mUsername == null;
             mConfirmCredentials = intent.getBooleanExtra(PARAM_CONFIRMCREDENTIALS, false);
 
-            Log.i(LOG_TAG, "    request new: " + mRequestNewAccount);
+            Log.i(LOG_TAG, "request new: " + mRequestNewAccount);
 
             final String restUrl = SugarCrmSettings.getSugarRestUrl(WizardAuthActivity.this);
             final String usr = SugarCrmSettings.getUsername(WizardAuthActivity.this).toString();
-            Log.i(LOG_TAG, "restUrl - " + restUrl + "\n usr - " + usr + "\n");
+            Log.i(LOG_TAG, "restUrl - " + restUrl + "\nusr - " + usr + "\n");
             mInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             Account userAccount = getAccount(usr);
@@ -181,7 +179,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                         mHeaderTextView.setText(R.string.login);
 
                         // never print the password
-                        Log.i(LOG_TAG, " user name is " + usr);
+                        Log.i(LOG_TAG, "user name is " + usr);
                         String pwd = mAccountManager.getPassword(userAccount);
                         mAuthTask = new AuthenticationTask();
                         mAuthTask.execute(usr, pwd);
@@ -337,10 +335,6 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             }
             next.setVisibility(View.VISIBLE);
         }
-
-        if (state == Util.URL_USER_PWD_AVAILABLE) {
-            next.setVisibility(View.INVISIBLE);
-        }
     }
 
     // Task to validate the REST URL
@@ -440,10 +434,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             prefs = PreferenceManager.getDefaultSharedPreferences(WizardAuthActivity.this);
-            if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                mProgressDialog = ViewUtil.getProgressDialog(WizardAuthActivity.this, getString(R.string.authenticatingMsg), true);
-                mProgressDialog.show();
-            }
+            mProgressDialog = ViewUtil.getProgressDialog(WizardAuthActivity.this, getString(R.string.authenticatingMsg), true);
+            mProgressDialog.show();
         }
 
         @Override
@@ -510,23 +502,24 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 return;
 
             if (hasExceptions) {
-                if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                    TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
-                    tv.setText(sceDesc);
-                    mProgressDialog.cancel();
-                } else {
-                    setFlipper();
-                    View loginView = inflateLoginView();
-
-                    next.setText(getString(R.string.signIn));
-                    next.setVisibility(View.VISIBLE);
-
-                    EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
-                    editTextUser.setText(usr);
-
-                    TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
-                    tv.setText(sceDesc);
-                }
+                // if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
+                TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
+                tv.setText(sceDesc);
+                mProgressDialog.cancel();
+                // }
+                // else {
+                // setFlipper();
+                // View loginView = inflateLoginView();
+                //
+                // next.setText(getString(R.string.signIn));
+                // next.setVisibility(View.VISIBLE);
+                //
+                // EditText editTextUser = (EditText) loginView.findViewById(R.id.loginUsername);
+                // editTextUser.setText(usr);
+                //
+                // TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
+                // tv.setText(sceDesc);
+                // }
 
             } else {
 
