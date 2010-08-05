@@ -21,7 +21,7 @@
         		android:layout_width="fill_parent"
         		android:layout_height="wrap_content">
         		<TextView 
-	        		id="@+id/moduleName" 
+	        		android:id="@+id/moduleName" 
 	        		android:layout_width="wrap_content" 
 	        		android:layout_height="wrap_content"
 	        		android:text="@string/module"
@@ -40,7 +40,7 @@
         		android:layout_width="fill_parent"
         		android:layout_height="wrap_content">
         		<TextView 
-	        		id="@+id/moduleField" 
+	        		android:id="@+id/moduleField" 
 	        		android:layout_width="wrap_content" 
 	        		android:layout_height="wrap_content"
 	        		android:text="@string/moduleField"
@@ -57,7 +57,7 @@
         		android:layout_width="fill_parent"
         		android:layout_height="wrap_content">
         		<TextView 
-	        		id="@+id/sortOrder" 
+	        		android:id="@+id/sortOrder" 
 	        		android:layout_width="wrap_content" 
 	        		android:layout_height="wrap_content"
 	        		android:text="@string/sortBy"
