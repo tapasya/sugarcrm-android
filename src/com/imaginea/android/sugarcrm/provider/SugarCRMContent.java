@@ -162,8 +162,8 @@ public final class SugarCRMContent {
         public static final String[] LIST_VIEW_PROJECTION = { FIRST_NAME, LAST_NAME };
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, FIRST_NAME,
-                LAST_NAME, ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, CREATED_BY_NAME,
-                DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
+                LAST_NAME, ACCOUNT_NAME, PHONE_MOBILE, PHONE_WORK, EMAIL1, ASSIGNED_USER_NAME,
+                CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED, ACCOUNT_ID };
 
     }
 
@@ -192,6 +192,8 @@ public final class SugarCRMContent {
 
         // TODO: may move out to separate table having the contact beanId and accountId
         public String ACCOUNT_ID = ModuleFields.ACCOUNT_ID;
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
 
         public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
 

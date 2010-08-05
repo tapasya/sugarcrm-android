@@ -74,7 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 30;
+    private static final int DATABASE_VERSION = 31;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -251,7 +251,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         relationshipTables.put(Util.MEETINGS, new String[] {});
 
         // selection for the moduleName that has relationship with Accounts module
-        // moduleName vs  selection column name
+        // moduleName vs selection column name
         accountRelationsSelection.put(Util.CONTACTS, ModuleFields.CONTACT_ID);
         accountRelationsSelection.put(Util.OPPORTUNITIES, ModuleFields.OPPORTUNITY_ID);
         accountRelationsSelection.put(Util.CASES, Util.CASE_ID);
@@ -525,6 +525,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + ContactsColumns.PHONE_MOBILE + " TEXT,"
                                         + ContactsColumns.PHONE_WORK + " TEXT,"
                                         + ContactsColumns.EMAIL1 + " TEXT,"
+                                        + ContactsColumns.ASSIGNED_USER_NAME + " TEXT,"
                                         + ContactsColumns.CREATED_BY + " TEXT,"
                                         + ContactsColumns.MODIFIED_BY_NAME + " TEXT,"
                                         + ContactsColumns.CREATED_BY_NAME + " TEXT,"
