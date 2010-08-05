@@ -31,13 +31,12 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * ContactListActivity
@@ -92,6 +91,8 @@ public class ContactListActivity extends ListActivity {
     private String mSelections = ModuleFields.DELETED + "=?";
 
     private String[] mSelectionArgs = new String[] { Util.EXCLUDE_DELETED_ITEMS };
+    
+    private SugarCrmApp app;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +101,7 @@ public class ContactListActivity extends ListActivity {
         setContentView(R.layout.common_list);
 
         mDbHelper = new DatabaseHelper(getBaseContext());
+        app = (SugarCrmApp) getApplication();
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -142,7 +144,7 @@ public class ContactListActivity extends ListActivity {
         // when needed.
         // TODO - optimize this, if we sync up a dataset, then no need to run detail projection
         // here, just do a list projection
-        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), mSelections, mSelectionArgs, mDbHelper.getModuleSortOrder(mModuleName));
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), mSelections, mSelectionArgs, getSortOrder());
 
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
@@ -626,13 +628,13 @@ public class ContactListActivity extends ListActivity {
         // TODO: get the user name from Account Manager
         String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
         String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
-        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, mDbHelper.getModuleSortOrder(mModuleName));
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, getSortOrder());
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
 
     public void showAllItems(View view) {
-        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), null, null, mDbHelper.getModuleSortOrder(mModuleName));
+        Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), null, null, getSortOrder());
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
@@ -640,6 +642,15 @@ public class ContactListActivity extends ListActivity {
     public void showHome(View view) {
         Intent homeIntent = new Intent(this, DashboardActivity.class);
         startActivity(homeIntent);
+    }
+    
+    private String getSortOrder(){
+        String sortOrder = null;
+        Map<String, String> sortOrderMap = app.getModuleSortOrder(mModuleName);
+        for(Entry<String, String> entry : sortOrderMap.entrySet()){
+            sortOrder = entry.getKey() + " " + entry.getValue();
+        }
+        return sortOrder;
     }
 
     public void callNumber(int position) {
