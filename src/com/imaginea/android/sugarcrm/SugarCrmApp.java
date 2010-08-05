@@ -9,6 +9,9 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.util.Util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SugarCrmApp extends Application {
 
     // easy ref to App instance for classes which do not have access to Activity/Service context
@@ -20,6 +23,8 @@ public class SugarCrmApp extends Application {
      * as follows : SugarCrmApp app = ((SugarCrmApp) getApplication()); app.getSessionId();
      */
     private String mSessionId;
+
+    private Map<String, Map<String, String>> moduleSortOrder = new HashMap<String, Map<String, String>>();
 
     public String getSessionId() {
         // TODO - remove this
@@ -65,10 +70,52 @@ public class SugarCrmApp extends Application {
         this.mSessionId = mSessionId;
     }
 
+    public void setModuleSortOrder(String moduleName, String fieldName, String sortBy) {
+        Map<String, String> fieldMap = new HashMap<String, String>();
+        fieldMap.put(fieldName, sortBy);
+        moduleSortOrder.put(moduleName, fieldMap);
+    }
+
+    public Map<String, String> getModuleSortOrder(String moduleName) {
+        return moduleSortOrder.get(moduleName);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         app = this;
+
+        setDefaultModuleSortOrders();
+    }
+
+    private void setDefaultModuleSortOrders() {
+        Map<String, String> fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.NAME, Util.ASC);
+        moduleSortOrder.put(Util.ACCOUNTS, fieldMap);
+
+        fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.FIRST_NAME, Util.ASC);
+        moduleSortOrder.put(Util.CONTACTS, fieldMap);
+
+        fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.FIRST_NAME, Util.ASC);
+        moduleSortOrder.put(Util.LEADS, fieldMap);
+
+        fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.NAME, Util.ASC);
+        moduleSortOrder.put(Util.OPPORTUNITIES, fieldMap);
+
+        fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.NAME, Util.ASC);
+        moduleSortOrder.put(Util.CASES, fieldMap);
+
+        fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.NAME, Util.ASC);
+        moduleSortOrder.put(Util.CALLS, fieldMap);
+
+        fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.NAME, Util.ASC);
+        moduleSortOrder.put(Util.MEETINGS, fieldMap);
     }
 
 }
