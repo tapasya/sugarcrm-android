@@ -33,7 +33,7 @@ public class CRMSyncTestingBase extends SyncBaseInstrumentation {
 
     protected Context mTargetContext;
 
-    protected String mAccount;
+    protected Account mAccount;
 
     protected ContentResolver mResolver;
 
@@ -66,7 +66,7 @@ public class CRMSyncTestingBase extends SyncBaseInstrumentation {
      */
     protected void syncSugarCRMAccounts() throws Exception {
         cancelSyncsandDisableAutoSync();
-        syncProvider(mAccountsUri, mAccount, SugarCRMContent.AUTHORITY);
+        syncProvider(mAccountsUri, mAccount.name, SugarCRMContent.AUTHORITY);
     }
 
     /**
@@ -164,7 +164,7 @@ public class CRMSyncTestingBase extends SyncBaseInstrumentation {
      * 
      * @return
      */
-    protected String getAccount() {
+    protected String getAccountName() {
         Account[] accounts = mAccountManager.getAccountsByType(Util.ACCOUNT_TYPE);
 
         assertTrue("Didn't find any sugar crm accounts", accounts.length > 0);
@@ -172,6 +172,21 @@ public class CRMSyncTestingBase extends SyncBaseInstrumentation {
         Account account = accounts[accounts.length - 1];
         Log.v(TAG, "Found " + accounts.length + " accounts; using the last one, " + account.name);
         return account.name;
+    }
+    
+    /**
+     * Returns the default sugar crm account on the device.
+     * 
+     * @return an Account obj
+     */
+    protected Account getAccount() {
+        Account[] accounts = mAccountManager.getAccountsByType(Util.ACCOUNT_TYPE);
+
+        assertTrue("Didn't find any sugar crm accounts", accounts.length > 0);
+
+        Account account = accounts[accounts.length - 1];
+        Log.v(TAG, "Found " + accounts.length + " accounts; using the last one, " + account.name);
+        return account;
     }
 
     /**

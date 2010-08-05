@@ -1,8 +1,10 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.format.Time;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
@@ -62,5 +64,12 @@ public class SyncCRMTest extends CRMSyncTestingBase {
         assertTrue("A account should have been created.", getAccountsCount() > countBeforeNewAccount);
         deleteAccount(insertUri);
         assertEquals("Account should have been deleted.", countBeforeNewAccount, getAccountsCount());
+    }
+
+    public void testSyncModules() throws Exception {
+        Uri insertUri = insertAccount();
+        Bundle extras = new Bundle();
+        //extras.putInt(key, value)
+        ContentResolver.requestSync(getAccount(), SugarCRMProvider.AUTHORITY, extras);
     }
 }
