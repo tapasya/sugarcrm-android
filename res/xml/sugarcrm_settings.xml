@@ -11,6 +11,14 @@
 		android:summary="@string/userSummary"
 		android:defaultValue="@string/defaultUser" />
 		
+	<PreferenceScreen android:key="sortSettings"
+         android:title="@string/sortSettings"
+         android:summary="@string/sortSummary">
+         <intent            
+             android:targetPackage="com.imaginea.android.sugarcrm"
+             android:targetClass="com.imaginea.android.sugarcrm.ModuleSortConfigActivity" />
+     </PreferenceScreen>
+
 	<PreferenceScreen android:key="syncSettings"
          android:title="@string/syncSettings"
          android:summary="@string/syncSummary">
