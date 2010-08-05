@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/module_sort_config"        
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@drawable/bg" >
+	<include layout="@layout/header" />
+	<ScrollView 
+	    android:id="@+id/scroll_view"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" >
+	    <LinearLayout android:id="@+id/container"
+        	android:orientation="vertical"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content" >
+        	<LinearLayout
+        		android:id="@+id/moduleNameContainer"
+        		android:orientation="horizontal"
+        		android:layout_width="fill_parent"
+        		android:layout_height="wrap_content">
+        		<TextView 
+	        		id="@+id/moduleName" 
+	        		android:layout_width="wrap_content" 
+	        		android:layout_height="wrap_content"
+	        		android:text="@string/module"
+	        		android:width="120dip"
+	        		style="@style/text_label" />
+        		<Spinner 
+	        		android:layout_width="fill_parent" 
+	        		android:layout_height="wrap_content" 
+	        		android:drawSelectorOnTop="true"
+	        		android:prompt="@string/module"
+	        		style="@style/text_row_value" />
+        	</LinearLayout>
+        	<LinearLayout
+        		android:id="@+id/moduleFieldContainer"
+        		android:orientation="horizontal"
+        		android:layout_width="fill_parent"
+        		android:layout_height="wrap_content">
+        		<TextView 
+	        		id="@+id/moduleField" 
+	        		android:layout_width="wrap_content" 
+	        		android:layout_height="wrap_content"
+	        		android:text="@string/moduleField"
+	        		android:width="120dip"
+	        		style="@style/text_label" />
+       			<Spinner 
+	        		android:layout_width="fill_parent" 
+	        		android:layout_height="wrap_content"
+	        		style="@style/text_row_value" />
+        	</LinearLayout>
+        	<LinearLayout
+        		android:id="@+id/sortOrderContainer"
+        		android:orientation="horizontal"
+        		android:layout_width="fill_parent"
+        		android:layout_height="wrap_content">
+        		<TextView 
+	        		id="@+id/sortOrder" 
+	        		android:layout_width="wrap_content" 
+	        		android:layout_height="wrap_content"
+	        		android:text="@string/sortBy"
+	        		android:width="120dip"
+	        		style="@style/text_label" />
+	       		<Spinner
+	        		android:layout_width="fill_parent" 
+	        		android:layout_height="wrap_content"
+	        		style="@style/text_row_value" />
+        	</LinearLayout>
+       		<Button android:id="@+id/saveSortOrder"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" 
+                android:layout_weight="2"              
+                android:gravity="center_horizontal"
+                android:onClick="saveSortOrder"
+                android:text="@string/save"
+                style="@style/button_style" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
