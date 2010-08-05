@@ -32,6 +32,7 @@
 	<string name="settings">Settings</string>
 	<string name="settingsSummary">Change the SUGARCRM URL</string>
 	<string name="syncSummary">Select Sync Filters and start a Sync</string>
+	<string name="sortSummary">Set the sort order for the modules</string>
 
 	<!-- Login Module -->
 	<string name="sugarCrmUrlHeader">SUGARCRM REST URL</string>
