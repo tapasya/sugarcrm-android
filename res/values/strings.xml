@@ -78,6 +78,8 @@
 	<!-- Search -->
 	<string name="searchHint">Search SugarCRM</string>
 	<string name="search">Search</string>
+	<string name="searching">Searching...</string>
+	<string name="searchresults">Search Results</string>
 
 	<!-- Menu items - not present above-->
 	<string name="addItem">Add</string>
