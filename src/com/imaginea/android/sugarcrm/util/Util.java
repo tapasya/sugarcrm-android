@@ -117,6 +117,11 @@ public class Util {
 
     public static final String STATUS = "Status";
 
+    // sql sort order contacts
+    public static final String ASC = "ASC";
+
+    public static final String DESC = "DESC";
+
     // CRUD constants
     public static final int GET = 0;
 
@@ -134,6 +139,7 @@ public class Util {
     // sync constants
     // RECORD_ID (_id) of the module that needs to be synced
     public static final String SYNC_ID = "sync_id";
+
     public static final String SYNC_RELATED_ID = "sync_related_id";
 
     // The sync command - INSERT, DELETE, UPDATE
@@ -159,8 +165,9 @@ public class Util {
     public static final int SYNC_ALL = 5;
 
     public static final String PREF_SYNC_START_TIME = "syncStart";
-    
+
     public static final String PREF_SYNC_END_TIME = "syncEnd";
+
     // sub Activity request codes
     public static final int LOGIN_REQUEST_CODE = 0;
 
