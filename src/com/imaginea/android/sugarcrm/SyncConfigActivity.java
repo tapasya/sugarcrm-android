@@ -9,7 +9,6 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
-import android.text.format.Time;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -17,6 +16,10 @@ import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.SugarCRMProvider;
 import com.imaginea.android.sugarcrm.util.Util;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * SyncConfigActivity
@@ -35,9 +38,9 @@ public class SyncConfigActivity extends Activity {
     private Button mEndDateButton;
 
     // cache the time
-    private Time mStartTime;
+    private Date mStartTime;
 
-    private Time mEndTime;
+    private Date mEndTime;
 
     public static final long THREE_MONTHS = 3 * 30 * 24 * 60 * 60 * 1000L;
 
@@ -58,12 +61,12 @@ public class SyncConfigActivity extends Activity {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         long startTime = pref.getLong(Util.PREF_SYNC_START_TIME, time - THREE_MONTHS);
         long endTime = pref.getLong(Util.PREF_SYNC_END_TIME, time);
-        mStartTime = new Time();
-        mStartTime.set(startTime);
-        mEndTime = new Time();
-        mEndTime.set(endTime);
-        setDate(mStartDateButton, mStartTime.normalize(true));
-        setDate(mEndDateButton, mEndTime.normalize(true));
+        mStartTime = new Date();
+        mStartTime.setTime(startTime);
+        mEndTime = new Date();
+        mEndTime.setTime(endTime);
+        setDate(mStartDateButton, mStartTime);
+        setDate(mEndDateButton, mEndTime);
         populateWhen();
 
         SugarCrmApp app = (SugarCrmApp) getApplication();
@@ -93,8 +96,8 @@ public class SyncConfigActivity extends Activity {
     private void savePrefs() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-        long startMillis = mStartTime.toMillis(false /* use isDst */);
-        long endMillis = mEndTime.toMillis(false /* use isDst */);
+        long startMillis = mStartTime.getTime();
+        long endMillis = mEndTime.getTime();
         Editor editor = pref.edit();
         editor.putLong(Util.PREF_SYNC_START_TIME, startMillis);
         editor.putLong(Util.PREF_SYNC_END_TIME, endMillis);
@@ -124,10 +127,8 @@ public class SyncConfigActivity extends Activity {
     }
 
     private void populateWhen() {
-        long startMillis = mStartTime.toMillis(false /* use isDst */);
-        long endMillis = mEndTime.toMillis(false /* use isDst */);
-        setDate(mStartDateButton, startMillis);
-        setDate(mEndDateButton, endMillis);
+        setDate(mStartDateButton, mStartTime);
+        setDate(mEndDateButton, mEndTime);
 
         mStartDateButton.setOnClickListener(new DateClickListener(mStartTime));
         mEndDateButton.setOnClickListener(new DateClickListener(mEndTime));
@@ -145,8 +146,10 @@ public class SyncConfigActivity extends Activity {
 
         public void onDateSet(DatePicker view, int year, int month, int monthDay) {
             // Cache the member variables locally to avoid inner class overhead.
-            Time startTime = mStartTime;
-            Time endTime = mEndTime;
+            Date startDate = mStartTime;
+            Date endDate = mEndTime;
+
+            Calendar calendar = Calendar.getInstance();
 
             // Cache the start and end millis so that we limit the number
             // of calls to normalize() and toMillis(), which are fairly
@@ -155,38 +158,33 @@ public class SyncConfigActivity extends Activity {
             long endMillis;
             if (mView == mStartDateButton) {
                 // The start date was changed.
-                int yearDuration = endTime.year - startTime.year;
-                int monthDuration = endTime.month - startTime.month;
-                int monthDayDuration = endTime.monthDay - startTime.monthDay;
-
-                startTime.year = year;
-                startTime.month = month;
-                startTime.monthDay = monthDay;
-                startMillis = startTime.normalize(true);
-
-                // Also update the end date to keep the duration constant.
-                endTime.year = year + yearDuration;
-                endTime.month = month + monthDuration;
-                endTime.monthDay = monthDay + monthDayDuration;
-                endMillis = endTime.normalize(true);
+                long duartion = endDate.getTime() - startDate.getTime();
+                calendar.set(year, month, monthDay);
+                startMillis = calendar.getTimeInMillis();
+                endMillis = startMillis + duartion;
+                long curTime = System.currentTimeMillis();
+                // see to that the endDate does not exceed the current date
+                if (endMillis > curTime) {
+                    endMillis = curTime;
+                }
 
             } else {
                 // The end date was changed.
-                startMillis = startTime.toMillis(true);
-                endTime.year = year;
-                endTime.month = month;
-                endTime.monthDay = monthDay;
-                endMillis = endTime.normalize(true);
+                startMillis = startDate.getTime();
+                calendar.set(year, month, monthDay);
+                endMillis = calendar.getTimeInMillis();
 
                 // Do not allow an event to have an end time before the start time.
-                if (endTime.before(startTime)) {
-                    endTime.set(startTime);
-                    endMillis = startMillis;
+                if (endDate.before(startDate)) {
+                    endDate.setTime(startMillis);
                 }
             }
 
-            setDate(mStartDateButton, startMillis);
-            setDate(mEndDateButton, endMillis);
+            startDate.setTime(startMillis);
+            endDate.setTime(endMillis);
+
+            setDate(mStartDateButton, startDate);
+            setDate(mEndDateButton, endDate);
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             Editor editor = pref.edit();
             editor.putLong(Util.PREF_SYNC_START_TIME, startMillis);
@@ -199,23 +197,30 @@ public class SyncConfigActivity extends Activity {
      * DateClickListener
      */
     private class DateClickListener implements View.OnClickListener {
-        private Time mTime;
+        private Date mDate;
 
-        public DateClickListener(Time time) {
-            mTime = time;
+        public DateClickListener(Date date) {
+            mDate = date;
         }
 
         public void onClick(View v) {
-            new DatePickerDialog(SyncConfigActivity.this, new DateListener(v), mTime.year, mTime.month, mTime.monthDay).show();
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(mDate.getTime());
+
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int date = calendar.get(Calendar.DATE);
+
+            new DatePickerDialog(SyncConfigActivity.this, new DateListener(v), year, month, date).show();
         }
     }
 
-    private void setDate(TextView view, long millis) {
+    private void setDate(TextView view, Date date) {
         int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
                                         | DateUtils.FORMAT_SHOW_WEEKDAY
                                         | DateUtils.FORMAT_ABBREV_MONTH
                                         | DateUtils.FORMAT_ABBREV_WEEKDAY;
-        view.setText(DateUtils.formatDateTime(this, millis, flags));
+        view.setText(DateUtils.formatDateTime(this, date.getTime(), flags));
     }
 
     @Override
