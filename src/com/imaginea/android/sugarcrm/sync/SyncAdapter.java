@@ -58,7 +58,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(LOG_TAG, "onPerformSync");
         String authtoken = null;
         int syncType = extras.getInt(Util.SYNC_TYPE);
-       // extras.remove(Util.SYNC_TYPE);
+        // extras.remove(Util.SYNC_TYPE);
         Log.v(LOG_TAG, "Sync Type name: " + syncType);
         try {
             // use the account manager to request the credentials
@@ -148,7 +148,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Log.e(LOG_TAG, e.getMessage(), e);
         } catch (SugarCrmException se) {
             Log.e(LOG_TAG, se.getMessage(), se);
-        }               
+        }
     }
 
     /**
