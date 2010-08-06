@@ -9,6 +9,7 @@ import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
@@ -32,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -107,29 +108,30 @@ public class SugarSyncManager {
         String[] projections = databaseHelper.getModuleProjections(moduleName);
         String orderBy = databaseHelper.getModuleSortOrder(moduleName);
         setLinkNameToFieldsArray(moduleName);
+
+        // TODO - Fetching based on dates
+        if (mDateFormat == null)
+            mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // mDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        Date startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 1);
+        long time = pref.getLong(Util.PREF_SYNC_START_TIME, startDate.getTime());
+        startDate.setTime(time);
+
+        Date endDate = new Date();
+        endDate.setTime(System.currentTimeMillis());
+        time = pref.getLong(Util.PREF_SYNC_END_TIME, endDate.getTime());
+        endDate.setTime(time);
+
+        mQuery = moduleName + "." + ModuleFields.DATE_MODIFIED + ">'"
+                                        + mDateFormat.format(startDate) + "' AND " + moduleName
+                                        + "." + ModuleFields.DATE_MODIFIED + "<='"
+                                        + mDateFormat.format(endDate) + "'";
+
         while (true) {
             if (projections == null || projections.length == 0)
                 break;
-
-            // TODO - Fetching based on dates
-            // Date startDate = new Date();
-            // long duration = 3 * 30 * 24 * 60 * 60 * 1000;
-            long duration = 24 * 60 * 60 * 1000;
-            // Date endDate = new Date(startDate.getTime() - duration);
-            if (mDateFormat == null)
-                mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            // mDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-            mCalendar = new GregorianCalendar();
-            mCalendar.setTimeInMillis(System.currentTimeMillis() - duration);
-            String remoteDateStr = mDateFormat.format(mCalendar.getTime());
-            // mQuery = moduleName + "." + ModuleFields.DATE_MODIFIED + " > " + "DATE('"
-            // + remoteDateStr + "')";
-            mQuery = moduleName + "." + ModuleFields.DATE_MODIFIED + " > "
-                                            + mCalendar.getTimeInMillis();
-            // + " AND " + ModuleFields.DATE_MODIFIED + "< " + startDate.toGMTString();
-            // CalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:[NSTimeZone timeZoneWithName:@"GMT"]
-            // locale:nil];
 
             SugarBean[] sBeans = RestUtil.getEntryList(url, sessionId, moduleName, mQuery, orderBy, ""
                                             + offset, projections, mLinkNameToFieldsArray, ""
@@ -140,6 +142,7 @@ public class SugarSyncManager {
                 break;
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 Log.d(LOG_TAG, "In Syncmanager");
+
             for (SugarBean sBean : sBeans) {
 
                 String beandIdValue = sBean.getFieldValue(mBeanIdField);
@@ -147,18 +150,25 @@ public class SugarSyncManager {
                 rawId = lookupRawId(resolver, moduleName, beandIdValue);
                 if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
                     Log.v(LOG_TAG, "beanId/rawid:" + beandIdValue + "/" + rawId);
+
+                String name = TextUtils.isEmpty(sBean.getFieldValue(ModuleFields.NAME)) ? sBean.getFieldValue(ModuleFields.FIRST_NAME)
+                                                : sBean.getFieldValue(ModuleFields.NAME);
+
                 if (rawId != 0) {
                     if (!sBean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
+                        Log.i(LOG_TAG, "updating... " + moduleName + ": " + rawId + ") " + name);
                         updateModuleItem(context, resolver, account, moduleName, sBean, rawId, batchOperation);
                     } else {
                         // delete module item - never delete the item here, just update the deleted
                         // flag
+                        Log.i(LOG_TAG, "deleting... " + moduleName + ": " + rawId + ") " + name);
                         deleteModuleItem(context, rawId, moduleName, batchOperation);
                     }
                 } else {
                     // add new moduleItem
                     // Log.v(LOG_TAG, "In addModuleItem");
                     if (!sBean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
+                        Log.i(LOG_TAG, "inserting... " + moduleName + ": " + " " + name);
                         addModuleItem(context, account, sBean, moduleName, batchOperation);
                     }
                 }
@@ -215,6 +225,7 @@ public class SugarSyncManager {
         long rawId = lookupRawId(context.getContentResolver(), moduleName, beandIdValue);
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "syncRelationshipsData: RawId:" + rawId);
+
         for (String relation : relationships) {
             String linkFieldName = databaseHelper.getLinkfieldName(relation);
             // for a particular module-link field name
@@ -225,6 +236,7 @@ public class SugarSyncManager {
                     Log.v(LOG_TAG, "relationship beans is null or empty");
                 continue;
             }
+
             for (SugarBean relationbean : relationshipBeans) {
                 // long relationRawId = lookupRawId(context.getContentResolver(), relation,
                 // relationbean.getBeanId());
@@ -232,23 +244,31 @@ public class SugarSyncManager {
 
                 if (relationBeanId == null)
                     continue;
+
                 long relationRawId = lookupRawId(context.getContentResolver(), relation, relationBeanId);
                 if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
                     Log.v(LOG_TAG, "RelationBeanId/RelatedRawid:" + relationRawId + "/"
                                                     + relationBeanId);
+
                 if (relationRawId != 0) {
                     if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
                         // update module Item
-
-                        updateRelatedModuleItem(context, context.getContentResolver(), account, moduleName, relation, relationbean, relationRawId, batchOperation);
+                        Log.i(LOG_TAG, "updating... " + moduleName + "_" + relation
+                                                        + ": relationRawId - " + relationRawId
+                                                        + ") ");
+                        updateRelatedModuleItem(context, context.getContentResolver(), account, moduleName, rawId, relation, relationbean, relationRawId, batchOperation);
                     } else {
                         // delete module item
+                        Log.i(LOG_TAG, "deleting... " + moduleName + "_" + relation
+                                                        + ": relationRawId - " + relationRawId
+                                                        + ") ");
                         deleteRelatedModuleItem(context, rawId, relationRawId, moduleName, relation, batchOperation);
                     }
                 } else {
                     // add new moduleItem
                     // Log.v(LOG_TAG, "In addModuleItem");
                     if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
+                        Log.i(LOG_TAG, "inserting... " + moduleName + "_" + relation);
                         addRelatedModuleItem(context, account, rawId, bean, relationbean, moduleName, relation, batchOperation);
                     }
                 }
@@ -271,7 +291,11 @@ public class SugarSyncManager {
             // get the relationships for a user only if access is allowed
             if (databaseHelper.isModuleAccessAvailable(relation)) {
                 String linkFieldName = databaseHelper.getLinkfieldName(relation);
-                String[] relationProj = databaseHelper.getModuleProjections(relation);
+                // String[] relationProj = databaseHelper.getModuleProjections(relation);
+
+                // we only insert the bean id and the deleted flag during the relationship but not
+                // all the fields in the details projection
+                String[] relationProj = new String[] { ModuleFields.ID, ModuleFields.DELETED };
                 mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));
             }
         }
@@ -363,17 +387,23 @@ public class SugarSyncManager {
     }
 
     private static void updateRelatedModuleItem(Context context, ContentResolver resolver,
-                                    String accountName, String moduleName,
+                                    String accountName, String moduleName, long rawId,
                                     String relatedModuleName, SugarBean relatedBean,
                                     long relationRawId, BatchOperation batchOperation)
                                     throws SugarCrmException {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateRelatedModuleItem");
-        Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
+        // Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
         String[] projections = databaseHelper.getModuleProjections(relatedModuleName);
-        Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
-        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
-            Log.v(LOG_TAG, "updateRelatedModuleItem URI:" + uri.toString());
+        // Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
+
+        // modified the uri to have moduleName/#/relatedModuleName/# so the uri would take care of
+        // updates
+        Uri contentUri = Uri.withAppendedPath(databaseHelper.getModuleUri(moduleName), rawId + "");
+        contentUri = Uri.withAppendedPath(contentUri, relatedModuleName);
+        contentUri = Uri.withAppendedPath(contentUri, relationRawId + "");
+        // if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
+        // Log.v(LOG_TAG, "updateRelatedModuleItem URI:" + uri.toString());
         // check the changes from server and mark them for merge in sync table
         SyncRecord syncRecord = databaseHelper.getSyncRecord(relationRawId, moduleName, relatedModuleName);
         if (syncRecord != null) {
@@ -382,11 +412,13 @@ public class SugarSyncManager {
             databaseHelper.updateSyncRecord(syncRecord._id, values);
         } else {
             // TODO - is this query resolver needed to query here
-            final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] { String.valueOf(relationRawId) }, null);
+
+            // final Cursor c = resolver.query(contentUri, projections, mSelection, new String[] {
+            // String.valueOf(relationRawId) }, null);
             // TODO - do something here with cursor
-            c.close();
+            // c.close();
             final SugarCRMOperations moduleItemOp = SugarCRMOperations.updateExistingModuleItem(context, relatedModuleName, relatedBean, relationRawId, batchOperation);
-            moduleItemOp.updateSugarBean(relatedBean, uri);
+            moduleItemOp.updateSugarBean(relatedBean, contentUri);
         }
 
     }
@@ -469,7 +501,7 @@ public class SugarSyncManager {
         try {
             if (userModules == null || userModules.size() == 0)
                 userModules = RestUtil.getAvailableModules(url, sessionId);
-            Log.i(LOG_TAG, "userModules : " + userModules.size());
+            // Log.i(LOG_TAG, "userModules : " + userModules.size());
             databaseHelper.setUserModules(userModules);
         } catch (SugarCrmException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -794,50 +826,50 @@ public class SugarSyncManager {
         }
         return false;
     }
-    
+
     /**
      * syncUsersList
      * 
      * @param context
      * @param sessionId
      */
-    public synchronized static boolean syncUsersList(Context context, String sessionId){
+    public synchronized static boolean syncUsersList(Context context, String sessionId) {
         try {
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 Log.d(LOG_TAG, "Sync Acl Access");
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
             // TODO use a constant and remove this as we start from the login screen
             String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
-            
+
             HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
             SugarBean[] userBeans = RestUtil.getEntryList(url, sessionId, Util.USERS, null, null, "0", Users.INSERT_PROJECTION, linkNameToFieldsArray, null, "0");
-            
+
             Map<String, Map<String, String>> usersMap = new TreeMap<String, Map<String, String>>();
-            for(SugarBean userBean : userBeans){
+            for (SugarBean userBean : userBeans) {
                 Map<String, String> userBeanValues = getUserBeanValues(userBean);
                 String userName = userBean.getFieldValue(ModuleFields.USER_NAME);
-                if(userBeanValues != null & userBeanValues.size() > 0)
+                if (userBeanValues != null & userBeanValues.size() > 0)
                     usersMap.put(userName, userBeanValues);
             }
-            
+
             if (databaseHelper == null)
                 databaseHelper = new DatabaseHelper(context);
             databaseHelper.insertUsers(usersMap);
-            
+
             return true;
         } catch (SugarCrmException sce) {
             Log.e(LOG_TAG, "" + sce.getMessage());
         }
         return false;
     }
-    
+
     private static Map<String, String> getUserBeanValues(SugarBean userBean) {
         Map<String, String> userBeanValues = new TreeMap<String, String>();
-        for(String fieldName : Users.INSERT_PROJECTION){
+        for (String fieldName : Users.INSERT_PROJECTION) {
             String fieldValue = userBean.getFieldValue(fieldName);
             userBeanValues.put(fieldName, fieldValue);
         }
-        if(userBeanValues.size() > 0)
+        if (userBeanValues.size() > 0)
             return userBeanValues;
         return null;
     }
