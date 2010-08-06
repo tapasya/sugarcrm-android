@@ -71,7 +71,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
              */
             String userName = account.name;
             String password = mAccountManager.getPassword(account);
-            Log.v(LOG_TAG, "user name: " + userName + " and authority:" + authority);
+            // Log.v(LOG_TAG, "user name: " + userName + " and authority: " + authority);
 
             if (!Util.isNetworkOn(mContext)) {
                 Log.v(LOG_TAG, "Network is not on..skipping sync:");
