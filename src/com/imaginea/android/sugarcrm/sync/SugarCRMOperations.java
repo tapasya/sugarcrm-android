@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.SugarBean;
@@ -37,6 +38,8 @@ public class SugarCRMOperations {
     private int mBackReference;
 
     private boolean mIsNewId;
+
+    private final String TAG = "SugarCRMOperations";
 
     /**
      * Returns an instance of SugarCRMOperations instance for adding new module item to the sugar
@@ -169,6 +172,8 @@ public class SugarCRMOperations {
             mValues.put(fieldName, fieldValue);
         }
         if (mValues.size() > 0) {
+            if(Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "updateSugarBean: uri - " + uri);
             addUpdateOp(uri);
         }
         return this;
@@ -208,7 +213,8 @@ public class SugarCRMOperations {
 
         // ContentUris.withAppendedId(contentUri, mRawId);
         Uri relatedUri = Uri.withAppendedPath(ContentUris.withAppendedId(contentUri, mRawId), mRelatedModuleName);
-
+        if(Log.isLoggable(TAG, Log.DEBUG))
+            Log.d(TAG, "addRelatedInsertOp: relatedUri - " + relatedUri);
         mBuilder = newInsertCpo(relatedUri, mYield);
         mBuilder.withValues(mValues);
         // TODO - check out the undocumented Value backreferences
