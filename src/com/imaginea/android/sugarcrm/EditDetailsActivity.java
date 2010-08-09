@@ -226,19 +226,27 @@ public class EditDetailsActivity extends Activity {
                 // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
                                                 && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
+                    // only if the module is directly related to Accounts, disable the account name
+                    // field populating it with the corresponding account name
                     if (MODE == Util.NEW_RELATIONSHIP_MODE) {
-                        if (mDbHelper == null)
-                            mDbHelper = new DatabaseHelper(getBaseContext());
+                        String module = (String) mIntentUri.getPathSegments().get(0);
+                        if (Util.ACCOUNTS.equals(module)) {
+                            if (mDbHelper == null)
+                                mDbHelper = new DatabaseHelper(getBaseContext());
 
-                        int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
-                        String selection = AccountsColumns.ID + "=" + accountRowId;
-                        Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                        cursor.moveToFirst();
-                        String accountName = cursor.getString(2);
-                        cursor.close();
+                            int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
+                            String selection = AccountsColumns.ID + "=" + accountRowId;
+                            Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                            cursor.moveToFirst();
+                            String accountName = cursor.getString(2);
+                            cursor.close();
 
-                        valueView.setText(accountName);
-                        valueView.setEnabled(false);
+                            valueView.setText(accountName);
+                            valueView.setEnabled(false);
+                        } else {
+                            valueView.setAdapter(mAccountAdapter);
+                            valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                        }
                     } else {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
@@ -276,18 +284,26 @@ public class EditDetailsActivity extends Activity {
                 if (!Util.ACCOUNTS.equals(mModuleName)
                                                 && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
                     if (MODE == Util.NEW_RELATIONSHIP_MODE) {
-                        if (mDbHelper == null)
-                            mDbHelper = new DatabaseHelper(getBaseContext());
+                        String module = (String) mIntentUri.getPathSegments().get(0);
+                        // only if the module is directly related to Accounts, disable the account
+                        // name field populating it with the corresponding account name
+                        if (Util.ACCOUNTS.equals(module)) {
+                            if (mDbHelper == null)
+                                mDbHelper = new DatabaseHelper(getBaseContext());
 
-                        int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
-                        String selection = AccountsColumns.ID + "=" + accountRowId;
-                        Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                        cursor.moveToFirst();
-                        String accountName = cursor.getString(2);
-                        cursor.close();
+                            int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
+                            String selection = AccountsColumns.ID + "=" + accountRowId;
+                            Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                            cursor.moveToFirst();
+                            String accountName = cursor.getString(2);
+                            cursor.close();
 
-                        valueView.setText(accountName);
-                        valueView.setEnabled(false);
+                            valueView.setText(accountName);
+                            valueView.setEnabled(false);
+                        } else {
+                            valueView.setAdapter(mAccountAdapter);
+                            valueView.setOnItemClickListener(new AccountsClickedItemListener());
+                        }
                     } else {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
