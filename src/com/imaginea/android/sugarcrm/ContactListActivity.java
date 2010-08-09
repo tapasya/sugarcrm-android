@@ -91,7 +91,7 @@ public class ContactListActivity extends ListActivity {
     private String mSelections = ModuleFields.DELETED + "=?";
 
     private String[] mSelectionArgs = new String[] { Util.EXCLUDE_DELETED_ITEMS };
-    
+
     private SugarCrmApp app;
 
     @Override
@@ -108,6 +108,12 @@ public class ContactListActivity extends ListActivity {
         mModuleName = Util.CONTACTS;
         if (extras != null) {
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
+        }
+
+        // If the list is a list of related items, hide the filterImage and allItems image
+        if (intent.getData() != null && intent.getData().getPathSegments().size() >= 3) {
+            findViewById(R.id.filterImage).setVisibility(View.GONE);
+            findViewById(R.id.allItems).setVisibility(View.GONE);
         }
 
         TextView tv = (TextView) findViewById(R.id.headerText);
@@ -638,16 +644,16 @@ public class ContactListActivity extends ListActivity {
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
-    
+
     public void showHome(View view) {
         Intent homeIntent = new Intent(this, DashboardActivity.class);
         startActivity(homeIntent);
     }
-    
-    private String getSortOrder(){
+
+    private String getSortOrder() {
         String sortOrder = null;
         Map<String, String> sortOrderMap = app.getModuleSortOrder(mModuleName);
-        for(Entry<String, String> entry : sortOrderMap.entrySet()){
+        for (Entry<String, String> entry : sortOrderMap.entrySet()) {
             sortOrder = entry.getKey() + " " + entry.getValue();
         }
         return sortOrder;
