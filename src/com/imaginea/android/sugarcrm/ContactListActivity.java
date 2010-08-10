@@ -307,7 +307,7 @@ public class ContactListActivity extends ListActivity {
             Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         if (mIntentUri != null)
-            detailIntent.setData(mIntentUri);
+            detailIntent.setData(Uri.withAppendedPath(mIntentUri, cursor.getString(0)));
 
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
