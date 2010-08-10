@@ -28,7 +28,7 @@
 			android:src="@drawable/my_items_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:onClick="showAssignedItems" 			
+			android:onClick="showAssignedItems"
 			/>
 		<ImageView
 			android:id="@+id/allItems" 
