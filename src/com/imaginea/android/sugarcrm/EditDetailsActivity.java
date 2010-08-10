@@ -108,9 +108,6 @@ public class EditDetailsActivity extends Activity {
         Log.v(TAG, "uri - " + (mIntentUri != null ? mIntentUri : ""));
 
         if (intent.getData() != null && mRowId != null) {
-            // TODO: this case is intentionally left as of now
-            // this case comes into picture only if the user can change the accountName to which it
-            // is associated
             MODE = Util.EDIT_RELATIONSHIP_MODE;
         } else if (mRowId != null) {
             MODE = Util.EDIT_ORPHAN_MODE;
@@ -229,11 +226,17 @@ public class EditDetailsActivity extends Activity {
                     // only if the module is directly related to Accounts, disable the account name
                     // field populating it with the corresponding account name
                     if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+
+                        // get the module name from the URI
                         String module = (String) mIntentUri.getPathSegments().get(0);
+
+                        // only if the module is directly related with the Accounts module
                         if (Util.ACCOUNTS.equals(module)) {
+
                             if (mDbHelper == null)
                                 mDbHelper = new DatabaseHelper(getBaseContext());
 
+                            // get the account name using the account row id in the URI
                             int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
                             String selection = AccountsColumns.ID + "=" + accountRowId;
                             Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
@@ -241,26 +244,35 @@ public class EditDetailsActivity extends Activity {
                             String accountName = cursor.getString(2);
                             cursor.close();
 
+                            // pre-populate the field with the account name and disable it
                             valueView.setText(accountName);
                             valueView.setEnabled(false);
                         } else {
+                            // if the module is not directly related to Accounts module, show the
+                            // auto-suggest instead of pre-populating the account name field
                             valueView.setAdapter(mAccountAdapter);
                             valueView.setOnItemClickListener(new AccountsClickedItemListener());
                         }
                     } else {
+                        // set the adapter to show the auto-suggest
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
 
                         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
+                            // store the account name in mAccountName if the bean is already related
+                            // to an account
                             if (!TextUtils.isEmpty(editTextValue)) {
                                 mAccountName = editTextValue;
                             }
                     }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
+                    // set the adapter to show the auto-suggest
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
 
                     if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                        // store the user name in mUserName if the bean is already assigned to a
+                        // user
                         if (!TextUtils.isEmpty(editTextValue)) {
                             mUserName = editTextValue;
                         }
@@ -283,14 +295,20 @@ public class EditDetailsActivity extends Activity {
                 // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
                                                 && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
+                    // only if the module is directly related to Accounts, disable the account name
+                    // field populating it with the corresponding account name
                     if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+
+                        // get the module name from the URI
                         String module = (String) mIntentUri.getPathSegments().get(0);
-                        // only if the module is directly related to Accounts, disable the account
-                        // name field populating it with the corresponding account name
+
+                        // only if the module is directly related with the Accounts module
                         if (Util.ACCOUNTS.equals(module)) {
+
                             if (mDbHelper == null)
                                 mDbHelper = new DatabaseHelper(getBaseContext());
 
+                            // get the account name using the account row id in the URI
                             int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
                             String selection = AccountsColumns.ID + "=" + accountRowId;
                             Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
@@ -298,27 +316,35 @@ public class EditDetailsActivity extends Activity {
                             String accountName = cursor.getString(2);
                             cursor.close();
 
+                            // pre-populate the field with the account name and disable it
                             valueView.setText(accountName);
                             valueView.setEnabled(false);
                         } else {
+                            // if the module is not directly related to Accounts module, show the
+                            // auto-suggest instead of pre-populating the account name field
                             valueView.setAdapter(mAccountAdapter);
                             valueView.setOnItemClickListener(new AccountsClickedItemListener());
                         }
                     } else {
+                        // set the apadter to show the auto-suggest
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
 
-                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
+                            // store the account name in mAccountName if the bean is already related
+                            // to an account
                             if (!TextUtils.isEmpty(editTextValue)) {
                                 mAccountName = editTextValue;
                             }
-                        }
                     }
                 } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
+                    // set the apadter to show the auto-suggest
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
 
                     if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                        // store the user name in mUserName if the bean is already assigned to a
+                        // user
                         if (!TextUtils.isEmpty(editTextValue)) {
                             mUserName = editTextValue;
                         }
@@ -483,9 +509,7 @@ public class EditDetailsActivity extends Activity {
         if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
             modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
 
-        // used for all the modules that has relationship with Accounts
-        String accountRowId = null;
-        Uri uri = mIntentUri;
+        Uri uri = getIntent().getData();
 
         Map<String, String> fieldsExcludedForEdit = mDbHelper.getFieldsExcludedForEdit();
         int rowsCount = 0;
@@ -509,93 +533,63 @@ public class EditDetailsActivity extends Activity {
                 if (!TextUtils.isEmpty(fieldValue)) {
 
                     if (!TextUtils.isEmpty(mSelectedAccountName)) {
+                        // if the user has selected an account from the auto-suggest list
 
                         // check if the field value is the selected value
-                        if (mSelectedAccountName.equals(fieldValue)) {
-                            // get the account id for the account name
-                            String selection = AccountsColumns.NAME + "='" + mSelectedAccountName
-                                                            + "'";
-                            Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                            cursor.moveToFirst();
-                            accountRowId = cursor.getString(0);
-                            cursor.close();
-
-                            uri = Uri.withAppendedPath(mDbHelper.getModuleUri(Util.ACCOUNTS), accountRowId);
-                            uri = Uri.withAppendedPath(uri, mModuleName);
-                        } else {
+                        if (!mSelectedAccountName.equals(fieldValue)) {
                             // account name is incorrect.
                             hasError = true;
                             editText.setError(getString(R.string.accountNameErrorMsg));
                         }
 
+                    } else if (!TextUtils.isEmpty(mAccountName)) {
+                        // if the user doesn't change the account name and it remains the same
+
+                        if (!fieldValue.equals(mAccountName)) {
+                            // if the user just enters some value without selecting from the
+                            // auto-suggest
+                            hasError = true;
+                            editText.setError(getString(R.string.accountNameErrorMsg));
+                        }
+
                     } else {
-                        // mSelectedAccountName is null
-
-                        if (MODE != Util.NEW_RELATIONSHIP_MODE) {
-                            // in NEW_RELATIONSHIP_MODE, the editText is disabled.
-
-                            if (!TextUtils.isEmpty(mAccountName)) {
-                                // if the user doesn't change the account name and it remains the
-                                // same
-
-                                if (fieldValue.equals(mAccountName)) {
-
-                                    // get the account id for the account name
-                                    String selection = AccountsColumns.NAME + "='" + mAccountName
-                                                                    + "'";
-                                    Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                                    cursor.moveToFirst();
-                                    accountRowId = cursor.getString(0);
-                                    cursor.close();
-
-                                    uri = Uri.withAppendedPath(mDbHelper.getModuleUri(Util.ACCOUNTS), accountRowId);
-                                    uri = Uri.withAppendedPath(uri, mModuleName);
-                                } else {
-                                    // if the user just enters some value without selecting from the
-                                    // auto-suggest
-                                    hasError = true;
-                                    editText.setError(getString(R.string.accountNameErrorMsg));
-                                }
-                            } else {
-                                // if the user just enters some value without selecting from the
-                                // auto-suggest
-                                hasError = true;
-                                editText.setError(getString(R.string.accountNameErrorMsg));
-                            }
+                        // if the editText has been disabled, do not show the error
+                        if (editText.isEnabled()) {
+                            // if the user just enters some value without selecting from the
+                            // auto-suggest
+                            hasError = true;
+                            editText.setError(getString(R.string.accountNameErrorMsg));
                         }
                     }
-                } else {
-                    // fieldValue is null
 
-                    // if there was a relationship with an account earlier and if it has been
-                    // removed now
-                    if (!TextUtils.isEmpty(mAccountName)) {
-                        uri = Uri.withAppendedPath(uri, mModuleName);
-                    }
                 }
 
             } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
+
                 if (!TextUtils.isEmpty(fieldValue)) {
+
                     if (!TextUtils.isEmpty(mSelectedUserName)) {
+                        // if the user has selected a user name from the auto-suggest list
+
                         // check if the field value is the selected value
                         if (!mSelectedUserName.equals(fieldValue)) {
                             // user name is incorrect.
                             hasError = true;
                             editText.setError(getString(R.string.userNameErrorMsg));
                         }
-                    } else {
-                        if (!TextUtils.isEmpty(mUserName)) {
-                            // check if the username is exactly as the actual username
-                            if (!mUserName.equals(fieldValue)) {
-                                hasError = true;
-                                editText.setError(getString(R.string.userNameErrorMsg));
-                            }
-                        } else {
-                            // if the user just enters some value
+                    } else if (!TextUtils.isEmpty(mUserName)) {
+                        // if the user doesn't change the user name and it remains the same
 
+                        // check if the username is exactly as the actual username
+                        if (!mUserName.equals(fieldValue)) {
                             hasError = true;
                             editText.setError(getString(R.string.userNameErrorMsg));
                         }
+                    } else {
+                        // if the user just enters some value
+
+                        hasError = true;
+                        editText.setError(getString(R.string.userNameErrorMsg));
                     }
                 }
             }
@@ -606,15 +600,10 @@ public class EditDetailsActivity extends Activity {
         }
 
         if (!hasError) {
+
             if (MODE == Util.EDIT_ORPHAN_MODE) {
-                if (uri == null) {
-                    uri = Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId);
-                } else {
-                    uri = Uri.withAppendedPath(uri, mRowId);
-                }
                 ServiceHelper.startServiceForUpdate(getBaseContext(), uri, mModuleName, mSugarBeanId, modifiedValues);
             } else if (MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                uri = Uri.withAppendedPath(uri, mRowId);
                 ServiceHelper.startServiceForUpdate(getBaseContext(), uri, mModuleName, mSugarBeanId, modifiedValues);
             } else if (MODE == Util.NEW_RELATIONSHIP_MODE) {
                 modifiedValues.put(ModuleFields.DELETED, Util.NEW_ITEM);
