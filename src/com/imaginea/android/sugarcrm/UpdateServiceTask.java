@@ -114,7 +114,39 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                 if (Log.isLoggable(TAG, Log.DEBUG)) {
                                     Log.i(TAG, "Relationship is also set!");
                                 }
-                                serverUpdated = true;
+                                //serverUpdated = true;
+                                
+                                if (!Util.ACCOUNTS.equals(mModuleName) && !Util.ACCOUNTS.equals(mParentModuleName)) {
+                                    String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
+                                    if (!TextUtils.isEmpty(accountName)) {
+                                        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+                                        // get the account bean id for the account name
+                                        String selection = AccountsColumns.NAME + "='" + accountName
+                                                                        + "'";
+                                        Cursor cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
+                                        cursor.moveToFirst();
+                                        String newAccountBeanId = cursor.getString(1);
+                                        cursor.close();
+
+                                        mLinkFieldName = mDbHelper.getLinkfieldName(mModuleName);
+
+                                        // set the relationship with the account
+                                        RelationshipStatus accountStatus = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, newAccountBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                                        if (status.getCreatedCount() >= 1) {
+                                            if (Log.isLoggable(TAG, Log.DEBUG))
+                                                Log.d(TAG, "Relationship is also set!");
+
+                                            serverUpdated = true;
+                                        } else {
+                                            if (Log.isLoggable(TAG, Log.DEBUG))
+                                                Log.d(TAG, "setRelationship failed!");
+
+                                            serverUpdated = false;
+                                        }
+                                    }
+                                }
+                                
                             } else {
                                 if (Log.isLoggable(TAG, Log.DEBUG)) {
                                     Log.i(TAG, "setRelationship failed!");
@@ -133,8 +165,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                             if (!Util.ACCOUNTS.equals(mModuleName)) {
                                 String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
                                 if (!TextUtils.isEmpty(accountName)) {
-                                    // delete the relationship if there exists one
-
+                                    
                                     SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
                                     // get the account bean id for the account name
@@ -147,7 +178,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
                                     mLinkFieldName = mDbHelper.getLinkfieldName(mModuleName);
 
-                                    // set the relationship with delete flag as '1'
+                                    // set the relationship with the account
                                     RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, newAccountBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
                                     if (Log.isLoggable(TAG, Log.DEBUG))
                                         Log.d(TAG, "created: " + status.getCreatedCount()
