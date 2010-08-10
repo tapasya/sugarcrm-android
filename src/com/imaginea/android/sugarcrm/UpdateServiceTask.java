@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.sync.SyncRecord;
 import com.imaginea.android.sugarcrm.util.RelationshipStatus;
@@ -65,12 +66,6 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         mUri = intent.getData();
         // current module being updated/inserted/deleted
         mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
-
-        if (mUri.getPathSegments().size() >= 3) {
-            mParentModuleName = mUri.getPathSegments().get(0);
-            String relatedModuleName = mUri.getPathSegments().get(2);
-            mLinkFieldName = mDbHelper.getLinkfieldName(relatedModuleName);
-        }
         mBeanId = extras.getString(RestUtilConstants.BEAN_ID);
         mUpdateNameValueMap = (Map<String, String>) extras.getSerializable(RestUtilConstants.NAME_VALUE_LIST);
         mCommand = extras.getInt(Util.COMMAND);
@@ -101,9 +96,12 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         if (updatedBeanId != null) {
-                            // get the parent beanId
+                            // get the module name and beanId of the parent from the URI
+                            mParentModuleName = mUri.getPathSegments().get(0);
                             String rowId = mUri.getPathSegments().get(1);
                             mBeanId = mDbHelper.lookupBeanId(mParentModuleName, rowId);
+                            mLinkFieldName = mDbHelper.getLinkfieldName(mModuleName);
+                            // set the relationship
                             RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
                             if (Log.isLoggable(TAG, Log.DEBUG)) {
                                 Log.i(TAG, "created: " + status.getCreatedCount() + " failed: "
@@ -132,131 +130,311 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                         // updatedBeanId is actually a new beanId returned by server
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         if (updatedBeanId != null) {
-                            serverUpdated = true;
+                            if (!Util.ACCOUNTS.equals(mModuleName)) {
+                                String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
+                                if (!TextUtils.isEmpty(accountName)) {
+                                    // delete the relationship if there exists one
+
+                                    SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+                                    // get the account bean id for the account name
+                                    String selection = AccountsColumns.NAME + "='" + accountName
+                                                                    + "'";
+                                    Cursor cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
+                                    cursor.moveToFirst();
+                                    String newAccountBeanId = cursor.getString(1);
+                                    cursor.close();
+
+                                    mLinkFieldName = mDbHelper.getLinkfieldName(mModuleName);
+
+                                    // set the relationship with delete flag as '1'
+                                    RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, newAccountBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                                    if (Log.isLoggable(TAG, Log.DEBUG))
+                                        Log.d(TAG, "created: " + status.getCreatedCount()
+                                                                        + " failed: "
+                                                                        + status.getFailedCount()
+                                                                        + " deleted: "
+                                                                        + status.getDeletedCount());
+
+                                    if (status.getCreatedCount() >= 1) {
+                                        if (Log.isLoggable(TAG, Log.DEBUG))
+                                            Log.d(TAG, "Relationship is also set!");
+
+                                        serverUpdated = true;
+                                    } else {
+                                        if (Log.isLoggable(TAG, Log.DEBUG))
+                                            Log.d(TAG, "setRelationship failed!");
+
+                                        serverUpdated = false;
+                                    }
+
+                                }
+                            } else {
+                                // if the updatedBeanId is not null and the module is not Accounts
+                                serverUpdated = true;
+                            }
                         } else {
+                            // if the updatedBeanId is null
                             serverUpdated = false;
                         }
+
                     }
                     break;
 
-                // make the same calls for update and delete as delete only changes the DELETED flag
-                // to 1
                 case Util.UPDATE:
                     String serverUpdatedBeanId = null;
-                    // updates - relationship
+                    // update the bean via relationship
                     if (mUri.getPathSegments().size() >= 3) {
+
+                        // get the module name and beanId of the parent using the rowId in the URI
+                        mParentModuleName = mUri.getPathSegments().get(0);
                         String rowId = mUri.getPathSegments().get(1);
                         mBeanId = mDbHelper.lookupBeanId(mParentModuleName, rowId);
 
+                        // get the related module name and beanId from the URI
                         String moduleName = mUri.getPathSegments().get(2);
-                        // related BeanId
                         rowId = mUri.getPathSegments().get(3);
-                        updatedBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
+                        updatedBeanId = mDbHelper.lookupBeanId(moduleName, rowId);
+                        mLinkFieldName = mDbHelper.getLinkfieldName(moduleName);
 
-                        serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
-                        if(Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  serverUpdatedBeanId : "
-                                                        + serverUpdatedBeanId);
+                        // update the bean
+                        serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, moduleName, mUpdateNameValueMap);
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "updatedBeanId : " + updatedBeanId
+                                                            + "  serverUpdatedBeanId : "
+                                                            + serverUpdatedBeanId);
+
+                        // if the actual beanId (updatedBeanId) is equal to serverUpdatedBeanId
+                        // (beanId returned by server)
                         if (serverUpdatedBeanId.equals(updatedBeanId)) {
 
+                            // get the accountName from the name-value map
                             String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
+                            // if the accountName is not null
                             if (!TextUtils.isEmpty(accountName)) {
-                                // delete the relationship if there exists one
-                                /*
-                                 * get the bean_id of the old accountId and call the setRelationship
-                                 * with delete flasg as 1
-                                 */
+
                                 SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-                                String selection = mDbHelper.getAccountRelationsSelection(moduleName)
-                                                                + "=" + rowId;
-                                Cursor cursor = db.query(mDbHelper.getAccountRelationsTableName(moduleName), new String[] { ModuleFields.ACCOUNT_ID }, selection, null, null, null, null);
+                                // get the account bean id for the account name
+                                String selection = AccountsColumns.NAME + "='" + accountName + "'";
+                                Cursor cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
                                 cursor.moveToFirst();
-                                String accountRowId = cursor.getString(0);
+                                String newAccountBeanId = cursor.getString(1);
                                 cursor.close();
 
-                                selection = AccountsColumns.ID + "=" + accountRowId;
-                                cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, new String[] { AccountsColumns.BEAN_ID }, selection, null, null, null, null);
-                                cursor.moveToFirst();
-                                String accountBeanId = cursor.getString(0);
+                                // get the related account id for the bean
+                                selection = mDbHelper.getAccountRelationsSelection(moduleName)
+                                                                + "=" + rowId + " AND "
+                                                                + ModuleFields.DELETED + "="
+                                                                + Util.EXCLUDE_DELETED_ITEMS;
+                                cursor = db.query(mDbHelper.getAccountRelationsTableName(moduleName), new String[] { ModuleFields.ACCOUNT_ID }, selection, null, null, null, null);
+                                String accountRowId = null;
+                                if (cursor.moveToFirst()) {
+                                    accountRowId = cursor.getString(0);
+                                }
                                 cursor.close();
 
-                                db.close();
-                                if(Log.isLoggable(TAG, Log.DEBUG))
-                                    Log.d(TAG, "updating delete flag for relationship with account bean id : "
-                                                                + accountBeanId
-                                                                + " linkFieldName : "
-                                                                + mDbHelper.getLinkfieldName(moduleName)
-                                                                + " bean Id : " + updatedBeanId);
-                                RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, accountBeanId, mDbHelper.getLinkfieldName(moduleName), new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.DELETED_ITEM);
+                                String accountBeanId = null;
+                                // if the related account id, i.e. accountRowId is not null, =>
+                                // there already exists a relationship.
+                                if (!TextUtils.isEmpty(accountRowId)) {
+
+                                    // get the account bean id (accountBeanId) for the accountRowId
+                                    selection = AccountsColumns.ID + "=" + accountRowId;
+                                    cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, new String[] { AccountsColumns.BEAN_ID }, selection, null, null, null, null);
+                                    cursor.moveToFirst();
+                                    accountBeanId = cursor.getString(0);
+                                    cursor.close();
+
+                                    // if the accountBeanId (from the old relation) is equal to the
+                                    // newAccountBeanId => the relationship is the same. Otherwise,
+                                    // set the old relationship with the delete flag set to '1'.
+                                    if (!accountBeanId.equals(newAccountBeanId)) {
+                                        if (Log.isLoggable(TAG, Log.DEBUG))
+                                            Log.d(TAG, "updating delete flag for relationship with account bean id : "
+                                                                            + accountBeanId
+                                                                            + " linkFieldName : "
+                                                                            + mDbHelper.getLinkfieldName(mModuleName)
+                                                                            + " bean Id : "
+                                                                            + updatedBeanId);
+
+                                        RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, accountBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.DELETED_ITEM);
+
+                                        if (Log.isLoggable(TAG, Log.DEBUG))
+                                            Log.d(TAG, "updating delete flag for relationship is also set!");
+                                    }
+                                }
+
+                                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                                    Log.d(TAG, "updating relationship with parent module : "
+                                                                    + mParentModuleName
+                                                                    + " parent bean Id : "
+                                                                    + mBeanId);
+                                    Log.d(TAG, "updating relationship with link field name : "
+                                                                    + mLinkFieldName
+                                                                    + " updated bean Id : "
+                                                                    + updatedBeanId);
+                                }
+                                // set the new relationship
+                                RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                                if (Log.isLoggable(TAG, Log.DEBUG))
+                                    Log.d(TAG, "created: " + status.getCreatedCount() + " failed: "
+                                                                    + status.getFailedCount()
+                                                                    + " deleted: "
+                                                                    + status.getDeletedCount());
 
                                 if (status.getCreatedCount() >= 1) {
                                     if (Log.isLoggable(TAG, Log.DEBUG)) {
-                                        Log.d(TAG, "updating delete flag for relationship is also set!");
+                                        Log.d(TAG, "Relationship is also set!");
                                     }
                                     serverUpdated = true;
                                 } else {
                                     if (Log.isLoggable(TAG, Log.DEBUG)) {
-                                        Log.d(TAG, "updating delete flag for relationship failed!");
+                                        Log.d(TAG, "setRelationship failed!");
                                     }
                                     serverUpdated = false;
                                 }
-                            }
 
-                            if(Log.isLoggable(TAG, Log.DEBUG)){
-                                Log.d(TAG, "updating relationship with parent module : "
-                                                            + mParentModuleName
-                                                            + " parent bean Id : " + mBeanId);
-                                Log.d(TAG, "updating relationship with link field name : "
-                                                            + mLinkFieldName
-                                                            + " updated bean Id : " + updatedBeanId);
-                            }
-                            RelationshipStatus status = RestUtil.setRelationship(url, sessionId, mParentModuleName, mBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
-                            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                                Log.d(TAG, "created: " + status.getCreatedCount() + " failed: "
-                                                                + status.getFailedCount()
-                                                                + " deleted: "
-                                                                + status.getDeletedCount());
-                            }
-
-                            if (status.getCreatedCount() >= 1) {
-                                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                                    Log.d(TAG, "Relationship is also set!");
-                                }
-                                serverUpdated = true;
-                            } else {
-                                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                                    Log.d(TAG, "setRelationship failed!");
-                                }
-                                serverUpdated = false;
+                                db.close();
                             }
                         } else {
                             // a new bean was created instead of sending back the same updated bean
                             serverUpdated = false;
                         }
                     } else {
-                        String rowId = mUri.getLastPathSegment();
+                        // update an orphan
+
+                        // get the module name and beanId from the URI
+                        mModuleName = mUri.getPathSegments().get(0);
+                        String rowId = mUri.getPathSegments().get(1);
                         mBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
                         mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
+                        // update the bean
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
                         mUpdateNameValueMap.remove(SugarCRMContent.SUGAR_BEAN_ID);
-                        if(Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  mBeanId : " + mBeanId);
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  mBeanId : "
+                                                            + mBeanId);
 
+                        // if the actual beanId (mBeanId) is equal to updatedBeanId (beanId returned
+                        // by server)
                         if (mBeanId.equals(updatedBeanId)) {
-                            serverUpdated = true;
+
+                            if (!Util.ACCOUNTS.equals(mModuleName)) {
+
+                                // get the accountName from the name-value map
+                                String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
+                                // if accountName is not null
+                                if (!TextUtils.isEmpty(accountName)) {
+
+                                    SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+                                    // get the account bean id for the account name
+                                    String selection = AccountsColumns.NAME + "='" + accountName
+                                                                    + "'";
+                                    Cursor cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
+                                    cursor.moveToFirst();
+                                    String newAccountBeanId = cursor.getString(1);
+                                    cursor.close();
+
+                                    // get the related account id for the bean
+                                    selection = mDbHelper.getAccountRelationsSelection(mModuleName)
+                                                                    + "=" + rowId + " AND "
+                                                                    + ModuleFields.DELETED + "="
+                                                                    + Util.EXCLUDE_DELETED_ITEMS;
+                                    cursor = db.query(mDbHelper.getAccountRelationsTableName(mModuleName), new String[] { ModuleFields.ACCOUNT_ID }, selection, null, null, null, null);
+                                    String accountRowId = null;
+                                    if (cursor.moveToFirst()) {
+                                        accountRowId = cursor.getString(0);
+                                    }
+                                    cursor.close();
+
+                                    String accountBeanId = null;
+                                    // if the related account id, i.e. accountRowId is not null, =>
+                                    // there already exists a relationship.
+                                    if (!TextUtils.isEmpty(accountRowId)) {
+
+                                        // get the account bean id (accountBeanId) for the
+                                        // accountRowId
+                                        selection = AccountsColumns.ID + "=" + accountRowId;
+                                        cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, new String[] { AccountsColumns.BEAN_ID }, selection, null, null, null, null);
+                                        cursor.moveToFirst();
+                                        accountBeanId = cursor.getString(0);
+                                        cursor.close();
+
+                                        // if the accountBeanId (from the old relation) is equal to
+                                        // the newAccountBeanId => the relationship is the same.
+                                        // Otherwise, set the old relationship with the delete flag
+                                        // set to '1'.
+                                        if (!accountBeanId.equals(newAccountBeanId)) {
+                                            if (Log.isLoggable(TAG, Log.DEBUG))
+                                                Log.d(TAG, "updating delete flag for relationship with account bean id : "
+                                                                                + accountBeanId
+                                                                                + " linkFieldName : "
+                                                                                + mDbHelper.getLinkfieldName(mModuleName)
+                                                                                + " bean Id : "
+                                                                                + updatedBeanId);
+                                            RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, accountBeanId, mDbHelper.getLinkfieldName(mModuleName), new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.DELETED_ITEM);
+
+                                            if (Log.isLoggable(TAG, Log.DEBUG))
+                                                Log.d(TAG, "updating delete flag for relationship is also set!");
+                                        }
+                                    }
+
+                                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                                        Log.d(TAG, "updating relationship with parent module : "
+                                                                        + Util.ACCOUNTS
+                                                                        + " parent bean Id : "
+                                                                        + newAccountBeanId);
+                                        Log.d(TAG, "updating relationship with link field name : "
+                                                                        + mDbHelper.getLinkfieldName(mModuleName)
+                                                                        + " updated bean Id : "
+                                                                        + updatedBeanId);
+                                    }
+
+                                    // set the new relationship
+                                    RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, newAccountBeanId, mDbHelper.getLinkfieldName(mModuleName), new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
+                                    if (Log.isLoggable(TAG, Log.DEBUG))
+                                        Log.d(TAG, "created: " + status.getCreatedCount()
+                                                                        + " failed: "
+                                                                        + status.getFailedCount()
+                                                                        + " deleted: "
+                                                                        + status.getDeletedCount());
+
+                                    if (status.getCreatedCount() >= 1) {
+                                        if (Log.isLoggable(TAG, Log.DEBUG))
+                                            Log.d(TAG, "Relationship is also set!");
+
+                                        serverUpdated = true;
+                                    } else {
+                                        if (Log.isLoggable(TAG, Log.DEBUG))
+                                            Log.d(TAG, "setRelationship failed!");
+
+                                        serverUpdated = false;
+                                    }
+
+                                    db.close();
+                                }
+                            } else {
+                                // if the updatedBeanId is same as mBeanId and the module is not
+                                // Accounts
+                                serverUpdated = true;
+                            }
                         } else {
+                            // a new bean was created instead of sending back the same updated bean
                             serverUpdated = false;
                         }
-
                     }
                     break;
                 case Util.DELETE:
+                    // get the module name and bean id from the URI
+                    mModuleName = mUri.getPathSegments().get(0);
                     String rowId = mUri.getPathSegments().get(1);
                     mBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
                     mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
+                    // delete: set entry with the delete flag as '1'
                     updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
-                    if(Log.isLoggable(TAG, Log.DEBUG))
+                    if (Log.isLoggable(TAG, Log.DEBUG))
                         Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  mBeanId : " + mBeanId);
 
                     mUpdateNameValueMap.remove(SugarCRMContent.SUGAR_BEAN_ID);
@@ -272,9 +450,12 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
             switch (mCommand) {
             case Util.INSERT:
+
                 for (String key : mUpdateNameValueMap.keySet()) {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
+
+                // if the update is successful on the server-side
                 if (serverUpdated) {
                     // add updatedBeanId to the values map
                     values.put(SugarCRMContent.SUGAR_BEAN_ID, updatedBeanId);
@@ -289,8 +470,8 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                      */
                     values.put(SugarCRMContent.SUGAR_BEAN_ID, "Sync" + UUID.randomUUID());
                     Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
-                    // after success url insertion, we set the updatedRow to 1 so we dont get a fail
-                    // msg
+                    // after success url insertion, we set the updatedRow to 1 so we don't get a
+                    // fail msg
                     updatedRows = 1;
                     Log.i(TAG, "insertResultURi - " + insertResultUri);
                     insertSyncRecord(insertResultUri);
@@ -302,7 +483,9 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 for (String key : mUpdateNameValueMap.keySet()) {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
-                updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
+
+                if (serverUpdated)
+                    updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
 
                 if (!serverUpdated && updatedRows > 0) {
                     updateSyncRecord();
