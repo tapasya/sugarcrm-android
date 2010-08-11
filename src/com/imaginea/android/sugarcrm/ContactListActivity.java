@@ -95,7 +95,7 @@ public class ContactListActivity extends ListActivity {
     private String[] mSelectionArgs = new String[] { Util.EXCLUDE_DELETED_ITEMS };
 
     private SugarCrmApp app;
-    
+
     private ProgressDialog mProgressDialog;
 
     @Override
@@ -104,12 +104,9 @@ public class ContactListActivity extends ListActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
 
-        TextView tv = (TextView) findViewById(R.id.headerText);
-        tv.setText(mModuleName);
-        
         mProgressDialog = ViewUtil.getProgressDialog(ContactListActivity.this, getString(R.string.loading), true);
-        mProgressDialog.show(); 
-            
+        mProgressDialog.show();
+
         mDbHelper = new DatabaseHelper(getBaseContext());
         app = (SugarCrmApp) getApplication();
 
@@ -125,6 +122,9 @@ public class ContactListActivity extends ListActivity {
             findViewById(R.id.filterImage).setVisibility(View.GONE);
             findViewById(R.id.allItems).setVisibility(View.GONE);
         }
+
+        TextView tv = (TextView) findViewById(R.id.headerText);
+        tv.setText(mModuleName);
 
         mListView = getListView();
 
@@ -190,7 +190,7 @@ public class ContactListActivity extends ListActivity {
         mListFooterText = (TextView) findViewById(R.id.status);
 
         mListFooterProgress = mListFooterView.findViewById(R.id.progress);
-        
+
         mProgressDialog.cancel();
     }
 
