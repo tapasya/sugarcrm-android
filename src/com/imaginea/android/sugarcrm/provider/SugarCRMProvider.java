@@ -391,7 +391,6 @@ public class SugarCRMProvider extends ContentProvider {
             break;
         case USERS:
             c = db.query(DatabaseHelper.USERS_TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-            Log.d(TAG, "uri - " + uri + " results count : " + c.getCount());
             break;
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
