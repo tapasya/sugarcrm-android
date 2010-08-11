@@ -8,7 +8,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +23,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -25,6 +31,7 @@ import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 import com.imaginea.android.sugarcrm.util.ViewUtil;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +64,7 @@ public class AccountDetailsActivity extends Activity {
     private DatabaseHelper mDbHelper;
 
     private LoadContentTask mTask;
-    
+
     private ProgressDialog mProgressDialog;
 
     /** Called when the activity is first created. */
@@ -200,7 +207,7 @@ public class AccountDetailsActivity extends Activity {
             super.onPreExecute();
             TextView tv = (TextView) findViewById(R.id.headerText);
             tv.setText(String.format(getString(R.string.detailsHeader), mModuleName));
-            
+
             mProgressDialog = ViewUtil.getProgressDialog(AccountDetailsActivity.this, getString(R.string.loading), true);
             mProgressDialog.show();
         }
@@ -212,28 +219,96 @@ public class AccountDetailsActivity extends Activity {
             switch ((Integer) values[0]) {
 
             case HEADER:
-                TextView titleView = (TextView) values[1];
-                titleView.setText((String) values[2]);
+                TextView titleView = (TextView) values[2];
+                titleView.setText((String) values[3]);
                 break;
 
             case STATIC_ROW:
-                View detailRow = (View) values[1];
+                ViewGroup detailRow = (ViewGroup) values[2];
                 detailRow.setVisibility(View.VISIBLE);
 
-                TextView labelView = (TextView) values[2];
-                labelView.setText((String) values[3]);
-                TextView valueView = (TextView) values[4];
-                valueView.setText((String) values[5]);
+                TextView labelView = (TextView) values[3];
+                labelView.setText((String) values[4]);
+                TextView valueView = (TextView) values[5];
+                final String value = (String) values[6];
+                valueView.setText(value);
+
+                // handle the map
+                String fieldName = (String) values[1];
+                if (ModuleFields.SHIPPING_ADDRESS_COUNTRY.equals(fieldName)
+                                                || ModuleFields.BILLING_ADDRESS_COUNTRY.equals(fieldName)) {
+                    if (!TextUtils.isEmpty(value)) {
+                        valueView.setLinksClickable(true);
+                        valueView.setClickable(true);
+
+                        SpannableString spannableString = new SpannableString(value);
+                        spannableString.setSpan(new InternalURLSpan(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.i(LOG_TAG, "trying to locate - " + value);
+                                Uri uri = Uri.parse("geo:0,0?q=" + URLEncoder.encode(value));
+                                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, uri);
+                                intent.setData(uri);
+                                startActivity(intent);
+                            }
+                        }), 0, value.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        valueView.setText(spannableString);
+
+                        // for trackball movement
+                        MovementMethod m = valueView.getMovementMethod();
+                        if ((m == null) || !(m instanceof LinkMovementMethod)) {
+                            if (valueView.getLinksClickable()) {
+                                valueView.setMovementMethod(LinkMovementMethod.getInstance());
+                            }
+                        }
+                    }
+                }
+
                 break;
 
             case DYNAMIC_ROW:
-                detailRow = (View) values[1];
+                detailRow = (ViewGroup) values[2];
                 detailRow.setVisibility(View.VISIBLE);
 
-                labelView = (TextView) values[2];
-                labelView.setText((String) values[3]);
-                valueView = (TextView) values[4];
-                valueView.setText((String) values[5]);
+                labelView = (TextView) values[3];
+                labelView.setText((String) values[4]);
+                valueView = (TextView) values[5];
+                final String value2 = (String) values[6];
+                valueView.setText(value2);
+
+                // handle the map
+                fieldName = (String) values[1];
+                if (ModuleFields.SHIPPING_ADDRESS_COUNTRY.equals(fieldName)
+                                                || ModuleFields.BILLING_ADDRESS_COUNTRY.equals(fieldName)) {
+                    if (!TextUtils.isEmpty(value2)) {
+                        valueView.setLinksClickable(true);
+                        valueView.setClickable(true);
+
+                        SpannableString spannableString = new SpannableString(value2);
+                        spannableString.setSpan(new InternalURLSpan(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.i(LOG_TAG, "trying to locate - " + value2);
+                                Uri uri = Uri.parse("geo:0,0?q=" + URLEncoder.encode(value2));
+                                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, uri);
+                                intent.setData(uri);
+                                startActivity(intent);
+                            }
+                        }), 0, value2.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        valueView.setText(spannableString);
+
+                        // for trackball movement
+                        MovementMethod m = valueView.getMovementMethod();
+                        if ((m == null) || !(m instanceof LinkMovementMethod)) {
+                            if (valueView.getLinksClickable()) {
+                                valueView.setMovementMethod(LinkMovementMethod.getInstance());
+                            }
+                        }
+                    }
+                }
+
                 mDetailsTable.addView(detailRow);
                 break;
             }
@@ -277,7 +352,7 @@ public class AccountDetailsActivity extends Activity {
             default:
 
             }
-            
+
             mProgressDialog.cancel();
         }
 
@@ -348,7 +423,7 @@ public class AccountDetailsActivity extends Activity {
                 // set the title
                 if (titleFields.contains(fieldName)) {
                     title = title + tempValue + " ";
-                    publishProgress(HEADER, textViewForTitle, title);
+                    publishProgress(HEADER, fieldName, textViewForTitle, title);
                     continue;
                 }
 
@@ -409,14 +484,29 @@ public class AccountDetailsActivity extends Activity {
                 int command = staticRowsCount < rowsCount ? DYNAMIC_ROW : STATIC_ROW;
 
                 if (!TextUtils.isEmpty(value)) {
-                    publishProgress(command, tableRow, textViewForLabel, label, textViewForValue, value);
+                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, value);
                 } else {
-                    publishProgress(command, tableRow, textViewForLabel, label, textViewForValue, getString(R.string.notAvailable));
+                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, getString(R.string.notAvailable));
                 }
 
                 rowsCount++;
 
             }
+        }
+    }
+
+    static class InternalURLSpan extends ClickableSpan {
+        OnClickListener mListener;
+
+        public InternalURLSpan(OnClickListener listener) {
+            super();
+            mListener = listener;
+        }
+
+        @Override
+        public void onClick(View widget) {
+            Log.i("AccountDetailsActivity", "InternalURLSpan onClick");
+            mListener.onClick(widget);
         }
     }
 
