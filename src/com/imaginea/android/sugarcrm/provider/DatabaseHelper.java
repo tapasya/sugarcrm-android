@@ -1553,4 +1553,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return null;
     }
+
+    public String lookupUserBeanId(String userBeanName) {
+        ContentResolver resolver = mContext.getContentResolver();
+        String beanId = null;
+        Uri contentUri = getModuleUri(Util.USERS);
+        String[] projection = new String[] { ModuleFields.ID };
+        String selection = Users.USER_NAME + "='" + userBeanName + "'";
+        final Cursor c = resolver.query(contentUri, projection, selection, null, null);
+        try {
+            if (c.moveToFirst()) {
+                beanId = c.getString(0);
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return beanId;
+    }
 }
