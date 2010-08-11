@@ -1,6 +1,7 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -81,6 +82,8 @@ public class EditDetailsActivity extends Activity {
     private String mAccountName;
 
     private String mUserName;
+
+    private ProgressDialog mProgressDialog;
 
     /** Called when the activity is first created. */
     @Override
@@ -200,6 +203,9 @@ public class EditDetailsActivity extends Activity {
 
             mUserCursor = getContentResolver().query(mDbHelper.getModuleUri(Util.USERS), Users.DETAILS_PROJECTION, null, null, null);
             mUserAdapter = new UsersSuggestAdapter(getBaseContext(), mUserCursor);
+
+            mProgressDialog = ViewUtil.getProgressDialog(EditDetailsActivity.this, getString(R.string.loading), true);
+            mProgressDialog.show();
         }
 
         @Override
@@ -404,6 +410,8 @@ public class EditDetailsActivity extends Activity {
             default:
 
             }
+
+            mProgressDialog.cancel();
         }
 
         private void setContents() {
@@ -502,6 +510,10 @@ public class EditDetailsActivity extends Activity {
      * @param v
      */
     public void saveModuleItem(View v) {
+
+        mProgressDialog = ViewUtil.getProgressDialog(EditDetailsActivity.this, getString(R.string.saving), true);
+        mProgressDialog.show();
+
         boolean hasError = false;
         String[] detailsProjection = mSelectFields;
 
@@ -654,6 +666,7 @@ public class EditDetailsActivity extends Activity {
             case R.id.status:
                 if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, "Display Status");
+                mProgressDialog.cancel();
                 ViewUtil.makeToast(getBaseContext(), (String) message.obj);
                 finish();
                 break;
