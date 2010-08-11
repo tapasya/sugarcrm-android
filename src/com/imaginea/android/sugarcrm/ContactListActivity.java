@@ -283,6 +283,11 @@ public class ContactListActivity extends ListActivity {
      * @param position
      */
     void openDetailScreen(int position) {
+        if (mProgressDialog == null) {
+            mProgressDialog = ViewUtil.getProgressDialog(ContactListActivity.this, getString(R.string.loading), false);
+        }
+        mProgressDialog.show();
+
         Intent detailIntent = new Intent(ContactListActivity.this, AccountDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
@@ -304,6 +309,11 @@ public class ContactListActivity extends ListActivity {
      * @param position
      */
     private void openEditScreen(int position) {
+        if (mProgressDialog == null) {
+            mProgressDialog = ViewUtil.getProgressDialog(ContactListActivity.this, getString(R.string.loading), false);
+        }
+        mProgressDialog.show();
+        
         Intent detailIntent = new Intent(ContactListActivity.this, EditDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
@@ -373,6 +383,10 @@ public class ContactListActivity extends ListActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (mProgressDialog != null) {
+            mProgressDialog.cancel();
+            mProgressDialog = null;
+        }
     }
 
     @Override
