@@ -3,6 +3,7 @@ package com.imaginea.android.sugarcrm;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -34,6 +35,7 @@ import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
+import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,6 +95,8 @@ public class ContactListActivity extends ListActivity {
     private String[] mSelectionArgs = new String[] { Util.EXCLUDE_DELETED_ITEMS };
 
     private SugarCrmApp app;
+    
+    private ProgressDialog mProgressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +104,12 @@ public class ContactListActivity extends ListActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
 
+        TextView tv = (TextView) findViewById(R.id.headerText);
+        tv.setText(mModuleName);
+        
+        mProgressDialog = ViewUtil.getProgressDialog(ContactListActivity.this, getString(R.string.loading), true);
+        mProgressDialog.show(); 
+            
         mDbHelper = new DatabaseHelper(getBaseContext());
         app = (SugarCrmApp) getApplication();
 
@@ -115,9 +125,6 @@ public class ContactListActivity extends ListActivity {
             findViewById(R.id.filterImage).setVisibility(View.GONE);
             findViewById(R.id.allItems).setVisibility(View.GONE);
         }
-
-        TextView tv = (TextView) findViewById(R.id.headerText);
-        tv.setText(mModuleName);
 
         mListView = getListView();
 
@@ -183,6 +190,8 @@ public class ContactListActivity extends ListActivity {
         mListFooterText = (TextView) findViewById(R.id.status);
 
         mListFooterProgress = mListFooterView.findViewById(R.id.progress);
+        
+        mProgressDialog.cancel();
     }
 
     /**
