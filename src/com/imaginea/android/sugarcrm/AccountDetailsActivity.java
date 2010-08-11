@@ -1,6 +1,7 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
+import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +57,8 @@ public class AccountDetailsActivity extends Activity {
     private DatabaseHelper mDbHelper;
 
     private LoadContentTask mTask;
+    
+    private ProgressDialog mProgressDialog;
 
     /** Called when the activity is first created. */
     @Override
@@ -195,7 +199,10 @@ public class AccountDetailsActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             TextView tv = (TextView) findViewById(R.id.headerText);
-            tv.setText(mModuleName + " Details");
+            tv.setText(String.format(getString(R.string.detailsHeader), mModuleName));
+            
+            mProgressDialog = ViewUtil.getProgressDialog(AccountDetailsActivity.this, getString(R.string.loading), true);
+            mProgressDialog.show();
         }
 
         @Override
@@ -270,6 +277,8 @@ public class AccountDetailsActivity extends Activity {
             default:
 
             }
+            
+            mProgressDialog.cancel();
         }
 
         private void setContents() {
