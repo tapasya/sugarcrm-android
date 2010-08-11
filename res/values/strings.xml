@@ -91,6 +91,7 @@
 	<string name="dateFilters">Date Filters</string>
 	<string name="startDate">Start Date</string>
 	<string name="endDate">End Date</string>
+	<string name="detailsHeader">%s Details</string>
 	<string name="editDetailsHeader">Edit %s Details</string>
 	<string name="newDetailsHeader">New %s Details</string>
 	<string name="save">Save</string>
@@ -127,4 +128,6 @@
 	<string name="moduleField">Field name</string>
 	<string name="settingsSaved">Settings saved!</string>
 	<string name="saving">Saving...</string>
+	
+	<string name="loading">Loading...</string>
 </resources>
