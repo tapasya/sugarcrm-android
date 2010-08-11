@@ -1,6 +1,7 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.Util;
+import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,13 +36,18 @@ public class DashboardActivity extends Activity {
 
     private List<String> mModuleNames;
 
-    private DatabaseHelper mDbHelper = new DatabaseHelper(this);
+    private DatabaseHelper mDbHelper;
+
+    private ProgressDialog mProgressDialog;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        mDbHelper = new DatabaseHelper(this);
+
         Class wizardActivity = WizardDetector.getClass(getBaseContext());
         startActivityForResult(new Intent(this, wizardActivity), Util.LOGIN_REQUEST_CODE);
 
@@ -51,6 +58,10 @@ public class DashboardActivity extends Activity {
 
         mDashboard.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+
+                mProgressDialog = ViewUtil.getProgressDialog(DashboardActivity.this, getString(R.string.loading), false);
+                mProgressDialog.show();
+
                 // invoke the corresponding activity when the item in the GridView is clicked
                 Intent myIntent;
                 String moduleName = mModuleNames.get(position);
@@ -67,6 +78,21 @@ public class DashboardActivity extends Activity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mProgressDialog != null) {
+            mProgressDialog.cancel();
+            mProgressDialog = null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
@@ -78,7 +104,7 @@ public class DashboardActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(DashboardActivity.this);
                 Long syncScreenCheck = prefs.getLong(Util.PREF_SYNC_START_TIME, 0L);
-                if (syncScreenCheck ==0L) {
+                if (syncScreenCheck == 0L) {
                     startActivityForResult(new Intent(this, SyncConfigActivity.class), Util.SYNC_DATA_REQUEST_CODE);
                 } else
                     showDashboard();
