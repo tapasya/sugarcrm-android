@@ -93,8 +93,15 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 case Util.INSERT:
                     // inserts with a relationship
                     if (mUri.getPathSegments().size() >= 3) {
-
+                        // get the user id from the username and then add it to the map
+                        String userBeanName = mUpdateNameValueMap.get(ModuleFields.ASSIGNED_USER_NAME);
+                        if (!TextUtils.isEmpty(userBeanName)) {
+                            String userBeanId = mDbHelper.lookupUserBeanId(userBeanName);
+                            mUpdateNameValueMap.put(ModuleFields.ASSIGNED_USER_ID, userBeanId);
+                        }
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                        mUpdateNameValueMap.remove(ModuleFields.ASSIGNED_USER_ID);
+
                         if (updatedBeanId != null) {
                             // get the module name and beanId of the parent from the URI
                             mParentModuleName = mUri.getPathSegments().get(0);
@@ -114,16 +121,17 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                 if (Log.isLoggable(TAG, Log.DEBUG)) {
                                     Log.i(TAG, "Relationship is also set!");
                                 }
-                                //serverUpdated = true;
-                                
-                                if (!Util.ACCOUNTS.equals(mModuleName) && !Util.ACCOUNTS.equals(mParentModuleName)) {
+                                // serverUpdated = true;
+
+                                if (!Util.ACCOUNTS.equals(mModuleName)
+                                                                && !Util.ACCOUNTS.equals(mParentModuleName)) {
                                     String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
                                     if (!TextUtils.isEmpty(accountName)) {
                                         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
                                         // get the account bean id for the account name
-                                        String selection = AccountsColumns.NAME + "='" + accountName
-                                                                        + "'";
+                                        String selection = AccountsColumns.NAME + "='"
+                                                                        + accountName + "'";
                                         Cursor cursor = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
                                         cursor.moveToFirst();
                                         String newAccountBeanId = cursor.getString(1);
@@ -146,7 +154,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                         }
                                     }
                                 }
-                                
+
                             } else {
                                 if (Log.isLoggable(TAG, Log.DEBUG)) {
                                     Log.i(TAG, "setRelationship failed!");
@@ -160,12 +168,21 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     } else {
                         // insert case for an orphan module add without any relationship, the
                         // updatedBeanId is actually a new beanId returned by server
+
+                        // get the user id from the username and then add it to the map
+                        String userBeanName = mUpdateNameValueMap.get(ModuleFields.ASSIGNED_USER_NAME);
+                        if (!TextUtils.isEmpty(userBeanName)) {
+                            String userBeanId = mDbHelper.lookupUserBeanId(userBeanName);
+                            mUpdateNameValueMap.put(ModuleFields.ASSIGNED_USER_ID, userBeanId);
+                        }
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                        mUpdateNameValueMap.remove(ModuleFields.ASSIGNED_USER_ID);
+
                         if (updatedBeanId != null) {
                             if (!Util.ACCOUNTS.equals(mModuleName)) {
                                 String accountName = mUpdateNameValueMap.get(ModuleFields.ACCOUNT_NAME);
                                 if (!TextUtils.isEmpty(accountName)) {
-                                    
+
                                     SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
                                     // get the account bean id for the account name
@@ -228,8 +245,17 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                         updatedBeanId = mDbHelper.lookupBeanId(moduleName, rowId);
                         mLinkFieldName = mDbHelper.getLinkfieldName(moduleName);
 
+                        // get the user id from the username and then add it to the map
+                        String userBeanName = mUpdateNameValueMap.get(ModuleFields.ASSIGNED_USER_NAME);
+                        if (!TextUtils.isEmpty(userBeanName)) {
+                            String userBeanId = mDbHelper.lookupUserBeanId(userBeanName);
+                            mUpdateNameValueMap.put(ModuleFields.ASSIGNED_USER_ID, userBeanId);
+                        }
+
                         // update the bean
                         serverUpdatedBeanId = RestUtil.setEntry(url, sessionId, moduleName, mUpdateNameValueMap);
+                        mUpdateNameValueMap.remove(ModuleFields.ASSIGNED_USER_ID);
+
                         if (Log.isLoggable(TAG, Log.DEBUG))
                             Log.d(TAG, "updatedBeanId : " + updatedBeanId
                                                             + "  serverUpdatedBeanId : "
@@ -340,9 +366,19 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                         String rowId = mUri.getPathSegments().get(1);
                         mBeanId = mDbHelper.lookupBeanId(mModuleName, rowId);
                         mUpdateNameValueMap.put(SugarCRMContent.SUGAR_BEAN_ID, mBeanId);
+
+                        // get the user id from the username and then add it to the map
+                        String userBeanName = mUpdateNameValueMap.get(ModuleFields.ASSIGNED_USER_NAME);
+                        if (!TextUtils.isEmpty(userBeanName)) {
+                            String userBeanId = mDbHelper.lookupUserBeanId(userBeanName);
+                            mUpdateNameValueMap.put(ModuleFields.ASSIGNED_USER_ID, userBeanId);
+                        }
+
                         // update the bean
                         updatedBeanId = RestUtil.setEntry(url, sessionId, mModuleName, mUpdateNameValueMap);
+                        mUpdateNameValueMap.remove(ModuleFields.ASSIGNED_USER_ID);
                         mUpdateNameValueMap.remove(SugarCRMContent.SUGAR_BEAN_ID);
+
                         if (Log.isLoggable(TAG, Log.DEBUG))
                             Log.d(TAG, "updatedBeanId : " + updatedBeanId + "  mBeanId : "
                                                             + mBeanId);
