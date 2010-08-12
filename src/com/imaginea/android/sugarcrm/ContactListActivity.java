@@ -3,7 +3,6 @@ package com.imaginea.android.sugarcrm;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -35,7 +34,6 @@ import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
-import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -96,16 +94,11 @@ public class ContactListActivity extends ListActivity {
 
     private SugarCrmApp app;
 
-    private ProgressDialog mProgressDialog;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.common_list);
-
-        mProgressDialog = ViewUtil.getProgressDialog(ContactListActivity.this, getString(R.string.loading), true);
-        mProgressDialog.show();
 
         mDbHelper = new DatabaseHelper(getBaseContext());
         app = (SugarCrmApp) getApplication();
@@ -190,8 +183,6 @@ public class ContactListActivity extends ListActivity {
         mListFooterText = (TextView) findViewById(R.id.status);
 
         mListFooterProgress = mListFooterView.findViewById(R.id.progress);
-
-        mProgressDialog.cancel();
     }
 
     /**
@@ -283,11 +274,6 @@ public class ContactListActivity extends ListActivity {
      * @param position
      */
     void openDetailScreen(int position) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ViewUtil.getProgressDialog(ContactListActivity.this, getString(R.string.loading), false);
-        }
-        mProgressDialog.show();
-
         Intent detailIntent = new Intent(ContactListActivity.this, AccountDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
@@ -309,11 +295,6 @@ public class ContactListActivity extends ListActivity {
      * @param position
      */
     private void openEditScreen(int position) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ViewUtil.getProgressDialog(ContactListActivity.this, getString(R.string.loading), false);
-        }
-        mProgressDialog.show();
-        
         Intent detailIntent = new Intent(ContactListActivity.this, EditDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
@@ -383,10 +364,6 @@ public class ContactListActivity extends ListActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mProgressDialog != null) {
-            mProgressDialog.cancel();
-            mProgressDialog = null;
-        }
     }
 
     @Override
