@@ -3,7 +3,8 @@
     android:orientation="vertical"
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent"
-    android:background="@drawable/bg">
+    android:background="@drawable/bg"
+    android:paddingBottom="30dip">
 	<include android:id="@+id/header" layout="@layout/header"/>
     <TextView android:id="@+id/accountName"
 		android:layout_height="wrap_content" 
