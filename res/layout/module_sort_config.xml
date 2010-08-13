@@ -32,7 +32,8 @@
 	        		android:layout_height="wrap_content" 
 	        		android:drawSelectorOnTop="true"
 	        		android:prompt="@string/module"
-	        		style="@style/text_row_value" />
+	        		style="@style/text_row_value"
+	        		android:paddingLeft="20dip" />
         	</LinearLayout>
         	<LinearLayout
         		android:id="@+id/moduleFieldContainer"
@@ -49,7 +50,8 @@
        			<Spinner 
 	        		android:layout_width="fill_parent" 
 	        		android:layout_height="wrap_content"
-	        		style="@style/text_row_value" />
+	        		style="@style/text_row_value"
+	        		android:paddingLeft="20dip" />
         	</LinearLayout>
         	<LinearLayout
         		android:id="@+id/sortOrderContainer"
@@ -66,7 +68,8 @@
 	       		<Spinner
 	        		android:layout_width="fill_parent" 
 	        		android:layout_height="wrap_content"
-	        		style="@style/text_row_value" />
+	        		style="@style/text_row_value"
+	        		android:paddingLeft="20dip" />
         	</LinearLayout>
        		<Button android:id="@+id/saveSortOrder"
                 android:layout_width="fill_parent"
