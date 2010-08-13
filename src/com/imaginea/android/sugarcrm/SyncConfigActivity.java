@@ -174,10 +174,17 @@ public class SyncConfigActivity extends Activity {
                 calendar.set(year, month, monthDay);
                 endMillis = calendar.getTimeInMillis();
 
+                long curTime = System.currentTimeMillis();
+                // see to that the endDate does not exceed the current date
+                if (endMillis > curTime) {
+                    endMillis = curTime;
+                }
+
                 // Do not allow an event to have an end time before the start time.
                 if (endDate.before(startDate)) {
                     endDate.setTime(startMillis);
                 }
+
             }
 
             startDate.setTime(startMillis);
