@@ -21,6 +21,8 @@
 			android:src="@drawable/home"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:paddingTop="10dip"
+			android:paddingBottom="10dip"
 			android:onClick="showHome" 							
 			/> 
 		<ImageView
@@ -28,6 +30,9 @@
 			android:src="@drawable/my_items_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:paddingTop="10dip"
+			android:paddingBottom="10dip"
+			android:paddingLeft="10dip"
 			android:onClick="showAssignedItems"
 			/>
 		<ImageView
@@ -35,6 +40,9 @@
 			android:src="@drawable/all_items_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:paddingTop="10dip"
+			android:paddingBottom="10dip"
+			android:paddingLeft="10dip"
 			android:onClick="showAllItems"			
 			 />
 		  </LinearLayout>
