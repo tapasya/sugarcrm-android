@@ -216,9 +216,13 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                         serverUpdated = false;
                                     }
 
+                                } else {
+                                    // if the updatedBeanId is not null, module is not Accounts and
+                                    // accountName is null
+                                    serverUpdated = true;
                                 }
                             } else {
-                                // if the updatedBeanId is not null and the module is not Accounts
+                                // if the updatedBeanId is not null and the module is Accounts
                                 serverUpdated = true;
                             }
                         } else {
@@ -353,6 +357,10 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                 }
 
                                 db.close();
+                            } else {
+                                // if the updatedBeanId is not null, module is not Accounts and
+                                // accountName is null
+                                serverUpdated = true;
                             }
                         } else {
                             // a new bean was created instead of sending back the same updated bean
@@ -481,9 +489,13 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                     }
 
                                     db.close();
+                                } else {
+                                    // if the updatedBeanId is not null, module is not Accounts and
+                                    // accountName is null
+                                    serverUpdated = true;
                                 }
                             } else {
-                                // if the updatedBeanId is same as mBeanId and the module is not
+                                // if the updatedBeanId is same as mBeanId and the module is
                                 // Accounts
                                 serverUpdated = true;
                             }
