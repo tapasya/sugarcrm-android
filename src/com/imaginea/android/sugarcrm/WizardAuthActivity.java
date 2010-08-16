@@ -236,7 +236,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     TextView tv = (TextView) flipper.findViewById(R.id.wizardUrlStatus);
                     if (TextUtils.isEmpty(url)) {
                         tv.setText(getString(R.string.validFieldMsg)
-                                                        + " REST url \n\n"
+                                                        + " REST url. \n For example, \n"
                                                         + getBaseContext().getString(R.string.defaultUrl));
                     } else {
                         mUrlTask = new UrlValidationTask();
