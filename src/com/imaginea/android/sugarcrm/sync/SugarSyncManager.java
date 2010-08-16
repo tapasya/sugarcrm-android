@@ -255,7 +255,7 @@ public class SugarSyncManager {
                         // update module Item
                         Log.i(LOG_TAG, "updating... " + moduleName + "_" + relation
                                                         + ": relationRawId - " + relationRawId
-                                                        + ") ");
+                                                        + ")");
                         updateRelatedModuleItem(context, context.getContentResolver(), account, moduleName, rawId, relation, relationbean, relationRawId, batchOperation);
                     } else {
                         // delete module item
@@ -291,12 +291,12 @@ public class SugarSyncManager {
             // get the relationships for a user only if access is allowed
             if (databaseHelper.isModuleAccessAvailable(relation)) {
                 String linkFieldName = databaseHelper.getLinkfieldName(relation);
-                // String[] relationProj = databaseHelper.getModuleProjections(relation);
+                String[] relationProj = databaseHelper.getModuleProjections(relation);
 
-                // we only insert the bean id and the deleted flag during the relationship but not
-                // all the fields in the details projection
-                String[] relationProj = new String[] { ModuleFields.ID, ModuleFields.DELETED };
-                mLinkNameToFieldsArray.put(linkFieldName, Arrays.asList(relationProj));
+                // remove ACCOUNT_NAME from the projection
+                List<String> projList = new ArrayList<String>(Arrays.asList(relationProj));
+                projList.remove(ModuleFields.ACCOUNT_NAME);
+                mLinkNameToFieldsArray.put(linkFieldName, projList);
             }
         }
     }
