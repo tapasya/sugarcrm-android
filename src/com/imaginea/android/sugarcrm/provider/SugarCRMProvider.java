@@ -517,6 +517,7 @@ public class SugarCRMProvider extends ContentProvider {
                 ContentValues val2 = new ContentValues();
                 val2.put(AccountsOpportunitiesColumns.ACCOUNT_ID, accountId);
                 val2.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, rowId);
+                val2.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
                 // TODO - date_modified
                 db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val2);
 
@@ -544,6 +545,7 @@ public class SugarCRMProvider extends ContentProvider {
                 ContentValues val2 = new ContentValues();
                 val2.put(AccountsCasesColumns.ACCOUNT_ID, accountId);
                 val2.put(AccountsCasesColumns.CASE_ID, rowId);
+                val2.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
                 // TODO - date_modified
                 db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val2);
 
@@ -555,25 +557,27 @@ public class SugarCRMProvider extends ContentProvider {
         case CONTACT:
             rowId = db.insert(DatabaseHelper.CONTACTS_TABLE_NAME, "", values);
             if (rowId > 0) {
-                // get the account name from the name-value map
-                accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    // get the account name from the name-value map
+                    accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        Cursor c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
+                        c.moveToFirst();
+                        String newAccountId = c.getString(0);
+                        c.close();
 
-                    // create a new relationship with the account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsContactsColumns.CONTACT_ID, rowId);
-                    val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
-                    long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
-                    if (relationRowId > 0)
-                        Log.i(TAG, "created relation: contactId - " + rowId
-                                                        + " accountId - " + newAccountId);
+                        // create a new relationship with the account
+                        ContentValues val3 = new ContentValues();
+                        val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
+                        val3.put(AccountsContactsColumns.CONTACT_ID, rowId);
+                        val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
+                        long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
+                        if (relationRowId > 0)
+                            Log.i(TAG, "created relation: contactId - " + rowId + " accountId - "
+                                                            + newAccountId);
+                    }
                 }
 
                 Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, rowId);
@@ -607,28 +611,33 @@ public class SugarCRMProvider extends ContentProvider {
                 // TODO - date_modified
                 long relationRowId = db.insert(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, "", val2);
                 if (relationRowId > 0)
-                        Log.i(TAG, "created relation: opportunityId - " + rowId
-                                                        + " contactId - " + rowId);
+                    Log.i(TAG, "created relation: opportunityId - " + rowId + " contactId - "
+                                                    + contactId);
 
                 // accounts_opportunities relationship
-                accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                        String newAccountId = null;
+                        if (cursor.moveToFirst())
+                            newAccountId = cursor.getString(0);
+                        cursor.close();
 
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, rowId);
-                    val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
-                    // TODO - date_modified
-                    relationRowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
-                    if (relationRowId > 0)
-                        Log.i(TAG, "created relation: opportunityId - " + rowId
-                                                        + " accountId - " + newAccountId);
+                        if (newAccountId != null) {
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, rowId);
+                            val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
+                            // TODO - date_modified
+                            relationRowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
+                            if (relationRowId > 0)
+                                Log.i(TAG, "created relation: opportunityId - " + rowId
+                                                                + " accountId - " + newAccountId);
+                        }
+                    }
                 }
 
                 return opportunityUri;
@@ -641,13 +650,16 @@ public class SugarCRMProvider extends ContentProvider {
             if (!TextUtils.isEmpty(accountName)) {
                 // get the account id for the account name
                 selection = AccountsColumns.NAME + "='" + accountName + "'";
-                cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                cursor.moveToFirst();
-                String newAccountId = cursor.getString(0);
-                cursor.close();
-                values.put(Leads.ACCOUNT_ID, newAccountId);
+                Cursor c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
+                String newAccountId = null;
+                if (c.moveToFirst()) {
+                    newAccountId = c.getString(0);
+                    values.put(Leads.ACCOUNT_ID, newAccountId);
+                }
+                c.close();
+
             }
-            
+
             rowId = db.insert(DatabaseHelper.LEADS_TABLE_NAME, "", values);
             if (rowId > 0) {
                 Uri leadUri = ContentUris.withAppendedId(Leads.CONTENT_URI, rowId);
@@ -668,26 +680,32 @@ public class SugarCRMProvider extends ContentProvider {
         case OPPORTUNITY:
             rowId = db.insert(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, "", values);
             if (rowId > 0) {
-                accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        Cursor c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
+                        String newAccountId = null;
+                        if (c.moveToFirst()) {
+                            newAccountId = c.getString(0);
+                        }
+                        c.close();
 
-                    // create a new relationship with the new account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, rowId);
-                    val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
-                    long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
-                    if (relationRowId > 0)
-                        Log.i(TAG, "created relation: opportunityId - " + rowId
-                                                        + " accountId - " + newAccountId);
+                        if (newAccountId != null) {
+                            // create a new relationship with the new account
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, rowId);
+                            val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
+                            long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
+                            if (relationRowId > 0)
+                                Log.i(TAG, "created relation: opportunityId - " + rowId
+                                                                + " accountId - " + newAccountId);
+                        }
+                    }
                 }
-                
+
                 Uri oppUri = ContentUris.withAppendedId(Opportunities.CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(oppUri, null);
                 return oppUri;
@@ -711,24 +729,30 @@ public class SugarCRMProvider extends ContentProvider {
                 db.insert(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, "", val2);
 
                 // accounts_contacts relationship
-                accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                        String newAccountId = null;
+                        if (cursor.moveToFirst()) {
+                            newAccountId = cursor.getString(0);
+                        }
+                        cursor.close();
 
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsContactsColumns.CONTACT_ID, rowId);
-                    val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
-                    // TODO - date_modified
-                    long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
-                    if (relationRowId > 0)
-                        Log.i(TAG, "created relation: contactId - " + rowId
-                                                        + " accountId - " + newAccountId);
+                        if (newAccountId != null) {
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsContactsColumns.CONTACT_ID, rowId);
+                            val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
+                            // TODO - date_modified
+                            long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
+                            if (relationRowId > 0)
+                                Log.i(TAG, "created relation: contactId - " + rowId
+                                                                + " accountId - " + newAccountId);
+                        }
+                    }
                 }
 
                 return contactsUri;
@@ -739,24 +763,30 @@ public class SugarCRMProvider extends ContentProvider {
         case CASE:
             rowId = db.insert(DatabaseHelper.CASES_TABLE_NAME, "", values);
             if (rowId > 0) {
-                accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        Cursor c = db.query(DatabaseHelper.ACCOUNTS_TABLE_NAME, Accounts.LIST_PROJECTION, selection, null, null, null, null);
+                        String newAccountId = null;
+                        if (c.moveToFirst()) {
+                            newAccountId = c.getString(0);
+                        }
+                        c.close();
 
-                    // create a new relationship with the new account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsCasesColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsCasesColumns.CASE_ID, rowId);
-                    val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
-                    long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
-                    if (relationRowId > 0)
-                        Log.i(TAG, "created relation: caseId - " + rowId
-                                                        + " accountId - " + newAccountId);
+                        if (newAccountId != null) {
+                            // create a new relationship with the new account
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsCasesColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsCasesColumns.CASE_ID, rowId);
+                            val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
+                            long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
+                            if (relationRowId > 0)
+                                Log.i(TAG, "created relation: caseId - " + rowId + " accountId - "
+                                                                + newAccountId);
+                        }
+                    }
                 }
                 Uri accountUri = ContentUris.withAppendedId(Cases.CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(accountUri, null);
@@ -974,18 +1004,48 @@ public class SugarCRMProvider extends ContentProvider {
             String selection = ContactsColumns.ID + "=" + contactId;
             count = db.update(DatabaseHelper.CONTACTS_TABLE_NAME, values, selection, null);
 
-            String accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+            if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                String accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
 
-            if (!TextUtils.isEmpty(accountName)) {
-                // get the account id for the account name
-                selection = AccountsColumns.NAME + "='" + accountName + "'";
-                Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                cursor.moveToFirst();
-                String newAccountId = cursor.getString(0);
-                cursor.close();
+                if (!TextUtils.isEmpty(accountName)) {
+                    // get the account id for the account name
+                    selection = AccountsColumns.NAME + "='" + accountName + "'";
+                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                    String newAccountId = null;
+                    if (cursor.moveToFirst())
+                        newAccountId = cursor.getString(0);
+                    cursor.close();
 
-                if (!accountId.equals(newAccountId)) {
-                    // the row Id of the new account is not the same as the old one
+                    if (newAccountId != null) {
+                        if (!accountId.equals(newAccountId)) {
+                            // the row Id of the new account is not the same as the old one
+
+                            // update the delete flag to '1' for the old relationship
+                            ContentValues val2 = new ContentValues();
+                            selection = AccountsContactsColumns.ACCOUNT_ID + "=" + accountId
+                                                            + " AND "
+                                                            + AccountsContactsColumns.CONTACT_ID
+                                                            + "=" + contactId;
+                            val2.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
+                            db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
+                            Log.i(TAG, "updated deleted flag for the relation: contactId - "
+                                                            + contactId + " oldAccountId - "
+                                                            + accountId);
+
+                            // create a new relationship with the new account
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsContactsColumns.CONTACT_ID, contactId);
+                            val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
+                            long rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
+                            if (rowId > 0)
+                                Log.i(TAG, "created relation: contactId - " + contactId
+                                                                + " accountId - " + newAccountId);
+                        }
+                    }
+
+                } else {
+                    // if the accountName is removed while updating, delete the relationship
 
                     // update the delete flag to '1' for the old relationship
                     ContentValues val2 = new ContentValues();
@@ -996,30 +1056,7 @@ public class SugarCRMProvider extends ContentProvider {
                     db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
                     Log.i(TAG, "updated deleted flag for the relation: contactId - " + contactId
                                                     + " oldAccountId - " + accountId);
-
-                    // create a new relationship with the new account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsContactsColumns.CONTACT_ID, contactId);
-                    val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
-                    long rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
-                    if (rowId > 0)
-                        Log.i(TAG, "created relation: contactId - " + contactId + " accountId - "
-                                                        + newAccountId);
                 }
-
-            } else {
-                // if the accountName is removed while updating, delete the relationship
-
-                // update the delete flag to '1' for the old relationship
-                ContentValues val2 = new ContentValues();
-                selection = AccountsContactsColumns.ACCOUNT_ID + "=" + accountId + " AND "
-                                                + AccountsContactsColumns.CONTACT_ID + "="
-                                                + contactId;
-                val2.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
-                db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
-                Log.i(TAG, "updated deleted flag for the relation: contactId - " + contactId
-                                                + " oldAccountId - " + accountId);
             }
 
             break;
@@ -1042,18 +1079,50 @@ public class SugarCRMProvider extends ContentProvider {
             selection = OpportunitiesColumns.ID + "=" + opportunityId;
             count = db.update(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, values, selection, null);
 
-            accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+            if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                String accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
 
-            if (!TextUtils.isEmpty(accountName)) {
-                // get the account id for the account name
-                selection = AccountsColumns.NAME + "='" + accountName + "'";
-                Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                cursor.moveToFirst();
-                String newAccountId = cursor.getString(0);
-                cursor.close();
+                if (!TextUtils.isEmpty(accountName)) {
+                    // get the account id for the account name
+                    selection = AccountsColumns.NAME + "='" + accountName + "'";
+                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                    String newAccountId = null;
+                    if (cursor.moveToFirst())
+                        newAccountId = cursor.getString(0);
+                    cursor.close();
 
-                if (!accountId.equals(newAccountId)) {
-                    // the row Id of the new account is not the same as the old one
+                    if (newAccountId != null) {
+                        if (!accountId.equals(newAccountId)) {
+                            // the row Id of the new account is not the same as the old one
+
+                            // update the delete flag to '1' for the old relationship
+                            ContentValues val2 = new ContentValues();
+                            selection = AccountsOpportunitiesColumns.ACCOUNT_ID
+                                                            + "="
+                                                            + accountId
+                                                            + " AND "
+                                                            + AccountsOpportunitiesColumns.OPPORTUNITY_ID
+                                                            + "=" + opportunityId;
+                            val2.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
+                            db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, val2, selection, null);
+                            Log.i(TAG, "updated deleted flag for the relation: opportunityId - "
+                                                            + opportunityId + " oldAccountId - "
+                                                            + accountId);
+
+                            // create a new relationship with the new account
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, opportunityId);
+                            val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
+                            long rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
+                            if (rowId > 0)
+                                Log.i(TAG, "created relation: opportunityId - " + opportunityId
+                                                                + " accountId - " + newAccountId);
+                        }
+                    }
+
+                } else {
+                    // if the accountName is removed while updating, delete the relationship
 
                     // update the delete flag to '1' for the old relationship
                     ContentValues val2 = new ContentValues();
@@ -1065,30 +1134,7 @@ public class SugarCRMProvider extends ContentProvider {
                     Log.i(TAG, "updated deleted flag for the relation: opportunityId - "
                                                     + opportunityId + " oldAccountId - "
                                                     + accountId);
-
-                    // create a new relationship with the new account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, opportunityId);
-                    val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
-                    long rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
-                    if (rowId > 0)
-                        Log.i(TAG, "created relation: opportunityId - " + opportunityId
-                                                        + " accountId - " + newAccountId);
                 }
-
-            } else {
-                // if the accountName is removed while updating, delete the relationship
-
-                // update the delete flag to '1' for the old relationship
-                ContentValues val2 = new ContentValues();
-                selection = AccountsOpportunitiesColumns.ACCOUNT_ID + "=" + accountId + " AND "
-                                                + AccountsOpportunitiesColumns.OPPORTUNITY_ID + "="
-                                                + opportunityId;
-                val2.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
-                db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, val2, selection, null);
-                Log.i(TAG, "updated deleted flag for the relation: opportunityId - "
-                                                + opportunityId + " oldAccountId - " + accountId);
             }
 
             break;
@@ -1101,18 +1147,45 @@ public class SugarCRMProvider extends ContentProvider {
             selection = CasesColumns.ID + "=" + caseId;
             count = db.update(DatabaseHelper.CASES_TABLE_NAME, values, selection, null);
 
-            accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+            if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                String accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
 
-            if (!TextUtils.isEmpty(accountName)) {
-                // get the account id for the account name
-                selection = AccountsColumns.NAME + "='" + accountName + "'";
-                Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                cursor.moveToFirst();
-                String newAccountId = cursor.getString(0);
-                cursor.close();
+                if (!TextUtils.isEmpty(accountName)) {
+                    // get the account id for the account name
+                    selection = AccountsColumns.NAME + "='" + accountName + "'";
+                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                    String newAccountId = null;
+                    if (cursor.moveToFirst())
+                        newAccountId = cursor.getString(0);
+                    cursor.close();
 
-                if (!accountId.equals(newAccountId)) {
-                    // the row Id of the new account is not the same as the old one
+                    if (newAccountId != null) {
+                        if (!accountId.equals(newAccountId)) {
+                            // the row Id of the new account is not the same as the old one
+
+                            // update the delete flag to '1' for the old relationship
+                            ContentValues val2 = new ContentValues();
+                            selection = AccountsCasesColumns.ACCOUNT_ID + "=" + accountId + " AND "
+                                                            + AccountsCasesColumns.CASE_ID + "="
+                                                            + caseId;
+                            val2.put(AccountsCasesColumns.DELETED, Util.DELETED_ITEM);
+                            db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, val2, selection, null);
+                            Log.i(TAG, "updated deleted flag for the relation: caseId - " + caseId
+                                                            + " oldAccountId - " + accountId);
+
+                            // create a new relationship with the new account
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsCasesColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsCasesColumns.CASE_ID, caseId);
+                            val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
+                            long rowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
+                            if (rowId > 0)
+                                Log.i(TAG, "created relation: caseId - " + caseId + " accountId - "
+                                                                + newAccountId);
+                        }
+                    }
+                } else {
+                    // if the accountName is removed while updating, delete the relationship
 
                     // update the delete flag to '1' for the old relationship
                     ContentValues val2 = new ContentValues();
@@ -1122,29 +1195,7 @@ public class SugarCRMProvider extends ContentProvider {
                     db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, val2, selection, null);
                     Log.i(TAG, "updated deleted flag for the relation: caseId - " + caseId
                                                     + " oldAccountId - " + accountId);
-
-                    // create a new relationship with the new account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsCasesColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsCasesColumns.CASE_ID, caseId);
-                    val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
-                    long rowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
-                    if (rowId > 0)
-                        Log.i(TAG, "created relation: caseId - " + caseId + " accountId - "
-                                                        + newAccountId);
                 }
-
-            } else {
-                // if the accountName is removed while updating, delete the relationship
-
-                // update the delete flag to '1' for the old relationship
-                ContentValues val2 = new ContentValues();
-                selection = AccountsCasesColumns.ACCOUNT_ID + "=" + accountId + " AND "
-                                                + AccountsCasesColumns.CASE_ID + "=" + caseId;
-                val2.put(AccountsCasesColumns.DELETED, Util.DELETED_ITEM);
-                db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, val2, selection, null);
-                Log.i(TAG, "updated deleted flag for the relation: caseId - " + caseId
-                                                + " oldAccountId - " + accountId);
             }
 
             break;
@@ -1170,55 +1221,65 @@ public class SugarCRMProvider extends ContentProvider {
                     db.update(tableName, values, whereClause, null);
                 }
             } else {
-                accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    String accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                        String newAccountId = null;
+                        if (cursor.moveToFirst())
+                            newAccountId = cursor.getString(0);
+                        cursor.close();
 
-                    // get the accountId to which this contact is related to
-                    selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
-                    cursor = db.query(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, new String[] { AccountsContactsColumns.ACCOUNT_ID }, selection, null, null, null, null);
-                    accountId = null;
-                    if(cursor.moveToFirst())
-                        accountId = cursor.getString(0);
-                    cursor.close();
+                        // get the accountId to which this contact is related to
+                        selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
+                        cursor = db.query(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, new String[] { AccountsContactsColumns.ACCOUNT_ID }, selection, null, null, null, null);
+                        accountId = null;
+                        if (cursor.moveToFirst())
+                            accountId = cursor.getString(0);
+                        cursor.close();
 
-                    if (!newAccountId.equals(accountId)) {
-                        // the row Id of the new account is not the same as the old one
+                        if (newAccountId != null && accountId != null) {
+                            if (!newAccountId.equals(accountId)) {
 
-                        // update the delete flag to '1' for the old relationship
-                        ContentValues val2 = new ContentValues();
-                        selection = AccountsContactsColumns.ACCOUNT_ID + "=" + accountId + " AND "
-                                                        + AccountsContactsColumns.CONTACT_ID + "="
-                                                        + contactId;
-                        val2.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
-                        db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
-                        Log.i(TAG, "updated deleted flag for the relation: contactId - "
-                                                        + contactId + " oldAccountId - "
-                                                        + accountId);
+                                // the row Id of the new account is not the same as the old one
 
-                        // create a new relationship with the new account
-                        ContentValues val3 = new ContentValues();
-                        val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
-                        val3.put(AccountsContactsColumns.CONTACT_ID, contactId);
-                        val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
-                        long rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
-                        if (rowId > 0)
-                            Log.i(TAG, "created relation: contactId - " + contactId
-                                                            + " accountId - " + newAccountId);
+                                // update the delete flag to '1' for the old relationship
+                                ContentValues val2 = new ContentValues();
+                                selection = AccountsContactsColumns.ACCOUNT_ID
+                                                                + "="
+                                                                + accountId
+                                                                + " AND "
+                                                                + AccountsContactsColumns.CONTACT_ID
+                                                                + "=" + contactId;
+                                val2.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
+                                db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
+                                Log.i(TAG, "updated deleted flag for the relation: contactId - "
+                                                                + contactId + " oldAccountId - "
+                                                                + accountId);
+
+                                // create a new relationship with the new account
+                                ContentValues val3 = new ContentValues();
+                                val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
+                                val3.put(AccountsContactsColumns.CONTACT_ID, contactId);
+                                val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
+                                long rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
+                                if (rowId > 0)
+                                    Log.i(TAG, "created relation: contactId - " + contactId
+                                                                    + " accountId - "
+                                                                    + newAccountId);
+                            }
+                        }
+
+                    } else {
+                        // delete the relationship if there exists one
+
+                        ContentValues relationValues = new ContentValues();
+                        selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
+                        relationValues.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
+                        db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, relationValues, selection, null);
                     }
-
-                } else {
-                    // delete the relationship if there exists one
-
-                    ContentValues relationValues = new ContentValues();
-                    selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
-                    relationValues.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
-                    db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, relationValues, selection, null);
                 }
             }
 
@@ -1242,61 +1303,69 @@ public class SugarCRMProvider extends ContentProvider {
                 Log.i(TAG, "created relation: opportunityId - " + opportunityId + " contactId - "
                                                 + contactId);
 
-            accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+            if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                String accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
 
-            if (!TextUtils.isEmpty(accountName)) {
+                if (!TextUtils.isEmpty(accountName)) {
 
-                // get the account id for the account name
-                selection = AccountsColumns.NAME + "='" + accountName + "'";
-                Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                cursor.moveToFirst();
-                String newAccountId = cursor.getString(0);
-                cursor.close();
+                    // get the account id for the account name
+                    selection = AccountsColumns.NAME + "='" + accountName + "'";
+                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                    String newAccountId = null;
+                    if (cursor.moveToFirst())
+                        newAccountId = cursor.getString(0);
+                    cursor.close();
 
-                // get the accountId to which this opportunity is related to
-                selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "=" + opportunityId;
-                cursor = db.query(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, new String[] { AccountsOpportunitiesColumns.ACCOUNT_ID }, selection, null, null, null, null);
-                accountId = null;
-                if(cursor.moveToFirst())
-                    accountId = cursor.getString(0);
-                cursor.close();
+                    // get the accountId to which this opportunity is related to
+                    selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "=" + opportunityId;
+                    cursor = db.query(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, new String[] { AccountsOpportunitiesColumns.ACCOUNT_ID }, selection, null, null, null, null);
+                    accountId = null;
+                    if (cursor.moveToFirst())
+                        accountId = cursor.getString(0);
+                    cursor.close();
 
-                if (!newAccountId.equals(accountId)) {
-                    // the row Id of the new account is not the same as the old one
+                    if (newAccountId != null && accountId != null) {
+                        if (!newAccountId.equals(accountId)) {
+                            // the row Id of the new account is not the same as the old one
+
+                            // update the delete flag to '1' for the old relationship
+                            ContentValues val2 = new ContentValues();
+                            selection = AccountsOpportunitiesColumns.ACCOUNT_ID
+                                                            + "="
+                                                            + accountId
+                                                            + " AND "
+                                                            + AccountsOpportunitiesColumns.OPPORTUNITY_ID
+                                                            + "=" + opportunityId;
+                            val2.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
+                            db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, val2, selection, null);
+                            Log.i(TAG, "updated deleted flag for the relation: opportunityId - "
+                                                            + opportunityId + " oldAccountId - "
+                                                            + accountId);
+
+                            // create a new relationship with the new account
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, opportunityId);
+                            val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
+                            rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
+                            if (rowId > 0)
+                                Log.i(TAG, "created relation: opportunityId - " + opportunityId
+                                                                + " accountId - " + newAccountId);
+                        }
+                    }
+
+                } else {
+                    // if the accountName is removed while updating, delete the relationship
 
                     // update the delete flag to '1' for the old relationship
                     ContentValues val2 = new ContentValues();
-                    selection = AccountsOpportunitiesColumns.ACCOUNT_ID + "=" + accountId + " AND "
-                                                    + AccountsOpportunitiesColumns.OPPORTUNITY_ID
-                                                    + "=" + opportunityId;
+                    selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "=" + opportunityId;
                     val2.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
                     db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, val2, selection, null);
-                    Log.i(TAG, "updated deleted flag for the relation: opportunityId - "
-                                                    + opportunityId + " oldAccountId - "
-                                                    + accountId);
+                    Log.i(TAG, "updated deleted flag for the relations in CONTACT_OPPORTUNITIES table with opportunityId - "
+                                                    + opportunityId);
 
-                    // create a new relationship with the new account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, opportunityId);
-                    val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
-                    rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
-                    if (rowId > 0)
-                        Log.i(TAG, "created relation: opportunityId - " + opportunityId
-                                                        + " accountId - " + newAccountId);
                 }
-
-            } else {
-                // if the accountName is removed while updating, delete the relationship
-
-                // update the delete flag to '1' for the old relationship
-                ContentValues val2 = new ContentValues();
-                selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "=" + opportunityId;
-                val2.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
-                db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, val2, selection, null);
-                Log.i(TAG, "updated deleted flag for the relations in ACCOUNT_OPPORTUNITIES table with opportunityId - "
-                                                + opportunityId);
-
             }
 
             break;
@@ -1308,32 +1377,37 @@ public class SugarCRMProvider extends ContentProvider {
         case LEAD_ID:
             String leadId = uri.getPathSegments().get(1);
 
-            accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+            if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                String accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
 
-            if (!TextUtils.isEmpty(accountName)) {
+                if (!TextUtils.isEmpty(accountName)) {
 
-                // get the account id for the account name
-                selection = AccountsColumns.NAME + "='" + accountName + "'";
-                Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                cursor.moveToFirst();
-                String newAccountId = cursor.getString(0);
-                cursor.close();
+                    // get the account id for the account name
+                    selection = AccountsColumns.NAME + "='" + accountName + "'";
+                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                    String newAccountId = null;
+                    if (cursor.moveToFirst())
+                        newAccountId = cursor.getString(0);
+                    cursor.close();
 
-                // get the accountId to which this lead is related to
-                selection = Leads.ID + "=" + leadId;
-                cursor = db.query(DatabaseHelper.LEADS_TABLE_NAME, new String[] { Leads.ACCOUNT_ID }, selection, null, null, null, null);
-                accountId = null;
-                if(cursor.moveToFirst())
-                    accountId = cursor.getString(0);
-                cursor.close();
+                    // get the accountId to which this lead is related to
+                    selection = Leads.ID + "=" + leadId;
+                    cursor = db.query(DatabaseHelper.LEADS_TABLE_NAME, new String[] { Leads.ACCOUNT_ID }, selection, null, null, null, null);
+                    accountId = null;
+                    if (cursor.moveToFirst())
+                        accountId = cursor.getString(0);
+                    cursor.close();
 
-                if (!newAccountId.equals(accountId)) {
-                    // the row Id of the new account is not the same as the old one
+                    if (newAccountId != null && accountId != null) {
+                        if (!newAccountId.equals(accountId)) {
+                            // the row Id of the new account is not the same as the old one
 
-                    // update the field 'account_id'
-                    values.put(ModuleFields.ACCOUNT_ID, newAccountId);
+                            // update the field 'account_id'
+                            values.put(ModuleFields.ACCOUNT_ID, newAccountId);
+                        }
+                    }
+
                 }
-
             }
 
             count = db.update(DatabaseHelper.LEADS_TABLE_NAME, values, Leads.ID
@@ -1365,58 +1439,66 @@ public class SugarCRMProvider extends ContentProvider {
                     db.update(tableName, values, whereClause, null);
                 }
             } else {
-                accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    String accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                        String newAccountId = null;
+                        if (cursor.moveToFirst())
+                            newAccountId = cursor.getString(0);
+                        cursor.close();
 
-                    // get the accountId to which this opportunity is related to
-                    selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "=" + opportunityId;
-                    cursor = db.query(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, new String[] { AccountsOpportunitiesColumns.ACCOUNT_ID }, selection, null, null, null, null);
-                    accountId = null;
-                    if(cursor.moveToFirst())
-                        accountId = cursor.getString(0);
-                    cursor.close();
+                        // get the accountId to which this opportunity is related to
+                        selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "="
+                                                        + opportunityId;
+                        cursor = db.query(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, new String[] { AccountsOpportunitiesColumns.ACCOUNT_ID }, selection, null, null, null, null);
+                        accountId = null;
+                        if (cursor.moveToFirst())
+                            accountId = cursor.getString(0);
+                        cursor.close();
 
-                    if (!newAccountId.equals(accountId)) {
-                        // the row Id of the new account is not the same as the old one
+                        if (newAccountId != null && accountId != null) {
+                            if (!newAccountId.equals(accountId)) {
+                                // the row Id of the new account is not the same as the old one
 
-                        // update the delete flag to '1' for the old relationship
-                        ContentValues val2 = new ContentValues();
-                        selection = AccountsOpportunitiesColumns.ACCOUNT_ID
-                                                        + "="
-                                                        + accountId
-                                                        + " AND "
-                                                        + AccountsOpportunitiesColumns.OPPORTUNITY_ID
-                                                        + "=" + opportunityId;
-                        val2.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
-                        db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, val2, selection, null);
-                        Log.i(TAG, "updated deleted flag for the relation: opportunityId - "
-                                                        + opportunityId + " oldAccountId - "
-                                                        + accountId);
+                                // update the delete flag to '1' for the old relationship
+                                ContentValues val2 = new ContentValues();
+                                selection = AccountsOpportunitiesColumns.ACCOUNT_ID
+                                                                + "="
+                                                                + accountId
+                                                                + " AND "
+                                                                + AccountsOpportunitiesColumns.OPPORTUNITY_ID
+                                                                + "=" + opportunityId;
+                                val2.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
+                                db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, val2, selection, null);
+                                Log.i(TAG, "updated deleted flag for the relation: opportunityId - "
+                                                                + opportunityId
+                                                                + " oldAccountId - " + accountId);
 
-                        // create a new relationship with the new account
-                        ContentValues val3 = new ContentValues();
-                        val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
-                        val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, opportunityId);
-                        val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
-                        rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
-                        if (rowId > 0)
-                            Log.i(TAG, "created relation: opportunityId - " + opportunityId
-                                                            + " accountId - " + newAccountId);
+                                // create a new relationship with the new account
+                                ContentValues val3 = new ContentValues();
+                                val3.put(AccountsOpportunitiesColumns.ACCOUNT_ID, newAccountId);
+                                val3.put(AccountsOpportunitiesColumns.OPPORTUNITY_ID, opportunityId);
+                                val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
+                                rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
+                                if (rowId > 0)
+                                    Log.i(TAG, "created relation: opportunityId - " + opportunityId
+                                                                    + " accountId - "
+                                                                    + newAccountId);
+                            }
+                        }
+
+                    } else {
+                        // delete the relationship if there exists one
+
+                        relationValues = new ContentValues();
+                        selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "="
+                                                        + opportunityId;
+                        relationValues.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
+                        db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, relationValues, selection, null);
                     }
-
-                } else {
-                    // delete the relationship if there exists one
-
-                    relationValues = new ContentValues();
-                    selection = AccountsOpportunitiesColumns.OPPORTUNITY_ID + "=" + opportunityId;
-                    relationValues.put(AccountsOpportunitiesColumns.DELETED, Util.DELETED_ITEM);
-                    db.update(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, relationValues, selection, null);
                 }
             }
 
@@ -1440,60 +1522,66 @@ public class SugarCRMProvider extends ContentProvider {
                 Log.i(TAG, "created relation: opportunityId - " + opportunityId + " contactId - "
                                                 + contactId);
 
-            accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
+            if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                String accountName = values.getAsString(ModuleFields.ACCOUNT_NAME);
 
-            if (!TextUtils.isEmpty(accountName)) {
+                if (!TextUtils.isEmpty(accountName)) {
 
-                // get the account id for the account name
-                selection = AccountsColumns.NAME + "='" + accountName + "'";
-                Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                cursor.moveToFirst();
-                String newAccountId = cursor.getString(0);
-                cursor.close();
+                    // get the account id for the account name
+                    selection = AccountsColumns.NAME + "='" + accountName + "'";
+                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                    String newAccountId = null;
+                    if (cursor.moveToFirst())
+                        newAccountId = cursor.getString(0);
+                    cursor.close();
 
-                // get the accountId to which this opportunity is related to
-                selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
-                cursor = db.query(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, new String[] { AccountsContactsColumns.ACCOUNT_ID }, selection, null, null, null, null);
-                accountId = null;
-                if(cursor.moveToFirst())
-                    accountId = cursor.getString(0);
-                cursor.close();
+                    // get the accountId to which this opportunity is related to
+                    selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
+                    cursor = db.query(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, new String[] { AccountsContactsColumns.ACCOUNT_ID }, selection, null, null, null, null);
+                    accountId = null;
+                    if (cursor.moveToFirst())
+                        accountId = cursor.getString(0);
+                    cursor.close();
 
-                if (!newAccountId.equals(accountId)) {
-                    // the row Id of the new account is not the same as the old one
+                    if (newAccountId != null && accountId != null) {
+                        if (!newAccountId.equals(accountId)) {
+                            // the row Id of the new account is not the same as the old one
+
+                            // update the delete flag to '1' for the old relationship
+                            ContentValues val2 = new ContentValues();
+                            selection = AccountsContactsColumns.ACCOUNT_ID + "=" + accountId
+                                                            + " AND "
+                                                            + AccountsContactsColumns.CONTACT_ID
+                                                            + "=" + contactId;
+                            val2.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
+                            db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
+                            Log.i(TAG, "updated deleted flag for the relation: contactId - "
+                                                            + contactId + " oldAccountId - "
+                                                            + accountId);
+
+                            // create a new relationship with the new account
+                            ContentValues val3 = new ContentValues();
+                            val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
+                            val3.put(AccountsContactsColumns.CONTACT_ID, opportunityId);
+                            val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
+                            rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
+                            if (rowId > 0)
+                                Log.i(TAG, "created relation: contactId - " + contactId
+                                                                + " accountId - " + newAccountId);
+                        }
+                    }
+
+                } else {
+                    // if the accountName is removed while updating, delete the relationship
 
                     // update the delete flag to '1' for the old relationship
                     ContentValues val2 = new ContentValues();
-                    selection = AccountsContactsColumns.ACCOUNT_ID + "=" + accountId + " AND "
-                                                    + AccountsContactsColumns.CONTACT_ID + "="
-                                                    + contactId;
+                    selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
                     val2.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
                     db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
-                    Log.i(TAG, "updated deleted flag for the relation: contactId - " + contactId
-                                                    + " oldAccountId - " + accountId);
-
-                    // create a new relationship with the new account
-                    ContentValues val3 = new ContentValues();
-                    val3.put(AccountsContactsColumns.ACCOUNT_ID, newAccountId);
-                    val3.put(AccountsContactsColumns.CONTACT_ID, opportunityId);
-                    val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
-                    rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
-                    if (rowId > 0)
-                        Log.i(TAG, "created relation: contactId - " + contactId + " accountId - "
-                                                        + newAccountId);
+                    Log.i(TAG, "updated deleted flag for the relations in ACCOUNT_CONTACTS table with contactId - "
+                                                    + contactId);
                 }
-
-            } else {
-                // if the accountName is removed while updating, delete the relationship
-
-                // update the delete flag to '1' for the old relationship
-                ContentValues val2 = new ContentValues();
-                selection = AccountsContactsColumns.CONTACT_ID + "=" + contactId;
-                val2.put(AccountsContactsColumns.DELETED, Util.DELETED_ITEM);
-                db.update(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, val2, selection, null);
-                Log.i(TAG, "updated deleted flag for the relations in ACCOUNT_CONTACTS table with contactId - "
-                                                + contactId);
-
             }
 
             break;
@@ -1519,54 +1607,62 @@ public class SugarCRMProvider extends ContentProvider {
                     db.update(tableName, values, whereClause, null);
                 }
             } else {
-                accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
-                if (!TextUtils.isEmpty(accountName)) {
-                    // get the account id for the account name
-                    selection = AccountsColumns.NAME + "='" + accountName + "'";
-                    Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                    cursor.moveToFirst();
-                    String newAccountId = cursor.getString(0);
-                    cursor.close();
+                if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
+                    String accountName = (String) values.get(ModuleFields.ACCOUNT_NAME);
+                    if (!TextUtils.isEmpty(accountName)) {
+                        // get the account id for the account name
+                        selection = AccountsColumns.NAME + "='" + accountName + "'";
+                        Cursor cursor = query(mOpenHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                        String newAccountId = null;
+                        if (cursor.moveToFirst())
+                            newAccountId = cursor.getString(0);
+                        cursor.close();
 
-                    // get the accountId to which this opportunity is related to
-                    selection = AccountsCasesColumns.CASE_ID + "=" + caseId;
-                    cursor = db.query(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, new String[] { AccountsCasesColumns.ACCOUNT_ID }, selection, null, null, null, null);
-                    accountId = null;
-                    if(cursor.moveToFirst())
-                        accountId = cursor.getString(0);
-                    cursor.close();
+                        // get the accountId to which this opportunity is related to
+                        selection = AccountsCasesColumns.CASE_ID + "=" + caseId;
+                        cursor = db.query(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, new String[] { AccountsCasesColumns.ACCOUNT_ID }, selection, null, null, null, null);
+                        accountId = null;
+                        if (cursor.moveToFirst())
+                            accountId = cursor.getString(0);
+                        cursor.close();
 
-                    if (!newAccountId.equals(accountId)) {
-                        // the row Id of the new account is not the same as the old one
+                        if (newAccountId != null && accountId != null) {
+                            if (!newAccountId.equals(accountId)) {
+                                // the row Id of the new account is not the same as the old one
 
-                        // update the delete flag to '1' for the old relationship
-                        ContentValues val2 = new ContentValues();
-                        selection = AccountsCasesColumns.ACCOUNT_ID + "=" + accountId + " AND "
-                                                        + AccountsCasesColumns.CASE_ID + "="
-                                                        + caseId;
-                        val2.put(AccountsCasesColumns.DELETED, Util.DELETED_ITEM);
-                        db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, val2, selection, null);
-                        Log.i(TAG, "updated deleted flag for the relation: caseId - " + caseId
-                                                        + " oldAccountId - " + accountId);
+                                // update the delete flag to '1' for the old relationship
+                                ContentValues val2 = new ContentValues();
+                                selection = AccountsCasesColumns.ACCOUNT_ID + "=" + accountId
+                                                                + " AND "
+                                                                + AccountsCasesColumns.CASE_ID
+                                                                + "=" + caseId;
+                                val2.put(AccountsCasesColumns.DELETED, Util.DELETED_ITEM);
+                                db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, val2, selection, null);
+                                Log.i(TAG, "updated deleted flag for the relation: caseId - "
+                                                                + caseId + " oldAccountId - "
+                                                                + accountId);
 
-                        // create a new relationship with the new account
-                        ContentValues val3 = new ContentValues();
-                        val3.put(AccountsCasesColumns.ACCOUNT_ID, newAccountId);
-                        val3.put(AccountsCasesColumns.CASE_ID, caseId);
-                        val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
-                        rowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
-                        if (rowId > 0)
-                            Log.i(TAG, "created relation: caseId - " + caseId + " accountId - "
-                                                            + newAccountId);
+                                // create a new relationship with the new account
+                                ContentValues val3 = new ContentValues();
+                                val3.put(AccountsCasesColumns.ACCOUNT_ID, newAccountId);
+                                val3.put(AccountsCasesColumns.CASE_ID, caseId);
+                                val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
+                                rowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
+                                if (rowId > 0)
+                                    Log.i(TAG, "created relation: caseId - " + caseId
+                                                                    + " accountId - "
+                                                                    + newAccountId);
+                            }
+                        }
+
+                    } else {
+                        // delete the relationship if there exists one
+
+                        relationValues = new ContentValues();
+                        selection = AccountsCasesColumns.CASE_ID + "=" + caseId;
+                        relationValues.put(AccountsCasesColumns.DELETED, Util.DELETED_ITEM);
+                        db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, relationValues, selection, null);
                     }
-
-                } else {
-                    // delete the relationship if there exists one
-
-                    relationValues = new ContentValues();
-                    selection = AccountsCasesColumns.CASE_ID + "=" + caseId;
-                    relationValues.put(AccountsCasesColumns.DELETED, Util.DELETED_ITEM);
-                    db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, relationValues, selection, null);
                 }
             }
 
