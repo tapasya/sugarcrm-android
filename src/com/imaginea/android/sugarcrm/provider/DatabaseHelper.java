@@ -74,7 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 31;
+    private static final int DATABASE_VERSION = 32;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -591,7 +591,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE " + CASES_TABLE_NAME + " (" + Cases.ID + " INTEGER PRIMARY KEY,"
                                         + Cases.BEAN_ID + " TEXT," + Cases.NAME + " TEXT,"
-                                        + Cases.CASE_NUMBER + " TEXT," + Cases.PRIORITY + " TEXT,"
+                                        + Cases.ACCOUNT_NAME + " TEXT," + Cases.CASE_NUMBER
+                                        + " TEXT," + Cases.PRIORITY + " TEXT,"
                                         + Cases.ASSIGNED_USER_NAME + " TEXT," + Cases.STATUS
                                         + " TEXT," + Cases.DESCRIPTION + " TEXT,"
                                         + Cases.RESOLUTION + " TEXT," + Cases.CREATED_BY_NAME
@@ -604,22 +605,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE " + CALLS_TABLE_NAME + " (" + Calls.ID + " INTEGER PRIMARY KEY,"
                                         + Calls.BEAN_ID + " TEXT," + Calls.NAME + " TEXT,"
-                                        + Calls.STATUS + " TEXT," + Calls.START_DATE + " TEXT,"
-                                        + Calls.DURATION_HOURS + " TEXT," + Calls.DURATION_MINUTES
-                                        + " TEXT," + Calls.ASSIGNED_USER_NAME + " TEXT,"
-                                        + Calls.DESCRIPTION + " TEXT," + Calls.CREATED_BY_NAME
-                                        + " TEXT," + Calls.DATE_ENTERED + " TEXT,"
-                                        + Calls.DATE_MODIFIED + " TEXT," + Calls.DELETED
-                                        + " INTEGER," + " UNIQUE(" + Calls.BEAN_ID + ")" + ");");
+                                        + Calls.ACCOUNT_NAME + " TEXT," + Calls.STATUS + " TEXT,"
+                                        + Calls.START_DATE + " TEXT," + Calls.DURATION_HOURS
+                                        + " TEXT," + Calls.DURATION_MINUTES + " TEXT,"
+                                        + Calls.ASSIGNED_USER_NAME + " TEXT," + Calls.DESCRIPTION
+                                        + " TEXT," + Calls.CREATED_BY_NAME + " TEXT,"
+                                        + Calls.DATE_ENTERED + " TEXT," + Calls.DATE_MODIFIED
+                                        + " TEXT," + Calls.DELETED + " INTEGER," + " UNIQUE("
+                                        + Calls.BEAN_ID + ")" + ");");
     }
 
     private static void createMeetingsTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + MEETINGS_TABLE_NAME + " (" + Meetings.ID
                                         + " INTEGER PRIMARY KEY," + Meetings.BEAN_ID + " TEXT,"
-                                        + Meetings.NAME + " TEXT," + Meetings.STATUS + " TEXT,"
-                                        + Meetings.LOCATION + " TEXT," + Meetings.START_DATE
-                                        + " TEXT," + Meetings.DURATION_HOURS + " TEXT,"
+                                        + Meetings.NAME + " TEXT," + Meetings.ACCOUNT_NAME
+                                        + " TEXT," + Meetings.STATUS + " TEXT," + Meetings.LOCATION
+                                        + " TEXT," + Meetings.START_DATE + " TEXT,"
+                                        + Meetings.DURATION_HOURS + " TEXT,"
                                         + Meetings.DURATION_MINUTES + " TEXT,"
                                         + Meetings.ASSIGNED_USER_NAME + " TEXT,"
                                         + Meetings.DESCRIPTION + " TEXT,"

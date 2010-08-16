@@ -407,9 +407,9 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, PRIORITY, DATE_MODIFIED };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, CASE_NUMBER,
-                PRIORITY, ASSIGNED_USER_NAME, STATUS, DESCRIPTION, RESOLUTION, CREATED_BY_NAME,
-                DATE_ENTERED, DATE_MODIFIED, DELETED };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
+                CASE_NUMBER, PRIORITY, ASSIGNED_USER_NAME, STATUS, DESCRIPTION, RESOLUTION,
+                CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
 
@@ -421,6 +421,8 @@ public final class SugarCRMContent {
         public String NAME = ModuleFields.NAME;
 
         public String CASE_NUMBER = ModuleFields.CASE_NUMBER;
+
+        public String ACCOUNT_NAME = ModuleFields.ACCOUNT_NAME;
 
         public String PRIORITY = ModuleFields.PRIORITY;
 
@@ -457,9 +459,9 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
-                DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME, DESCRIPTION, CREATED_BY_NAME,
-                DATE_ENTERED, DATE_MODIFIED, DELETED };
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
+                START_DATE, DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME, DESCRIPTION,
+                CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
 
@@ -477,6 +479,8 @@ public final class SugarCRMContent {
         public String DURATION_HOURS = ModuleFields.DURATION_HOURS;
 
         public String DURATION_MINUTES = ModuleFields.DURATION_MINUTES;
+
+        public String ACCOUNT_NAME = ModuleFields.ACCOUNT_NAME;
 
         public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
 
@@ -507,8 +511,8 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, STATUS,
-                LOCATION, START_DATE, DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME,
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
+                STATUS, LOCATION, START_DATE, DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME,
                 DESCRIPTION, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
 
     }
@@ -529,6 +533,8 @@ public final class SugarCRMContent {
         public String DURATION_HOURS = ModuleFields.DURATION_HOURS;
 
         public String DURATION_MINUTES = ModuleFields.DURATION_MINUTES;
+
+        public String ACCOUNT_NAME = ModuleFields.ACCOUNT_NAME;
 
         public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
 
