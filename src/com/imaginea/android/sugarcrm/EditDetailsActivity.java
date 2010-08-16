@@ -574,6 +574,9 @@ public class EditDetailsActivity extends Activity {
                         }
                     }
 
+                } else{
+                    // if the fieldValue is empty
+                    fieldValue = null;
                 }
 
             } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
