@@ -80,6 +80,7 @@
 	<string name="search">Search</string>
 	<string name="searching">Searching...</string>
 	<string name="searchresults">Search Results</string>
+	<string name="searchResultsHeaderText"> : Search results</string>
 
 	<!-- Menu items - not present above-->
 	<string name="addItem">Add</string>
