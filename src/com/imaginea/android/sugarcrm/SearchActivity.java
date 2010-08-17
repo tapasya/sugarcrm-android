@@ -83,7 +83,9 @@ public class SearchActivity extends ListActivity {
         }
 
         TextView tv = (TextView) findViewById(R.id.headerText);
-        tv.setText(mModuleName + " : Search results");
+        tv.setText(mModuleName + getString(R.string.searchResultsHeaderText));
+        findViewById(R.id.filterImage).setVisibility(View.GONE);
+        findViewById(R.id.allItems).setVisibility(View.GONE);
 
         Cursor cursor = managedQuery(getIntent().getData(), dbHelper.getModuleProjections(mModuleName), dbHelper.getModuleSelection(mModuleName, query), null, null);
 
@@ -147,6 +149,11 @@ public class SearchActivity extends ListActivity {
             View v = super.getView(position, convertView, parent);
             return v;
         }
+    }
+
+    public void showHome(View view) {
+        Intent homeIntent = new Intent(this, DashboardActivity.class);
+        startActivity(homeIntent);
     }
 
 }
