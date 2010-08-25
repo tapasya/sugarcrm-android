@@ -20,6 +20,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Calls;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Campaigns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Cases;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.CasesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
@@ -70,32 +71,36 @@ public class SugarCRMProvider extends ContentProvider {
 
     private static final int CALL_ID = 13;
 
-    private static final int ACCOUNT_CONTACT = 14;
+    private static final int CAMPAIGN = 14;
 
-    private static final int ACCOUNT_LEAD = 15;
+    private static final int CAMPAIGN_ID = 15;
 
-    private static final int ACCOUNT_OPPORTUNITY = 16;
+    private static final int ACCOUNT_CONTACT = 16;
 
-    private static final int ACCOUNT_CASE = 17;
+    private static final int ACCOUNT_LEAD = 17;
 
-    private static final int CONTACT_LEAD = 18;
+    private static final int ACCOUNT_OPPORTUNITY = 18;
+
+    private static final int ACCOUNT_CASE = 19;
+
+    private static final int CONTACT_LEAD = 20;
 
     // TODO - is this required
-    private static final int CONTACT_OPPORTUNITY = 19;
+    private static final int CONTACT_OPPORTUNITY = 21;
 
-    private static final int CONTACT_CASE = 20;
+    private static final int CONTACT_CASE = 22;
 
-    private static final int LEAD_OPPORTUNITY = 21;
+    private static final int LEAD_OPPORTUNITY = 23;
 
-    private static final int OPPORTUNITY_CONTACT = 22;
+    private static final int OPPORTUNITY_CONTACT = 24;
 
-    private static final int USERS = 23;
+    private static final int USERS = 25;
 
-    private static final int SEARCH = 24;
+    private static final int SEARCH = 26;
 
     private static final UriMatcher sUriMatcher;
 
-    private static final String TAG = "SugarCRMProvider";
+    private static final String TAG = SugarCRMProvider.class.getSimpleName();
 
     private DatabaseHelper mOpenHelper;
 
@@ -389,6 +394,16 @@ public class SugarCRMProvider extends ContentProvider {
             selection = SugarCRMContent.RECORD_ID + " = ?";
             c = db.query(DatabaseHelper.MEETINGS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
             break;
+
+        case CAMPAIGN:
+            c = db.query(DatabaseHelper.CAMPAIGNS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+            break;
+
+        case CAMPAIGN_ID:
+            selection = SugarCRMContent.RECORD_ID + " = ?";
+            c = db.query(DatabaseHelper.CAMPAIGNS_TABLE_NAME, projection, selection, new String[] { uri.getPathSegments().get(1) }, null, null, null);
+            break;
+
         case USERS:
             c = db.query(DatabaseHelper.USERS_TABLE_NAME, projection, selection, selectionArgs, null, null, null);
             break;
@@ -788,27 +803,36 @@ public class SugarCRMProvider extends ContentProvider {
                         }
                     }
                 }
-                Uri accountUri = ContentUris.withAppendedId(Cases.CONTENT_URI, rowId);
-                getContext().getContentResolver().notifyChange(accountUri, null);
-                return accountUri;
+                Uri caseUri = ContentUris.withAppendedId(Cases.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(caseUri, null);
+                return caseUri;
             }
             break;
 
         case CALL:
             rowId = db.insert(DatabaseHelper.CALLS_TABLE_NAME, "", values);
             if (rowId > 0) {
-                Uri accountUri = ContentUris.withAppendedId(Calls.CONTENT_URI, rowId);
-                getContext().getContentResolver().notifyChange(accountUri, null);
-                return accountUri;
+                Uri callUri = ContentUris.withAppendedId(Calls.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(callUri, null);
+                return callUri;
             }
             break;
 
         case MEETING:
             rowId = db.insert(DatabaseHelper.MEETINGS_TABLE_NAME, "", values);
             if (rowId > 0) {
-                Uri accountUri = ContentUris.withAppendedId(Meetings.CONTENT_URI, rowId);
-                getContext().getContentResolver().notifyChange(accountUri, null);
-                return accountUri;
+                Uri meetingUri = ContentUris.withAppendedId(Meetings.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(meetingUri, null);
+                return meetingUri;
+            }
+            break;
+
+        case CAMPAIGN:
+            rowId = db.insert(DatabaseHelper.CAMPAIGNS_TABLE_NAME, "", values);
+            if (rowId > 0) {
+                Uri campaignUri = ContentUris.withAppendedId(Campaigns.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(campaignUri, null);
+                return campaignUri;
             }
             break;
 
@@ -970,6 +994,19 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
 
+        case CAMPAIGN:
+            count = db.delete(DatabaseHelper.CAMPAIGNS_TABLE_NAME, where, whereArgs);
+            break;
+
+        case CAMPAIGN_ID:
+            String campaignId = uri.getPathSegments().get(1);
+            count = db.delete(DatabaseHelper.CAMPAIGNS_TABLE_NAME, Campaigns.ID
+                                            + "="
+                                            + campaignId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+            
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -1693,6 +1730,20 @@ public class SugarCRMProvider extends ContentProvider {
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
+            
+        case CAMPAIGN:
+            count = db.update(DatabaseHelper.CAMPAIGNS_TABLE_NAME, values, where, whereArgs);
+            break;
+
+        case CAMPAIGN_ID:
+            String campaignId = uri.getPathSegments().get(1);
+            count = db.update(DatabaseHelper.CAMPAIGNS_TABLE_NAME, values, Campaigns.ID
+                                            + "="
+                                            + campaignId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
+                                                                            : ""), whereArgs);
+            break;
+            
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -1763,6 +1814,10 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CASES, CASE);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CASES + "/#", CASE_ID);
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CASES + "/#/#", CASE);
+
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CAMPAIGNS, CAMPAIGN);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CAMPAIGNS + "/#", CAMPAIGN_ID);
+        sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CAMPAIGNS + "/#/#", CAMPAIGN);
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.USERS, USERS);
 
