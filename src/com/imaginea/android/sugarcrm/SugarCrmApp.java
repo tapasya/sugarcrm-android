@@ -116,6 +116,10 @@ public class SugarCrmApp extends Application {
         fieldMap = new HashMap<String, String>();
         fieldMap.put(ModuleFields.NAME, Util.ASC);
         moduleSortOrder.put(Util.MEETINGS, fieldMap);
+
+        fieldMap = new HashMap<String, String>();
+        fieldMap.put(ModuleFields.NAME, Util.ASC);
+        moduleSortOrder.put(Util.CAMPAIGNS, fieldMap);
     }
 
 }
