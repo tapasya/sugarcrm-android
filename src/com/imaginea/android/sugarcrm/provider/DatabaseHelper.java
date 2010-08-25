@@ -23,6 +23,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Calls;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Campaigns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Cases;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsCasesColumns;
@@ -74,7 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 32;
+    private static final int DATABASE_VERSION = 33;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -100,6 +101,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CASES_TABLE_NAME = "cases";
 
+    public static final String CAMPAIGNS_TABLE_NAME = "campaigns";
+
     public static final String MODULES_TABLE_NAME = "modules";
 
     public static final String MODULE_FIELDS_TABLE_NAME = "module_fields";
@@ -121,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     private String[] defaultSupportedModules = { Util.ACCOUNTS, Util.CONTACTS, Util.LEADS,
-            Util.OPPORTUNITIES, Util.CASES, Util.CALLS, Util.MEETINGS };
+            Util.OPPORTUNITIES, Util.CASES, Util.CALLS, Util.MEETINGS, Util.CAMPAIGNS };
 
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
 
@@ -179,6 +182,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleIcons.put(Util.CASES, R.drawable.cases);
         moduleIcons.put(Util.CALLS, R.drawable.calls);
         moduleIcons.put(Util.MEETINGS, R.drawable.meeting);
+        //TODO: as of now, there is no icon for campaigns
+        // moduleIcons.put(Util.CAMPAIGNS, R.drawable.campaings);
         moduleIcons.put("Settings", R.drawable.settings);
 
         // Module Projections
@@ -189,6 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleProjections.put(Util.CASES, Cases.DETAILS_PROJECTION);
         moduleProjections.put(Util.CALLS, Calls.DETAILS_PROJECTION);
         moduleProjections.put(Util.MEETINGS, Meetings.DETAILS_PROJECTION);
+        moduleProjections.put(Util.CAMPAIGNS, Campaigns.DETAILS_PROJECTION);
 
         // module list projections
         moduleListProjections.put(Util.ACCOUNTS, Accounts.LIST_PROJECTION);
@@ -198,6 +204,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleListProjections.put(Util.CASES, Cases.LIST_PROJECTION);
         moduleListProjections.put(Util.CALLS, Calls.LIST_PROJECTION);
         moduleListProjections.put(Util.MEETINGS, Meetings.LIST_PROJECTION);
+        moduleListProjections.put(Util.CAMPAIGNS, Campaigns.LIST_PROJECTION);
 
         // Module List Selections
         moduleListSelections.put(Util.ACCOUNTS, Accounts.LIST_VIEW_PROJECTION);
@@ -207,6 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleListSelections.put(Util.CASES, Cases.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CALLS, Calls.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.MEETINGS, Meetings.LIST_VIEW_PROJECTION);
+        moduleListSelections.put(Util.CAMPAIGNS, Campaigns.LIST_VIEW_PROJECTION);
 
         // Default sort orders
         moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
@@ -216,6 +224,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleSortOrder.put(Util.CASES, Cases.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.CALLS, Calls.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.MEETINGS, Meetings.DEFAULT_SORT_ORDER);
+        moduleSortOrder.put(Util.CAMPAIGNS, Campaigns.DEFAULT_SORT_ORDER);
 
         // Content Uris
         moduleUris.put(Util.ACCOUNTS, Accounts.CONTENT_URI);
@@ -225,6 +234,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put(Util.CASES, Cases.CONTENT_URI);
         moduleUris.put(Util.CALLS, Calls.CONTENT_URI);
         moduleUris.put(Util.MEETINGS, Meetings.CONTENT_URI);
+        moduleUris.put(Util.CAMPAIGNS, Campaigns.CONTENT_URI);
         moduleUris.put(Util.USERS, Users.CONTENT_URI);
 
         // TODO - complete this list
@@ -233,9 +243,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // TODO - leads removed from CONTACTS relationship and vice versa
         moduleRelationshipItems.put(Util.CONTACTS, new String[] { Util.OPPORTUNITIES });
         // TODO -
+        moduleRelationshipItems.put(Util.LEADS, new String[] {});
         // moduleRelationshipItems.put(Util.LEADS, new String[] { Util.OPPORTUNITIES});
         moduleRelationshipItems.put(Util.OPPORTUNITIES, new String[] { Util.CONTACTS });
         // TODO -
+        moduleRelationshipItems.put(Util.CASES, new String[] {});
+        moduleRelationshipItems.put(Util.CALLS, new String[] {});
+        moduleRelationshipItems.put(Util.MEETINGS, new String[] {});
+        moduleRelationshipItems.put(Util.CAMPAIGNS, new String[] {});
         // moduleRelationshipItems.put(Util.CASES, new String[] { Util.CONTACTS });
         // moduleRelationshipItems.put(Util.CALLS, new String[] { Util.CONTACTS });
         // moduleRelationshipItems.put(Util.MEETINGS, new String[] { Util.CONTACTS });
@@ -249,6 +264,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         relationshipTables.put(Util.CASES, new String[] { ACCOUNTS_CASES_TABLE_NAME });
         relationshipTables.put(Util.CALLS, new String[] {});
         relationshipTables.put(Util.MEETINGS, new String[] {});
+        relationshipTables.put(Util.CAMPAIGNS, new String[] {});
 
         // selection for the moduleName that has relationship with Accounts module
         // moduleName vs selection column name
@@ -268,6 +284,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         linkfieldNames.put(Util.CASES, "cases");
         linkfieldNames.put(Util.CALLS, "calls");
         linkfieldNames.put(Util.MEETINGS, "meetings");
+        linkfieldNames.put(Util.CAMPAIGNS, "campaigns");
         linkfieldNames.put(Util.ACLROLES, "aclroles");
         linkfieldNames.put(Util.ACLACTIONS, "actions");
 
@@ -327,6 +344,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createCasesTable(db);
         createCallsTable(db);
         createMeetingsTable(db);
+        createCampaignsTable(db);
 
         // create meta-data tables
         createModulesTable(db);
@@ -380,6 +398,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     void dropMeetingsTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + MEETINGS_TABLE_NAME);
+    }
+
+    void dropCampaignsTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + CAMPAIGNS_TABLE_NAME);
     }
 
     void dropModulesTable(SQLiteDatabase db) {
@@ -455,6 +477,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropCasesTable(db);
         dropCallsTable(db);
         dropMeetingsTable(db);
+        dropCampaignsTable(db);
 
         dropModulesTable(db);
         dropModuleFieldsTable(db);
@@ -630,6 +653,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                         + Meetings.DATE_ENTERED + " TEXT," + Meetings.DATE_MODIFIED
                                         + " TEXT," + Meetings.DELETED + " INTEGER," + " UNIQUE("
                                         + Meetings.BEAN_ID + ")" + ");");
+    }
+
+    private static void createCampaignsTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + CAMPAIGNS_TABLE_NAME + " (" + Campaigns.ID
+                                        + " INTEGER PRIMARY KEY," + Campaigns.BEAN_ID + " TEXT,"
+                                        + Campaigns.NAME + " TEXT," + Campaigns.STATUS + " TEXT,"
+                                        + Campaigns.START_DATE + " TEXT," + Campaigns.END_DATE
+                                        + " TEXT," + Campaigns.CAMPAIGN_TYPE + " TEXT,"
+                                        + Campaigns.BUDGET + " TEXT," + Campaigns.ACTUAL_COST
+                                        + " TEXT," + Campaigns.EXPECTED_COST + " TEXT,"
+                                        + Campaigns.EXPECTED_REVENUE + " TEXT,"
+                                        + Campaigns.IMPRESSIONS + " TEXT," + Campaigns.OBJECTIVE
+                                        + " TEXT," + Campaigns.FREQUENCY + " TEXT,"
+                                        + Campaigns.ASSIGNED_USER_NAME + " TEXT,"
+                                        + Campaigns.DESCRIPTION + " TEXT,"
+                                        + Campaigns.CREATED_BY_NAME + " TEXT,"
+                                        + Campaigns.DATE_ENTERED + " TEXT,"
+                                        + Campaigns.DATE_MODIFIED + " TEXT," + Campaigns.DELETED
+                                        + " INTEGER," + " UNIQUE(" + Meetings.BEAN_ID + ")" + ");");
     }
 
     private static void createModulesTable(SQLiteDatabase db) {
