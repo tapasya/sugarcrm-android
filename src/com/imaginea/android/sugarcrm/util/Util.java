@@ -109,6 +109,8 @@ public class Util {
 
     public static final String CASES = "Cases";
 
+    public static final String CAMPAIGNS = "Campaigns";
+
     public static final String USERS = "Users";
 
     public static final String ACLROLES = "ACLRoles";
