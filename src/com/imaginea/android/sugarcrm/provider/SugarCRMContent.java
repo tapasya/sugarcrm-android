@@ -550,6 +550,71 @@ public final class SugarCRMContent {
 
     }
 
+    public static final class Campaigns implements CampaignColumns {
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
+                                        + "/" + Util.CAMPAIGNS);
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = START_DATE + " ASC";
+
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME, START_DATE,
+                CREATED_BY_NAME };
+
+        public static final String[] LIST_VIEW_PROJECTION = { NAME };
+
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, STATUS,
+                START_DATE, END_DATE, CAMPAIGN_TYPE, BUDGET, ACTUAL_COST, EXPECTED_COST,
+                EXPECTED_REVENUE, IMPRESSIONS, OBJECTIVE, FREQUENCY, ASSIGNED_USER_NAME,
+                DESCRIPTION, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
+
+    }
+
+    public interface CampaignColumns {
+        public String ID = RECORD_ID;
+
+        public String BEAN_ID = SUGAR_BEAN_ID;
+
+        public String NAME = ModuleFields.NAME;
+
+        public String STATUS = ModuleFields.STATUS;
+
+        public String START_DATE = ModuleFields.START_DATE;
+
+        public String END_DATE = ModuleFields.END_DATE;
+
+        public String CAMPAIGN_TYPE = ModuleFields.CAMPAIGN_TYPE;
+
+        public String BUDGET = ModuleFields.BUDGET;
+
+        public String ACTUAL_COST = ModuleFields.ACTUAL_COST;
+
+        public String EXPECTED_COST = ModuleFields.EXPECTED_COST;
+
+        public String EXPECTED_REVENUE = ModuleFields.EXPECTED_REVENUE;
+
+        public String IMPRESSIONS = ModuleFields.IMPRESSIONS;
+
+        public String OBJECTIVE = ModuleFields.OBJECTIVE;
+
+        public String FREQUENCY = ModuleFields.FREQUENCY;
+
+        public String ASSIGNED_USER_NAME = ModuleFields.ASSIGNED_USER_NAME;
+
+        public String DESCRIPTION = ModuleFields.DESCRIPTION;
+
+        public String DATE_ENTERED = ModuleFields.DATE_ENTERED;
+
+        public String DATE_MODIFIED = ModuleFields.DATE_MODIFIED;
+
+        public String DELETED = ModuleFields.DELETED;
+
+        public String CREATED_BY_NAME = ModuleFields.CREATED_BY_NAME;
+
+    }
+
     public static final class Modules implements ModuleColumns {
 
         public static final String[] DETAILS_PROJECTION = { RECORD_ID, MODULE_NAME };
