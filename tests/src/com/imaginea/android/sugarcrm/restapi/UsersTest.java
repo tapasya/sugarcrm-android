@@ -21,28 +21,28 @@ public class UsersTest extends RestAPITest {
     HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
 
     @SmallTest
-    public void testUsersInsertion() throws Exception{
+    public void testUsersInsertion() throws Exception {
         SugarBean[] userBeans = getUsers();
-        
+
         Map<String, Map<String, String>> usersMap = new TreeMap<String, Map<String, String>>();
-        for(SugarBean userBean : userBeans){
+        for (SugarBean userBean : userBeans) {
             Map<String, String> userBeanValues = getUserBeanValues(userBean);
             String userName = userBean.getFieldValue(ModuleFields.USER_NAME);
-            if(userBeanValues != null & userBeanValues.size() > 0)
+            if (userBeanValues != null & userBeanValues.size() > 0)
                 usersMap.put(userName, userBeanValues);
         }
-        
+
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         dbHelper.insertUsers(usersMap);
     }
 
     private Map<String, String> getUserBeanValues(SugarBean userBean) {
         Map<String, String> userBeanValues = new TreeMap<String, String>();
-        for(String fieldName : Users.INSERT_PROJECTION){
+        for (String fieldName : Users.INSERT_PROJECTION) {
             String fieldValue = userBean.getFieldValue(fieldName);
             userBeanValues.put(fieldName, fieldValue);
         }
-        if(userBeanValues.size() > 0)
+        if (userBeanValues.size() > 0)
             return userBeanValues;
         return null;
     }
