@@ -20,7 +20,7 @@ public class ModuleFieldsOrderInsertTest extends AndroidTestCase {
     public void testSortOrderInsertion() throws Exception {
 
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        dbHelper.executeSQLFromFile(SQL_FILE);
+        //dbHelper.executeSQLFromFile(SQL_FILE);
 
     }
 }
