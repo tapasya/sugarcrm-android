@@ -44,7 +44,6 @@ public class AccountsApiTest extends RestAPITest {
             Log.d(LOG_TAG, sBean.getBeanId());
             Log.d(LOG_TAG, sBean.getFieldValue(ModuleFields.NAME));
             SugarBean[] relationshipBeans = sBean.getRelationshipBeans("contacts");
-            Log.d(LOG_TAG, "relationshipBeans size : " + relationshipBeans.length);
             if (relationshipBeans != null) {
                 for (SugarBean relationshipBean : relationshipBeans) {
                     Log.d(LOG_TAG, "" + relationshipBean.getFieldValue(ModuleFields.FIRST_NAME));
@@ -69,7 +68,10 @@ public class AccountsApiTest extends RestAPITest {
 
     @SmallTest
     public void testGetEntry() throws Exception {
-        String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+        // get only one sugar bean
+        SugarBean[] sBeans = getSugarBeans(0, 1);
+        assertTrue(sBeans.length > 0);
+        String beanId = sBeans[0].getBeanId();
         linkNameToFieldsArray.put("contacts", Arrays.asList(new String[] { "first_name",
                 "last_name" }));
         SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName, beanId, selectFields, linkNameToFieldsArray);
@@ -91,8 +93,16 @@ public class AccountsApiTest extends RestAPITest {
 
     @SmallTest
     public void testSetEntry() throws Exception {
-        String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+        // create a sugar bean
         Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
+        nameValuePairs.put(ModuleFields.NAME, "Test Advertising Inc."); //
+        nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String beanId = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
+        Log.d(LOG_TAG, "setEntry response : " + beanId);
+        assertNotNull(beanId);
+        
+        // modify the newly created bean
+        nameValuePairs = new LinkedHashMap<String, String>();
         nameValuePairs.put(ModuleFields.ID, beanId);
         nameValuePairs.put(ModuleFields.NAME, "R R Advertising Inc."); //
         nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
@@ -107,11 +117,13 @@ public class AccountsApiTest extends RestAPITest {
     public void testSetEntries() throws Exception {
         List<Map<String, String>> beanNameValuePairs = new ArrayList<Map<String, String>>();
 
-        String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+        // create a sugar bean
         Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
-        nameValuePairs.put(ModuleFields.ID, beanId);
-        nameValuePairs.put(ModuleFields.NAME, "R Advertising Inc."); //
+        nameValuePairs.put(ModuleFields.NAME, "Test Advertising Inc."); //
         nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String beanId = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
+        Log.d(LOG_TAG, "setEntry response : " + beanId);
+        assertNotNull(beanId);
 
         beanNameValuePairs.add(nameValuePairs);
         List<String> beanIds = RestUtil.setEntries(url, mSessionId, moduleName, beanNameValuePairs);
@@ -122,23 +134,30 @@ public class AccountsApiTest extends RestAPITest {
 
     @SmallTest
     public void testDeleteEntry() throws Exception {
-
-        String beanId = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
+        //create a new bean
         Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
+        nameValuePairs.put(ModuleFields.NAME, "Test Advertising Inc."); //
+        nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String beanId = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
+        Log.d(LOG_TAG, "setEntry response : " + beanId);
+        assertNotNull(beanId);
+        
+        // delete the newly created bean
+        nameValuePairs = new LinkedHashMap<String, String>();
         nameValuePairs.put(ModuleFields.ID, beanId);
         nameValuePairs.put(ModuleFields.DELETED, "1"); //
-        nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
         String _beanId = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
         Log.d(LOG_TAG, "setEntry response : " + _beanId);
         assertNotNull(_beanId);
         assertEquals(beanId, _beanId);
-        SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName, beanId, selectFields, linkNameToFieldsArray);
-        Log.d(LOG_TAG, "Deleted:" + sBean.getFieldValue(ModuleFields.DELETED));
     }
 
     @SmallTest
     public void testGetRelationships() throws Exception {
-        String beanId = "63f10b82-7aa0-5105-1038-4c1f268ae69b";
+        // get only one sugar bean
+        SugarBean[] sBeans = getSugarBeans(0, 1);
+        assertTrue(sBeans.length > 0);
+        String beanId = sBeans[0].getBeanId();
         String linkFieldName = "contacts";
         String relatedModuleQuery = "";
         String[] relatedFields = { "id", "first_name", "account_id" };
@@ -146,18 +165,33 @@ public class AccountsApiTest extends RestAPITest {
         relatedModuleLinkNameToFieldsArray.put("contacts", Arrays.asList(new String[] { "id",
                 "first_name", "last_name" }));
         int deleted = 0;
-        SugarBean[] sBeans = RestUtil.getRelationships(url, mSessionId, moduleName, beanId, linkFieldName, relatedModuleQuery, relatedFields, relatedModuleLinkNameToFieldsArray, deleted
+        SugarBean[] relationBeans = RestUtil.getRelationships(url, mSessionId, moduleName, beanId, linkFieldName, relatedModuleQuery, relatedFields, relatedModuleLinkNameToFieldsArray, deleted
                                         + "");
-        for (SugarBean sBean : sBeans) {
+        for (SugarBean sBean : relationBeans) {
             Log.i("LOG_TAG", "BeanId - " + sBean.getBeanId());
         }
     }
 
     @SmallTest
     public void testSetRelationship() throws Exception {
-        String beanId = "63f10b82-7aa0-5105-1038-4c1f268ae69b";
+        //create a new bean : Account
+        Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
+        nameValuePairs.put(ModuleFields.NAME, "Test Advertising Inc."); //
+        nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String accountBeanId = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
+        Log.d(LOG_TAG, "setEntry response : " + accountBeanId);
+        assertNotNull(accountBeanId);
+        
+        //create a new bean : Contact
+        nameValuePairs = new LinkedHashMap<String, String>();
+        nameValuePairs.put(ModuleFields.NAME, "Test Contact"); //
+        nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String contactBeanId = RestUtil.setEntry(url, mSessionId, Util.CONTACTS, nameValuePairs);
+        Log.d(LOG_TAG, "setEntry response : " + contactBeanId);
+        assertNotNull(contactBeanId);
+        
         String linkFieldName = "contacts";
-        String[] relatedIds = { "8ed461ad-808b-fa49-cf48-4c3c5a14bad6" };
+        String[] relatedIds = { contactBeanId };
         Map<String, String> nameValueList = new LinkedHashMap<String, String>();
         nameValueList.put(ModuleFields.ID, relatedIds[0]);
         nameValueList.put(ModuleFields.FIRST_NAME, "Nekkanti");
@@ -165,7 +199,7 @@ public class AccountsApiTest extends RestAPITest {
         nameValueList.put(ModuleFields.EMAIL1, "vasu1705@gmail.com");
 
         int delete = 0;
-        RelationshipStatus response = RestUtil.setRelationship(url, mSessionId, moduleName, beanId, linkFieldName, relatedIds, null, delete
+        RelationshipStatus response = RestUtil.setRelationship(url, mSessionId, moduleName, contactBeanId, linkFieldName, relatedIds, null, delete
                                         + "");
         System.out.println("setRelationship : " + response.getCreatedCount() + "-"
                                         + response.getFailedCount() + "-"
@@ -175,12 +209,28 @@ public class AccountsApiTest extends RestAPITest {
 
     @SmallTest
     public void testSetRelationships() throws Exception {
+        //create a new bean : Account
+        Map<String, String> nameValuePairs = new LinkedHashMap<String, String>();
+        nameValuePairs.put(ModuleFields.NAME, "Test Advertising Inc."); //
+        nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String accountBeanId = RestUtil.setEntry(url, mSessionId, moduleName, nameValuePairs);
+        Log.d(LOG_TAG, "setEntry response : " + accountBeanId);
+        assertNotNull(accountBeanId);
+        
+        //create a new bean : Contact
+        nameValuePairs = new LinkedHashMap<String, String>();
+        nameValuePairs.put(ModuleFields.NAME, "Test Contact"); //
+        nameValuePairs.put(ModuleFields.PHONE_OFFICE, "(078) 123-4567");
+        String contactBeanId = RestUtil.setEntry(url, mSessionId, Util.CONTACTS, nameValuePairs);
+        Log.d(LOG_TAG, "setEntry response : " + contactBeanId);
+        assertNotNull(contactBeanId);
+        
         List<Map<String, String>> nameValueLists = new ArrayList<Map<String, String>>();
 
-        String[] moduleNames = { "Contacts" };
-        String[] beanIds = { "1e9d5cb4-1972-28a4-7b36-4c1f261afd48" };
+        String[] moduleNames = { "Accounts" };
+        String[] beanIds = { accountBeanId };
         String[] linkFieldNames = { "Contacts" };
-        String[] relatedIds = { "c2503633-fdb7-2cee-d8ad-4c1f265a9ffd" };
+        String[] relatedIds = { contactBeanId };
 
         Map<String, String> nameValueList = new LinkedHashMap<String, String>();
         nameValueList.put(ModuleFields.ID, beanIds[0]);
