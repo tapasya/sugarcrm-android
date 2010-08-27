@@ -19,13 +19,12 @@ import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.RelationshipStatus;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
+import com.imaginea.android.sugarcrm.util.Util;
 
 public class AccountsApiTest extends RestAPITest {
-    String moduleName = "Accounts";
+    String moduleName = Util.ACCOUNTS;
 
     String[] fields = new String[] {};
-
-    String[] customFields = new String[] { "a", "b" };
 
     String[] selectFields = { ModuleFields.NAME, ModuleFields.PARENT_NAME,
             ModuleFields.PHONE_OFFICE, ModuleFields.PHONE_FAX, ModuleFields.EMAIL1,
@@ -33,7 +32,7 @@ public class AccountsApiTest extends RestAPITest {
 
     HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
 
-    public final static String LOG_TAG = "AccountsApiTest";
+    public final static String LOG_TAG = AccountsApiTest.class.getSimpleName();
 
     @SmallTest
     public void testGetAccountsList() throws Exception {
