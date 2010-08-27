@@ -7,10 +7,10 @@ import android.util.Log;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
+//import org.apache.velocity.VelocityContext;
+///import org.apache.velocity.app.Velocity;
+//import org.apache.velocity.exception.MethodInvocationException;
+//import org.apache.velocity.exception.ParseErrorException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -87,7 +87,7 @@ public class GenerateModuleFieldsTest extends RestAPITest {
             ModuleField field = (ModuleField) iterator.next();
             Log.i("ModuleFields:", field.getName());
         }
-        generateClass(moduleFieldsSet);
+        //generateClass(moduleFieldsSet);
         // Log.i("ModuleFields:"+ moduleName.)
     }
 
@@ -107,7 +107,7 @@ public class GenerateModuleFieldsTest extends RestAPITest {
         try {
             Properties prop = new Properties();
             prop.put("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
-            Velocity.init(prop);
+           // Velocity.init(prop);
             // Velocity.addProperty("runtime.log.logsystem.class",
             // "org.apache.velocity.runtime.log.NullLogSystem");
         } catch (Exception e) {
@@ -117,9 +117,9 @@ public class GenerateModuleFieldsTest extends RestAPITest {
 
         /* lets make a Context and put data into it */
 
-        VelocityContext context = new VelocityContext();
-        context.put("fields", set);
-
+       // VelocityContext context = new VelocityContext();
+      //  context.put("fields", set);
+//
         /* lets render a template */
 
         StringWriter w = new StringWriter();
@@ -155,20 +155,23 @@ public class GenerateModuleFieldsTest extends RestAPITest {
         w = new StringWriter();
 
         try {
-            Velocity.evaluate(context, w, "mystring", s);
-        } catch (ParseErrorException pee) {
-            /*
-             * thrown if something is wrong with the syntax of our template string
-             */
+           // Velocity.evaluate(context, w, "mystring", s);
+        } 
+        /*catch (ParseErrorException pee) {
+            
+             // thrown if something is wrong with the syntax of our template string
+             
             Log.e(LOG_TAG, "ParseErrorException : " + pee);
-        } catch (MethodInvocationException mee) {
+        } */
+        //catch (MethodInvocationException mee) {
             /*
              * thrown if a method of a reference called by the template throws an exception. That
              * won't happen here as we aren't calling any methods in this example, but we have to
              * catch them anyway
              */
-            Log.e(LOG_TAG, "MethodInvocationException : " + mee);
-        } catch (Exception e) {
+          //  Log.e(LOG_TAG, "MethodInvocationException : " + mee);
+        //}
+        catch (Exception e) {
             Log.e(LOG_TAG, "Exception : " + e);
         }
 
