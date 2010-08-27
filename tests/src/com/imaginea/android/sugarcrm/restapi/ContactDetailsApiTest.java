@@ -22,27 +22,47 @@ public class ContactDetailsApiTest extends RestAPITest {
 
     String[] fields = new String[] {};
 
-    String[] customFields = new String[] { "a", "b" };
-
-    private String[] mSelectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
+    String[] selectFields = { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME,
             ModuleFields.ACCOUNT_NAME, ModuleFields.PHONE_MOBILE, ModuleFields.PHONE_WORK,
             ModuleFields.EMAIL1 };
 
-    HashMap<String, List<String>> mLinkNameToFieldsArray = new HashMap<String, List<String>>();
+    HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
 
     public final static String LOG_TAG = "ContactDetailsTest";
 
     @SmallTest
     public void testContactDetail() throws Exception {
 
-        String id = "c2dc2bf6-2845-f460-1a25-4c1f47c05b87";
-        SugarBean sBean = getSugarBean(id);
+        // get only one sugar bean
+        SugarBean[] sBeans = getSugarBeans(0, 1);
+        assertTrue(sBeans.length > 0);
+        String beanId = sBeans[0].getBeanId();
+        assertNotNull(beanId);
+        SugarBean sBean = getSugarBean(beanId);
         assertNotNull(sBean);
-        for (int i = 0; i < mSelectFields.length; i++) {
-            String fieldValue = sBean.getFieldValue(mSelectFields[i]);
-            Log.i(LOG_TAG, "FieldName:|Field value " + mSelectFields[i] + ":" + fieldValue);
+        for (int i = 0; i < selectFields.length; i++) {
+            String fieldValue = sBean.getFieldValue(selectFields[i]);
+            Log.i(LOG_TAG, "FieldName:|Field value " + selectFields[i] + ":" + fieldValue);
             assertNotNull(fieldValue);
         }
+    }
+    
+    /**
+     * demonstrates the usage of RestUtil for contacts List. ModuleFields.NAME or FULL_NAME is not
+     * returned by Sugar CRM. The fields that are not returned by SugarCRM can be automated, but not
+     * yet generated
+     * 
+     * @param offset
+     * @param maxResults
+     * @return
+     * @throws Exception
+     */
+    private SugarBean[] getSugarBeans(int offset, int maxResults) throws Exception {
+        String query = "", orderBy = "";
+        int deleted = 0;
+        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset
+                                        + "", selectFields, linkNameToFieldsArray, maxResults + "", "");
+        return sBeans;
     }
 
     /**
@@ -55,7 +75,7 @@ public class ContactDetailsApiTest extends RestAPITest {
      * @throws Exception
      */
     private SugarBean getSugarBean(String beanId) throws Exception {
-        SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName, beanId, mSelectFields, mLinkNameToFieldsArray);
+        SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName, beanId, selectFields, linkNameToFieldsArray);
         return sBean;
     }
 

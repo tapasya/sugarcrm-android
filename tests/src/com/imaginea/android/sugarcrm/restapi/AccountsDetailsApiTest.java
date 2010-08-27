@@ -1,16 +1,15 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import static com.imaginea.android.sugarcrm.ModuleFields.NAME;
+
 import java.util.HashMap;
 import java.util.List;
 
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
-import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
-
-import static com.imaginea.android.sugarcrm.ModuleFields.*;
 
 public class AccountsDetailsApiTest extends RestAPITest {
 
@@ -18,9 +17,9 @@ public class AccountsDetailsApiTest extends RestAPITest {
 
     String[] fields = new String[] {};
 
-    String[] customFields = new String[] { "a", "b" };
+    String[] selectFields = { NAME };
 
-    private String[] mSelectFields = { NAME };
+    HashMap<String, List<String>> linkNameToFieldsArray = new HashMap<String, List<String>>();
 
     /*
      * { ModuleFields.FIRST_NAME, ModuleFields.LAST_NAME, ModuleFields.ACCOUNT_NAME,
@@ -33,15 +32,36 @@ public class AccountsDetailsApiTest extends RestAPITest {
 
     @SmallTest
     public void testAccountDetail() throws Exception {
-
-        String id = "1e9d5cb4-1972-28a4-7b36-4c1f261afd48";
-        SugarBean sBean = getSugarBean(id);
+        // get only one sugar bean
+        SugarBean[] sBeans = getSugarBeans(0, 1);
+        assertTrue(sBeans.length > 0);
+        String beanId = sBeans[0].getBeanId();
+        assertNotNull(beanId);
+        SugarBean sBean = getSugarBean(beanId);
         assertNotNull(sBean);
-        for (int i = 0; i < mSelectFields.length; i++) {
-            String fieldValue = sBean.getFieldValue(mSelectFields[i]);
-            Log.i(LOG_TAG, "FieldName:|Field value " + mSelectFields[i] + ":" + fieldValue);
+        for (int i = 0; i < selectFields.length; i++) {
+            String fieldValue = sBean.getFieldValue(selectFields[i]);
+            Log.i(LOG_TAG, "FieldName:|Field value " + selectFields[i] + ":" + fieldValue);
             assertNotNull(fieldValue);
         }
+    }
+
+    /**
+     * demonstrates the usage of RestUtil for contacts List. ModuleFields.NAME or FULL_NAME is not
+     * returned by Sugar CRM. The fields that are not returned by SugarCRM can be automated, but not
+     * yet generated
+     * 
+     * @param offset
+     * @param maxResults
+     * @return
+     * @throws Exception
+     */
+    private SugarBean[] getSugarBeans(int offset, int maxResults) throws Exception {
+        String query = "", orderBy = "";
+        int deleted = 0;
+        SugarBean[] sBeans = RestUtil.getEntryList(url, mSessionId, moduleName, query, orderBy, offset
+                                        + "", selectFields, linkNameToFieldsArray, maxResults + "", "");
+        return sBeans;
     }
 
     /**
@@ -54,7 +74,7 @@ public class AccountsDetailsApiTest extends RestAPITest {
      * @throws Exception
      */
     private SugarBean getSugarBean(String beanId) throws Exception {
-        SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName, beanId, mSelectFields, mLinkNameToFieldsArray);
+        SugarBean sBean = RestUtil.getEntry(url, mSessionId, moduleName, beanId, selectFields, mLinkNameToFieldsArray);
         return sBean;
     }
 
