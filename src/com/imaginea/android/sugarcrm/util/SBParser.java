@@ -23,14 +23,20 @@ public class SBParser {
     private JSONArray mRelationshipListJson;
 
     public SBParser(String jsonText) throws JSONException {
-        if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
-            Log.v(LOG_TAG, jsonText);
         JSONObject responseObj = new JSONObject(jsonText);
-        this.mEntryListJson = responseObj.getJSONArray(ENTRY_LIST);
-        this.mRelationshipListJson = responseObj.getJSONArray(RELATIONSHIP_LIST);
+        if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+            Log.v(LOG_TAG, jsonText);
+            Log.v(LOG_TAG, "length" + responseObj.length());
+        }
+        if (responseObj.has(ENTRY_LIST))
+            this.mEntryListJson = responseObj.getJSONArray(ENTRY_LIST);
+        if (responseObj.has(RELATIONSHIP_LIST))
+            this.mRelationshipListJson = responseObj.getJSONArray(RELATIONSHIP_LIST);
     }
 
     public SugarBean[] getSugarBeans() throws SugarCrmException {
+        if (mEntryListJson == null)
+            return null;
         SugarBean[] sugarBeans = new SugarBean[mEntryListJson.length()];
         for (int i = 0; i < mEntryListJson.length(); i++) {
             sugarBeans[i] = new SugarBean();
@@ -52,6 +58,8 @@ public class SBParser {
     }
 
     public Map<String, SugarBean[]> getRelationshipBeans(int index) throws SugarCrmException {
+        if (mRelationshipListJson == null)
+            return null;
         Map<String, SugarBean[]> relationshipList = new HashMap<String, SugarBean[]>();
         try {
             if (index >= mRelationshipListJson.length())
