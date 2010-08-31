@@ -1,6 +1,4 @@
 <resources>
-  <item type="id" name="get" />
-  <item type="id" name="update" />
-  <item type="id" name="delete" />
-  <item type="id" name="insert" />
+  <item type="id" name="test" />
+ 
 </resources>
