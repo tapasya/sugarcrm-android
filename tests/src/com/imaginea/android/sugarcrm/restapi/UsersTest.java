@@ -32,8 +32,10 @@ public class UsersTest extends RestAPITest {
                 usersMap.put(userName, userBeanValues);
         }
 
-        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        dbHelper.insertUsers(usersMap);
+        // this is not a test, so commenting for now, till a set of users can be cleanly inserted
+        // into the system and the result asserted
+        // DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        // dbHelper.insertUsers(usersMap);
     }
 
     private Map<String, String> getUserBeanValues(SugarBean userBean) {
