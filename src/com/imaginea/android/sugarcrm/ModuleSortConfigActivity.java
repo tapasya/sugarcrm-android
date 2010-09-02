@@ -19,6 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <p>
+ * ModuleSortConfigActivity class.
+ * </p>
+ * 
+ */
 public class ModuleSortConfigActivity extends Activity {
 
     private final String TAG = ModuleSortConfigActivity.class.getSimpleName();
@@ -45,6 +51,7 @@ public class ModuleSortConfigActivity extends Activity {
 
     private SugarCrmApp app;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +93,8 @@ public class ModuleSortConfigActivity extends Activity {
         mSortOrderSpinner.setEnabled(false);
 
         mModuleNameSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                            int position, long id) {
                 // store the selected module index
                 selectedModuleIndex = position;
 
@@ -98,7 +106,8 @@ public class ModuleSortConfigActivity extends Activity {
                 // get the labels of the module fields to display
                 String[] moduleFieldsChoice = new String[moduleFields.length];
                 for (int i = 0; i < moduleFields.length; i++) {
-                    // add the module field label to be displayed in the choice menu
+                    // add the module field label to be displayed in the choice
+                    // menu
                     ModuleField modField = map.get(moduleFields[i]);
                     if (modField != null) {
                         moduleFieldsChoice[i] = modField.getLabel();
@@ -124,7 +133,8 @@ public class ModuleSortConfigActivity extends Activity {
         });
 
         mFieldNameSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                            int position, long id) {
                 // store the selected field index
                 selectedFieldIndex = position;
                 mSortOrderSpinner.setEnabled(true);
@@ -136,7 +146,8 @@ public class ModuleSortConfigActivity extends Activity {
         });
 
         mSortOrderSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                            int position, long id) {
                 // store the selected order index
                 selectedOrderIndex = position;
             }
@@ -148,23 +159,34 @@ public class ModuleSortConfigActivity extends Activity {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onResume() {
         super.onResume();
     }
 
+    /**
+     * <p>
+     * saveSortOrder
+     * </p>
+     * 
+     * @param view
+     *            a {@link android.view.View} object.
+     */
     public void saveSortOrder(View view) {
         Log.i(TAG, "saveSortOrder : ");
 
         String module = (String) mModuleNameSpinner.getAdapter().getItem(selectedModuleIndex);
         String fieldName = fieldMap.get(mFieldNameSpinner.getAdapter().getItem(selectedFieldIndex));
         String sortBy = orderMap.get(mSortOrderSpinner.getAdapter().getItem(selectedOrderIndex));
-        Log.i(TAG, "module : " + module + " field : " + fieldName + " order : " + sortBy);
+        Log.i(TAG, "module : " + module + " field : " + fieldName + " order : "
+                                        + sortBy);
 
         app.setModuleSortOrder(module, fieldName, sortBy);
 

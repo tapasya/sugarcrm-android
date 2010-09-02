@@ -19,6 +19,12 @@ import android.widget.TextView;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.Util;
 
+/**
+ * <p>
+ * SearchActivity class.
+ * </p>
+ * 
+ */
 public class SearchActivity extends ListActivity {
 
     private static final String TAG = SearchActivity.class.getSimpleName();
@@ -39,6 +45,7 @@ public class SearchActivity extends ListActivity {
 
     private int mMaxResults = 20;
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +71,8 @@ public class SearchActivity extends ListActivity {
             }
             showResults(mQuery);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            // handles a click on a search suggestion; launches activity to show the bean
+            // handles a click on a search suggestion; launches activity to show
+            // the bean
             Intent detailIntent = new Intent(this, AccountDetailsActivity.class);
             Log.i(TAG, "view uri - " + intent.getData());
             detailIntent.putExtra(Util.ROW_ID, intent.getData().getLastPathSegment());
@@ -106,7 +114,8 @@ public class SearchActivity extends ListActivity {
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> arg0, View view,
+                                            int position, long id) {
                 openDetailScreen(position);
             }
         });
@@ -125,10 +134,12 @@ public class SearchActivity extends ListActivity {
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        // SugarBean bean = (SugarBean) getListView().getItemAtPosition(position);
+        // SugarBean bean = (SugarBean)
+        // getListView().getItemAtPosition(position);
         // TODO
         if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "beanId:" + cursor.getString(1) + " rowId: " + cursor.getString(0));
+            Log.d(TAG, "beanId:" + cursor.getString(1) + " rowId: "
+                                            + cursor.getString(0));
         }
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
@@ -140,7 +151,8 @@ public class SearchActivity extends ListActivity {
      */
     private final class GenericCursorAdapter extends SimpleCursorAdapter {
 
-        public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
+        public GenericCursorAdapter(Context context, int layout, Cursor c,
+                                        String[] from, int[] to) {
             super(context, layout, c, from, to);
         }
 
@@ -151,6 +163,14 @@ public class SearchActivity extends ListActivity {
         }
     }
 
+    /**
+     * <p>
+     * showHome
+     * </p>
+     * 
+     * @param view
+     *            a {@link android.view.View} object.
+     */
     public void showHome(View view) {
         Intent homeIntent = new Intent(this, DashboardActivity.class);
         startActivity(homeIntent);

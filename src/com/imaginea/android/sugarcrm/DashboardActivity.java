@@ -40,7 +40,11 @@ public class DashboardActivity extends Activity {
 
     private ProgressDialog mProgressDialog;
 
-    /** Called when the activity is first created. */
+    /**
+     * {@inheritDoc}
+     * 
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,12 +61,14 @@ public class DashboardActivity extends Activity {
         mDashboard = (GridView) findViewById(R.id.dashboard);
 
         mDashboard.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                            int position, long id) {
 
                 mProgressDialog = ViewUtil.getProgressDialog(DashboardActivity.this, getString(R.string.loading), false);
                 mProgressDialog.show();
 
-                // invoke the corresponding activity when the item in the GridView is clicked
+                // invoke the corresponding activity when the item in the
+                // GridView is clicked
                 Intent myIntent;
                 String moduleName = mModuleNames.get(position);
                 if (moduleName.equals(getString(R.string.settings))) {
@@ -77,6 +83,7 @@ public class DashboardActivity extends Activity {
         });
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
@@ -87,11 +94,13 @@ public class DashboardActivity extends Activity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onResume() {
         super.onResume();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

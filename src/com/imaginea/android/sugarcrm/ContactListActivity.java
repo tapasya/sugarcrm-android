@@ -41,8 +41,9 @@ import java.util.Map.Entry;
 /**
  * ContactListActivity, lists the view projections for all the modules.
  * 
- * Note: Ideally we would have to rename the file, but to preserve CVS history we have chosen not to
- * rename the file. Cannot use CVS rename command as we are still using an old CVS server
+ * Note: Ideally we would have to rename the file, but to preserve CVS history
+ * we have chosen not to rename the file. Cannot use CVS rename command as we
+ * are still using an old CVS server
  * 
  * @author chander
  */
@@ -70,7 +71,8 @@ public class ContactListActivity extends ListActivity {
 
     private int mCurrentSelection;
 
-    // we don't make this final as we may want to use the sugarCRM value dynamically, but prevent
+    // we don't make this final as we may want to use the sugarCRM value
+    // dynamically, but prevent
     // others from modiying anyway
     private static int mMaxResults = 20;
 
@@ -113,8 +115,10 @@ public class ContactListActivity extends ListActivity {
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
         }
 
-        // If the list is a list of related items, hide the filterImage and allItems image
-        if (intent.getData() != null && intent.getData().getPathSegments().size() >= 3) {
+        // If the list is a list of related items, hide the filterImage and
+        // allItems image
+        if (intent.getData() != null
+                                        && intent.getData().getPathSegments().size() >= 3) {
             findViewById(R.id.filterImage).setVisibility(View.GONE);
             findViewById(R.id.allItems).setVisibility(View.GONE);
         }
@@ -128,7 +132,8 @@ public class ContactListActivity extends ListActivity {
         // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> arg0, View view,
+                                            int position, long id) {
                 openDetailScreen(position);
             }
         });
@@ -149,9 +154,11 @@ public class ContactListActivity extends ListActivity {
         if (intent.getData() == null) {
             intent.setData(mModuleUri);
         }
-        // Perform a managed query. The Activity will handle closing and requerying the cursor
+        // Perform a managed query. The Activity will handle closing and
+        // requerying the cursor
         // when needed.
-        // TODO - optimize this, if we sync up a dataset, then no need to run detail projection
+        // TODO - optimize this, if we sync up a dataset, then no need to run
+        // detail projection
         // here, just do a list projection
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), mSelections, mSelectionArgs, getSortOrder());
 
@@ -191,7 +198,8 @@ public class ContactListActivity extends ListActivity {
     /**
      * GenericCursorAdapter
      */
-    private final class GenericCursorAdapter extends SimpleCursorAdapter implements Filterable {
+    private final class GenericCursorAdapter extends SimpleCursorAdapter
+                                    implements Filterable {
 
         private int realoffset = 0;
 
@@ -199,7 +207,8 @@ public class ContactListActivity extends ListActivity {
 
         private ContentResolver mContent;
 
-        public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
+        public GenericCursorAdapter(Context context, int layout, Cursor c,
+                                        String[] from, int[] to) {
             super(context, layout, c, from, to);
             mContent = context.getContentResolver();
         }
@@ -213,9 +222,10 @@ public class ContactListActivity extends ListActivity {
             if (!mBusy && position != 0 && position == count - 1) {
                 mBusy = true;
                 realoffset += count;
-                Uri uri = getIntent().getData();
+                // Uri uri = getIntent().getData();
                 // TODO - fix this, this is no longer used
-                Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset + "/" + limit);
+                Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset
+                                                + "/" + limit);
                 Log.d(LOG_TAG, "Changing cursor:" + newUri.toString());
                 final Cursor cursor = managedQuery(newUri, Contacts.LIST_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
                 CRMContentObserver observer = new CRMContentObserver(new Handler() {
@@ -339,7 +349,8 @@ public class ContactListActivity extends ListActivity {
         Uri deleteUri = Uri.withAppendedPath(mModuleUri, cursor.getString(0));
         getContentResolver().registerContentObserver(deleteUri, false, new DeleteContentObserver(new Handler()));
         ServiceHelper.startServiceForDelete(getBaseContext(), deleteUri, mModuleName, beanId);
-        // getContentResolver().delete(mModuleUri, SugarCRMContent.RECORD_ID, new String[] {
+        // getContentResolver().delete(mModuleUri, SugarCRMContent.RECORD_ID,
+        // new String[] {
         // cursor.getString(0) });
         // detailIntent.putExtra(RestUtilConstants.ID, cursor.getString(0));
         // detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
@@ -432,7 +443,8 @@ public class ContactListActivity extends ListActivity {
         // get the module fields for the module
         Map<String, ModuleField> map = mDbHelper.getModuleFields(mModuleName);
         if (map == null) {
-            Log.w(LOG_TAG, "Cannot prepare Options as Map is null for module:" + mModuleName);
+            Log.w(LOG_TAG, "Cannot prepare Options as Map is null for module:"
+                                            + mModuleName);
             return false;
         }
         mModuleFieldsChoice = new String[mModuleFields.length];
@@ -525,7 +537,8 @@ public class ContactListActivity extends ListActivity {
             });
             builder.setNegativeButton(R.string.descending, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    String sortOrder = mModuleFields[mSortColumnIndex] + " DESC";
+                    String sortOrder = mModuleFields[mSortColumnIndex]
+                                                    + " DESC";
                     sortList(sortOrder);
                 }
             });
@@ -551,7 +564,8 @@ public class ContactListActivity extends ListActivity {
 
     /** {@inheritDoc} */
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenuInfo menuInfo) {
         menu.setHeaderTitle(R.string.options);
         AdapterView.AdapterContextMenuInfo info;
         try {
@@ -652,7 +666,8 @@ public class ContactListActivity extends ListActivity {
         MODE = Util.ASSIGNED_ITEMS_MODE;
         // TODO: get the user name from Account Manager
         String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
-        String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
+        String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName
+                                        + "'";
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, getSortOrder());
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
@@ -713,7 +728,8 @@ public class ContactListActivity extends ListActivity {
         String number = cursor.getString(index);
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "Work number to call:" + number);
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"
+                                        + number));
         startActivity(intent);
     }
 
@@ -736,7 +752,8 @@ public class ContactListActivity extends ListActivity {
         String emailAddress = cursor.getString(index);
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "email :" + emailAddress);
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + emailAddress));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:"
+                                        + emailAddress));
         startActivity(intent);
     }
 }
