@@ -39,7 +39,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * ContactListActivity
+ * ContactListActivity, lists the view projections for all the modules.
+ * 
+ * Note: Ideally we would have to rename the file, but to preserve CVS history we have chosen not to
+ * rename the file. Cannot use CVS rename command as we are still using an old CVS server
  * 
  * @author chander
  */
@@ -55,8 +58,6 @@ public class ContactListActivity extends ListActivity {
 
     private View mListFooterProgress;
 
-    private Menu mMenu;
-
     private boolean mBusy = false;
 
     private String mModuleName;
@@ -69,16 +70,15 @@ public class ContactListActivity extends ListActivity {
 
     private int mCurrentSelection;
 
-    // we don't make this final as we may want to use the sugarCRM value dynamically
-    public static int mMaxResults = 20;
-
-    public final static String LOG_TAG = "ContactListActivity";
+    // we don't make this final as we may want to use the sugarCRM value dynamically, but prevent
+    // others from modiying anyway
+    private static int mMaxResults = 20;
 
     private DatabaseHelper mDbHelper;
 
     private GenericCursorAdapter mAdapter;
 
-    private final int DIALOG_SORT_CHOICE = 1;
+    private static final int DIALOG_SORT_CHOICE = 1;
 
     private String[] mModuleFields;
 
@@ -94,6 +94,9 @@ public class ContactListActivity extends ListActivity {
 
     private SugarCrmApp app;
 
+    public final static String LOG_TAG = ContactListActivity.class.getSimpleName();
+
+    /** {@inheritDoc} */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -361,11 +364,13 @@ public class ContactListActivity extends ListActivity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onSearchRequested() {
         Bundle appData = new Bundle();
@@ -416,6 +421,7 @@ public class ContactListActivity extends ListActivity {
     // }
     // }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuHelper.onPrepareOptionsMenu(this, menu, mModuleName);
@@ -445,10 +451,9 @@ public class ContactListActivity extends ListActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Hold on to this
-        mMenu = menu;
 
         // Inflate the currently selected menu XML resource.
         MenuInflater inflater = getMenuInflater();
@@ -457,6 +462,7 @@ public class ContactListActivity extends ListActivity {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -484,16 +490,19 @@ public class ContactListActivity extends ListActivity {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
         super.onPrepareDialog(id, dialog, args);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPrepareDialog(int id, Dialog dialog) {
         super.onPrepareDialog(id, dialog);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -540,6 +549,7 @@ public class ContactListActivity extends ListActivity {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.setHeaderTitle(R.string.options);
@@ -576,6 +586,7 @@ public class ContactListActivity extends ListActivity {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 
@@ -629,6 +640,14 @@ public class ContactListActivity extends ListActivity {
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * <p>
+     * showAssignedItems
+     * </p>
+     * 
+     * @param view
+     *            a {@link android.view.View} object.
+     */
     public void showAssignedItems(View view) {
         MODE = Util.ASSIGNED_ITEMS_MODE;
         // TODO: get the user name from Account Manager
@@ -639,12 +658,28 @@ public class ContactListActivity extends ListActivity {
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * <p>
+     * showAllItems
+     * </p>
+     * 
+     * @param view
+     *            a {@link android.view.View} object.
+     */
     public void showAllItems(View view) {
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), null, null, getSortOrder());
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * <p>
+     * showHome
+     * </p>
+     * 
+     * @param view
+     *            a {@link android.view.View} object.
+     */
     public void showHome(View view) {
         Intent homeIntent = new Intent(this, DashboardActivity.class);
         startActivity(homeIntent);
@@ -659,6 +694,14 @@ public class ContactListActivity extends ListActivity {
         return sortOrder;
     }
 
+    /**
+     * <p>
+     * callNumber
+     * </p>
+     * 
+     * @param position
+     *            a int.
+     */
     public void callNumber(int position) {
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
@@ -674,6 +717,14 @@ public class ContactListActivity extends ListActivity {
         startActivity(intent);
     }
 
+    /**
+     * <p>
+     * sendMail
+     * </p>
+     * 
+     * @param position
+     *            a int.
+     */
     public void sendMail(int position) {
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {

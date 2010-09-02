@@ -37,13 +37,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * AccountDetailsActivity
+ * AccountDetailsActivity is used to show details for all modules. Note: Ideally we would have to
+ * rename the file, but to preserve CVS history we have chosen not to rename the file. Cannot use
+ * CVS rename command as we are still using an old CVS server.
  * 
  * @author vasavi
  */
 public class AccountDetailsActivity extends Activity {
-
-    private Menu mMenu;
 
     private String mRowId;
 
@@ -55,8 +55,6 @@ public class AccountDetailsActivity extends Activity {
 
     private String[] mSelectFields;
 
-    private final String LOG_TAG = "AccountDetailsActivity";
-
     private ViewGroup mDetailsTable;
 
     private String[] mRelationshipModules;
@@ -65,9 +63,21 @@ public class AccountDetailsActivity extends Activity {
 
     private LoadContentTask mTask;
 
+    private static final int HEADER = 1;
+
+    private static final int STATIC_ROW = 2;
+
+    private static final int DYNAMIC_ROW = 3;
+
     private ProgressDialog mProgressDialog;
 
-    /** Called when the activity is first created. */
+    private static final String LOG_TAG = AccountDetailsActivity.class.getSimpleName();
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -114,6 +124,14 @@ public class AccountDetailsActivity extends Activity {
         mTask.execute(null);
     }
 
+    /**
+     * <p>
+     * openListScreen
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     */
     protected void openListScreen(String moduleName) {
         // if (mModuleName.equals("Accounts")) {
         Intent detailIntent = new Intent(AccountDetailsActivity.this, ContactListActivity.class);
@@ -130,25 +148,18 @@ public class AccountDetailsActivity extends Activity {
         // }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
         if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
             mTask.cancel(true);
         }
-    }
+    }   
 
-    /*
-     * @Override public boolean onPrepareOptionsMenu(Menu menu) {
-     * MenuHelper.onPrepareOptionsMenu(this, menu, mModuleName); return
-     * super.onPrepareOptionsMenu(menu); }
-     */
-
+    /** {@inheritDoc} */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Hold on to this
-        mMenu = menu;
-
         // Inflate the currently selected menu XML resource.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.details_activity_menu, menu);
@@ -159,13 +170,14 @@ public class AccountDetailsActivity extends Activity {
             for (int i = 0; i < mRelationshipModules.length; i++) {
                 relationshipMenu.add(0, Menu.FIRST + i, 0, mRelationshipModules[i]);
             }
-        } else{
+        } else {
             menu.setGroupEnabled(1, false);
         }
 
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -178,27 +190,15 @@ public class AccountDetailsActivity extends Activity {
         default:
             if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                 Log.i(LOG_TAG, "item id : " + item.getItemId());
-            }
-
-            // if (mModuleName.equals("Accounts")) {
-            openListScreen(mRelationshipModules[item.getItemId() - 1]);
-            // } else {
-            // Toast.makeText(this, "Not yet supported!", Toast.LENGTH_SHORT).show();
-            // }
+            }           
+            openListScreen(mRelationshipModules[item.getItemId() - 1]);           
             return true;
-        }
-        // return false;
+        }      
     }
 
     class LoadContentTask extends AsyncTask<Object, Object, Object> {
 
         int staticRowsCount;
-
-        final int HEADER = 1;
-
-        final int STATIC_ROW = 2;
-
-        final int DYNAMIC_ROW = 3;
 
         LoadContentTask() {
             mDetailsTable = (ViewGroup) findViewById(R.id.accountDetalsTable);
@@ -544,5 +544,4 @@ public class AccountDetailsActivity extends Activity {
      * 
      * }
      */
-
 }
