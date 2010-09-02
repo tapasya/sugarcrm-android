@@ -12,7 +12,6 @@ import com.imaginea.android.sugarcrm.util.Util;
  * to retrieve column values by name instead of column number
  * 
  * @author chander
- * 
  */
 public final class SugarCRMContent {
     public static final String AUTHORITY = SugarCRMProvider.AUTHORITY;
