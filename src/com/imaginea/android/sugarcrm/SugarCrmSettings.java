@@ -13,12 +13,19 @@ import com.imaginea.android.sugarcrm.util.Util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * <p>
+ * SugarCrmSettings class.
+ * </p>
+ * 
+ */
 public class SugarCrmSettings extends PreferenceActivity {
 
     private static final String LOG_TAG = "SugarCrmSettings";
 
     private static final Map<String, String> savedSettings = new HashMap<String, String>();
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +35,15 @@ public class SugarCrmSettings extends PreferenceActivity {
         addPreferencesFromResource(R.xml.sugarcrm_settings);
     }
 
-    // Static getters (extracting data from context)
+    /**
+     * <p>
+     * getUsername
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @return a {@link java.lang.String} object.
+     */
     public static String getUsername(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(Util.PREF_USERNAME, context.getString(R.string.defaultUser));
     }
@@ -40,7 +55,8 @@ public class SugarCrmSettings extends PreferenceActivity {
      * // TODO - optimize once loaded instead of calling package manager everytime
      * 
      * @param context
-     * @return
+     *            a {@link android.content.Context} object.
+     * @return a {@link java.lang.String} object.
      */
     public static String getSugarRestUrl(Context context) {
         PackageManager pm = context.getPackageManager();
@@ -57,6 +73,9 @@ public class SugarCrmSettings extends PreferenceActivity {
 
     /**
      * This methods saves the current settings, to be able to check later if settings changed
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
      */
     public static void saveCurrentSettings(Context context) {
         savedSettings.clear();
@@ -66,6 +85,10 @@ public class SugarCrmSettings extends PreferenceActivity {
 
     /**
      * This methods tells if the settings have changed.
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @return a boolean.
      */
     public static boolean currentSettingsChanged(Context context) {
 

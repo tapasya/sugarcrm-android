@@ -1,5 +1,12 @@
 package com.imaginea.android.sugarcrm;
 
+/**
+ * Module fields for Accounts, Contacts, Opportunities, Leads, Campaigns, Meetings, Cases.
+ * 
+ * Velocity is used to generate this file, please do not edit manually
+ * 
+ * @author velocity
+ */
 public interface ModuleFields {
 
 	#foreach ($field in $fields)

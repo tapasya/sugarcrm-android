@@ -20,7 +20,6 @@ import java.util.List;
  * EntryListServiceTask
  * 
  * @author chander
- * 
  */
 public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
@@ -47,6 +46,16 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
 
     public static final String LOG_TAG = "EntryListTask";
 
+    /**
+     * <p>
+     * Constructor for EntryListServiceTask.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param intent
+     *            a {@link android.content.Intent} object.
+     */
     public EntryListServiceTask(Context context, Intent intent) {
         super(context);
         mContext = context;
@@ -62,6 +71,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
         mOrderBy = extras.getString(Util.SORT_ORDER);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Object doInBackground(Object... params) {
         try {
@@ -99,6 +109,7 @@ public class EntryListServiceTask extends AsyncServiceTask<Object, Void, Object>
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onCancelled() {
         super.onCancelled();
