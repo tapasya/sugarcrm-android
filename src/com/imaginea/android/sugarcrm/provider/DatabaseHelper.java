@@ -182,7 +182,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleIcons.put(Util.CASES, R.drawable.cases);
         moduleIcons.put(Util.CALLS, R.drawable.calls);
         moduleIcons.put(Util.MEETINGS, R.drawable.meeting);
-        //TODO: as of now, there is no icon for campaigns
+        // TODO: as of now, there is no icon for campaigns
         // moduleIcons.put(Util.CAMPAIGNS, R.drawable.campaings);
         moduleIcons.put("Settings", R.drawable.settings);
 
@@ -330,11 +330,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * <p>
+     * Constructor for DatabaseHelper.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     */
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         mContext = context;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate(SQLiteDatabase db) {
         createAccountsTable(db);
@@ -355,9 +364,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createAclRolesTable(db);
         createAclActionsTable(db);
 
-        /*
-         * createModuleFieldsSortOrderTable(db); createModuleFieldsGroupTable(db);
-         */
+        //TODO: Dyanamic Module Support
+        // createModuleFieldsSortOrderTable(db);
+        //createModuleFieldsGroupTable(db);
+         
 
         // create join tables
 
@@ -460,6 +470,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_GROUP_TABLE_NAME);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
@@ -857,10 +868,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * <p>
+     * isAclEnabled
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param name
+     *            a {@link java.lang.String} object.
+     * @return a boolean.
+     */
     public boolean isAclEnabled(String moduleName, String name) {
         return isAclEnabled(moduleName, name, null);
     }
 
+    /**
+     * <p>
+     * isAclEnabled
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param name
+     *            a {@link java.lang.String} object.
+     * @param ownerName
+     *            a {@link java.lang.String} object.
+     * @return a boolean.
+     */
     public boolean isAclEnabled(String moduleName, String name, String ownerName) {
         Map<String, Map<String, Integer>> aclAccessMap = getAclAccessMap();
         // TODO - checkk if syncd ACLRoles and Actions succesfully- if no roles are given to a user,
@@ -902,34 +937,104 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>fieldsExcludedForEdit</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, String> getFieldsExcludedForEdit() {
         return fieldsExcludedForEdit;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>fieldsExcludedForDetails</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, String> getFieldsExcludedForDetails() {
         return fieldsExcludedForDetails;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>moduleProjections</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return an array of {@link java.lang.String} objects.
+     */
     public String[] getModuleProjections(String moduleName) {
         return moduleProjections.get(moduleName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>moduleListProjections</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return an array of {@link java.lang.String} objects.
+     */
     public String[] getModuleListProjections(String moduleName) {
         return moduleListProjections.get(moduleName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>moduleListSelections</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return an array of {@link java.lang.String} objects.
+     */
     public String[] getModuleListSelections(String moduleName) {
         return moduleListSelections.get(moduleName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>moduleSortOrder</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String getModuleSortOrder(String moduleName) {
         return moduleSortOrder.get(moduleName);
     }
 
+    /**
+     * <p>
+     * getModuleUri
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link android.net.Uri} object.
+     */
     public Uri getModuleUri(String moduleName) {
         return moduleUris.get(moduleName);
     }
 
+    /**
+     * <p>
+     * getModuleSelection
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param searchString
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String getModuleSelection(String moduleName, String searchString) {
         // TODO: modify this if the selection criteria has to be applied on a different module field
         // for a module
@@ -944,22 +1049,65 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // TODO - get from DB
+    /**
+     * <p>
+     * Getter for the field <code>moduleRelationshipItems</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return an array of {@link java.lang.String} objects.
+     */
     public String[] getModuleRelationshipItems(String moduleName) {
         return moduleRelationshipItems.get(moduleName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>relationshipTables</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return an array of {@link java.lang.String} objects.
+     */
     public String[] getRelationshipTables(String moduleName) {
         return relationshipTables.get(moduleName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>accountRelationsSelection</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String getAccountRelationsSelection(String moduleName) {
         return accountRelationsSelection.get(moduleName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>accountRelationsTableName</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String getAccountRelationsTableName(String moduleName) {
         return accountRelationsTableName.get(moduleName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>moduleList</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getModuleList() {
         List<String> userModules = getUserModules();
         List<String> supportedModules = Arrays.asList(getSupportedModulesList());
@@ -979,7 +1127,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * that module, this module should be present in the modules available to the user
      * 
      * @param moduleName
-     * @return
+     *            a {@link java.lang.String} object.
+     * @return a boolean.
      */
     public boolean isModuleAccessAvailable(String moduleName) {
         // userModules list is already sorted when querying from DB, hey we can as well go against
@@ -989,14 +1138,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return index < 0 ? false : true;
     }
 
+    /**
+     * <p>
+     * getLinkfieldName
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String getLinkfieldName(String moduleName) {
         return linkfieldNames.get(moduleName);
     }
 
+    /**
+     * <p>
+     * getSupportedModulesList
+     * </p>
+     * 
+     * @return an array of {@link java.lang.String} objects.
+     */
     public String[] getSupportedModulesList() {
         return defaultSupportedModules;
     }
 
+    /**
+     * <p>
+     * getModuleIcon
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a int.
+     */
     public int getModuleIcon(String moduleName) {
         Integer iconResource = moduleIcons.get(moduleName);
         if (iconResource == null)
@@ -1004,18 +1178,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return iconResource;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>billingAddressGroup</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getBillingAddressGroup() {
         return billingAddressGroup;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>shippingAddressGroup</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getShippingAddressGroup() {
         return shippingAddressGroup;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>durationGroup</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getDurationGroup() {
         return durationGroup;
     }
 
+    /**
+     * <p>
+     * getModuleField
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param fieldName
+     *            a {@link java.lang.String} object.
+     * @return a {@link com.imaginea.android.sugarcrm.util.ModuleField} object.
+     */
     public ModuleField getModuleField(String moduleName, String fieldName) {
         SQLiteDatabase db = getReadableDatabase();
         ModuleField moduleField = null;
@@ -1045,6 +1251,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return moduleField;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>moduleFields</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, ModuleField> getModuleFields(String moduleName) {
         if (moduleFields != null) {
             HashMap<String, ModuleField> map = moduleFields.get(moduleName);
@@ -1077,6 +1292,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return fieldNameVsModuleField;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>linkFields</code>.
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, LinkField> getLinkFields(String moduleName) {
         if (linkFields != null) {
             HashMap<String, LinkField> map = linkFields.get(moduleName);
@@ -1111,6 +1335,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
      * gives all the available user modules
      */
+    /**
+     * <p>
+     * getUserModules
+     * </p>
+     * 
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getUserModules() {
         SQLiteDatabase db = getReadableDatabase();
         moduleList = new ArrayList<String>();
@@ -1127,6 +1358,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return moduleList;
     }
 
+    /**
+     * <p>
+     * setUserModules
+     * </p>
+     * 
+     * @param moduleNames
+     *            a {@link java.util.List} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public void setUserModules(List<String> moduleNames) throws SugarCrmException {
         boolean hasFailed = false;
         SQLiteDatabase db = getWritableDatabase();
@@ -1152,6 +1393,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * <p>
+     * setModuleFieldsInfo
+     * </p>
+     * 
+     * @param moduleFieldsInfo
+     *            a {@link java.util.Set} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public void setModuleFieldsInfo(Set<Module> moduleFieldsInfo) throws SugarCrmException {
         boolean hasFailed = false;
 
@@ -1216,8 +1467,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * get a Sync record given syncId and moduleName
      * 
      * @param syncId
+     *            a long.
      * @param moduleName
-     * @return
+     *            a {@link java.lang.String} object.
+     * @return a {@link com.imaginea.android.sugarcrm.sync.SyncRecord} object.
      */
     public SyncRecord getSyncRecord(long syncId, String moduleName) {
         // TODO -currently we are storing module name in both the fields in database if only orphans
@@ -1231,8 +1484,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * get a Sync record given syncId and moduleName
      * 
      * @param syncId
+     *            a long.
      * @param moduleName
-     * @return
+     *            a {@link java.lang.String} object.
+     * @param relatedModuleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link com.imaginea.android.sugarcrm.sync.SyncRecord} object.
      */
     public SyncRecord getSyncRecord(long syncId, String moduleName, String relatedModuleName) {
         SyncRecord record = null;
@@ -1265,7 +1522,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * gets the unsynced sync records from the sync table
      * 
      * @param moduleName
-     * @return
+     *            a {@link java.lang.String} object.
+     * @param status
+     *            a int.
+     * @return a {@link android.database.Cursor} object.
      */
     public Cursor getSyncRecords(String moduleName, int status) {
         SQLiteDatabase db = getReadableDatabase();
@@ -1276,14 +1536,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    /**
+     * <p>
+     * getConflictingSyncRecords
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link android.database.Cursor} object.
+     */
     public Cursor getConflictingSyncRecords(String moduleName) {
         return getSyncRecords(moduleName, Util.SYNC_CONFLICTS);
     }
 
+    /**
+     * <p>
+     * getSyncRecordsToSync
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link android.database.Cursor} object.
+     */
     public Cursor getSyncRecordsToSync(String moduleName) {
         return getSyncRecords(moduleName, Util.UNSYNCED);
     }
 
+    /**
+     * <p>
+     * getModuleProjectionInOrder
+     * </p>
+     * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, ModuleFieldBean> getModuleProjectionInOrder(String moduleName) {
         int moduleId = getModuleId(moduleName);
 
@@ -1341,8 +1628,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * // TODO - when do we update ?? - not required -??
      * 
      * @param record
-     * @return
-     * @throws SugarCrmException
+     *            a {@link com.imaginea.android.sugarcrm.sync.SyncRecord} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     * @return a int.
      */
     public int updateSyncRecord(SyncRecord record) throws SugarCrmException {
 
@@ -1367,8 +1656,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * updateSyncRecord
      * 
      * @param syncRecordId
+     *            a long.
      * @param values
-     * @return
+     *            a {@link android.content.ContentValues} object.
+     * @return a int.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public int updateSyncRecord(long syncRecordId, ContentValues values) throws SugarCrmException {
         SQLiteDatabase db = getWritableDatabase();
@@ -1379,6 +1672,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
+    /**
+     * <p>
+     * insertSyncRecord
+     * </p>
+     * 
+     * @param record
+     *            a {@link com.imaginea.android.sugarcrm.sync.SyncRecord} object.
+     * @return a long.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public long insertSyncRecord(SyncRecord record) throws SugarCrmException {
 
         SQLiteDatabase db = getWritableDatabase();
@@ -1401,7 +1705,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * deletes a syncrecord based on the syncRecdordId (_id)
      * 
      * @param syncRecordId
-     * @return
+     *            a long.
+     * @return a int.
      */
     public int deleteSyncRecord(long syncRecordId) {
         SQLiteDatabase db = getWritableDatabase();
@@ -1412,6 +1717,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
+    /**
+     * <p>
+     * insertActions
+     * </p>
+     * 
+     * @param roleId
+     *            a {@link java.lang.String} object.
+     * @param roleRelationBeans
+     *            an array of {@link com.imaginea.android.sugarcrm.util.SugarBean} objects.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public void insertActions(String roleId, SugarBean[] roleRelationBeans)
                                     throws SugarCrmException {
         boolean hasFailed = false;
@@ -1454,6 +1771,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * <p>
+     * insertRoles
+     * </p>
+     * 
+     * @param roleBeans
+     *            an array of {@link com.imaginea.android.sugarcrm.util.SugarBean} objects.
+     * @return a {@link java.util.List} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public List<String> insertRoles(SugarBean[] roleBeans) throws SugarCrmException {
         boolean hasFailed = false;
 
@@ -1488,6 +1816,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // key : userName value: userValues
+    /**
+     * <p>
+     * insertUsers
+     * </p>
+     * 
+     * @param usersList
+     *            a {@link java.util.Map} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public void insertUsers(Map<String, Map<String, String>> usersList) throws SugarCrmException {
         boolean hasFailed = false;
 
@@ -1521,6 +1859,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * executes SQL statements from a SQL file name present in assets folder
      * 
      * @param fileName
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public void executeSQLFromFile(String fileName) throws SugarCrmException {
         SQLiteDatabase db = getWritableDatabase();
@@ -1550,6 +1891,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Returns the beanId id , or null if the item is not found.
      * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param rowId
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
      */
     public String lookupBeanId(String moduleName, String rowId) {
         ContentResolver resolver = mContext.getContentResolver();
@@ -1573,6 +1919,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Returns the corresponding account beanId id , or null if the item is not found.
      * 
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param rowId
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
      */
     public String lookupAccountBeanId(String moduleName, String rowId) {
 
@@ -1599,6 +1950,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    /**
+     * <p>
+     * lookupUserBeanId
+     * </p>
+     * 
+     * @param userBeanName
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String lookupUserBeanId(String userBeanName) {
         ContentResolver resolver = mContext.getContentResolver();
         String beanId = null;
