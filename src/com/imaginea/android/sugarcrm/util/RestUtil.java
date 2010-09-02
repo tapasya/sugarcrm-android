@@ -1,59 +1,6 @@
 package com.imaginea.android.sugarcrm.util;
 
-import static com.imaginea.android.sugarcrm.RestUtilConstants.APPLICATION;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_ID;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_IDS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.CREATED;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.DELETED;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.DESCRIPTION;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.FAILED;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.FIELDS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_AVAILABLE_MODULES;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES_COUNT;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY_LIST;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_MODULE_FIELDS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_RELATIONSHIPS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_SERVER_INFO;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.ID;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.IDS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.INPUT_TYPE;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.JSON;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.JSON_EXCEPTION;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.LINK_FIELD_NAME;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.LINK_FIELD_NAMES;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.LINK_NAME_TO_FIELDS_ARRAY;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.LOGIN;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.MAX_RESULTS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.METHOD;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULES;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULE_NAME;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULE_NAMES;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME_VALUE_LIST;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME_VALUE_LISTS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.OFFSET;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.ORDER_BY;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.PASSWORD;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.QUERY;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_FIELDS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_IDS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_MODULE_QUERY;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.RESPONSE_TYPE;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.REST_DATA;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.RESULT_COUNT;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SEARCH_BY_MODULE;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SEARCH_STRING;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SELECT_FIELDS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SESSION;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_ENTRIES;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_ENTRY;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_RELATIONSHIP;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_RELATIONSHIPS;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_AUTH;
-import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_NAME;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.*;
 
 import android.util.Log;
 
@@ -79,6 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * <p>
+ * RestUtil class.
+ * </p>
+ * 
+ */
 public class RestUtil {
 
     public final static String LOG_TAG = "RestUtil";
@@ -88,32 +41,6 @@ public class RestUtil {
     /**
      * Retrieve a list of beans. This is the primary method for getting list of SugarBeans
      * 
-     * @param String
-     *            session -- Session ID returned by a previous call to login.
-     * @param String
-     *            module_name -- The name of the module to return records from. This name should be
-     *            the name the module was developed under (changing a tab name is studio does not
-     *            affect the name that should be passed into this method)..
-     * @param String
-     *            query -- SQL where clause without the word 'where'
-     * @param String
-     *            order_by -- SQL order by clause without the phrase 'order by'
-     * @param integer
-     *            offset -- The record offset to start from.
-     * @param Array
-     *            select_fields -- A list of the fields to be included in the results. This optional
-     *            parameter allows for only needed fields to be retrieved.
-     * @param Array
-     *            link_name_to_fields_array -- A list of link_names and for each link_name, what
-     *            fields value to be returned. For ex.'link_name_to_fields_array' =>
-     *            array(array('name' => 'email_addresses', 'value' => array('id', 'email_address',
-     *            'opt_out', 'primary_address')))
-     * @param integer
-     *            max_results -- The maximum number of records to return. The default is the sugar
-     *            configuration value for 'list_max_entries_per_page'
-     * @param integer
-     *            deleted -- false if deleted records should not be include, true if deleted records
-     *            should be included.
      * @return Array 'result_count' -- integer - The number of records returned 'next_offset' --
      *         integer - The start of the next page (This will always be the previous offset plus
      *         the number of rows returned. It does not indicate if there is additional data unless
@@ -128,7 +55,28 @@ public class RestUtil {
      *         [name] => id [value] => 403f8da1-214b-6a88-9cef-490b63d43566 ) [1] => Array ( [name]
      *         => email_address [value] => kid.hr@example.name ) [2] => Array ( [name] => opt_out
      *         [value] => 0 ) [3] => Array ( [name] => primary_address [value] => 0 ) ) ) ) )
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param query
+     *            a {@link java.lang.String} object.
+     * @param orderBy
+     *            a {@link java.lang.String} object.
+     * @param offset
+     *            a {@link java.lang.String} object.
+     * @param selectFields
+     *            an array of {@link java.lang.String} objects.
+     * @param linkNameToFieldsArray
+     *            a {@link java.util.Map} object.
+     * @param maxResults
+     *            a {@link java.lang.String} object.
+     * @param deleted
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static SugarBean[] getEntryList(String url, String sessionId, String moduleName,
                                     String query, String orderBy, String offset,
@@ -186,6 +134,27 @@ public class RestUtil {
         }
     }
 
+    /**
+     * <p>
+     * getEntries
+     * </p>
+     * 
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param ids
+     *            an array of {@link java.lang.String} objects.
+     * @param selectFields
+     *            an array of {@link java.lang.String} objects.
+     * @param linkNameToFieldsArray
+     *            a {@link java.util.Map} object.
+     * @return an array of {@link com.imaginea.android.sugarcrm.util.SugarBean} objects.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public static SugarBean[] getEntries(String url, String sessionId, String moduleName,
                                     String[] ids, String[] selectFields,
                                     Map<String, List<String>> linkNameToFieldsArray)
@@ -237,6 +206,27 @@ public class RestUtil {
         }
     }
 
+    /**
+     * <p>
+     * getEntry
+     * </p>
+     * 
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param id
+     *            a {@link java.lang.String} object.
+     * @param selectFields
+     *            an array of {@link java.lang.String} objects.
+     * @param linkNameToFieldsArray
+     *            a {@link java.util.Map} object.
+     * @return a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public static SugarBean getEntry(String url, String sessionId, String moduleName, String id,
                                     String[] selectFields,
                                     Map<String, List<String>> linkNameToFieldsArray)
@@ -289,16 +279,19 @@ public class RestUtil {
     /**
      * Retrieve number of records in a given module
      * 
-     * @param String
-     *            session -- Session ID returned by a previous call to login.
-     * @param String
-     *            module_name -- module to retrieve number of records from
-     * @param String
-     *            query -- allows webservice user to provide a WHERE clause
-     * @param int deleted -- specify whether or not to include deleted records
-     * 
      * @return Array result_count - integer - Total number of records for a given module and query
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param query
+     *            a {@link java.lang.String} object.
+     * @param deleted
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static int getEntriesCount(String url, String sessionId, String moduleName,
                                     String query, String deleted) throws SugarCrmException {
@@ -340,17 +333,17 @@ public class RestUtil {
     /**
      * Update or create a single SugarBean.
      * 
-     * @param String
-     *            $session -- Session ID returned by a previous call to login.
-     * @param String
-     *            $module_name -- The name of the module to return records from. This name should be
-     *            the name the module was developed under (changing a tab name is studio does not
-     *            affect the name that should be passed into this method)..
-     * @param Array
-     *            $name_value_list -- The keys of the array are the SugarBean attributes, the values
-     *            of the array are the values the attributes should have.
      * @return Array 'id' -- the ID of the bean that was written to (-1 on error)
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param nameValueList
+     *            a {@link java.util.Map} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static String setEntry(String url, String sessionId, String moduleName,
                                     Map<String, String> nameValueList) throws SugarCrmException {
@@ -403,18 +396,17 @@ public class RestUtil {
     /**
      * Update or create a list of SugarBeans
      * 
-     * @param String
-     *            $session -- Session ID returned by a previous call to login.
-     * @param String
-     *            $module_name -- The name of the module to return records from. This name should be
-     *            the name the module was developed under (changing a tab name is studio does not
-     *            affect the name that should be passed into this method)..
-     * @param Array
-     *            $name_value_lists -- Array of Bean specific Arrays where the keys of the array are
-     *            the SugarBean attributes, the values of the array are the values the attributes
-     *            should have.
      * @return Array 'ids' -- Array of the IDs of the beans that was written to (-1 on error)
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param nameValueLists
+     *            a {@link java.util.List} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static List<String> setEntries(String url, String sessionId, String moduleName,
                                     List<Map<String, String>> nameValueLists)
@@ -481,31 +473,6 @@ public class RestUtil {
      * relationship data for those related beans. So in this API you can get contacts info for an
      * account and also return all those contact's email address or an opportunity info also.
      * 
-     * @param String
-     *            $session -- Session ID returned by a previous call to login.
-     * @param String
-     *            $module_name -- The name of the module that the primary record is from. This name
-     *            should be the name the module was developed under (changing a tab name is studio
-     *            does not affect the name that should be passed into this method)..
-     * @param String
-     *            $module_id -- The ID of the bean in the specified module
-     * @param String
-     *            $link_field_name -- The name of the lnk field to return records from. This name
-     *            should be the name the relationship.
-     * @param String
-     *            $related_module_query -- A portion of the where clause of the SQL statement to
-     *            find the related items. The SQL query will already be filtered to only include the
-     *            beans that are related to the specified bean.
-     * @param Array
-     *            $related_fields - Array of related bean fields to be returned.
-     * @param Array
-     *            $related_module_link_name_to_fields_array - For every related bean returrned,
-     *            specify link fields name to fields info for that bean to be returned. For
-     *            ex.'link_name_to_fields_array' => array(array('name' => 'email_addresses', 'value'
-     *            => array('id', 'email_address', 'opt_out', 'primary_address'))).
-     * @param Number
-     *            $deleted -- false if deleted records should not be include, true if deleted
-     *            records should be included.
      * @return Array 'entry_list' -- Array - The records that were retrieved 'relationship_list' --
      *         Array - The records link field data. The example is if asked about accounts contacts
      *         email address then return data would look like Array ( [0] => Array ( [name] =>
@@ -517,7 +484,26 @@ public class RestUtil {
      *         => Array ( [name] => email_address [value] => kid.hr@example.name ) [2] => Array (
      *         [name] => opt_out [value] => 0 ) [3] => Array ( [name] => primary_address [value] =>
      *         0 ) ) ) ) )
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param beanId
+     *            a {@link java.lang.String} object.
+     * @param linkFieldName
+     *            a {@link java.lang.String} object.
+     * @param relatedModuleQuery
+     *            a {@link java.lang.String} object.
+     * @param relatedFields
+     *            an array of {@link java.lang.String} objects.
+     * @param relatedModuleLinkNameToFieldsArray
+     *            a {@link java.util.Map} object.
+     * @param deleted
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static SugarBean[] getRelationships(String url, String sessionId, String moduleName,
                                     String beanId, String linkFieldName, String relatedModuleQuery,
@@ -580,33 +566,27 @@ public class RestUtil {
     /**
      * Set a single relationship between two beans. The items are related by module name and id.
      * 
-     * @param String
-     *            $session -- Session ID returned by a previous call to login.
-     * @param array
-     *            $module_names -- Array of the name of the module that the primary record is from.
-     *            This name should be the name the module was developed under (changing a tab name
-     *            is studio does not affect the name that should be passed into this method)..
-     * @param array
-     *            $module_ids - The array of ID of the bean in the specified module_name
-     * @param array
-     *            $link_field_names -- Array of the name of the link field which relates to the
-     *            other module for which the relationships needs to be generated.
-     * @param array
-     *            $related_ids -- array of an array of related record ids for which relationships
-     *            needs to be generated
-     * @param array
-     *            $name_value_lists -- Array of Array. The keys of the inner array are the SugarBean
-     *            attributes, the values of the inner array are the values the attributes should
-     *            have.
-     * @param array
-     *            int $delete_array -- Optional, array of 0 or 1. If the value 0 or nothing is
-     *            passed then it will add the relationship for related_ids and if 1 is passed, it
-     *            will delete this relationship for related_ids
      * @return Array - created - integer - How many relationships has been created - failed -
      *         integer - How many relationsip creation failed - deleted - integer - How many
      *         relationships were deleted
-     * 
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleNames
+     *            an array of {@link java.lang.String} objects.
+     * @param beanIds
+     *            an array of {@link java.lang.String} objects.
+     * @param linkFieldNames
+     *            an array of {@link java.lang.String} objects.
+     * @param relatedIds
+     *            an array of {@link java.lang.String} objects.
+     * @param nameValueLists
+     *            a {@link java.util.List} object.
+     * @param deleted
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static RelationshipStatus setRelationships(String url, String sessionId,
                                     String[] moduleNames, String[] beanIds,
@@ -672,31 +652,27 @@ public class RestUtil {
     /**
      * Set a single relationship between two beans. The items are related by module name and id.
      * 
-     * @param String
-     *            $session -- Session ID returned by a previous call to login.
-     * @param String
-     *            $module_name -- name of the module that the primary record is from. This name
-     *            should be the name the module was developed under (changing a tab name is studio
-     *            does not affect the name that should be passed into this method)..
-     * @param String
-     *            $module_id - The ID of the bean in the specified module_name
-     * @param String
-     *            link_field_name -- name of the link field which relates to the other module for
-     *            which the relationship needs to be generated.
-     * @param array
-     *            related_ids -- array of related record ids for which relationships needs to be
-     *            generated
-     * @param array
-     *            $name_value_list -- The keys of the array are the SugarBean attributes, the values
-     *            of the array are the values the attributes should have.
-     * @param integer
-     *            $delete -- Optional, if the value 0 or nothing is passed then it will add the
-     *            relationship for related_ids and if 1 is passed, it will delete this relationship
-     *            for related_ids
      * @return Array - created - integer - How many relationships has been created - failed -
      *         integer - How many relationsip creation failed - deleted - integer - How many
      *         relationships were deleted
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param beanId
+     *            a {@link java.lang.String} object.
+     * @param linkFieldName
+     *            a {@link java.lang.String} object.
+     * @param relatedIds
+     *            an array of {@link java.lang.String} objects.
+     * @param nameValueList
+     *            a {@link java.util.Map} object.
+     * @param delete
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static RelationshipStatus setRelationship(String url, String sessionId,
                                     String moduleName, String beanId, String linkFieldName,
@@ -756,17 +732,22 @@ public class RestUtil {
      * the fields We will support Accounts, Bug Tracker, Cases, Contacts, Leads, Opportunities,
      * Project, ProjectTask, Quotes
      * 
-     * @param string
-     *            $session - Session ID returned by a previous call to login.
-     * @param string
-     *            $search_string - string to search
-     * @param string
-     *            [] $modules - array of modules to query
-     * @param int $offset - a specified offset in the query
-     * @param int $max_results - max number of records to return
      * @return Array return_search_result - Array('Accounts' => array(array('name' => 'first_name',
      *         'value' => 'John', 'name' => 'last_name', 'value' => 'Do')))
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param searchString
+     *            a {@link java.lang.String} object.
+     * @param modules
+     *            an array of {@link java.lang.String} objects.
+     * @param offset
+     *            a {@link java.lang.String} object.
+     * @param maxResults
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static Map<String, SugarBean[]> searchByModule(String url, String sessionId,
                                     String searchString, String[] modules, String offset,
@@ -811,23 +792,18 @@ public class RestUtil {
     /**
      * Log the user into the application
      * 
-     * @param UserAuth
-     *            array $user_auth -- Set user_name and password (password needs to be in the right
-     *            encoding for the type of authentication the user is setup for. For Base sugar
-     *            validation, password is the MD5 sum of the plain text password.
-     * @param String
-     *            $application -- The name of the application you are logging in from. (Currently
-     *            unused).
-     * @param array
-     *            $name_value_list -- Array of name value pair of extra parameters. As of today only
-     *            'language' and 'notifyonsave' is supported
      * @return Array - id - String id is the session_id of the session that was created. -
      *         module_name - String - module name of user - name_value_list - Array - The name value
      *         pair of user_id, user_name, user_language, user_currency_id, user_currency_name
-     * @throws SugarCrmException
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param username
+     *            a {@link java.lang.String} object.
+     * @param password
+     *            a {@link java.lang.String} object.
      */
-
     public static String loginToSugarCRM(String url, String username, String password)
                                     throws SugarCrmException {
         JSONObject credentials = new JSONObject();
@@ -883,10 +859,13 @@ public class RestUtil {
      * Retrieve the list of available modules on the system available to the currently logged in
      * user.
      * 
-     * @param String
-     *            $session -- Session ID returned by a previous call to login.
      * @return Array 'modules' -- Array - An array of module names
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static List<String> getAvailableModules(String url, String sessionId)
                                     throws SugarCrmException {
@@ -933,18 +912,18 @@ public class RestUtil {
     /**
      * Retrieve vardef information on the fields of the specified bean.
      * 
-     * @param String
-     *            $session -- Session ID returned by a previous call to login.
-     * @param String
-     *            $module_name -- The name of the module to return records from. This name should be
-     *            the name the module was developed under (changing a tab name is studio does not
-     *            affect the name that should be passed into this method)..
-     * @param Array
-     *            $fields -- Optional, if passed then retrieve vardef information on these fields
-     *            only.
      * @return Array 'module_fields' -- Array - The vardef information on the selected fields.
      *         'link_fields' -- Array - The vardef information on the link fields
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param fields
+     *            an array of {@link java.lang.String} objects.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static Module getModuleFields(String url, String sessionId, String moduleName,
                                     String[] fields) throws SugarCrmException {
@@ -1002,7 +981,10 @@ public class RestUtil {
      *         Retrieve the version number of Sugar that the server is running. - gmt_time - String
      *         - Return the current time on the server in the format 'Y-m-d H:i:s'. This time is in
      *         GMT.
-     * @exception 'SoapFault' -- The SOAP error, if any
+     * @param url
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static String getServerInfo(String url) throws SugarCrmException {
 
@@ -1023,14 +1005,12 @@ public class RestUtil {
                 throw new SugarCrmException("FAILED TO CONNECT!");
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
-            JSONObject jsonResponse = new JSONObject(response);
-
             // TODO: have to parse the response
+            // JSONObject jsonResponse = new JSONObject(response);
+
             return response;
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage());
-        } catch (JSONException jsone) {
-            throw new SugarCrmException(jsone.getMessage());
         }
     }
 
