@@ -14,6 +14,12 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * <p>
+ * SBParser class.
+ * </p>
+ * 
+ */
 public class SBParser {
 
     private static final String LOG_TAG = SBParser.class.getSimpleName();
@@ -22,6 +28,16 @@ public class SBParser {
 
     private JSONArray mRelationshipListJson;
 
+    /**
+     * <p>
+     * Constructor for SBParser.
+     * </p>
+     * 
+     * @param jsonText
+     *            a {@link java.lang.String} object.
+     * @throws org.json.JSONException
+     *             if any.
+     */
     public SBParser(String jsonText) throws JSONException {
         JSONObject responseObj = new JSONObject(jsonText);
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
@@ -34,6 +50,15 @@ public class SBParser {
             this.mRelationshipListJson = responseObj.getJSONArray(RELATIONSHIP_LIST);
     }
 
+    /**
+     * <p>
+     * getSugarBeans
+     * </p>
+     * 
+     * @return an array of {@link com.imaginea.android.sugarcrm.util.SugarBean} objects.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public SugarBean[] getSugarBeans() throws SugarCrmException {
         if (mEntryListJson == null)
             return null;
@@ -57,6 +82,17 @@ public class SBParser {
         return sugarBeans;
     }
 
+    /**
+     * <p>
+     * getRelationshipBeans
+     * </p>
+     * 
+     * @param index
+     *            a int.
+     * @return a {@link java.util.Map} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public Map<String, SugarBean[]> getRelationshipBeans(int index) throws SugarCrmException {
         if (mRelationshipListJson == null)
             return null;

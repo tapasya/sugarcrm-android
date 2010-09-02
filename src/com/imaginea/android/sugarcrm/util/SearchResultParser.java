@@ -11,10 +11,28 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * <p>
+ * SearchResultParser class.
+ * </p>
+ * 
+ */
 public class SearchResultParser {
 
     private Map<String, SugarBean[]> mSearchResults;
 
+    /**
+     * <p>
+     * Constructor for SearchResultParser.
+     * </p>
+     * 
+     * @param jsonText
+     *            a {@link java.lang.String} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public SearchResultParser(String jsonText, String moduleName) throws SugarCrmException {
         mSearchResults = new HashMap<String, SugarBean[]>();
         try {
@@ -33,6 +51,16 @@ public class SearchResultParser {
         }
     }
 
+    /**
+     * <p>
+     * Constructor for SearchResultParser.
+     * </p>
+     * 
+     * @param jsonText
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public SearchResultParser(String jsonText) throws SugarCrmException {
         mSearchResults = new HashMap<String, SugarBean[]>();
         try {
@@ -64,6 +92,13 @@ public class SearchResultParser {
         }
     }
 
+    /**
+     * <p>
+     * getSearchResults
+     * </p>
+     * 
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, SugarBean[]> getSearchResults() {
         return mSearchResults;
     }

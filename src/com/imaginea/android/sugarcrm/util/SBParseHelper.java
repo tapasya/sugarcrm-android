@@ -9,11 +9,28 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * <p>
+ * SBParseHelper class.
+ * </p>
+ * 
+ */
 public class SBParseHelper {
 
     /*
      * Helper for the SBParser and SugarBean to parse the JSON response to retrieve the name value
      * pairs either in the entry_list or the relationship_list
+     */
+    /**
+     * <p>
+     * getNameValuePairs
+     * </p>
+     * 
+     * @param nameValueList
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static Map<String, String> getNameValuePairs(String nameValueList)
                                     throws SugarCrmException {

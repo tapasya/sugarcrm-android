@@ -11,6 +11,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * <p>
+ * ModuleFieldsParser class.
+ * </p>
+ * 
+ */
 public class ModuleFieldsParser {
 
     private final String LOG_TAG = ModuleFieldsParser.class.getSimpleName();
@@ -19,6 +25,16 @@ public class ModuleFieldsParser {
 
     private List<LinkField> linkFields;
 
+    /**
+     * <p>
+     * Constructor for ModuleFieldsParser.
+     * </p>
+     * 
+     * @param jsonResponse
+     *            a {@link java.lang.String} object.
+     * @throws org.json.JSONException
+     *             if any.
+     */
     public ModuleFieldsParser(String jsonResponse) throws JSONException {
         JSONObject responseObj = new JSONObject(jsonResponse);
         String moduleName = responseObj.get("module_name").toString();
@@ -79,10 +95,24 @@ public class ModuleFieldsParser {
         return new LinkField(name, type, relationship, module, beanName);
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>moduleFields</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.List} object.
+     */
     public List<ModuleField> getModuleFields() {
         return moduleFields;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>linkFields</code>.
+     * </p>
+     * 
+     * @return a {@link java.util.List} object.
+     */
     public List<LinkField> getLinkFields() {
         return linkFields;
     }
