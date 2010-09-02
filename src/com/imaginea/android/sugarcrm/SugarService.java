@@ -36,11 +36,6 @@ public class SugarService extends Service {
     // static SugarService self;
 
     /**
-     * wake lock so that we don't sleep when sync is going on
-     */
-    private WakeLock mWakeLock;
-
-    /**
      * file handler for logging the sync/copy requests
      */
     private static FileHandler fileHandler;
@@ -85,9 +80,6 @@ public class SugarService extends Service {
         Log.i(TAG, "OnCreate: ");
         // self = this;
         initLogger();
-
-        // create a wake lock if not created already
-        createWakeLock();
 
         /**
          * Start up the thread running the service. Note that we create a separate thread because
@@ -241,7 +233,8 @@ public class SugarService extends Service {
     };
 
     /**
-     * cancels any of the Async ServiceTasks based on the requestId
+     * cancels any of the Async ServiceTasks based on the requestId, use this to cancel any long
+     * running operations
      * 
      * @param requestId
      */
@@ -278,7 +271,6 @@ public class SugarService extends Service {
      * This is the old onStart method that will be called on the pre-2.0 // platform. On 2.0 or
      * later we override onStartCommand() so this // method will not be called.
      */
-    /** {@inheritDoc} */
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
@@ -314,7 +306,6 @@ public class SugarService extends Service {
         mServiceHandler.sendMessage(msg);
         if (Log.isLoggable(TAG, Log.VERBOSE))
             Log.v(TAG, "Sending: " + msg);
-
     }
 
     /**
@@ -386,7 +377,6 @@ public class SugarService extends Service {
         if (Log.isLoggable(TAG, Log.VERBOSE))
             Log.v(TAG, "onDestroy");
         mStatus = 0;
-        releaseWakeLock();
         closeLogger();
         super.onDestroy();
     }
@@ -395,34 +385,6 @@ public class SugarService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    /**
-     * Create a new wake lock if we haven't made one yet and disable ref-count
-     */
-    private synchronized void createWakeLock() {
-
-        if (mWakeLock == null) {
-            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-            mWakeLock.setReferenceCounted(false);
-        }
-    }
-
-    /**
-     * It's okay to acquire multiple times as we are not using it in reference-counted mode.
-     */
-    private void acquireWakeLock() {
-        mWakeLock.acquire();
-    }
-
-    /**
-     * Don't release the wake lock if it hasn't been created and acquired.
-     */
-    private void releaseWakeLock() {
-        if (mWakeLock != null && mWakeLock.isHeld()) {
-            mWakeLock.release();
-        }
     }
 
     /**
