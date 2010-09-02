@@ -47,11 +47,15 @@ public class SugarCRMOperations {
      * 
      * @param context
      *            the Authenticator Activity context
-     * @param userId
-     *            the userId of the SyncAdapter user object
      * @param accountName
      *            the username of the current login
      * @return instance of ContactOperations
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
      */
     public static SugarCRMOperations createNewModuleItem(Context context, String moduleName,
                                     String accountName, SugarBean sBean,
@@ -65,11 +69,21 @@ public class SugarCRMOperations {
      * 
      * @param context
      *            the Authenticator Activity context
-     * @param userId
-     *            the userId of the SyncAdapter user object
      * @param accountName
      *            the username of the current login
      * @return instance of ContactOperations
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param relationModuleName
+     *            a {@link java.lang.String} object.
+     * @param rawId
+     *            a long.
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param relatedBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
      */
     public static SugarCRMOperations createNewRelatedModuleItem(Context context, String moduleName,
                                     String relationModuleName, String accountName, long rawId,
@@ -87,12 +101,28 @@ public class SugarCRMOperations {
      * @param rawId
      *            the unique Id of the existing rawId
      * @return instance of ContactOperations
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
      */
     public static SugarCRMOperations updateExistingModuleItem(Context context, String moduleName,
                                     SugarBean sBean, long rawId, BatchOperation batchOperation) {
         return new SugarCRMOperations(context, moduleName, sBean, rawId, batchOperation);
     }
 
+    /**
+     * <p>
+     * Constructor for SugarCRMOperations.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
+     */
     public SugarCRMOperations(Context context, BatchOperation batchOperation) {
         mValues = new ContentValues();
         mModuleName = "";
@@ -102,6 +132,22 @@ public class SugarCRMOperations {
         databaseHelper = new DatabaseHelper(context);
     }
 
+    /**
+     * <p>
+     * Constructor for SugarCRMOperations.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param relationModuleName
+     *            a {@link java.lang.String} object.
+     * @param accountName
+     *            a {@link java.lang.String} object.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
+     */
     public SugarCRMOperations(Context context, String moduleName, String relationModuleName,
                                     String accountName, BatchOperation batchOperation) {
         this(context, batchOperation);
@@ -113,6 +159,20 @@ public class SugarCRMOperations {
         // mBatchOperation.add(mBuilder.build());
     }
 
+    /**
+     * <p>
+     * Constructor for SugarCRMOperations.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param accountName
+     *            a {@link java.lang.String} object.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
+     */
     public SugarCRMOperations(Context context, String moduleName, String accountName,
                                     BatchOperation batchOperation) {
         this(context, batchOperation);
@@ -123,6 +183,22 @@ public class SugarCRMOperations {
         // mBatchOperation.add(mBuilder.build());
     }
 
+    /**
+     * <p>
+     * Constructor for SugarCRMOperations.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param rawId
+     *            a long.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
+     */
     public SugarCRMOperations(Context context, String moduleName, SugarBean sBean, long rawId,
                                     BatchOperation batchOperation) {
         this(context, batchOperation);
@@ -131,6 +207,24 @@ public class SugarCRMOperations {
         mRawId = rawId;
     }
 
+    /**
+     * <p>
+     * Constructor for SugarCRMOperations.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param relationModuleName
+     *            a {@link java.lang.String} object.
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param rawId
+     *            a long.
+     * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
+     */
     public SugarCRMOperations(Context context, String moduleName, String relationModuleName,
                                     SugarBean sBean, long rawId, BatchOperation batchOperation) {
         this(context, batchOperation);
@@ -140,6 +234,15 @@ public class SugarCRMOperations {
         mRawId = rawId;
     }
 
+    /**
+     * <p>
+     * addSugarBean
+     * </p>
+     * 
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @return a {@link com.imaginea.android.sugarcrm.sync.SugarCRMOperations} object.
+     */
     public SugarCRMOperations addSugarBean(SugarBean sBean) {
         Map<String, String> map = sBean.getEntryList();
         for (String fieldName : map.keySet()) {
@@ -152,6 +255,17 @@ public class SugarCRMOperations {
         return this;
     }
 
+    /**
+     * <p>
+     * addRelatedSugarBean
+     * </p>
+     * 
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param relatedBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @return a {@link com.imaginea.android.sugarcrm.sync.SugarCRMOperations} object.
+     */
     public SugarCRMOperations addRelatedSugarBean(SugarBean sBean, SugarBean relatedBean) {
         Map<String, String> map = relatedBean.getEntryList();
         for (String fieldName : map.keySet()) {
@@ -165,6 +279,17 @@ public class SugarCRMOperations {
         return this;
     }
 
+    /**
+     * <p>
+     * updateSugarBean
+     * </p>
+     * 
+     * @param sBean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
+     * @param uri
+     *            a {@link android.net.Uri} object.
+     * @return a {@link com.imaginea.android.sugarcrm.sync.SugarCRMOperations} object.
+     */
     public SugarCRMOperations updateSugarBean(SugarBean sBean, Uri uri) {
         Map<String, String> map = sBean.getEntryList();
         for (String fieldName : map.keySet()) {
@@ -172,7 +297,7 @@ public class SugarCRMOperations {
             mValues.put(fieldName, fieldValue);
         }
         if (mValues.size() > 0) {
-            if(Log.isLoggable(TAG, Log.DEBUG))
+            if (Log.isLoggable(TAG, Log.DEBUG))
                 Log.d(TAG, "updateSugarBean: uri - " + uri);
             addUpdateOp(uri);
         }
@@ -213,7 +338,7 @@ public class SugarCRMOperations {
 
         // ContentUris.withAppendedId(contentUri, mRawId);
         Uri relatedUri = Uri.withAppendedPath(ContentUris.withAppendedId(contentUri, mRawId), mRelatedModuleName);
-        if(Log.isLoggable(TAG, Log.DEBUG))
+        if (Log.isLoggable(TAG, Log.DEBUG))
             Log.d(TAG, "addRelatedInsertOp: relatedUri - " + relatedUri);
         mBuilder = newInsertCpo(relatedUri, mYield);
         mBuilder.withValues(mValues);
@@ -234,14 +359,47 @@ public class SugarCRMOperations {
         mBatchOperation.add(mBuilder.build());
     }
 
+    /**
+     * <p>
+     * newInsertCpo
+     * </p>
+     * 
+     * @param uri
+     *            a {@link android.net.Uri} object.
+     * @param yield
+     *            a boolean.
+     * @return a {@link android.content.ContentProviderOperation.Builder} object.
+     */
     public static ContentProviderOperation.Builder newInsertCpo(Uri uri, boolean yield) {
         return ContentProviderOperation.newInsert(uri).withYieldAllowed(yield);
     }
 
+    /**
+     * <p>
+     * newUpdateCpo
+     * </p>
+     * 
+     * @param uri
+     *            a {@link android.net.Uri} object.
+     * @param yield
+     *            a boolean.
+     * @return a {@link android.content.ContentProviderOperation.Builder} object.
+     */
     public static ContentProviderOperation.Builder newUpdateCpo(Uri uri, boolean yield) {
         return ContentProviderOperation.newUpdate(uri).withYieldAllowed(yield);
     }
 
+    /**
+     * <p>
+     * newDeleteCpo
+     * </p>
+     * 
+     * @param uri
+     *            a {@link android.net.Uri} object.
+     * @param yield
+     *            a boolean.
+     * @return a {@link android.content.ContentProviderOperation.Builder} object.
+     */
     public static ContentProviderOperation.Builder newDeleteCpo(Uri uri, boolean yield) {
         return ContentProviderOperation.newDelete(uri).withYieldAllowed(yield);
 
