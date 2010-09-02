@@ -591,11 +591,13 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                     values.put(key, mUpdateNameValueMap.get(key));
                 }
 
-                if (serverUpdated)
+                if (serverUpdated) {
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
-
-                if (!serverUpdated && updatedRows > 0) {
-                    updateSyncRecord();
+                } else {
+                    //TODO: check this
+                    updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
+                    if (updatedRows > 0)
+                        updateSyncRecord();
                 }
                 break;
 
