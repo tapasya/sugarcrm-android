@@ -14,7 +14,9 @@ public class CRMCustomLogFormatter extends Formatter {
     DateFormat mDateFormat;
 
     /**
-     * <p>Constructor for CRMCustomLogFormatter.</p>
+     * <p>
+     * Constructor for CRMCustomLogFormatter.
+     * </p>
      */
     public CRMCustomLogFormatter() {
         super();

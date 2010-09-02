@@ -364,10 +364,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createAclRolesTable(db);
         createAclActionsTable(db);
 
-        //TODO: Dyanamic Module Support
+        // TODO: Dyanamic Module Support
         // createModuleFieldsSortOrderTable(db);
-        //createModuleFieldsGroupTable(db);
-         
+        // createModuleFieldsGroupTable(db);
 
         // create join tables
 
