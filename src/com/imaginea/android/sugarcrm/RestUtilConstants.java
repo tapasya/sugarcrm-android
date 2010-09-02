@@ -1,5 +1,11 @@
 package com.imaginea.android.sugarcrm;
 
+/**
+ * <p>
+ * RestUtilConstants interface.
+ * </p>
+ * 
+ */
 public interface RestUtilConstants {
 
     // request params

@@ -32,6 +32,7 @@ public class AuthenticationService extends Service {
 
     private Authenticator mAuthenticator;
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate() {
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
@@ -40,6 +41,7 @@ public class AuthenticationService extends Service {
         mAuthenticator = new Authenticator(this);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onDestroy() {
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
@@ -47,6 +49,7 @@ public class AuthenticationService extends Service {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public IBinder onBind(Intent intent) {
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
