@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * AccountListActivity
+ * AccountListActivity, not used. See ContactListActivity
  * 
  * @author vasavi
  */
@@ -61,6 +61,7 @@ public class AccountListActivity extends ListActivity {
     // we don't make this final as we may want to use the sugarCRM value dynamically
     public static int mMaxResults = 20;
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +124,7 @@ public class AccountListActivity extends ListActivity {
         startActivity(detailIntent);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
