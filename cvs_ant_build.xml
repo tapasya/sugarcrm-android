@@ -1,0 +1,7 @@
+<project name="cvspass" default="cvspass">
+  <target name="cvspass">
+    <cvspass cvsroot=":pserver:${username}@services.pramati.com:/cvsroot:sugarcrm-android"
+      password="${password}"
+    />
+  </target>
+</project>
