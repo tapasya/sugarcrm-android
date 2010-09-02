@@ -33,8 +33,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Modified version of AsyncTask borrowed from Android open source which doesnot post to UI but
- * offers benefits in thread pooling etc.
+ * Modified version of AsyncTask borrowed from Android open source which does not post to UI but
+ * offers benefits in thread pooling etc, and additionaly handles wake locks for subclasses,
+ * creates, aquires and releases the lock once the task is done
  * <p>
  * AsyncServiceTask enables proper and easy use of the UI thread from a Service. This is similar to
  * AsyncTask in many respects but allows to be run from a Service and uses the supplied Messenger
@@ -165,6 +166,9 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
 
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
      */
     public AsyncServiceTask(Context context) {
 
@@ -228,29 +232,49 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
      * 
      * @param params
      *            The parameters of the task.
-     * 
      * @return A result, defined by the subclass of this task.
-     * 
+     * @see #onPreExecute()
+     * @see #onPostExecute
+     * @see #publishProgress
+     * @see #onPreExecute()
+     * @see #onPostExecute
+     * @see #publishProgress
      * @see #onPreExecute()
      * @see #onPostExecute
      * @see #publishProgress
      */
     protected abstract Result doInBackground(Params... params);
 
+    /**
+     * <p>
+     * requiresNotification
+     * </p>
+     * 
+     * @return a boolean.
+     */
     protected boolean requiresNotification() {
         return false;
     }
 
     /**
-	 * 
-	 */
+     * <p>
+     * runInBackground
+     * </p>
+     * 
+     * @param flag
+     *            a boolean.
+     */
     protected void runInBackground(boolean flag) {
 
     }
 
     /**
-	 * 
-	 */
+     * <p>
+     * isRunningInBackground
+     * </p>
+     * 
+     * @return a boolean.
+     */
     public synchronized boolean isRunningInBackground() {
         return true;
     }
@@ -258,6 +282,8 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
     /**
      * Runs on the UI thread after {@link #cancel(boolean)} is invoked.
      * 
+     * @see #cancel(boolean)
+     * @see #isCancelled()
      * @see #cancel(boolean)
      * @see #isCancelled()
      */
@@ -268,7 +294,6 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
      * Returns <tt>true</tt> if this task was cancelled before it completed normally.
      * 
      * @return <tt>true</tt> if task was cancelled before it completed
-     * 
      * @see #cancel(boolean)
      */
     public final boolean isCancelled() {
@@ -286,10 +311,10 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
      * @param mayInterruptIfRunning
      *            <tt>true</tt> if the thread executing this task should be interrupted; otherwise,
      *            in-progress tasks are allowed to complete.
-     * 
      * @return <tt>false</tt> if the task could not be cancelled, typically because it has already
      *         completed normally; <tt>true</tt> otherwise
-     * 
+     * @see #isCancelled()
+     * @see #onCancelled()
      * @see #isCancelled()
      * @see #onCancelled()
      */
@@ -301,12 +326,11 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
      * Waits if necessary for the computation to complete, and then retrieves its result.
      * 
      * @return The computed result.
-     * 
      * @throws CancellationException
      *             If the computation was cancelled.
-     * @throws ExecutionException
+     * @throws java.util.concurrent.ExecutionException
      *             If the computation threw an exception.
-     * @throws InterruptedException
+     * @throws java.lang.InterruptedException
      *             If the current thread was interrupted while waiting.
      */
     public final Result get() throws InterruptedException, ExecutionException {
@@ -321,16 +345,14 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
      *            Time to wait before cancelling the operation.
      * @param unit
      *            The time unit for the timeout.
-     * 
      * @return The computed result.
-     * 
      * @throws CancellationException
      *             If the computation was cancelled.
-     * @throws ExecutionException
+     * @throws java.util.concurrent.ExecutionException
      *             If the computation threw an exception.
-     * @throws InterruptedException
+     * @throws java.lang.InterruptedException
      *             If the current thread was interrupted while waiting.
-     * @throws TimeoutException
+     * @throws java.util.concurrent.TimeoutException
      *             If the wait timed out.
      */
     public final Result get(long timeout, TimeUnit unit) throws InterruptedException,
@@ -342,13 +364,10 @@ public abstract class AsyncServiceTask<Params, Progress, Result> {
      * Executes the task with the specified parameters. The task returns itself (this) so that the
      * caller can keep a reference to it.
      * 
-     * 
      * @param params
      *            The parameters of the task.
-     * 
      * @return This instance of AsyncServiceTask.
-     * 
-     * @throws IllegalStateException
+     * @throws java.lang.IllegalStateException
      *             If {@link #getStatus()} returns either {@link AsyncServiceTask.Status#RUNNING} or
      *             {@link AsyncServiceTask.Status#FINISHED}.
      */
