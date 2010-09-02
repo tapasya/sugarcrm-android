@@ -51,7 +51,7 @@ import java.util.concurrent.Semaphore;
  * android 2.0 and above-minSdkVersion>=5
  * 
  * //TODO - as password is saved in Account Manager with Settings credential storage, we donot have
- * to store the password anymore and change the settings screen accordigly
+ * to store the password 
  * 
  * @author Vasavi
  * @author chander
@@ -83,7 +83,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
     protected boolean mRequestNewAccount = false;
 
     // In-order list of wizard steps to present to user. These are layout resource ids.
-    public final static int[] STEPS = new int[] { R.layout.url_config_wizard,
+    private final static int[] STEPS = new int[] { R.layout.url_config_wizard,
             R.layout.login_activity };
 
     protected ViewFlipper flipper = null;
