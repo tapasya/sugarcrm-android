@@ -30,11 +30,10 @@ import java.util.logging.Logger;
 
 /**
  * SugarService, follows the APIDemos pattern of command handling example of a Service
- * 
  */
 public class SugarService extends Service {
 
-    static SugarService self;
+    // static SugarService self;
 
     /**
      * wake lock so that we don't sleep when sync is going on
@@ -63,10 +62,10 @@ public class SugarService extends Service {
 
     public static final int ONE_MINUTE = 60 * 1000;
 
-    public static int mCurrentSyncEventIndex = 0;
+    private static int mCurrentSyncEventIndex = 0;
 
     // use better constants herer
-    public static int mStatus = 0;
+    private static int mStatus = 0;
 
     private static int mRecentStartId;
 
@@ -79,12 +78,13 @@ public class SugarService extends Service {
 
     private static final String TAG = SugarService.class.getSimpleName();
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate() {
 
         Log.i(TAG, "OnCreate: ");
-        self = this;
-        // initLogger();
+        // self = this;
+        initLogger();
 
         // create a wake lock if not created already
         createWakeLock();
@@ -153,7 +153,8 @@ public class SugarService extends Service {
      * isRunning returns if the transaction is running or not
      * 
      * @param transactionId
-     * @return
+     *            a long.
+     * @return a boolean.
      */
     public synchronized static boolean isRunning(long transactionId) {
 
@@ -180,7 +181,7 @@ public class SugarService extends Service {
      */
     private final class ServiceHandler extends Handler {
 
-        public int cancelStartId;
+        // public int cancelStartId;
 
         public ServiceHandler(Looper looper) {
             super(looper);
@@ -259,7 +260,8 @@ public class SugarService extends Service {
      * isCancelled
      * 
      * @param transactionId
-     * @return
+     *            a long.
+     * @return a boolean.
      */
     public synchronized static boolean isCancelled(long transactionId) {
         // AsyncServiceTask task = mTaskMap.get(transactionId);
@@ -272,16 +274,18 @@ public class SugarService extends Service {
         return false;
     }
 
-    /*
+    /**
      * This is the old onStart method that will be called on the pre-2.0 // platform. On 2.0 or
      * later we override onStartCommand() so this // method will not be called.
      */
+    /** {@inheritDoc} */
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
         handleStart(intent, startId);
     }
 
+    /** {@inheritDoc} */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         handleStart(intent, startId);
@@ -353,6 +357,7 @@ public class SugarService extends Service {
      * logStatus
      * 
      * @param str
+     *            a {@link java.lang.String} object.
      */
     public static void logStatus(String str) {
         if (fileHandler != null) {
@@ -365,6 +370,7 @@ public class SugarService extends Service {
      * logError
      * 
      * @param str
+     *            a {@link java.lang.String} object.
      */
     public static void logError(String str) {
         if (fileHandler != null) {
@@ -373,6 +379,7 @@ public class SugarService extends Service {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onDestroy() {
 
@@ -384,6 +391,7 @@ public class SugarService extends Service {
         super.onDestroy();
     }
 
+    /** {@inheritDoc} */
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -423,6 +431,7 @@ public class SugarService extends Service {
      * android architecture; will happen if single screen holds two activities ???
      * 
      * @param messenger
+     *            a {@link android.os.Messenger} object.
      */
     public static void registerMessenger(Messenger messenger) {
 
@@ -437,6 +446,7 @@ public class SugarService extends Service {
      * messages are not sent.
      * 
      * @param messenger
+     *            a {@link android.os.Messenger} object.
      */
     public static void unregisterMessenger(Messenger messenger) {
         mMessenger = null;
@@ -447,7 +457,9 @@ public class SugarService extends Service {
      * service made static so can directly call this to display the status of the
      * 
      * @param what
+     *            a int.
      * @param obj
+     *            a {@link java.lang.Object} object.
      */
     public static synchronized void sendMessage(int what, Object obj) {
 
