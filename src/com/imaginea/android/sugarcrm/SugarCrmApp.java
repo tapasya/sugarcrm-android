@@ -3,9 +3,6 @@ package com.imaginea.android.sugarcrm;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.imaginea.android.sugarcrm.util.Util;
 

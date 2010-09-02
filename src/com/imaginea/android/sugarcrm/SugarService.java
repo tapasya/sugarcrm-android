@@ -1,7 +1,6 @@
 package com.imaginea.android.sugarcrm;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,10 +10,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.SystemClock;
-import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.util.CRMCustomLogFormatter;
