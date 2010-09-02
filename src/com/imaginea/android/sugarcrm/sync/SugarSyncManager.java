@@ -32,7 +32,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,8 +72,6 @@ public class SugarSyncManager {
      */
     private static DateFormat mDateFormat;
 
-    private static Calendar mCalendar;
-
     private static final String LOG_TAG = SugarSyncManager.class.getSimpleName();
 
     /**
@@ -88,14 +85,17 @@ public class SugarSyncManager {
      *            The session Id associated with sugarcrm session
      * @param moduleName
      *            The name of the module to sync
+     * @param syncResult
+     *            a {@link android.content.SyncResult} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static synchronized void syncModulesData(Context context, String account,
                                     String sessionId, String moduleName, SyncResult syncResult)
                                     throws SugarCrmException {
-        long userId;
         long rawId = 0;
         final ContentResolver resolver = context.getContentResolver();
-        final BatchOperation batchOperation = new BatchOperation(context, resolver);
+        final BatchOperation batchOperation = new BatchOperation(resolver);
         if (databaseHelper == null)
             databaseHelper = new DatabaseHelper(context);
         int offset = 0;
@@ -203,11 +203,19 @@ public class SugarSyncManager {
      * syncRelationships
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param account
+     *            a {@link java.lang.String} object.
      * @param sessionId
+     *            a {@link java.lang.String} object.
      * @param moduleName
+     *            a {@link java.lang.String} object.
      * @param bean
+     *            a {@link com.imaginea.android.sugarcrm.util.SugarBean} object.
      * @param batchOperation
+     *            a {@link com.imaginea.android.sugarcrm.sync.BatchOperation} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static void syncRelationshipsData(Context context, String account, String sessionId,
                                     String moduleName, SugarBean bean, BatchOperation batchOperation)
@@ -281,7 +289,9 @@ public class SugarSyncManager {
      * set LinkNameToFieldsArray sets the array of link names to get for a given module
      * 
      * @param moduleName
-     * @throws SugarCrmException
+     *            a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static void setLinkNameToFieldsArray(String moduleName) throws SugarCrmException {
         String[] relationships = databaseHelper.getModuleRelationshipItems(moduleName);
@@ -487,8 +497,14 @@ public class SugarSyncManager {
      * syncModules, syncs the changes to any modules that are associated with the user
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param account
+     *            a {@link java.lang.String} object.
      * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @return a boolean.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static synchronized boolean syncModules(Context context, String account, String sessionId)
                                     throws SugarCrmException {
@@ -539,11 +555,17 @@ public class SugarSyncManager {
      * status flag is set for the modules that have merge conflicts
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param account
+     *            a {@link java.lang.String} object.
      * @param sessionId
+     *            a {@link java.lang.String} object.
      * @param moduleName
+     *            a {@link java.lang.String} object.
      * @param syncResult
-     * @throws SugarCrmException
+     *            a {@link android.content.SyncResult} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
      */
     public static synchronized void syncOutgoingModuleData(Context context, String account,
                                     String sessionId, String moduleName, SyncResult syncResult)
@@ -769,8 +791,12 @@ public class SugarSyncManager {
      * syncAclAccess
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param account
+     *            a {@link java.lang.String} object.
      * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @return a boolean.
      */
     public synchronized static boolean syncAclAccess(Context context, String account,
                                     String sessionId) {
@@ -831,7 +857,10 @@ public class SugarSyncManager {
      * syncUsersList
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param sessionId
+     *            a {@link java.lang.String} object.
+     * @return a boolean.
      */
     public synchronized static boolean syncUsersList(Context context, String sessionId) {
         try {
