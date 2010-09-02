@@ -29,7 +29,6 @@ import java.util.UUID;
  * 
  * @author chander
  * @author vasavi
- * 
  */
 public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
@@ -57,6 +56,16 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
 
     public static final String TAG = "UpdateServiceTask";
 
+    /**
+     * <p>
+     * Constructor for UpdateServiceTask.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param intent
+     *            a {@link android.content.Intent} object.
+     */
     @SuppressWarnings("unchecked")
     public UpdateServiceTask(Context context, Intent intent) {
         super(context);
@@ -72,6 +81,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         debug();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Object doInBackground(Object... params) {
         int updatedRows = 0;
@@ -143,7 +153,13 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                         RelationshipStatus accountStatus = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, newAccountBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.EXCLUDE_DELETED_ITEMS);
                                         if (status.getCreatedCount() >= 1) {
                                             if (Log.isLoggable(TAG, Log.DEBUG))
-                                                Log.d(TAG, "Relationship is also set!");
+                                                Log.d(TAG, "Relationship is also set!"
+                                                                                + "created: "
+                                                                                + accountStatus.getCreatedCount()
+                                                                                + " failed: "
+                                                                                + accountStatus.getFailedCount()
+                                                                                + " deleted: "
+                                                                                + accountStatus.getDeletedCount());
 
                                             serverUpdated = true;
                                         } else {
@@ -322,7 +338,13 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                         RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, accountBeanId, mLinkFieldName, new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.DELETED_ITEM);
 
                                         if (Log.isLoggable(TAG, Log.DEBUG))
-                                            Log.d(TAG, "updating delete flag for relationship is also set!");
+                                            Log.d(TAG, "updating delete flag for relationship is also set!"
+                                                                            + "created: "
+                                                                            + status.getCreatedCount()
+                                                                            + " failed: "
+                                                                            + status.getFailedCount()
+                                                                            + " deleted: "
+                                                                            + status.getDeletedCount());
                                     }
                                 }
 
@@ -452,7 +474,13 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                                             RelationshipStatus status = RestUtil.setRelationship(url, sessionId, Util.ACCOUNTS, accountBeanId, mDbHelper.getLinkfieldName(mModuleName), new String[] { updatedBeanId }, new LinkedHashMap<String, String>(), Util.DELETED_ITEM);
 
                                             if (Log.isLoggable(TAG, Log.DEBUG))
-                                                Log.d(TAG, "updating delete flag for relationship is also set!");
+                                                Log.d(TAG, "updating delete flag for relationship is also set!"
+                                                                                + "created: "
+                                                                                + status.getCreatedCount()
+                                                                                + " failed: "
+                                                                                + status.getFailedCount()
+                                                                                + " deleted: "
+                                                                                + status.getDeletedCount());
                                         }
                                     }
 
@@ -693,6 +721,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onCancelled() {
         super.onCancelled();
