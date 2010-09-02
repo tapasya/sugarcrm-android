@@ -25,7 +25,6 @@ import java.util.GregorianCalendar;
  * SyncConfigActivity
  * 
  * @author chander
- * 
  */
 public class SyncConfigActivity extends Activity {
 
@@ -46,6 +45,7 @@ public class SyncConfigActivity extends Activity {
 
     public static final String TAG = SyncConfigActivity.class.getSimpleName();
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +81,7 @@ public class SyncConfigActivity extends Activity {
      * starts sync for all the modules in the background
      * 
      * @param v
+     *            a {@link android.view.View} object.
      */
     public void startSync(View v) {
         Bundle extras = new Bundle();
@@ -108,6 +109,7 @@ public class SyncConfigActivity extends Activity {
      * cancel Sync
      * 
      * @param v
+     *            a {@link android.view.View} object.
      */
     public void cancelSync(View v) {
         SugarCrmApp app = (SugarCrmApp) getApplication();
@@ -119,6 +121,7 @@ public class SyncConfigActivity extends Activity {
      * sync Later, closes the activity
      * 
      * @param v
+     *            a {@link android.view.View} object.
      */
     public void syncLater(View v) {
         savePrefs();
@@ -228,15 +231,5 @@ public class SyncConfigActivity extends Activity {
                                         | DateUtils.FORMAT_ABBREV_MONTH
                                         | DateUtils.FORMAT_ABBREV_WEEKDAY;
         view.setText(DateUtils.formatDateTime(this, date.getTime(), flags));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 }
