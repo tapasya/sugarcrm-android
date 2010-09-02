@@ -51,11 +51,10 @@ import java.util.concurrent.Semaphore;
  * android 2.0 and above-minSdkVersion>=5
  * 
  * //TODO - as password is saved in Account Manager with Settings credential storage, we donot have
- * to store the password 
+ * to store the password
  * 
  * @author Vasavi
  * @author chander
- * 
  */
 public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
@@ -110,6 +109,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     private static final String LOG_TAG = WizardAuthActivity.class.getSimpleName();
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -268,6 +268,14 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         });
     }
 
+    /**
+     * <p>
+     * handleLogin
+     * </p>
+     * 
+     * @param view
+     *            a {@link android.view.View} object.
+     */
     public void handleLogin(View view) {
         String usr = ((EditText) flipper.findViewById(R.id.loginUsername)).getText().toString();
         String pwd = ((EditText) flipper.findViewById(R.id.loginPassword)).getText().toString();
@@ -286,12 +294,14 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.i(LOG_TAG, "onNewIntent");
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
@@ -301,20 +311,43 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onResume() {
         super.onResume();
         Log.i(LOG_TAG, "onResume");
     }
 
+    /**
+     * <p>
+     * isFirstDisplayed
+     * </p>
+     * 
+     * @return a boolean.
+     */
     protected boolean isFirstDisplayed() {
         return (flipper.getDisplayedChild() == 0);
     }
 
+    /**
+     * <p>
+     * isLastDisplayed
+     * </p>
+     * 
+     * @return a boolean.
+     */
     protected boolean isLastDisplayed() {
         return (flipper.getDisplayedChild() == flipper.getChildCount() - 1);
     }
 
+    /**
+     * <p>
+     * updateButtons
+     * </p>
+     * 
+     * @param state
+     *            a int.
+     */
     protected void updateButtons(int state) {
         /*
          * Log.i(LOG_TAG, "currentView Id : " + flipper.getCurrentView().getId()); Log.i(LOG_TAG,
@@ -616,9 +649,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         finish();
     }
 
-    /*
-     * @Override
-     */
+    /** {@inheritDoc} */
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
         case KeyEvent.KEYCODE_BACK:
@@ -634,6 +665,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Hold on to this
@@ -646,6 +678,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -660,6 +693,9 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     /**
      * Called when the authentication process completes (see attemptLogin()).
+     * 
+     * @param result
+     *            a boolean.
      */
     public void onAuthenticationResult(boolean result) {
         Log.i(LOG_TAG, "onAuthenticationResult(" + result + ")");
@@ -692,8 +728,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
      * onAuthenticationResult(). Sets the AccountAuthenticatorResult which is sent back to the
      * caller.
      * 
-     * @param the
-     *            confirmCredentials result.
+     * @param result
+     *            a boolean.
      */
     protected void finishConfirmCredentials(boolean result) {
         Log.i(LOG_TAG, "finishConfirmCredentials()");
@@ -711,11 +747,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
      * Called when response is received from the server for authentication request. See
      * onAuthenticationResult(). Sets the AccountAuthenticatorResult which is sent back to the
      * caller. Also sets the authToken in AccountManager for this account.
-     * 
-     * @param the
-     *            confirmCredentials result.
      */
-
     protected void finishLogin() {
         Log.i(LOG_TAG, "finishLogin()");
         final Account account = new Account(mUsername, Util.ACCOUNT_TYPE);
