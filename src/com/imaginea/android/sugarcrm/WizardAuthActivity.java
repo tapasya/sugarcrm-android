@@ -107,6 +107,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
     private TextView mHeaderTextView;
 
+    private TextView loginStatusMsg;
+
     private static final String LOG_TAG = WizardAuthActivity.class.getSimpleName();
 
     /** {@inheritDoc} */
@@ -225,6 +227,8 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
         this.flipper = (ViewFlipper) this.findViewById(R.id.wizardFlipper);
         prev = (Button) this.findViewById(R.id.actionPrev);
         next = (Button) this.findViewById(R.id.actionNext);
+
+        loginStatusMsg = (TextView) flipper.findViewById(R.id.loginStatusMsg);
 
         final int finalState = wizardState;
         next.setOnClickListener(new OnClickListener() {
@@ -512,6 +516,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
+                Log.e(LOG_TAG, sceDesc, sce);
             } catch (InterruptedException ie) {
                 hasExceptions = true;
                 sceDesc = ie.getMessage();
@@ -536,8 +541,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
 
             if (hasExceptions) {
                 // if (wizardState != Util.URL_USER_PWD_AVAILABLE) {
-                TextView tv = (TextView) flipper.findViewById(R.id.loginStatusMsg);
-                tv.setText(sceDesc);
+                loginStatusMsg.setText(sceDesc);
                 mProgressDialog.cancel();
                 // }
                 // else {
