@@ -2,8 +2,6 @@ package com.imaginea.android.sugarcrm.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
@@ -25,7 +23,6 @@ import com.imaginea.android.sugarcrm.util.Util;
 
 import org.apache.http.ParseException;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -46,32 +43,46 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String LOG_TAG = "SyncAdapter";
 
+    /**
+     * <p>
+     * Constructor for SyncAdapter.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param autoInitialize
+     *            a boolean.
+     */
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mContext = context;
         mAccountManager = AccountManager.get(context);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                                     ContentProviderClient provider, SyncResult syncResult) {
-        Log.d(LOG_TAG, "onPerformSync");
-        String authtoken = null;
+        Log.i(LOG_TAG, "onPerformSync");
+        // String authtoken = null;
         int syncType = extras.getInt(Util.SYNC_TYPE);
-        // extras.remove(Util.SYNC_TYPE);
-        Log.v(LOG_TAG, "Sync Type name: " + syncType);
+
         try {
             // use the account manager to request the credentials
-            authtoken = mAccountManager.blockingGetAuthToken(account, Util.AUTHTOKEN_TYPE, true /* notifyAuthFailure */);
+            // authtoken = mAccountManager.blockingGetAuthToken(account, Util.AUTHTOKEN_TYPE, true
+            // /* notifyAuthFailure */);
             // Log.v(LOG_TAG, "authtoken:" + authtoken);
-            // Log.v(LOG_TAG, "password:" + mAccountManager.getPassword(account));
+
             /*
              * if we are a password based system, the SugarCRM OAuth setup is not clear yet but
              * based on preferences, we ahould select the right one -?
              */
             String userName = account.name;
             String password = mAccountManager.getPassword(account);
-            // Log.v(LOG_TAG, "user name: " + userName + " and authority: " + authority);
+            if (Log.isLoggable(LOG_TAG, Log.VERBOSE)) {
+                Log.v(LOG_TAG, "Sync Type name: " + syncType);
+                Log.v(LOG_TAG, "user name: " + userName + " and authority: " + authority);
+            }
 
             if (!Util.isNetworkOn(mContext)) {
                 Log.v(LOG_TAG, "Network is not on..skipping sync:");
@@ -79,7 +90,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-            // TODO use a constant and remove this as we start from the login screen
             String url = pref.getString(Util.PREF_REST_URL, mContext.getString(R.string.defaultUrl));
             SugarCrmApp app = ((SugarCrmApp) SugarCrmApp.app);
             String sessionId = app != null ? app.getSessionId() : null;
@@ -136,17 +146,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (final ParseException e) {
             syncResult.stats.numParseExceptions++;
             Log.e(LOG_TAG, "ParseException", e);
-        } catch (OperationCanceledException e) {
-            // TODO - whats the stats update here
-            // syncResult.stats.++;
-            Log.e(LOG_TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            // syncResult.stats.numAuthExceptions++;
-            Log.e(LOG_TAG, e.getMessage(), e);
-        } catch (IOException e) {
-            syncResult.stats.numIoExceptions++;
-            Log.e(LOG_TAG, e.getMessage(), e);
-        } catch (SugarCrmException se) {
+        } /*
+           * catch (OperationCanceledException e) { // TODO - whats the stats update here //
+           * syncResult.stats.++; Log.e(LOG_TAG, e.getMessage(), e); } catch (AuthenticatorException
+           * e) { // syncResult.stats.numAuthExceptions++; Log.e(LOG_TAG, e.getMessage(), e); }
+           * catch (IOException e) { syncResult.stats.numIoExceptions++; Log.e(LOG_TAG,
+           * e.getMessage(), e); }
+           */catch (SugarCrmException se) {
             Log.e(LOG_TAG, se.getMessage(), se);
         }
     }
@@ -213,6 +219,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         SugarSyncManager.syncOutgoingModuleData(mContext, account.name, sessionId, moduleName, syncResult);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onSyncCanceled() {
         super.onSyncCanceled();
