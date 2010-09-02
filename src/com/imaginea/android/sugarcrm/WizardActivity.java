@@ -42,6 +42,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * <p>
+ * WizardActivity class.
+ * </p>
+ * 
+ */
 public class WizardActivity extends Activity {
 
     private final String LOG_TAG = "WizardActivity";
@@ -74,6 +80,7 @@ public class WizardActivity extends Activity {
 
     private DatabaseHelper mDbHelper = new DatabaseHelper(getBaseContext());
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -212,6 +219,14 @@ public class WizardActivity extends Activity {
         });
     }
 
+    /**
+     * <p>
+     * handleLogin
+     * </p>
+     * 
+     * @param view
+     *            a {@link android.view.View} object.
+     */
     public void handleLogin(View view) {
         String usr = ((EditText) flipper.findViewById(R.id.loginUsername)).getText().toString();
         String pwd = ((EditText) flipper.findViewById(R.id.loginPassword)).getText().toString();
@@ -228,32 +243,57 @@ public class WizardActivity extends Activity {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.i(LOG_TAG, "onNewIntent");
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
         Log.i(LOG_TAG, "onPause");
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onResume() {
         super.onResume();
         Log.i(LOG_TAG, "onResume");
     }
 
+    /**
+     * <p>
+     * isFirstDisplayed
+     * </p>
+     * 
+     * @return a boolean.
+     */
     protected boolean isFirstDisplayed() {
         return (flipper.getDisplayedChild() == 0);
     }
 
+    /**
+     * <p>
+     * isLastDisplayed
+     * </p>
+     * 
+     * @return a boolean.
+     */
     protected boolean isLastDisplayed() {
         return (flipper.getDisplayedChild() == flipper.getChildCount() - 1);
     }
 
+    /**
+     * <p>
+     * updateButtons
+     * </p>
+     * 
+     * @param state
+     *            a int.
+     */
     protected void updateButtons(int state) {
         /*
          * Log.i(LOG_TAG, "currentView Id : " + flipper.getCurrentView().getId()); Log.i(LOG_TAG,
@@ -507,9 +547,7 @@ public class WizardActivity extends Activity {
         finish();
     }
 
-    /*
-     * @Override
-     */
+    /** {@inheritDoc} */
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
         case KeyEvent.KEYCODE_BACK:
@@ -525,6 +563,7 @@ public class WizardActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Hold on to this
@@ -537,6 +576,7 @@ public class WizardActivity extends Activity {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
