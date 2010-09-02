@@ -104,12 +104,14 @@ public class SugarCRMProvider extends ContentProvider {
 
     private DatabaseHelper mOpenHelper;
 
+    /** {@inheritDoc} */
     @Override
     public boolean onCreate() {
         mOpenHelper = new DatabaseHelper(getContext());
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                                     String sortOrder) {
@@ -422,6 +424,7 @@ public class SugarCRMProvider extends ContentProvider {
         return c;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getType(Uri uri) {
         switch (sUriMatcher.match(uri)) {
@@ -436,6 +439,7 @@ public class SugarCRMProvider extends ContentProvider {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Uri insert(Uri uri, ContentValues initialValues) {
         ContentValues values;
@@ -445,7 +449,7 @@ public class SugarCRMProvider extends ContentProvider {
             values = new ContentValues();
         }
 
-        Long now = Long.valueOf(System.currentTimeMillis());
+        // Long now = Long.valueOf(System.currentTimeMillis());
         // Make sure that the fields are all set
 
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -844,6 +848,7 @@ public class SugarCRMProvider extends ContentProvider {
         throw new SQLException("Failed to insert row into " + uri);
     }
 
+    /** {@inheritDoc} */
     @Override
     public int delete(Uri uri, String where, String[] whereArgs) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -1006,7 +1011,7 @@ public class SugarCRMProvider extends ContentProvider {
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
-            
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -1015,6 +1020,7 @@ public class SugarCRMProvider extends ContentProvider {
         return count;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -1730,7 +1736,7 @@ public class SugarCRMProvider extends ContentProvider {
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
-            
+
         case CAMPAIGN:
             count = db.update(DatabaseHelper.CAMPAIGNS_TABLE_NAME, values, where, whereArgs);
             break;
@@ -1743,7 +1749,7 @@ public class SugarCRMProvider extends ContentProvider {
                                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')'
                                                                             : ""), whereArgs);
             break;
-            
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
