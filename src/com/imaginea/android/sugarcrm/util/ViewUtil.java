@@ -11,7 +11,6 @@ import android.widget.Toast;
  * 
  * @author Vasavi
  * @author chander
- * 
  */
 public class ViewUtil {
 
@@ -26,7 +25,9 @@ public class ViewUtil {
      * show ProgressDialog
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param startMsg
+     *            a {@link java.lang.String} object.
      */
     public static void showProgressDialog(Context context, String startMsg) {
         showProgressDialog(context, startMsg, true);
@@ -36,8 +37,11 @@ public class ViewUtil {
      * show ProgressDialog
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param startMsg
+     *            a {@link java.lang.String} object.
      * @param indeterminate
+     *            a boolean.
      */
     public static void showProgressDialog(Context context, String startMsg, boolean indeterminate) {
         mProgressDialog = new ProgressDialog(context);
@@ -52,8 +56,12 @@ public class ViewUtil {
      * get ProgressDialog
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param startMsg
+     *            a {@link java.lang.String} object.
      * @param indeterminate
+     *            a boolean.
+     * @return a {@link android.app.ProgressDialog} object.
      */
     public static ProgressDialog getProgressDialog(Context context, String startMsg,
                                     boolean indeterminate) {
@@ -78,7 +86,9 @@ public class ViewUtil {
      * helper method to display a toast specified by the resource id (strings.xml)
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param resid
+     *            a int.
      */
     public static void makeToast(Context context, int resid) {
         Toast toast = Toast.makeText(context, resid, Toast.LENGTH_LONG);
@@ -89,7 +99,9 @@ public class ViewUtil {
      * helper method to display a toast specified by the resource id (strings.xml)
      * 
      * @param context
-     * @param resid
+     *            a {@link android.content.Context} object.
+     * @param str
+     *            a {@link java.lang.CharSequence} object.
      */
     public static void makeToast(Context context, CharSequence str) {
         Toast toast = Toast.makeText(context, str, Toast.LENGTH_LONG);
@@ -100,8 +112,11 @@ public class ViewUtil {
      * showFormattedToast
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param id
+     *            a int.
      * @param args
+     *            a {@link java.lang.Object} object.
      */
     public static void showFormattedToast(Context context, int id, Object... args) {
         Toast.makeText(context, String.format(context.getString(id), args), Toast.LENGTH_LONG).show();
@@ -111,7 +126,9 @@ public class ViewUtil {
      * dismissVirtualKeyboard
      * 
      * @param context
+     *            a {@link android.content.Context} object.
      * @param view
+     *            a {@link android.view.View} object.
      */
     public static void dismissVirtualKeyboard(Context context, View view) {
 

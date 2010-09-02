@@ -1,5 +1,11 @@
 package com.imaginea.android.sugarcrm.util;
 
+/**
+ * <p>
+ * ACLConstants interface.
+ * </p>
+ * 
+ */
 public interface ACLConstants {
 
     public static final int ACL_ALLOW_ADMIN_DEV = 100;

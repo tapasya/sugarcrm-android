@@ -20,7 +20,6 @@ import java.security.NoSuchAlgorithmException;
  * 
  * @author Vasavi
  * @author chander
- * 
  */
 public class Util {
 
@@ -179,7 +178,17 @@ public class Util {
 
     private static final String LOG_TAG = Util.class.getSimpleName();
 
-    // calculate the MD5 hash of a string
+    /**
+     * <p>
+     * MD5, calculate the MD5 hash of a string
+     * </p>
+     * 
+     * @param text
+     *            a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     * @throws com.imaginea.android.sugarcrm.util.SugarCrmException
+     *             if any.
+     */
     public static String MD5(String text) throws SugarCrmException {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -215,7 +224,7 @@ public class Util {
      * changed from private to public so that anyone requiring unique requestIds for Pending Intents
      * can get it
      * 
-     * @return
+     * @return a int.
      */
     public static synchronized int getId() {
         mRequestId += 1;
@@ -226,7 +235,8 @@ public class Util {
      * is Network On
      * 
      * @param context
-     * @return
+     *            a {@link android.content.Context} object.
+     * @return a boolean.
      */
     public static boolean isNetworkOn(Context context) {
         boolean networkOn = false;
@@ -254,12 +264,13 @@ public class Util {
      *            - context of the component posting notification, can be an activity/service etc
      * @param clazz
      *            class of the optional activity that can be started
-     * @param tickerText
-     * @param title
      * @param message
-     * 
-     * 
+     *            a {@link java.lang.String} object.
      * @return ID of notification so it can be cancelled/updated
+     * @param tickerTextRes
+     *            a int.
+     * @param titleRes
+     *            a int.
      */
     public static synchronized int notify(Context context, Class<Activity> clazz,
                                     int tickerTextRes, int titleRes, String message) {
@@ -277,10 +288,14 @@ public class Util {
      *            - context of the component posting notification, can be an activity/service etc
      * @param clazz
      *            class of the optional activity that can be started
-     * @param tickerText
-     * @param title
+     * @param packageName
+     *            a {@link java.lang.String} object.
+     * @param tickerTextRes
+     *            a int.
+     * @param titleRes
+     *            a int.
      * @param message
-     * 
+     *            a {@link java.lang.String} object.
      * 
      * @return ID of notification so it can be cancelled/updated
      */

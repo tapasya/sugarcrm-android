@@ -13,11 +13,15 @@ public class CRMCustomLogFormatter extends Formatter {
 
     DateFormat mDateFormat;
 
+    /**
+     * <p>Constructor for CRMCustomLogFormatter.</p>
+     */
     public CRMCustomLogFormatter() {
         super();
         mDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
     }
 
+    /** {@inheritDoc} */
     public String format(LogRecord record) {
 
         // Create a StringBuffer to contain the formatted record
