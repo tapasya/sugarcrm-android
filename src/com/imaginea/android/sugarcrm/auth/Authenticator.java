@@ -27,14 +27,20 @@ class Authenticator extends AbstractAccountAuthenticator {
 
     private static final String LOG_TAG = Authenticator.class.getSimpleName();
 
+    /**
+     * <p>
+     * Constructor for Authenticator.
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     */
     public Authenticator(Context context) {
         super(context);
         mContext = context;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType,
                                     String authTokenType, String[] requiredFeatures, Bundle options) {
@@ -48,9 +54,7 @@ class Authenticator extends AbstractAccountAuthenticator {
         return bundle;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account,
                                     Bundle options) {
@@ -73,17 +77,13 @@ class Authenticator extends AbstractAccountAuthenticator {
         return bundle;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
                                     String authTokenType, Bundle loginOptions) {
@@ -119,9 +119,7 @@ class Authenticator extends AbstractAccountAuthenticator {
         return bundle;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String getAuthTokenLabel(String authTokenType) {
         if (authTokenType.equals(Util.AUTHTOKEN_TYPE)) {
@@ -131,9 +129,7 @@ class Authenticator extends AbstractAccountAuthenticator {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account,
                                     String[] features) {
@@ -152,14 +148,12 @@ class Authenticator extends AbstractAccountAuthenticator {
             sessionId = RestUtil.loginToSugarCRM(url, username, password);
 
         } catch (SugarCrmException e) {
-
+            Log.e(LOG_TAG, e.getMessage(), e);
         }
         return sessionId != null ? true : false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account,
                                     String authTokenType, Bundle loginOptions) {
