@@ -24,19 +24,47 @@ public class BatchOperation {
 
     private final String LOG_TAG = BatchOperation.class.getSimpleName();
 
-    public BatchOperation(Context context, ContentResolver resolver) {
+    /**
+     * <p>
+     * Constructor for BatchOperation.
+     * </p>
+     * 
+     * @param resolver
+     *            a {@link android.content.ContentResolver} object.
+     */
+    public BatchOperation(ContentResolver resolver) {
         mResolver = resolver;
         mOperations = new ArrayList<ContentProviderOperation>();
     }
 
+    /**
+     * <p>
+     * size
+     * </p>
+     * 
+     * @return a int.
+     */
     public int size() {
         return mOperations.size();
     }
 
+    /**
+     * <p>
+     * add
+     * </p>
+     * 
+     * @param cpo
+     *            a {@link android.content.ContentProviderOperation} object.
+     */
     public void add(ContentProviderOperation cpo) {
         mOperations.add(cpo);
     }
 
+    /**
+     * <p>
+     * execute
+     * </p>
+     */
     public void execute() {
         if (mOperations.size() == 0) {
             Log.v(LOG_TAG, "No Batch Operations found to execute");
