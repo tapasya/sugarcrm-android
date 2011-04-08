@@ -18,10 +18,10 @@
 		name="default_url">http://demo.sugarcrm.com/sugarcrm/service/v2/rest.php</string
 	-->
 
-	<string name="defaultUrl">http://10.0.2.2/sugarcrm/service/v2/rest.php
+	<string name="defaultUrl">http://192.168.6.61/sugarcrm6/service/v2/rest.php
 	</string>
-	<string name="defaultUser">will</string>
-	<string name="defaultPwd">will</string>
+	<string name="defaultUser">sugaradmin</string>
+	<string name="defaultPwd">sugaradmin</string>
 
 	<!-- Modules -->
 	<string name="contacts">Contacts</string>
@@ -30,6 +30,7 @@
 	<string name="opportunities">Opportunities</string>
 
 	<string name="settings">Settings</string>
+	<string name="recent">Recent</string>
 	<string name="settingsSummary">Change the SUGARCRM URL</string>
 	<string name="syncSummary">Select Sync Filters and start a Sync</string>
 	<string name="sortSummary">Set the sort order for the modules</string>

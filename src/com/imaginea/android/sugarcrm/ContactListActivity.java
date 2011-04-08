@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,9 +33,11 @@ import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Recent;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -134,6 +137,10 @@ public class ContactListActivity extends ListActivity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view,
                                             int position, long id) {
+            	//FIXME: start changes by Jaga
+            	Log.e(LOG_TAG, "item clicked");
+            	addToRecent(position);
+            	//FIXME: end changes by Jaga
                 openDetailScreen(position);
             }
         });
@@ -161,7 +168,7 @@ public class ContactListActivity extends ListActivity {
         // detail projection
         // here, just do a list projection
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), mSelections, mSelectionArgs, getSortOrder());
-
+        
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
         String[] moduleSel = mDbHelper.getModuleListSelections(mModuleName);
@@ -282,7 +289,7 @@ public class ContactListActivity extends ListActivity {
     }
 
     /**
-     * opens the Detail Screen
+     * s the Detail Screen
      * 
      * @param position
      */
@@ -612,9 +619,12 @@ public class ContactListActivity extends ListActivity {
             Log.e(LOG_TAG, "bad menuInfo", e);
             return false;
         }
-        // ListView listView = getListView();
-
         int position = info.position;
+        
+        //FIXME: start changes made by Jaga
+        addToRecent(position);
+        //FIXME: end changes made by Jaga
+        
         switch (item.getItemId()) {
         case R.string.view:
             openDetailScreen(position);
@@ -641,7 +651,7 @@ public class ContactListActivity extends ListActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
+    
     private void sortList(String sortOrder) {
         String selection = null;
         if (MODE == Util.ASSIGNED_ITEMS_MODE) {
@@ -653,7 +663,34 @@ public class ContactListActivity extends ListActivity {
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
-
+    //FIXME: start changes by Jaga
+	void addToRecent(int position) {
+		ContentValues modifiedValues = new ContentValues();
+		// push the selected record into recent table
+        Cursor cursor = (Cursor) getListAdapter().getItem(position);
+        
+        String[] moduleSel = mDbHelper.getModuleListSelections(mModuleName);
+        Log.e(LOG_TAG, "Name1:" + cursor.getString(2));
+        if (moduleSel.length >= 2)
+        Log.e(LOG_TAG, "Name2:" + cursor.getString(3));
+        //now insert into recent table
+        Log.e(LOG_TAG, "Inserting:" + cursor.getString(2));
+        modifiedValues.put(Recent.ACTUAL_ID, cursor.getInt(0)+"");
+        modifiedValues.put(Recent.BEAN_ID, cursor.getString(1));
+        modifiedValues.put(Recent.NAME_1, cursor.getString(2));
+        modifiedValues.put(Recent.NAME_2, cursor.getString(3));
+        modifiedValues.put(Recent.REF_MODULE_NAME, mModuleName);
+        modifiedValues.put(Recent.DELETED, "0");
+        Uri insertResultUri = getApplicationContext().getContentResolver().insert(Recent.CONTENT_URI, modifiedValues);
+       /* values.put(SugarCRMContent.SUGAR_BEAN_ID, "Sync" + UUID.randomUUID());
+        Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
+        // after success url insertion, we set the updatedRow to 1 so we don't get a
+        // fail msg
+        updatedRows = 1;*/
+        Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
+        
+	}
+	//FIXME: end changes by Jaga
     /**
      * <p>
      * showAssignedItems

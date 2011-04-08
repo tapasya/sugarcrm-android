@@ -73,7 +73,9 @@ public class DashboardActivity extends Activity {
                 String moduleName = mModuleNames.get(position);
                 if (moduleName.equals(getString(R.string.settings))) {
                     myIntent = new Intent(DashboardActivity.this, SugarCrmSettings.class);
-                } else {
+                } else if (moduleName.equals(getString(R.string.recent))){
+                	 myIntent = new Intent(DashboardActivity.this, RecentListActivity.class);
+                }else {
                     myIntent = new Intent(DashboardActivity.this, ContactListActivity.class);
                 }
 
@@ -133,6 +135,9 @@ public class DashboardActivity extends Activity {
     void showDashboard() {
         mModuleNames = mDbHelper.getModuleList();
         mModuleNames.add(getString(R.string.settings));
+        //FIXME: Start Changes by Jaga
+        mModuleNames.add(getString(R.string.recent));
+        //FIXME: End Changes by Jaga
         Collections.sort(mModuleNames);
         mDashboard.setAdapter(new AppsAdapter(this));
     }

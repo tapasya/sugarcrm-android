@@ -41,6 +41,8 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ModuleFieldSortOrd
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Modules;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Recent;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.RecentColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Sync;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.SyncColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Users;
@@ -75,7 +77,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "sugar_crm.db";
 
     // TODO: RESET the database version to 1
-    private static final int DATABASE_VERSION = 33;
+    //FIXME:Jaga changed the db version
+    private static final int DATABASE_VERSION = 34;
 
     public static final String ACCOUNTS_TABLE_NAME = "accounts";
 
@@ -90,8 +93,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CONTACTS_OPPORTUNITIES_TABLE_NAME = "contacts_opportunities";
 
     public static final String CONTACTS_CASES_TABLE_NAME = "contacts_cases";
-
+    
     public static final String LEADS_TABLE_NAME = "leads";
+    
+    //FIXME: start changes by Jaga
+    public static final String RECENT_TABLE_NAME = "recent";
+    //FIXME: start changes by Jaga
 
     public static final String OPPORTUNITIES_TABLE_NAME = "opportunities";
 
@@ -185,6 +192,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // TODO: as of now, there is no icon for campaigns
         // moduleIcons.put(Util.CAMPAIGNS, R.drawable.campaings);
         moduleIcons.put("Settings", R.drawable.settings);
+        //FIXME: start changes by Jaga
+        //moduleIcons.put("Recent");
+        //FIXME: start changes by Jaga
 
         // Module Projections
         moduleProjections.put(Util.ACCOUNTS, Accounts.DETAILS_PROJECTION);
@@ -215,7 +225,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleListSelections.put(Util.CALLS, Calls.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.MEETINGS, Meetings.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CAMPAIGNS, Campaigns.LIST_VIEW_PROJECTION);
-
+        //FIXME: start changes made by Jaga 
+        moduleListSelections.put(Util.RECENT, Recent.LIST_VIEW_PROJECTION);
+        //FIXME: end changes made by Jaga
+        
         // Default sort orders
         moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.CONTACTS, Contacts.DEFAULT_SORT_ORDER);
@@ -236,7 +249,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleUris.put(Util.MEETINGS, Meetings.CONTENT_URI);
         moduleUris.put(Util.CAMPAIGNS, Campaigns.CONTENT_URI);
         moduleUris.put(Util.USERS, Users.CONTENT_URI);
-
+        //FIXME: start change by Jaga
+        moduleUris.put(Util.RECENT, Recent.CONTENT_URI);
+        //FIXME: end change by Jaga
         // TODO - complete this list
         moduleRelationshipItems.put(Util.ACCOUNTS, new String[] { Util.CONTACTS,
                 Util.OPPORTUNITIES, Util.CASES });
@@ -378,6 +393,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // create sync tables
         createSyncTable(db);
+        //FIXME: start changes by Jaga
+        createRecentTable(db);
+        //FIXME: end changes by Jaga
 
     }
 
@@ -468,7 +486,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropModuleFieldsGroupTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_GROUP_TABLE_NAME);
     }
-
+    //FIXME: start changes by Jaga
+    void dropRecentTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + RECENT_TABLE_NAME);
+    }
+    //FIXME: end changes by Jaga
     /** {@inheritDoc} */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -509,8 +531,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropContactsCasesTable(db);
 
         dropSyncTable(db);
+      //FIXME: start changes by Jaga
+        dropRecentTable(db);
+      //FIXME: end changes by Jaga
     }
+    //FIXME: start changes by Jaga
+    private static void createRecentTable(SQLiteDatabase db) {
 
+        db.execSQL("CREATE TABLE " + RECENT_TABLE_NAME + " (" + RecentColumns.ID
+                                        + " INTEGER,"
+                                        +RecentColumns.ACTUAL_ID + " INTEGER,"
+                                        +RecentColumns.BEAN_ID + " TEXT,"
+                                        + RecentColumns.REF_MODULE_NAME + " TEXT,"
+                                        +RecentColumns.NAME_1 + " TEXT,"
+                                        +RecentColumns.NAME_2 + " TEXT,"
+                                        + RecentColumns.DELETED + " INTEGER"
+        								+");");
+    }
+    //FIXME: end changes by Jaga
     private static void createAccountsTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + AccountsColumns.ID

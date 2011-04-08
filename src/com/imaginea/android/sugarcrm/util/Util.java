@@ -117,6 +117,10 @@ public class Util {
     public static final String ACLACTIONS = "ACLActions";
 
     public static final String STATUS = "Status";
+    
+    //FIXME: changes by jaga
+    public static final String RECENT = "Recent";
+    //FIXME: changes by jaga
 
     // sql sort order contacts
     public static final String ASC = "ASC";
