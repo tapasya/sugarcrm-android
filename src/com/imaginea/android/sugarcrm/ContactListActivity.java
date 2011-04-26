@@ -289,7 +289,7 @@ public class ContactListActivity extends ListActivity {
     }
 
     /**
-     * s the Detail Screen
+     * opens the Detail Screen
      * 
      * @param position
      */
