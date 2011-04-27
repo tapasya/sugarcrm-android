@@ -355,7 +355,6 @@ public interface ModuleFields {
 
     public static final String ADDRESS_STREET = "address_street";
     
-    //FIXME:start changes by Jaga
     public static final String MODULE_NAME = "module_name";
     
     public static final String ACTUAL_RECORD_ID = "actual_record_id";
@@ -363,6 +362,5 @@ public interface ModuleFields {
     public static final String NAME_1 = "name_1";
     
     public static final String NAME_2 = "name_2";
-    //FIXME:end changes by Jaga
 
 }

@@ -135,9 +135,7 @@ public class DashboardActivity extends Activity {
     void showDashboard() {
         mModuleNames = mDbHelper.getModuleList();
         mModuleNames.add(getString(R.string.settings));
-        //FIXME: Start Changes by Jaga
         mModuleNames.add(getString(R.string.recent));
-        //FIXME: End Changes by Jaga
         Collections.sort(mModuleNames);
         mDashboard.setAdapter(new AppsAdapter(this));
     }

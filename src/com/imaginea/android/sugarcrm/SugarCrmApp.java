@@ -150,13 +150,11 @@ public class SugarCrmApp extends Application {
         fieldMap.put(ModuleFields.NAME, Util.ASC);
         moduleSortOrder.put(Util.CAMPAIGNS, fieldMap);
         
-        //FIXME: start changes by Jaga
         
         fieldMap = new HashMap<String, String>();
         fieldMap.put(ModuleFields.NAME_1, Util.ASC);
         moduleSortOrder.put(Util.RECENT, fieldMap);
         
-        //FIXME: end changes by Jaga
     }
 
 }

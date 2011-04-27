@@ -252,7 +252,6 @@ public final class SugarCRMContent {
         public String DELETED = ModuleFields.DELETED;
     }
     
-    //FIXME: start changes by Jaga
     public interface RecentColumns {
     	public String ID = RECORD_ID;
     	
@@ -286,7 +285,6 @@ public final class SugarCRMContent {
         //will be used to show the detailed view
 
     }
-    //FIXME: end changes by Jaga
 
     public static final class Leads implements LeadsColumns {
 

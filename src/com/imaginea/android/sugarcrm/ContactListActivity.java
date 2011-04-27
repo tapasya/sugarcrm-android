@@ -137,10 +137,8 @@ public class ContactListActivity extends ListActivity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view,
                                             int position, long id) {
-            	//FIXME: start changes by Jaga
             	Log.e(LOG_TAG, "item clicked");
             	addToRecent(position);
-            	//FIXME: end changes by Jaga
                 openDetailScreen(position);
             }
         });
@@ -621,9 +619,7 @@ public class ContactListActivity extends ListActivity {
         }
         int position = info.position;
         
-        //FIXME: start changes made by Jaga
         addToRecent(position);
-        //FIXME: end changes made by Jaga
         
         switch (item.getItemId()) {
         case R.string.view:
@@ -663,7 +659,6 @@ public class ContactListActivity extends ListActivity {
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
-    //FIXME: start changes by Jaga
 	void addToRecent(int position) {
 		ContentValues modifiedValues = new ContentValues();
 		// push the selected record into recent table
@@ -690,7 +685,7 @@ public class ContactListActivity extends ListActivity {
         Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
         
 	}
-	//FIXME: end changes by Jaga
+	
     /**
      * <p>
      * showAssignedItems

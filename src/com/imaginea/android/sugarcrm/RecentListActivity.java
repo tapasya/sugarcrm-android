@@ -1,46 +1,31 @@
 package com.imaginea.android.sugarcrm;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 
-import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Recent;
-import com.imaginea.android.sugarcrm.util.ModuleField;
-import com.imaginea.android.sugarcrm.util.Util;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
-import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
+import com.imaginea.android.sugarcrm.util.Util;
 /**
  * RecentListActivity, lists the view projections for all the Recently accessed records.
  * 
@@ -69,7 +54,6 @@ public class RecentListActivity extends ListActivity{
 
     private Uri mIntentUri;
 
-    private int mCurrentSelection;
 
     // we don't make this final as we may want to use the sugarCRM value
     // dynamically, but prevent
@@ -79,16 +63,6 @@ public class RecentListActivity extends ListActivity{
     private DatabaseHelper mDbHelper;
 
     private GenericCursorAdapter mAdapter;
-
-    private static final int DIALOG_SORT_CHOICE = 1;
-
-    private String[] mModuleFields;
-
-    private String[] mModuleFieldsChoice;
-
-    private int mSortColumnIndex;
-
-    private int MODE = Util.LIST_MODE;
 
     private String mSelections = ModuleFields.DELETED + "=?";
 
