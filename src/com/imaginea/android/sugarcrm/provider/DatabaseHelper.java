@@ -1392,14 +1392,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean hasFailed = false;
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
-        for (String moduleName : moduleNames) {
-            ContentValues values = new ContentValues();
-            values.put(ModuleColumns.MODULE_NAME, moduleName);
-            long rowId = db.insert(MODULES_TABLE_NAME, "", values);
-            if (rowId <= 0) {
-                hasFailed = true;
-                break;
+        
+	HashSet<String> moduleNamesSet = new HashSet<String>(moduleNames);
+        try{
+            for (String moduleName : moduleNamesSet) {
+                ContentValues values = new ContentValues();
+                if (moduleName != null && !moduleName.equals("")) {
+                    values.put(ModuleColumns.MODULE_NAME, moduleName);
+                    long rowId = db.insert(MODULES_TABLE_NAME, "", values);
+                    if (rowId <= 0) {
+                        hasFailed = true;
+                        break;
+                    }
+                }
             }
+        } catch(SQLException sqlex){
+            hasFailed = true;
+            Log.e(TAG, sqlex.getMessage(), sqlex);
         }
 
         if (hasFailed) {
