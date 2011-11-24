@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         
-		<activity android:name=".ContactListActivity" 
+		<activity android:name=".ModuleListActivity" 
 			   android:label="@string/appName" android:theme="@android:style/Theme.Black.NoTitleBar">
 			<intent-filter>
 				<action android:name="com.imaginea.android.sugarcrm.DEFAULT" />
@@ -56,7 +56,7 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".AccountDetailsActivity" android:label="@string/contactDetails"
+        <activity android:name=".ModuleDetailsActivity" android:label="@string/contactDetails"
        	 	android:theme="@android:style/Theme.Light.NoTitleBar" 
        	 	android:configChanges="orientation|keyboardHidden">
             <intent-filter>
@@ -144,7 +144,7 @@
 			android:syncable="true" />
     </application>
     <!--  changed to 5 as WizardActivity has WizardAuth stuff in it and no longer supports 1.6  -->
-   	<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="8" />
+   	<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="11" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />

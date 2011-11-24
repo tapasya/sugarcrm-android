@@ -61,8 +61,7 @@ public class DashboardActivity extends Activity {
         mDashboard = (GridView) findViewById(R.id.dashboard);
 
         mDashboard.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                            int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
                 mProgressDialog = ViewUtil.getProgressDialog(DashboardActivity.this, getString(R.string.loading), false);
                 mProgressDialog.show();
@@ -73,10 +72,10 @@ public class DashboardActivity extends Activity {
                 String moduleName = mModuleNames.get(position);
                 if (moduleName.equals(getString(R.string.settings))) {
                     myIntent = new Intent(DashboardActivity.this, SugarCrmSettings.class);
-                } else if (moduleName.equals(getString(R.string.recent))){
-                	 myIntent = new Intent(DashboardActivity.this, RecentListActivity.class);
-                }else {
-                    myIntent = new Intent(DashboardActivity.this, ContactListActivity.class);
+                } else if (moduleName.equals(getString(R.string.recent))) {
+                    myIntent = new Intent(DashboardActivity.this, RecentListActivity.class);
+                } else {
+                    myIntent = new Intent(DashboardActivity.this, ModuleListActivity.class);
                 }
 
                 myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleNames.get(position));

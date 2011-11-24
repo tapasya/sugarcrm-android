@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,17 +32,9 @@ public class SearchActivity extends ListActivity {
 
     private View mEmpty;
 
-    private Menu mMenu;
-
     private String mQuery = null;
 
     private String mModuleName = null;
-
-    private String[] mModules = null;
-
-    private int mOffset = 0;
-
-    private int mMaxResults = 20;
 
     /** {@inheritDoc} */
     @Override
@@ -58,10 +49,7 @@ public class SearchActivity extends ListActivity {
 
         Bundle appData = intent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
-            mModuleName = appData.getString(RestUtilConstants.MODULE_NAME);
-            mModules = appData.getStringArray(RestUtilConstants.MODULES);
-            mOffset = appData.getInt(RestUtilConstants.OFFSET);
-            mMaxResults = appData.getInt(RestUtilConstants.MAX_RESULTS);
+            mModuleName = appData.getString(RestUtilConstants.MODULE_NAME);            
         }
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -73,7 +61,7 @@ public class SearchActivity extends ListActivity {
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             // handles a click on a search suggestion; launches activity to show
             // the bean
-            Intent detailIntent = new Intent(this, AccountDetailsActivity.class);
+            Intent detailIntent = new Intent(this, ModuleDetailsActivity.class);
             Log.i(TAG, "view uri - " + intent.getData());
             detailIntent.putExtra(Util.ROW_ID, intent.getData().getLastPathSegment());
             detailIntent.putExtra(RestUtilConstants.MODULE_NAME, Util.ACCOUNTS);
@@ -127,7 +115,7 @@ public class SearchActivity extends ListActivity {
      * @param position
      */
     void openDetailScreen(int position) {
-        Intent detailIntent = new Intent(SearchActivity.this, AccountDetailsActivity.class);
+        Intent detailIntent = new Intent(SearchActivity.this, ModuleDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {

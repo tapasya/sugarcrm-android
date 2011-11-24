@@ -41,14 +41,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * ContactListActivity, lists the view projections for all the modules.
- * 
- * Note: Ideally we would have to rename the file, but to preserve CVS history we have chosen not to
- * rename the file. Cannot use CVS rename command as we are still using an old CVS server
+ * ModuleListActivity, lists the view projections for all the modules.
  * 
  * @author chander
  */
-public class ContactListActivity extends ListActivity {
+public class ModuleListActivity extends ListActivity {
 
     private ListView mListView;
 
@@ -97,7 +94,7 @@ public class ContactListActivity extends ListActivity {
 
     private SugarCrmApp app;
 
-    public final static String LOG_TAG = ContactListActivity.class.getSimpleName();
+    public final static String LOG_TAG = ModuleListActivity.class.getSimpleName();
 
     /** {@inheritDoc} */
     @Override
@@ -284,7 +281,7 @@ public class ContactListActivity extends ListActivity {
      * @param position
      */
     void openDetailScreen(int position) {
-        Intent detailIntent = new Intent(ContactListActivity.this, AccountDetailsActivity.class);
+        Intent detailIntent = new Intent(ModuleListActivity.this, ModuleDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
@@ -305,7 +302,7 @@ public class ContactListActivity extends ListActivity {
      * @param position
      */
     private void openEditScreen(int position) {
-        Intent detailIntent = new Intent(ContactListActivity.this, EditDetailsActivity.class);
+        Intent detailIntent = new Intent(ModuleListActivity.this, EditDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
@@ -438,20 +435,20 @@ public class ContactListActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.home:
-            Intent myIntent = new Intent(ContactListActivity.this, DashboardActivity.class);
-            ContactListActivity.this.startActivity(myIntent);
+            Intent myIntent = new Intent(ModuleListActivity.this, DashboardActivity.class);
+            ModuleListActivity.this.startActivity(myIntent);
             return true;
         case R.id.search:
             onSearchRequested();
             return true;
         case R.id.addItem:
-            myIntent = new Intent(ContactListActivity.this, EditDetailsActivity.class);
+            myIntent = new Intent(ModuleListActivity.this, EditDetailsActivity.class);
             myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
             if (mIntentUri != null)
                 myIntent.setData(mIntentUri);
             // myIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME,
             // DatabaseHelper.getRelationshipName(mModuleName));
-            ContactListActivity.this.startActivity(myIntent);
+            ModuleListActivity.this.startActivity(myIntent);
 
             return true;
         case R.id.sort:
@@ -504,7 +501,7 @@ public class ContactListActivity extends ListActivity {
 
         case R.string.delete:
 
-            return new AlertDialog.Builder(ContactListActivity.this).setTitle(id).setMessage(R.string.deleteAlert).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            return new AlertDialog.Builder(ModuleListActivity.this).setTitle(id).setMessage(R.string.deleteAlert).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
                     deleteItem();
@@ -604,7 +601,7 @@ public class ContactListActivity extends ListActivity {
         String selection = null;
         if (MODE == Util.ASSIGNED_ITEMS_MODE) {
             // TODO: get the user name from Account Manager
-            String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
+            String userName = SugarCrmSettings.getUsername(ModuleListActivity.this);
             selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
         }
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, sortOrder);
@@ -650,7 +647,7 @@ public class ContactListActivity extends ListActivity {
     public void showAssignedItems(View view) {
         MODE = Util.ASSIGNED_ITEMS_MODE;
         // TODO: get the user name from Account Manager
-        String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
+        String userName = SugarCrmSettings.getUsername(ModuleListActivity.this);
         String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, getSortOrder());
         mAdapter.changeCursor(cursor);

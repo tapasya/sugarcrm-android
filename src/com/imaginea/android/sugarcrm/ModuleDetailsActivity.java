@@ -37,13 +37,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * AccountDetailsActivity is used to show details for all modules. Note: Ideally we would have to
+ * ModuleDetailsActivity is used to show details for all modules. Note: Ideally we would have to
  * rename the file, but to preserve CVS history we have chosen not to rename the file. Cannot use
  * CVS rename command as we are still using an old CVS server.
  * 
  * @author vasavi
  */
-public class AccountDetailsActivity extends Activity {
+public class ModuleDetailsActivity extends Activity {
 
     private String mRowId;
 
@@ -71,7 +71,7 @@ public class AccountDetailsActivity extends Activity {
 
     private ProgressDialog mProgressDialog;
 
-    private static final String LOG_TAG = AccountDetailsActivity.class.getSimpleName();
+    private static final String LOG_TAG = ModuleDetailsActivity.class.getSimpleName();
 
     /**
      * {@inheritDoc}
@@ -121,7 +121,7 @@ public class AccountDetailsActivity extends Activity {
          * adapter.setRelationshipArray(mRelationshipModules); listView.setAdapter(adapter);
          */
         mTask = new LoadContentTask();
-        mTask.execute(null);
+        mTask.execute(null, null, null);
     }
 
     /**
@@ -134,7 +134,7 @@ public class AccountDetailsActivity extends Activity {
      */
     protected void openListScreen(String moduleName) {
         // if (mModuleName.equals("Accounts")) {
-        Intent detailIntent = new Intent(AccountDetailsActivity.this, ContactListActivity.class);
+        Intent detailIntent = new Intent(ModuleDetailsActivity.this, ModuleListActivity.class);
         if (mDbHelper == null)
             mDbHelper = new DatabaseHelper(getBaseContext());
         Uri uri = Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId);
@@ -182,8 +182,8 @@ public class AccountDetailsActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.home:
-            Intent myIntent = new Intent(AccountDetailsActivity.this, DashboardActivity.class);
-            AccountDetailsActivity.this.startActivity(myIntent);
+            Intent myIntent = new Intent(ModuleDetailsActivity.this, DashboardActivity.class);
+            ModuleDetailsActivity.this.startActivity(myIntent);
             return true;
         case R.string.related:
             return true;
@@ -212,7 +212,7 @@ public class AccountDetailsActivity extends Activity {
             TextView tv = (TextView) findViewById(R.id.headerText);
             tv.setText(String.format(getString(R.string.detailsHeader), mModuleName));
 
-            mProgressDialog = ViewUtil.getProgressDialog(AccountDetailsActivity.this, getString(R.string.loading), true);
+            mProgressDialog = ViewUtil.getProgressDialog(ModuleDetailsActivity.this, getString(R.string.loading), true);
             mProgressDialog.show();
         }
 
@@ -509,7 +509,7 @@ public class AccountDetailsActivity extends Activity {
 
         @Override
         public void onClick(View widget) {
-            Log.i("AccountDetailsActivity", "InternalURLSpan onClick");
+            Log.i("ModuleDetailsActivity", "InternalURLSpan onClick");
             mListener.onClick(widget);
         }
     }

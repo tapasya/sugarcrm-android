@@ -252,7 +252,7 @@ public class RecentListActivity extends ListActivity {
      * @param position
      */
     void openDetailScreen(int position) {
-        Intent detailIntent = new Intent(RecentListActivity.this, AccountDetailsActivity.class);
+        Intent detailIntent = new Intent(RecentListActivity.this, ModuleDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {

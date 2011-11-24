@@ -14,7 +14,7 @@ public class MenuHelper {
     public static void onPrepareOptionsMenu(Activity activity, Menu menu, String moduleName) {
         MenuItem menuItem;
 
-        if (activity instanceof ContactListActivity) {
+        if (activity instanceof ModuleListActivity) {
             menuItem = menu.findItem(R.id.search);
             menuItem.setEnabled(true);
             menuItem.setVisible(true);
