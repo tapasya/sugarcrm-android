@@ -37,16 +37,14 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Recent;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 /**
  * ContactListActivity, lists the view projections for all the modules.
  * 
- * Note: Ideally we would have to rename the file, but to preserve CVS history
- * we have chosen not to rename the file. Cannot use CVS rename command as we
- * are still using an old CVS server
+ * Note: Ideally we would have to rename the file, but to preserve CVS history we have chosen not to
+ * rename the file. Cannot use CVS rename command as we are still using an old CVS server
  * 
  * @author chander
  */
@@ -68,7 +66,7 @@ public class ContactListActivity extends ListActivity {
 
     private Uri mModuleUri;
 
-    private boolean mStopLoading = false;
+    // private boolean mStopLoading = false;
 
     private Uri mIntentUri;
 
@@ -77,7 +75,7 @@ public class ContactListActivity extends ListActivity {
     // we don't make this final as we may want to use the sugarCRM value
     // dynamically, but prevent
     // others from modiying anyway
-    private static int mMaxResults = 20;
+    // private static int mMaxResults = 20;
 
     private DatabaseHelper mDbHelper;
 
@@ -120,8 +118,7 @@ public class ContactListActivity extends ListActivity {
 
         // If the list is a list of related items, hide the filterImage and
         // allItems image
-        if (intent.getData() != null
-                                        && intent.getData().getPathSegments().size() >= 3) {
+        if (intent.getData() != null && intent.getData().getPathSegments().size() >= 3) {
             findViewById(R.id.filterImage).setVisibility(View.GONE);
             findViewById(R.id.allItems).setVisibility(View.GONE);
         }
@@ -135,10 +132,9 @@ public class ContactListActivity extends ListActivity {
         // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View view,
-                                            int position, long id) {
-            	Log.e(LOG_TAG, "item clicked");
-            	addToRecent(position);
+            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+                Log.e(LOG_TAG, "item clicked");
+                addToRecent(position);
                 openDetailScreen(position);
             }
         });
@@ -151,7 +147,6 @@ public class ContactListActivity extends ListActivity {
         registerForContextMenu(getListView());
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-            Log.d(LOG_TAG, "Instance count:" + getInstanceCount());
             Log.d(LOG_TAG, "ModuleName:-->" + mModuleName);
         }
 
@@ -166,7 +161,7 @@ public class ContactListActivity extends ListActivity {
         // detail projection
         // here, just do a list projection
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), mSelections, mSelectionArgs, getSortOrder());
-        
+
         // CRMContentObserver observer = new CRMContentObserver()
         // cursor.registerContentObserver(observer);
         String[] moduleSel = mDbHelper.getModuleListSelections(mModuleName);
@@ -203,8 +198,7 @@ public class ContactListActivity extends ListActivity {
     /**
      * GenericCursorAdapter
      */
-    private final class GenericCursorAdapter extends SimpleCursorAdapter
-                                    implements Filterable {
+    private final class GenericCursorAdapter extends SimpleCursorAdapter implements Filterable {
 
         private int realoffset = 0;
 
@@ -212,8 +206,7 @@ public class ContactListActivity extends ListActivity {
 
         private ContentResolver mContent;
 
-        public GenericCursorAdapter(Context context, int layout, Cursor c,
-                                        String[] from, int[] to) {
+        public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
             super(context, layout, c, from, to);
             mContent = context.getContentResolver();
         }
@@ -229,8 +222,7 @@ public class ContactListActivity extends ListActivity {
                 realoffset += count;
                 // Uri uri = getIntent().getData();
                 // TODO - fix this, this is no longer used
-                Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset
-                                                + "/" + limit);
+                Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset + "/" + limit);
                 Log.d(LOG_TAG, "Changing cursor:" + newUri.toString());
                 final Cursor cursor = managedQuery(newUri, Contacts.LIST_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
                 CRMContentObserver observer = new CRMContentObserver(new Handler() {
@@ -239,8 +231,8 @@ public class ContactListActivity extends ListActivity {
                     public void handleMessage(Message msg) {
                         super.handleMessage(msg);
                         Log.d(LOG_TAG, "Changing cursor: in handler");
-                        if (cursor.getCount() < mMaxResults)
-                            mStopLoading = true;
+                        // if (cursor.getCount() < mMaxResults)
+                        // mStopLoading = true;
                         changeCursor(cursor);
                         mListFooterText.setVisibility(View.GONE);
                         mListFooterProgress.setVisibility(View.GONE);
@@ -400,43 +392,6 @@ public class ContactListActivity extends ListActivity {
         return true;
     }
 
-    // We can stop loading once we do not get the
-    // if (sBeans.length < mMaxResults)
-    // mStopLoading = true;
-    // @Override
-    // protected void onPostExecute(Object result) {
-    // super.onPostExecute(result);
-    // if (isCancelled())
-    // return;
-    // int retVal = (Integer) result;
-    //
-    // switch (retVal) {
-    // case Util.FETCH_FAILED:
-    //
-    // mEmpty.findViewById(R.id.progress).setVisibility(View.GONE);
-    // TextView tv = (TextView) (mEmpty.findViewById(R.id.mainText));
-    // tv.setVisibility(View.VISIBLE);
-    // tv.setText(R.string.loadFailed);
-    // TextView footer = (TextView) findViewById(R.id.status);
-    // footer.setVisibility(View.VISIBLE);
-    // footer.setText(R.string.loadFailed);
-    //
-    // break;
-    //
-    // case Util.REFRESH_LIST:
-    // mBusy = false;
-    // mStatus.setVisibility(View.GONE);
-    // mListView.setVisibility(View.VISIBLE);
-    // int firstPos = getListView().getFirstVisiblePosition();
-    // setListAdapter(mAdapter);
-    // getListView().setSelection(firstPos);
-    // mAdapter.notifyDataSetChanged();
-    // break;
-    // default:
-    //
-    // }
-    // }
-
     /** {@inheritDoc} */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -448,8 +403,7 @@ public class ContactListActivity extends ListActivity {
         // get the module fields for the module
         Map<String, ModuleField> map = mDbHelper.getModuleFields(mModuleName);
         if (map == null) {
-            Log.w(LOG_TAG, "Cannot prepare Options as Map is null for module:"
-                                            + mModuleName);
+            Log.w(LOG_TAG, "Cannot prepare Options as Map is null for module:" + mModuleName);
             return false;
         }
         mModuleFieldsChoice = new String[mModuleFields.length];
@@ -542,8 +496,7 @@ public class ContactListActivity extends ListActivity {
             });
             builder.setNegativeButton(R.string.descending, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    String sortOrder = mModuleFields[mSortColumnIndex]
-                                                    + " DESC";
+                    String sortOrder = mModuleFields[mSortColumnIndex] + " DESC";
                     sortList(sortOrder);
                 }
             });
@@ -569,8 +522,7 @@ public class ContactListActivity extends ListActivity {
 
     /** {@inheritDoc} */
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.setHeaderTitle(R.string.options);
         AdapterView.AdapterContextMenuInfo info;
         try {
@@ -618,9 +570,9 @@ public class ContactListActivity extends ListActivity {
             return false;
         }
         int position = info.position;
-        
+
         addToRecent(position);
-        
+
         switch (item.getItemId()) {
         case R.string.view:
             openDetailScreen(position);
@@ -647,7 +599,7 @@ public class ContactListActivity extends ListActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    
+
     private void sortList(String sortOrder) {
         String selection = null;
         if (MODE == Util.ASSIGNED_ITEMS_MODE) {
@@ -659,33 +611,34 @@ public class ContactListActivity extends ListActivity {
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
     }
-	void addToRecent(int position) {
-		ContentValues modifiedValues = new ContentValues();
-		// push the selected record into recent table
+
+    void addToRecent(int position) {
+        ContentValues modifiedValues = new ContentValues();
+        // push the selected record into recent table
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
-        
+
         String[] moduleSel = mDbHelper.getModuleListSelections(mModuleName);
         Log.e(LOG_TAG, "Name1:" + cursor.getString(2));
         if (moduleSel.length >= 2)
-        Log.e(LOG_TAG, "Name2:" + cursor.getString(3));
-        //now insert into recent table
+            Log.e(LOG_TAG, "Name2:" + cursor.getString(3));
+        // now insert into recent table
         Log.e(LOG_TAG, "Inserting:" + cursor.getString(2));
-        modifiedValues.put(Recent.ACTUAL_ID, cursor.getInt(0)+"");
+        modifiedValues.put(Recent.ACTUAL_ID, cursor.getInt(0) + "");
         modifiedValues.put(Recent.BEAN_ID, cursor.getString(1));
         modifiedValues.put(Recent.NAME_1, cursor.getString(2));
         modifiedValues.put(Recent.NAME_2, cursor.getString(3));
         modifiedValues.put(Recent.REF_MODULE_NAME, mModuleName);
         modifiedValues.put(Recent.DELETED, "0");
         Uri insertResultUri = getApplicationContext().getContentResolver().insert(Recent.CONTENT_URI, modifiedValues);
-       /* values.put(SugarCRMContent.SUGAR_BEAN_ID, "Sync" + UUID.randomUUID());
-        Uri insertResultUri = mContext.getContentResolver().insert(mUri, values);
-        // after success url insertion, we set the updatedRow to 1 so we don't get a
-        // fail msg
-        updatedRows = 1;*/
+        /*
+         * values.put(SugarCRMContent.SUGAR_BEAN_ID, "Sync" + UUID.randomUUID()); Uri
+         * insertResultUri = mContext.getContentResolver().insert(mUri, values); // after success
+         * url insertion, we set the updatedRow to 1 so we don't get a // fail msg updatedRows = 1;
+         */
         Log.i(LOG_TAG, "insertResultURi - " + insertResultUri);
-        
-	}
-	
+
+    }
+
     /**
      * <p>
      * showAssignedItems
@@ -698,8 +651,7 @@ public class ContactListActivity extends ListActivity {
         MODE = Util.ASSIGNED_ITEMS_MODE;
         // TODO: get the user name from Account Manager
         String userName = SugarCrmSettings.getUsername(ContactListActivity.this);
-        String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName
-                                        + "'";
+        String selection = ModuleFields.ASSIGNED_USER_NAME + "='" + userName + "'";
         Cursor cursor = managedQuery(getIntent().getData(), mDbHelper.getModuleProjections(mModuleName), selection, null, getSortOrder());
         mAdapter.changeCursor(cursor);
         mAdapter.notifyDataSetChanged();
@@ -760,8 +712,7 @@ public class ContactListActivity extends ListActivity {
         String number = cursor.getString(index);
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "Work number to call:" + number);
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"
-                                        + number));
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
         startActivity(intent);
     }
 
@@ -784,8 +735,7 @@ public class ContactListActivity extends ListActivity {
         String emailAddress = cursor.getString(index);
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "email :" + emailAddress);
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:"
-                                        + emailAddress));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + emailAddress));
         startActivity(intent);
     }
 }

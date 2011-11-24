@@ -26,13 +26,14 @@ import android.widget.TextView;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.Util;
+
 /**
  * RecentListActivity, lists the view projections for all the Recently accessed records.
  * 
  * 
  * @author Jagadeeshwaran K
  */
-public class RecentListActivity extends ListActivity{
+public class RecentListActivity extends ListActivity {
 
     private ListView mListView;
 
@@ -50,15 +51,12 @@ public class RecentListActivity extends ListActivity{
 
     private Uri mModuleUri;
 
-    private boolean mStopLoading = false;
-
     private Uri mIntentUri;
-
 
     // we don't make this final as we may want to use the sugarCRM value
     // dynamically, but prevent
     // others from modiying anyway
-    private static int mMaxResults = 20;
+    // private static int mMaxResults = 20;
 
     private DatabaseHelper mDbHelper;
 
@@ -91,8 +89,7 @@ public class RecentListActivity extends ListActivity{
 
         // If the list is a list of related items, hide the filterImage and
         // allItems image
-        if (intent.getData() != null
-                                        && intent.getData().getPathSegments().size() >= 3) {
+        if (intent.getData() != null && intent.getData().getPathSegments().size() >= 3) {
             findViewById(R.id.filterImage).setVisibility(View.GONE);
             findViewById(R.id.allItems).setVisibility(View.GONE);
         }
@@ -106,9 +103,8 @@ public class RecentListActivity extends ListActivity{
         // mListView.setOnScrollListener(this);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View view,
-                                            int position, long id) {
-            	
+            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+
                 openDetailScreen(position);
             }
         });
@@ -121,7 +117,6 @@ public class RecentListActivity extends ListActivity{
         registerForContextMenu(getListView());
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-            Log.d(LOG_TAG, "Instance count:" + getInstanceCount());
             Log.d(LOG_TAG, "ModuleName:-->" + mModuleName);
         }
 
@@ -173,8 +168,7 @@ public class RecentListActivity extends ListActivity{
     /**
      * GenericCursorAdapter
      */
-    private final class GenericCursorAdapter extends SimpleCursorAdapter
-                                    implements Filterable {
+    private final class GenericCursorAdapter extends SimpleCursorAdapter implements Filterable {
 
         private int realoffset = 0;
 
@@ -182,8 +176,7 @@ public class RecentListActivity extends ListActivity{
 
         private ContentResolver mContent;
 
-        public GenericCursorAdapter(Context context, int layout, Cursor c,
-                                        String[] from, int[] to) {
+        public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
             super(context, layout, c, from, to);
             mContent = context.getContentResolver();
         }
@@ -199,8 +192,7 @@ public class RecentListActivity extends ListActivity{
                 realoffset += count;
                 // Uri uri = getIntent().getData();
                 // TODO - fix this, this is no longer used
-                Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset
-                                                + "/" + limit);
+                Uri newUri = Uri.withAppendedPath(Contacts.CONTENT_URI, realoffset + "/" + limit);
                 Log.d(LOG_TAG, "Changing cursor:" + newUri.toString());
                 final Cursor cursor = managedQuery(newUri, Contacts.LIST_PROJECTION, null, null, Contacts.DEFAULT_SORT_ORDER);
                 CRMContentObserver observer = new CRMContentObserver(new Handler() {
@@ -209,8 +201,6 @@ public class RecentListActivity extends ListActivity{
                     public void handleMessage(Message msg) {
                         super.handleMessage(msg);
                         Log.d(LOG_TAG, "Changing cursor: in handler");
-                        if (cursor.getCount() < mMaxResults)
-                            mStopLoading = true;
                         changeCursor(cursor);
                         mListFooterText.setVisibility(View.GONE);
                         mListFooterProgress.setVisibility(View.GONE);
@@ -269,18 +259,15 @@ public class RecentListActivity extends ListActivity{
             // For some reason the requested item isn't available, do nothing
             return;
         }
-        Log.d(LOG_TAG, "rowId:" + cursor.getString(1)+"BEAN_ID:" + cursor.getString(2)+"MODULE_NAME:" + cursor.getString(3));
-        //use the details available from cursor to open detailed view 
+        Log.d(LOG_TAG, "rowId:" + cursor.getString(1) + "BEAN_ID:" + cursor.getString(2)
+                                        + "MODULE_NAME:" + cursor.getString(3));
+        // use the details available from cursor to open detailed view
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(1));
         detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(2));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, cursor.getString(3));
 
         startActivity(detailIntent);
     }
-
-
-
-
 
     /** {@inheritDoc} */
     @Override
@@ -289,9 +276,8 @@ public class RecentListActivity extends ListActivity{
     }
 
     public void showAssignedItems(View view) {
-    	//keep this empty as the header is used from list view
+        // keep this empty as the header is used from list view
     }
-
 
     /**
      * <p>
@@ -328,8 +314,5 @@ public class RecentListActivity extends ListActivity{
         }
         return sortOrder;
     }
-
-
-
 
 }
