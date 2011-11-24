@@ -151,7 +151,7 @@ public class EditDetailsActivity extends Activity {
         // setContents();
 
         mTask = new LoadContentTask();
-        mTask.execute(null);
+        mTask.execute(null, null, null);
     }
 
     /** {@inheritDoc} */
