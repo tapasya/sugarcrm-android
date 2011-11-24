@@ -321,8 +321,7 @@ public class ModuleDetailsActivity extends Activity {
         @Override
         protected Object doInBackground(Object... params) {
             try {
-                mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
-                setContents();
+                mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));                
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 return Util.FETCH_FAILED;
@@ -341,6 +340,7 @@ public class ModuleDetailsActivity extends Activity {
         protected void onPostExecute(Object result) {
             super.onPostExecute(result);
 
+            setContents();
             // close the cursor irrespective of the result
             if (mCursor != null && !mCursor.isClosed())
                 mCursor.close();
