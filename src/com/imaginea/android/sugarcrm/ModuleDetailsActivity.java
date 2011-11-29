@@ -410,90 +410,95 @@ public class ModuleDetailsActivity extends Activity {
                 // get the attributes of the moduleField
                 ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
 
-                ViewGroup tableRow;
-                TextView textViewForLabel;
-                TextView textViewForValue;
-                // first two columns in the detail projection are ROW_ID and BEAN_ID
-                if (staticRowsCount > rowsCount) {
-                    tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
-                    textViewForLabel = (TextView) tableRow.getChildAt(0);
-                    textViewForValue = (TextView) tableRow.getChildAt(1);
+                if (moduleField != null) {
+	                ViewGroup tableRow;
+	                TextView textViewForLabel;
+	                TextView textViewForValue;
+	                // first two columns in the detail projection are ROW_ID and BEAN_ID
+	                if (staticRowsCount > rowsCount) {
+	                    tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
+	                    textViewForLabel = (TextView) tableRow.getChildAt(0);
+	                    textViewForValue = (TextView) tableRow.getChildAt(1);
+	                } else {
+	                    tableRow = (ViewGroup) inflater.inflate(R.layout.table_row, null);
+	                    textViewForLabel = (TextView) tableRow.getChildAt(0);
+	                    textViewForValue = (TextView) tableRow.getChildAt(1);
+	                }
+	
+	                // set the title
+	                if (titleFields.contains(fieldName)) {
+	                    title = title + tempValue + " ";
+	                    publishProgress(HEADER, fieldName, textViewForTitle, title);
+	                    continue;
+	                }
+	                
+	                String label = moduleField.getLabel();
+	                
+	
+	                // check for the billing and shipping address groups only if the module is
+	                // 'Accounts'
+	                if (Util.ACCOUNTS.equals(mModuleName)) {
+	                    if (billingAddressGroup.contains(fieldName)) {
+	                        if (fieldName.equals(ModuleFields.BILLING_ADDRESS_STREET)) {
+	                            // First field in the group
+	                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
+	                            continue;
+	                        } else if (fieldName.equals(ModuleFields.BILLING_ADDRESS_COUNTRY)) {
+	                            // last field in the group
+	
+	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
+	                            label = getBaseContext().getString(R.string.billing_address);
+	                        } else {
+	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
+	                            continue;
+	                        }
+	                    } else if (shippingAddressGroup.contains(fieldName)) {
+	                        if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_STREET)) {
+	                            // First field in the group
+	                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
+	                            continue;
+	                        } else if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_COUNTRY)) {
+	                            // Last field in the group
+	
+	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
+	                            label = getBaseContext().getString(R.string.shipping_address);
+	                        } else {
+	
+	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
+	                            continue;
+	                        }
+	                    } else {
+	                        value = tempValue;
+	                    }
+	                } else if (durationGroup.contains(fieldName)) {
+	                    if (fieldName.equals(ModuleFields.DURATION_HOURS)) {
+	                        // First field in the group
+	                        value = (!TextUtils.isEmpty(tempValue)) ? tempValue + "hr " : "";
+	                        continue;
+	                    } else if (fieldName.equals(ModuleFields.DURATION_MINUTES)) {
+	                        // Last field in the group
+	                        value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + "mins " : "");
+	                        label = getBaseContext().getString(R.string.duration);
+	                    }
+	                } else {
+	                    value = tempValue;
+	                }
+	
+	                if (moduleField.getType().equals("phone"))
+	                    textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
+	
+	                int command = staticRowsCount < rowsCount ? DYNAMIC_ROW : STATIC_ROW;
+	
+	                if (!TextUtils.isEmpty(value)) {
+	                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, value);
+	                } else {
+	                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, getString(R.string.notAvailable));
+	                }
+	
+	                rowsCount++;
                 } else {
-                    tableRow = (ViewGroup) inflater.inflate(R.layout.table_row, null);
-                    textViewForLabel = (TextView) tableRow.getChildAt(0);
-                    textViewForValue = (TextView) tableRow.getChildAt(1);
+                	// module fields is null
                 }
-
-                // set the title
-                if (titleFields.contains(fieldName)) {
-                    title = title + tempValue + " ";
-                    publishProgress(HEADER, fieldName, textViewForTitle, title);
-                    continue;
-                }
-
-                String label = moduleField.getLabel();
-
-                // check for the billing and shipping address groups only if the module is
-                // 'Accounts'
-                if (Util.ACCOUNTS.equals(mModuleName)) {
-                    if (billingAddressGroup.contains(fieldName)) {
-                        if (fieldName.equals(ModuleFields.BILLING_ADDRESS_STREET)) {
-                            // First field in the group
-                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
-                            continue;
-                        } else if (fieldName.equals(ModuleFields.BILLING_ADDRESS_COUNTRY)) {
-                            // last field in the group
-
-                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
-                            label = getBaseContext().getString(R.string.billing_address);
-                        } else {
-                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
-                            continue;
-                        }
-                    } else if (shippingAddressGroup.contains(fieldName)) {
-                        if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_STREET)) {
-                            // First field in the group
-                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
-                            continue;
-                        } else if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_COUNTRY)) {
-                            // Last field in the group
-
-                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
-                            label = getBaseContext().getString(R.string.shipping_address);
-                        } else {
-
-                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
-                            continue;
-                        }
-                    } else {
-                        value = tempValue;
-                    }
-                } else if (durationGroup.contains(fieldName)) {
-                    if (fieldName.equals(ModuleFields.DURATION_HOURS)) {
-                        // First field in the group
-                        value = (!TextUtils.isEmpty(tempValue)) ? tempValue + "hr " : "";
-                        continue;
-                    } else if (fieldName.equals(ModuleFields.DURATION_MINUTES)) {
-                        // Last field in the group
-                        value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + "mins " : "");
-                        label = getBaseContext().getString(R.string.duration);
-                    }
-                } else {
-                    value = tempValue;
-                }
-
-                if (moduleField.getType().equals("phone"))
-                    textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
-
-                int command = staticRowsCount < rowsCount ? DYNAMIC_ROW : STATIC_ROW;
-
-                if (!TextUtils.isEmpty(value)) {
-                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, value);
-                } else {
-                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, getString(R.string.notAvailable));
-                }
-
-                rowsCount++;
 
             }
         }

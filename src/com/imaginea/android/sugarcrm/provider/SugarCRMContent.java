@@ -492,7 +492,7 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, /*ACCOUNT_NAME*/
                 START_DATE, DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME, DESCRIPTION,
                 CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
 
@@ -544,7 +544,7 @@ public final class SugarCRMContent {
 
         public static final String[] LIST_VIEW_PROJECTION = { NAME, START_DATE };
 
-        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, ACCOUNT_NAME,
+        public static final String[] DETAILS_PROJECTION = { RECORD_ID, BEAN_ID, NAME, /*ACCOUNT_NAME*/
                 STATUS, LOCATION, START_DATE, DURATION_HOURS, DURATION_MINUTES, ASSIGNED_USER_NAME,
                 DESCRIPTION, CREATED_BY_NAME, DATE_ENTERED, DATE_MODIFIED, DELETED };
 

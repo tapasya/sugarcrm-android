@@ -515,8 +515,10 @@ public class SugarSyncManager {
         String url = pref.getString(Util.PREF_REST_URL, context.getString(R.string.defaultUrl));
 
         try {
-            if (userModules == null || userModules.size() == 0)
+            if (userModules == null || userModules.size() == 0) {
+            	//Log.d(LOG_TAG, "No user modules available in the database. Trying to get available modules from the server.");
                 userModules = RestUtil.getAvailableModules(url, sessionId);
+            }
             // Log.i(LOG_TAG, "userModules : " + userModules.size());
             databaseHelper.setUserModules(userModules);
         } catch (SugarCrmException e) {

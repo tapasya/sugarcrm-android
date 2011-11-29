@@ -109,8 +109,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             case Util.SYNC_ALL_META_DATA:
                 // should be used once for one time set-up
                 boolean modulesSyncd = SugarSyncManager.syncModules(mContext, account.name, sessionId);
+                //Log.d(LOG_TAG, "syncModules done. success: " + modulesSyncd);
+                
                 boolean aclAccessSyncd = SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
+                //Log.d(LOG_TAG, "ACL access aync done. success: " + aclAccessSyncd);
+                
                 boolean usersSyncd = SugarSyncManager.syncUsersList(mContext, sessionId);
+                //Log.d(LOG_TAG, "Users aync done. success: " + usersSyncd);
+                
                 if (modulesSyncd && aclAccessSyncd & usersSyncd) {
                     Editor editor = pref.edit();
                     editor.putBoolean(Util.SYNC_METADATA_COMPLETED, true);

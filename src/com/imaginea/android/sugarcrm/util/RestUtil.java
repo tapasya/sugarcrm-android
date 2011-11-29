@@ -898,6 +898,7 @@ public class RestUtil {
             List<String> modules = new ArrayList<String>();
             for (int i = 0; i < modulesArray.length(); i++) {
                 String module = modulesArray.getString(i).toString();
+                //Log.d(LOG_TAG, "getAvailableModules: module - " + module);
                 modules.add(module);
             }
 
