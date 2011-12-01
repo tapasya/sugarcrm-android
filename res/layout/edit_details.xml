@@ -44,8 +44,8 @@
 		<Button
 	           android:id="@+id/save"
 	           android:layout_width="fill_parent"
-	           android:layout_height="fill_parent"
-	           android:layout_gravity="center_horizontal"           
+	           android:layout_height="fill_parent" 
+	           android:gravity="center_horizontal"       
 	           android:text="@string/save"
 	           android:onClick="saveModuleItem"
 	           android:visibility="gone"/>

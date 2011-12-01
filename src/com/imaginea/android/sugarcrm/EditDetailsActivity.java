@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.provider.BaseColumns;
+import android.provider.ContactsContract;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,8 +34,10 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Accounts;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.UserColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Users;
+import com.imaginea.android.sugarcrm.util.ImportContactsUtility;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
+import com.imaginea.android.sugarcrm.util.Validation;
 import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import java.util.LinkedHashMap;
@@ -60,6 +64,8 @@ public class EditDetailsActivity extends Activity {
     private String mModuleName;
 
     private String mRowId;
+
+    private int importFlag;
 
     private String[] mSelectFields;
 
@@ -112,7 +118,7 @@ public class EditDetailsActivity extends Activity {
         if (extras != null) {
             // i always get the module name
             mModuleName = extras.getString(RestUtilConstants.MODULE_NAME);
-
+            importFlag = extras.getInt(Util.IMPORT_FLAG);
             mRowId = intent.getStringExtra(Util.ROW_ID);
             mSugarBeanId = intent.getStringExtra(RestUtilConstants.BEAN_ID);
         }
@@ -142,16 +148,18 @@ public class EditDetailsActivity extends Activity {
         mSelectFields = mDbHelper.getModuleProjections(mModuleName);
 
         /*
-         * if (MODE == Util.EDIT_ORPHAN_MODE || MODE ==
-         * Util.EDIT_RELATIONSHIP_MODE) { mCursor =
-         * getContentResolver().query(getIntent().getData(), mSelectFields,
-         * null, null, mDbHelper.getModuleSortOrder(mModuleName)); }
+         * if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) { mCursor =
+         * getContentResolver().query(getIntent().getData(), mSelectFields, null, null,
+         * mDbHelper.getModuleSortOrder(mModuleName)); }
          */
         // startManagingCursor(mCursor);
         // setContents();
 
         mTask = new LoadContentTask();
         mTask.execute(null, null, null);
+
+        if (importFlag == Util.CONTACT_IMPORT_FLAG)
+            importContact();
     }
 
     /** {@inheritDoc} */
@@ -206,11 +214,9 @@ public class EditDetailsActivity extends Activity {
             super.onPreExecute();
 
             TextView tv = (TextView) findViewById(R.id.headerText);
-            if (MODE == Util.EDIT_ORPHAN_MODE
-                                            || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+            if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                 tv.setText(String.format(getString(R.string.editDetailsHeader), mModuleName));
-            } else if (MODE == Util.NEW_ORPHAN_MODE
-                                            || MODE == Util.NEW_RELATIONSHIP_MODE) {
+            } else if (MODE == Util.NEW_ORPHAN_MODE || MODE == Util.NEW_RELATIONSHIP_MODE) {
                 tv.setText(String.format(getString(R.string.newDetailsHeader), mModuleName));
             }
 
@@ -232,15 +238,21 @@ public class EditDetailsActivity extends Activity {
 
             case STATIC_ROW:
                 String fieldName = (String) values[1];
-
+                // Log.i(TAG, "field Name: "+fieldName);
                 View editRow = (View) values[2];
+                // Log.i(TAG, "view: "+editRow);
                 editRow.setVisibility(View.VISIBLE);
 
                 TextView labelView = (TextView) values[3];
+                // Log.i(TAG, "labelview: "+values[3]+" - "+labelView);
                 labelView.setText((String) values[4]);
+                // Log.i(TAG, "label: "+values[4]);
                 AutoCompleteTextView valueView = (AutoCompleteTextView) values[5];
+                valueView.setTag(fieldName);
+                Log.i(TAG, "edittextview: " + valueView.getTag());
                 String editTextValue = (String) values[6];
                 valueView.setText(editTextValue);
+                // Log.i(TAG, "edittext: "+valueView.getText());
 
                 // set the adapter to auto-suggest
                 if (!Util.ACCOUNTS.equals(mModuleName)
@@ -251,10 +263,10 @@ public class EditDetailsActivity extends Activity {
                     if (MODE == Util.NEW_RELATIONSHIP_MODE) {
 
                         // get the module name from the URI
-                        String module = (String) mIntentUri.getPathSegments().get(0);
+                        String module = mIntentUri.getPathSegments().get(0);
 
                         // only if the module is directly related with the
-                        // Accounts module
+                        // Accounts modulemenu in
                         if (Util.ACCOUNTS.equals(module)) {
 
                             if (mDbHelper == null)
@@ -263,8 +275,7 @@ public class EditDetailsActivity extends Activity {
                             // get the account name using the account row id in
                             // the URI
                             int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
-                            String selection = AccountsColumns.ID + "="
-                                                            + accountRowId;
+                            String selection = AccountsColumns.ID + "=" + accountRowId;
                             Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
                             cursor.moveToFirst();
                             String accountName = cursor.getString(2);
@@ -287,8 +298,7 @@ public class EditDetailsActivity extends Activity {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
 
-                        if (MODE == Util.EDIT_ORPHAN_MODE
-                                                        || MODE == Util.EDIT_RELATIONSHIP_MODE)
+                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
                             // store the account name in mAccountName if the
                             // bean is already related
                             // to an account
@@ -301,8 +311,7 @@ public class EditDetailsActivity extends Activity {
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
 
-                    if (MODE == Util.EDIT_ORPHAN_MODE
-                                                    || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                    if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                         // store the user name in mUserName if the bean is
                         // already assigned to a
                         // user
@@ -322,6 +331,7 @@ public class EditDetailsActivity extends Activity {
                 labelView = (TextView) values[3];
                 labelView.setText((String) values[4]);
                 valueView = (AutoCompleteTextView) values[5];
+                valueView.setTag(fieldName);
                 editTextValue = (String) values[6];
                 valueView.setText(editTextValue);
 
@@ -334,7 +344,7 @@ public class EditDetailsActivity extends Activity {
                     if (MODE == Util.NEW_RELATIONSHIP_MODE) {
 
                         // get the module name from the URI
-                        String module = (String) mIntentUri.getPathSegments().get(0);
+                        String module = mIntentUri.getPathSegments().get(0);
 
                         // only if the module is directly related with the
                         // Accounts module
@@ -346,8 +356,7 @@ public class EditDetailsActivity extends Activity {
                             // get the account name using the account row id in
                             // the URI
                             int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
-                            String selection = AccountsColumns.ID + "="
-                                                            + accountRowId;
+                            String selection = AccountsColumns.ID + "=" + accountRowId;
                             Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
                             cursor.moveToFirst();
                             String accountName = cursor.getString(2);
@@ -370,8 +379,7 @@ public class EditDetailsActivity extends Activity {
                         valueView.setAdapter(mAccountAdapter);
                         valueView.setOnItemClickListener(new AccountsClickedItemListener());
 
-                        if (MODE == Util.EDIT_ORPHAN_MODE
-                                                        || MODE == Util.EDIT_RELATIONSHIP_MODE)
+                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
                             // store the account name in mAccountName if the
                             // bean is already related
                             // to an account
@@ -384,8 +392,7 @@ public class EditDetailsActivity extends Activity {
                     valueView.setAdapter(mUserAdapter);
                     valueView.setOnItemClickListener(new UsersClickedItemListener());
 
-                    if (MODE == Util.EDIT_ORPHAN_MODE
-                                                    || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                    if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                         // store the user name in mUserName if the bean is
                         // already assigned to a
                         // user
@@ -409,8 +416,7 @@ public class EditDetailsActivity extends Activity {
         @Override
         protected Object doInBackground(Object... params) {
             try {
-                if (MODE == Util.EDIT_ORPHAN_MODE
-                                                || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                     mCursor = getContentResolver().query(Uri.withAppendedPath(mDbHelper.getModuleUri(mModuleName), mRowId), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
                 }
                 setContents();
@@ -447,7 +453,6 @@ public class EditDetailsActivity extends Activity {
                 findViewById(R.id.save).setVisibility(View.VISIBLE);
                 break;
             default:
-
             }
 
             mProgressDialog.cancel();
@@ -460,12 +465,11 @@ public class EditDetailsActivity extends Activity {
             if (mDbHelper == null)
                 mDbHelper = new DatabaseHelper(getBaseContext());
 
-            if (MODE == Util.EDIT_ORPHAN_MODE
-                                            || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+            if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                 if (!isCancelled()) {
                     mCursor.moveToFirst();
                     mSugarBeanId = mCursor.getString(1); // beanId has
-                                                         // columnIndex 1
+                    // columnIndex 1
                 }
             }
 
@@ -515,8 +519,7 @@ public class EditDetailsActivity extends Activity {
                     command = DYNAMIC_ROW;
                 }
 
-                if (MODE == Util.EDIT_ORPHAN_MODE
-                                                || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
                     String value = mCursor.getString(mCursor.getColumnIndex(fieldName));
                     if (!TextUtils.isEmpty(value)) {
                         publishProgress(command, fieldName, tableRow, textViewForLabel, label, editTextForValue, value);
@@ -536,8 +539,7 @@ public class EditDetailsActivity extends Activity {
         /*
          * takes care of basic validation automatically for some fields
          */
-        private void setInputType(TextView editTextForValue,
-                                        ModuleField moduleField) {
+        private void setInputType(TextView editTextForValue, ModuleField moduleField) {
             if (Log.isLoggable(TAG, Log.VERBOSE))
                 Log.v(TAG, "ModuleField type:" + moduleField.getType());
             if (moduleField.getType().equals("phone")) {
@@ -562,8 +564,7 @@ public class EditDetailsActivity extends Activity {
         String[] detailsProjection = mSelectFields;
 
         Map<String, String> modifiedValues = new LinkedHashMap<String, String>();
-        if (MODE == Util.EDIT_ORPHAN_MODE
-                                        || MODE == Util.EDIT_RELATIONSHIP_MODE)
+        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
             modifiedValues.put(RestUtilConstants.ID, mSugarBeanId);
 
         Uri uri = getIntent().getData();
@@ -581,12 +582,33 @@ public class EditDetailsActivity extends Activity {
 
             AutoCompleteTextView editText = (AutoCompleteTextView) ((ViewGroup) mDetailsTable.getChildAt(rowsCount)).getChildAt(1);
             String fieldValue = editText.getText().toString();
-            Log.i(TAG, fieldName + " : " + fieldValue);
+
+            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))) {
+                if (Validation.isNotEmpty(fieldValue) && !Validation.isEmailValid(fieldValue)) {
+                    editText.setError(getString(R.string.emailValidationErrorMsg));
+                    hasError = true;
+                }
+            }
+
+            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
+                                            || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                if (Validation.isNotEmpty(fieldValue) && !Validation.isPhoneNumberValid(fieldValue)) {
+                    editText.setError(getString(R.string.phNoValidationErrorMsg));
+                    hasError = true;
+                }
+            }
+
+            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))
+                                            || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))) {
+                if (!Validation.isNotEmpty(fieldValue)) {
+                    editText.setError(String.format(this.getString(R.string.emptyValidationErrorMsg), fieldName));
+                    hasError = true;
+                }
+            }
 
             // TODO: validation
 
-            if (!Util.ACCOUNTS.equals(mModuleName)
-                                            && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
+            if (!Util.ACCOUNTS.equals(mModuleName) && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
 
                 if (!TextUtils.isEmpty(fieldValue)) {
 
@@ -618,7 +640,8 @@ public class EditDetailsActivity extends Activity {
                         // error
                         if (editText.isEnabled()) {
                             // if the user just enters some value without
-                            // selecting from the
+                            // selecting((ViewGroup)
+                            // mDetailsTable.getChildAt(rowsCount)).getChildAt(1) from the
                             // auto-suggest
                             hasError = true;
                             editText.setError(getString(R.string.accountNameErrorMsg));
@@ -683,9 +706,83 @@ public class EditDetailsActivity extends Activity {
             }
 
             // finish();
+        } else {
+            ViewUtil.makeToast(getBaseContext(), R.string.validationErrorMsg);
+            mProgressDialog.cancel();
         }
         ViewUtil.dismissVirtualKeyboard(getBaseContext(), v);
     }
+
+    public void importContact() {
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(intent, Util.IMPORT_CONTACTS_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+
+        switch (reqCode) {
+        case (Util.IMPORT_CONTACTS_REQUEST_CODE):
+            if (resultCode == Activity.RESULT_OK) {
+                getContactInfo(data);
+            }
+            break;
+        }
+    }
+
+    protected void getContactInfo(Intent intent) {
+
+        Cursor cursor = managedQuery(intent.getData(), null, null, null, null);
+        while (cursor.moveToNext()) {
+            String contactId = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
+
+            Cursor nameCursor = getApplicationContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, ContactsContract.Data.MIMETYPE
+                                            + " = ? AND "
+                                            + ContactsContract.RawContactsEntity.CONTACT_ID
+                                            + " = ? ", new String[] {
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE, contactId }, null);
+
+            while (nameCursor.moveToNext()) {
+                String givenName = nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
+                String familyName = nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))).setText(givenName);
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))).setText(familyName);
+            }
+            nameCursor.close();
+
+            String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+
+            if (hasPhone.equalsIgnoreCase("1"))
+                hasPhone = "true";
+            else
+                hasPhone = "false";
+
+            if (Boolean.parseBoolean(hasPhone)) {
+                Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID
+                                                + " = " + contactId, null, null);
+                while (phones.moveToNext()) {
+                    String contactPhno = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                    if (ContactsContract.CommonDataKinds.Phone.TYPE_WORK == type)
+                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))).setText(contactPhno);
+                    if (ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE == type)
+                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))).setText(contactPhno);
+                }
+                phones.close();
+            }
+
+            Cursor emails = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID
+                                            + " = " + contactId, null, null);
+            while (emails.moveToNext()) {
+                String contactEmail = emails.getString(emails.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))).setText(contactEmail);
+            }
+            emails.close();
+        }
+        cursor.close();
+
+    }// getContactInfo
 
     /** {@inheritDoc} */
     @Override
@@ -713,13 +810,14 @@ public class EditDetailsActivity extends Activity {
     }
 
     /*
-     * Status Handler, Handler updates the screen based on messages sent by the
-     * SugarService or any tasks
+     * Status Handler, Handler updates the screen based on messages sent by the SugarService or any
+     * tasks
      */
     private class StatusHandler extends Handler {
         StatusHandler() {
         }
 
+        @Override
         public void handleMessage(Message message) {
             switch (message.what) {
             case R.id.status:
@@ -733,8 +831,7 @@ public class EditDetailsActivity extends Activity {
         }
     }
 
-    public static class AutoSuggestAdapter extends CursorAdapter implements
-                                    Filterable {
+    public static class AutoSuggestAdapter extends CursorAdapter implements Filterable {
         protected ContentResolver mContent;
 
         protected DatabaseHelper mDbHelper;
@@ -792,9 +889,7 @@ public class EditDetailsActivity extends Activity {
             }
 
             if (Log.isLoggable(TAG, Log.DEBUG))
-                Log.d(TAG, "constraint "
-                                                + (constraint != null ? constraint.toString()
-                                                                                : ""));
+                Log.d(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
 
             return mContent.query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, buffer == null ? null
                                             : buffer.toString(), args, Accounts.DEFAULT_SORT_ORDER);
@@ -824,21 +919,17 @@ public class EditDetailsActivity extends Activity {
             }
 
             if (Log.isLoggable(TAG, Log.DEBUG))
-                Log.d(TAG, "constraint "
-                                                + (constraint != null ? constraint.toString()
-                                                                                : ""));
+                Log.d(TAG, "constraint " + (constraint != null ? constraint.toString() : ""));
 
             return mContent.query(mDbHelper.getModuleUri(Util.USERS), Users.DETAILS_PROJECTION, buffer == null ? null
                                             : buffer.toString(), args, null);
         }
     }
 
-    public class AccountsClickedItemListener implements
-                                    AdapterView.OnItemClickListener {
+    public class AccountsClickedItemListener implements AdapterView.OnItemClickListener {
 
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view,
-                                        int position, long l) {
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
             try {
                 // Remembers the selected account name
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
@@ -850,12 +941,10 @@ public class EditDetailsActivity extends Activity {
         }
     }
 
-    public class UsersClickedItemListener implements
-                                    AdapterView.OnItemClickListener {
+    public class UsersClickedItemListener implements AdapterView.OnItemClickListener {
 
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view,
-                                        int position, long l) {
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
             try {
                 // Remembers the selected username
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);

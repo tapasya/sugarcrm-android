@@ -1,135 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- Application name -->
-	<string name="appName">iCRM- Android</string>
-	<string name="appProviderDesc">Provider for Accounts, Contacts, Leads,
+
+    <!-- Application name -->
+    <string name="appName">iCRM- Android</string>
+    <string name="appProviderDesc">Provider for Accounts, Contacts, Leads,
 		Opportunities and other modules of Sugar CRM</string>
+    <string name="home">Home</string>
 
-	<string name="home">Home</string>
+    <!-- Sugar CRM Settings -->
+    <string name="userSummary">The username you use to log in to Sugar</string>
+    <string name="pwdSummary">The password associated to your username</string>
+    <string name="urlSummary">The REST URL of SugarCRM</string>
 
-	<!-- Sugar CRM Settings  -->
-	<string name="userSummary">The username you use to log in to Sugar</string>
-	<string name="pwdSummary">The password associated to your username</string>
-	<string name="urlSummary">The REST URL of SugarCRM</string>
-
-	<!-- default values for settings -->
-	<!--
+    <!-- default values for settings -->
+    <!--
 		string
 		name="default_url">http://demo.sugarcrm.com/sugarcrm/service/v2/rest.php</string
-	-->
+    -->
 
-	<string name="defaultUrl">http://192.168.6.61/sugarcrm6/service/v2/rest.php
-	</string>
-	<string name="defaultUser">sugaradmin</string>
-	<string name="defaultPwd">sugaradmin</string>
+    <string name="defaultUrl">http://192.168.1.83/sugarcrm/service/v2/rest.php</string>
+    <string name="defaultUser">will</string>
+    <string name="defaultPwd">will</string>
 
-	<!-- Modules -->
-	<string name="contacts">Contacts</string>
-	<string name="accounts">Accounts</string>
-	<string name="leads">Leads</string>
-	<string name="opportunities">Opportunities</string>
+    <!-- Modules -->
+    <string name="contacts">Contacts</string>
+    <string name="accounts">Accounts</string>
+    <string name="leads">Leads</string>
+    <string name="opportunities">Opportunities</string>
+    <string name="settings">Settings</string>
+    <string name="recent">Recent</string>
+    <string name="settingsSummary">Change the SUGARCRM URL</string>
+    <string name="syncSummary">Select Sync Filters and start a Sync</string>
+    <string name="sortSummary">Set the sort order for the modules</string>
 
-	<string name="settings">Settings</string>
-	<string name="recent">Recent</string>
-	<string name="settingsSummary">Change the SUGARCRM URL</string>
-	<string name="syncSummary">Select Sync Filters and start a Sync</string>
-	<string name="sortSummary">Set the sort order for the modules</string>
-
-	<!-- Login Module -->
-	<string name="sugarCrmUrlHeader">SUGARCRM REST URL</string>
-	<string name="login">Login</string>
-	<string name="username">Username</string>
-	<string name="password">Password</string>
-	<string name="rememberPassword">Remember Password</string>
-	<string name="signIn">Sign in</string>
-	<string name="validFieldMsg">Please enter a valid </string>
-	<string name="authenticatingMsg">Authenticating\u2026</string>
-	<string name="configureAppMsg">Configuring application\u2026</string>
-
-	<string name="appNotConfigMsg">Application did not configure cleanly, please try
+    <!-- Login Module -->
+    <string name="sugarCrmUrlHeader">SUGARCRM REST URL</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="rememberPassword">Remember Password</string>
+    <string name="signIn">Sign in</string>
+    <string name="validFieldMsg">Please enter a valid </string>
+    <string name="authenticatingMsg">Authenticating\u2026</string>
+    <string name="configureAppMsg">Configuring application\u2026</string>
+    <string name="appNotConfigMsg">Application did not configure cleanly, please try
 		again !!!</string>
-	<!-- Wizard -->
-	<string name="restUrl">Enter your SUGARCRM REST Url</string>
-	<string name="wizard_url_status_message">REST Url</string>
+    <!-- Wizard -->
+    <string name="restUrl">Enter your SUGARCRM REST Url</string>
+    <string name="wizard_url_status_message">REST Url</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="finish">Finish</string>
+    <string name="next">Next</string>
+    <string name="urlDesc">Example: %s</string>
 
-	<string name="back">Back</string>
-	<string name="cancel">Cancel</string>
-	<string name="finish">Finish</string>
-	<string name="next">Next</string>
-	<string name="urlDesc">Example: %s</string>
-	
+    <!-- Details Screen Context Menu -->
+    <string name="options">Options</string>
+    <string name="view">View</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="call">Call</string>
+    <string name="email">Email</string>
 
-	<!-- Details Screen Context Menu-->
-	<string name="options">Options</string>
-	<string name="view">View</string>
-	<string name="edit">Edit</string>
-	<string name="delete">Delete</string>
-	<string name="call">Call</string>
-	<string name="email">Email</string>
+    <!-- Contacts Details -->
+    <string name="addContact">Add Contact</string>
+    <string name="contactDetails">Contact Details</string>
+    <string name="editDetails">Edit details</string>
+    <string name="notAvailable">Not Available</string>
+    <string name="loadFailed">Load failed</string>
 
-	<!-- Contacts Details -->
-	<string name="addContact">Add Contact</string>
-	<string name="contactDetails">Contact Details</string>
+    <!-- Search -->
+    <string name="searchHint">Search SugarCRM</string>
+    <string name="search">Search</string>
+    <string name="searching">Searching...</string>
+    <string name="searchresults">Search Results</string>
+    <string name="searchResultsHeaderText"> : Search results</string>
 
-	<string name="editDetails">Edit details</string>
+    <!-- Menu items - not present above -->
+    <string name="addItem">Add</string>
+    <string name="related">Related</string>
+    <string name="noResults">No results found</string>
+    <string name="syncSettings">Sync Settings</string>
+    <string name="dateFilters">Date Filters</string>
+    <string name="startDate">Start Date</string>
+    <string name="endDate">End Date</string>
+    <string name="detailsHeader">%s Details</string>
+    <string name="editDetailsHeader">Edit %s Details</string>
+    <string name="newDetailsHeader">New %s Details</string>
+    <string name="save">Save</string>
+    <string name="importContact">Import Contact</string>
+    <string name="deleteAlert">Are you sure you want to delete?</string>
+    <string name="syncSuccess">Sync Successful</string>
+    <string name="syncFailed">Sync Failed</string>
+    <string name="syncMessage">Synced %d records</string>
+    <string name="sort">Sort</string>
+    <string name="descending">Descending</string>
+    <string name="ascending">Ascending</string>
+    <string name="sortBy">Sort by</string>
+    <string name="syncNow">Sync Now</string>
+    <string name="syncLater">Sync Later</string>
+    <string name="syncCancel">Cancel Sync</string>
+    <string name="updateFailed">Failed to %s</string>
+    <string name="serverUpdateFailed">Failed to %s on the server</string>
+    <string name="serverUpdateSuccess">%s successful</string>
+    <string name="insert">Insert</string>
+    <string name="update">Update</string>
 
-	<string name="notAvailable">Not Available</string>
-	<string name="loadFailed">Load failed</string>
-
-	<!-- Search -->
-	<string name="searchHint">Search SugarCRM</string>
-	<string name="search">Search</string>
-	<string name="searching">Searching...</string>
-	<string name="searchresults">Search Results</string>
-	<string name="searchResultsHeaderText"> : Search results</string>
-
-	<!-- Menu items - not present above-->
-	<string name="addItem">Add</string>
-	<string name="related">Related</string>
-
-	<string name="noResults">No results found</string>
-
-	<string name="syncSettings">Sync Settings</string>
-	<string name="dateFilters">Date Filters</string>
-	<string name="startDate">Start Date</string>
-	<string name="endDate">End Date</string>
-	<string name="detailsHeader">%s Details</string>
-	<string name="editDetailsHeader">Edit %s Details</string>
-	<string name="newDetailsHeader">New %s Details</string>
-	<string name="save">Save</string>
-	<string name="deleteAlert">Are you sure you want to delete?</string>
-	<string name="syncSuccess">Sync Successful</string>
-	<string name="syncFailed">Sync Failed</string>
-	<string name="syncMessage">Synced %d records</string>
-	<string name="sort">Sort</string>
-	<string name="descending">Descending</string>
-	<string name="ascending">Ascending</string>
-	<string name="sortBy">Sort by</string>
-	<string name="syncNow">Sync Now</string>
-	<string name="syncLater">Sync Later</string>
-	<string name="syncCancel">Cancel Sync</string>
-
-	<string name="updateFailed">Failed to %s</string>
-	<string name="serverUpdateFailed">Failed to %s on the server</string>
-	<string name="serverUpdateSuccess">%s successful</string>
-	<string name="insert">Insert</string>
-	<string name="update">Update</string>
-	
-	<!-- Titles for the groups -->
-	<string name="billing_address">Billing Address</string>
+    <!-- Titles for the groups -->
+    <string name="billing_address">Billing Address</string>
     <string name="shipping_address">Shipping Address</string>
     <string name="duration">Duration</string>
-    
+
     <!-- Error messages for validations in EditDetailsActivity -->
     <string name="accountNameErrorMsg">Account name has to be selected only from the auto-suggest drop down!</string>
     <string name="userNameErrorMsg">User name has to be selected only from the auto-suggest drop down!</string>
-    
+    <string name="validationErrorMsg">Please fix the validation errors before saving</string>
+    <string name="emailValidationErrorMsg">Enter a valid Email</string>
+    <string name="phNoValidationErrorMsg">Enter a valid Phone number</string>
+    <string name="emptyValidationErrorMsg">%s is mandatory</string>
+
     <!-- sort settings -->
     <string name="sortSettings">Module sort settings</string>
-	<string name="module">Module</string>
-	<string name="moduleField">Field name</string>
-	<string name="settingsSaved">Settings saved!</string>
-	<string name="saving">Saving...</string>
-	
-	<string name="loading">Loading...</string>
+    <string name="module">Module</string>
+    <string name="moduleField">Field name</string>
+    <string name="settingsSaved">Settings saved!</string>
+    <string name="saving">Saving...</string>
+    <string name="loading">Loading...</string>
+
 </resources>

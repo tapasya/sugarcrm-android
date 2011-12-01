@@ -55,22 +55,23 @@ public class AclTest extends RestAPITest {
                 if (roleBeans != null) {
                     // get the beanIds of the roles that are inserted
                     roleIds = dbHelper.insertRoles(roleBeans);
-                }
-
-                // get the acl actions for each roleId
-                for (String roleId : roleIds) {
-                    if (Log.isLoggable(TAG, Log.DEBUG))
-                        Log.d(TAG, "roleId - " + roleId);
-                    // get the aclRole along with the acl actions associated
-                    SugarBean roleBean = RestUtil.getEntry(url, mSessionId, Util.ACLROLES, roleId, ACLRoles.INSERT_PROJECTION, linkNameToFieldsArrayForActions);
-                    SugarBean[] roleRelationBeans = roleBean.getRelationshipBeans("actions");
-                    if (roleRelationBeans != null) {
-                        dbHelper.insertActions(roleId, roleRelationBeans);
+                    
+                 // get the acl actions for each roleId
+                    for (String roleId : roleIds) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "roleId - " + roleId);
+                        // get the aclRole along with the acl actions associated
+                        SugarBean roleBean = RestUtil.getEntry(url, mSessionId, Util.ACLROLES, roleId, ACLRoles.INSERT_PROJECTION, linkNameToFieldsArrayForActions);
+                        SugarBean[] roleRelationBeans = roleBean.getRelationshipBeans("actions");
+                        if (roleRelationBeans != null) {
+                            dbHelper.insertActions(roleId, roleRelationBeans);
+                        }
                     }
                 }
+
             }
         } catch (SugarCrmException sce) {
-            // Log.e(TAG, "" + sce.getMessage());
+            Log.e(TAG, "" + sce.getMessage());
         }
     }
 

@@ -594,7 +594,7 @@ public class UpdateServiceTask extends AsyncServiceTask<Object, Void, Object> {
                 if (serverUpdated) {
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                 } else {
-                    //TODO: check this
+                    // TODO: check this
                     updatedRows = mContext.getContentResolver().update(mUri, values, null, null);
                     if (updatedRows > 0)
                         updateSyncRecord();

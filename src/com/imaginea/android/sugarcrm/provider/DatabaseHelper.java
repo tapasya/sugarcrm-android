@@ -94,9 +94,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CONTACTS_OPPORTUNITIES_TABLE_NAME = "contacts_opportunities";
 
     public static final String CONTACTS_CASES_TABLE_NAME = "contacts_cases";
-    
+
     public static final String LEADS_TABLE_NAME = "leads";
-    
+
     public static final String RECENT_TABLE_NAME = "recent";
 
     public static final String OPPORTUNITIES_TABLE_NAME = "opportunities";
@@ -191,7 +191,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // TODO: as of now, there is no icon for campaigns
         // moduleIcons.put(Util.CAMPAIGNS, R.drawable.campaings);
         moduleIcons.put("Settings", R.drawable.settings);
-        //moduleIcons.put("Recent");
+        // moduleIcons.put("Recent");
 
         // Module Projections
         moduleProjections.put(Util.ACCOUNTS, Accounts.DETAILS_PROJECTION);
@@ -223,7 +223,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         moduleListSelections.put(Util.MEETINGS, Meetings.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.CAMPAIGNS, Campaigns.LIST_VIEW_PROJECTION);
         moduleListSelections.put(Util.RECENT, Recent.LIST_VIEW_PROJECTION);
-        
+
         // Default sort orders
         moduleSortOrder.put(Util.ACCOUNTS, Accounts.DEFAULT_SORT_ORDER);
         moduleSortOrder.put(Util.CONTACTS, Contacts.DEFAULT_SORT_ORDER);
@@ -477,9 +477,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     void dropModuleFieldsGroupTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + MODULE_FIELDS_GROUP_TABLE_NAME);
     }
+
     void dropRecentTable(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + RECENT_TABLE_NAME);
     }
+
     /** {@inheritDoc} */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -522,18 +524,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropSyncTable(db);
         dropRecentTable(db);
     }
+
     private static void createRecentTable(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + RECENT_TABLE_NAME + " (" + RecentColumns.ID
-                                        + " INTEGER,"
-                                        +RecentColumns.ACTUAL_ID + " INTEGER,"
-                                        +RecentColumns.BEAN_ID + " TEXT,"
+        db.execSQL("CREATE TABLE " + RECENT_TABLE_NAME + " (" + RecentColumns.ID + " INTEGER,"
+                                        + RecentColumns.ACTUAL_ID + " INTEGER,"
+                                        + RecentColumns.BEAN_ID + " TEXT,"
                                         + RecentColumns.REF_MODULE_NAME + " TEXT,"
-                                        +RecentColumns.NAME_1 + " TEXT,"
-                                        +RecentColumns.NAME_2 + " TEXT,"
-                                        + RecentColumns.DELETED + " INTEGER"
-        								+");");
+                                        + RecentColumns.NAME_1 + " TEXT," + RecentColumns.NAME_2
+                                        + " TEXT," + RecentColumns.DELETED + " INTEGER" + ");");
     }
+
     private static void createAccountsTable(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE " + ACCOUNTS_TABLE_NAME + " (" + AccountsColumns.ID
@@ -1394,9 +1395,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean hasFailed = false;
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
-        
-	HashSet<String> moduleNamesSet = new HashSet<String>(moduleNames);
-        try{
+
+        HashSet<String> moduleNamesSet = new HashSet<String>(moduleNames);
+        try {
             for (String moduleName : moduleNamesSet) {
                 ContentValues values = new ContentValues();
                 if (moduleName != null && !moduleName.equals("")) {
@@ -1408,7 +1409,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     }
                 }
             }
-        } catch(SQLException sqlex){
+        } catch (SQLException sqlex) {
             hasFailed = true;
             Log.e(TAG, sqlex.getMessage(), sqlex);
         }

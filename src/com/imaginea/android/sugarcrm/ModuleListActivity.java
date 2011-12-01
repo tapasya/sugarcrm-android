@@ -416,6 +416,10 @@ public class ModuleListActivity extends ListActivity {
             }
         }
 
+        if (!mModuleName.equalsIgnoreCase(Util.CONTACTS)) {
+            menu.findItem(R.id.importContact).setVisible(false);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -444,15 +448,21 @@ public class ModuleListActivity extends ListActivity {
         case R.id.addItem:
             myIntent = new Intent(ModuleListActivity.this, EditDetailsActivity.class);
             myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
+            Log.v(LOG_TAG, "intetnURI: " + mIntentUri);
             if (mIntentUri != null)
                 myIntent.setData(mIntentUri);
-            // myIntent.putExtra(RestUtilConstants.LINK_FIELD_NAME,
-            // DatabaseHelper.getRelationshipName(mModuleName));
             ModuleListActivity.this.startActivity(myIntent);
-
             return true;
         case R.id.sort:
             showDialog(DIALOG_SORT_CHOICE);
+            return true;
+        case R.id.importContact:
+            myIntent = new Intent(ModuleListActivity.this, EditDetailsActivity.class);
+            myIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
+            myIntent.putExtra(Util.IMPORT_FLAG, Util.CONTACT_IMPORT_FLAG);
+            if (mIntentUri != null)
+                myIntent.setData(mIntentUri);
+            ModuleListActivity.this.startActivity(myIntent);
             return true;
         }
         return false;

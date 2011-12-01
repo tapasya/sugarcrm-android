@@ -1,8 +1,5 @@
 package com.imaginea.android.sugarcrm;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -26,6 +23,9 @@ import android.widget.TextView;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Contacts;
 import com.imaginea.android.sugarcrm.util.Util;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * RecentListActivity, lists the view projections for all the Recently accessed records.

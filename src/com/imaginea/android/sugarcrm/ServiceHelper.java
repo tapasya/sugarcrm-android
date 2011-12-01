@@ -12,19 +12,26 @@ import java.util.Map;
 
 /**
  * ServiceHelper
- *
+ * 
  * @author chander
  */
 public class ServiceHelper {
 
     /**
-     * <p>startService</p>
-     *
-     * @param context a {@link android.content.Context} object.
-     * @param uri a {@link android.net.Uri} object.
-     * @param module a {@link java.lang.String} object.
-     * @param projection an array of {@link java.lang.String} objects.
-     * @param sortOrder a {@link java.lang.String} object.
+     * <p>
+     * startService
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param uri
+     *            a {@link android.net.Uri} object.
+     * @param module
+     *            a {@link java.lang.String} object.
+     * @param projection
+     *            an array of {@link java.lang.String} objects.
+     * @param sortOrder
+     *            a {@link java.lang.String} object.
      */
     public static void startService(Context context, Uri uri, String module, String[] projection,
                                     String sortOrder) {
@@ -39,12 +46,18 @@ public class ServiceHelper {
     }
 
     /**
-     * <p>startServiceForDelete</p>
-     *
-     * @param context a {@link android.content.Context} object.
-     * @param uri a {@link android.net.Uri} object.
-     * @param module a {@link java.lang.String} object.
-     * @param beanId a {@link java.lang.String} object.
+     * <p>
+     * startServiceForDelete
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param uri
+     *            a {@link android.net.Uri} object.
+     * @param module
+     *            a {@link java.lang.String} object.
+     * @param beanId
+     *            a {@link java.lang.String} object.
      */
     public static void startServiceForDelete(Context context, Uri uri, String module, String beanId) {
         Intent serviceIntent = new Intent(context, SugarService.class);
@@ -89,12 +102,18 @@ public class ServiceHelper {
     }
 
     /**
-     * <p>startServiceForInsert</p>
-     *
-     * @param context a {@link android.content.Context} object.
-     * @param uri a {@link android.net.Uri} object.
-     * @param moduleName a {@link java.lang.String} object.
-     * @param nameValueList a {@link java.util.Map} object.
+     * <p>
+     * startServiceForInsert
+     * </p>
+     * 
+     * @param context
+     *            a {@link android.content.Context} object.
+     * @param uri
+     *            a {@link android.net.Uri} object.
+     * @param moduleName
+     *            a {@link java.lang.String} object.
+     * @param nameValueList
+     *            a {@link java.util.Map} object.
      */
     public static void startServiceForInsert(Context context, Uri uri, String moduleName,
                                     Map<String, String> nameValueList) {

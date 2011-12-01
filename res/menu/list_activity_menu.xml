@@ -17,4 +17,8 @@
 		android:icon="@android:drawable/ic_menu_sort_by_size"		
         android:title="@string/sort"         
 		/>
+	<item android:id="@+id/importContact"  
+		android:icon="@android:drawable/ic_menu_more"		
+        android:title="@string/importContact"         
+		/>
 </menu>
