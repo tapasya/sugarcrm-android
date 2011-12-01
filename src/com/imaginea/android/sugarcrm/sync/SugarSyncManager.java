@@ -517,7 +517,7 @@ public class SugarSyncManager {
         try {
             if (userModules == null || userModules.size() == 0)
                 userModules = RestUtil.getAvailableModules(url, sessionId);
-            // Log.i(LOG_TAG, "userModules : " + userModules.size());
+            Log.i(LOG_TAG, "userModules : " + userModules.size());
             databaseHelper.setUserModules(userModules);
         } catch (SugarCrmException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -831,24 +831,24 @@ public class SugarSyncManager {
                 // get the beanIds of the roles that are inserted
                 if (roleBeans != null) {
                     roleIds = databaseHelper.insertRoles(roleBeans);
-                }
 
-                // get the acl actions for each roleId
-                for (String roleId : roleIds) {
-                    if (Log.isLoggable(LOG_TAG, Log.DEBUG))
-                        Log.d(LOG_TAG, "roleId - " + roleId);
+                    // get the acl actions for each roleId
+                    for (String roleId : roleIds) {
+                        if (Log.isLoggable(LOG_TAG, Log.DEBUG))
+                            Log.d(LOG_TAG, "roleId - " + roleId);
 
-                    // get the aclRole along with the acl actions associated
-                    SugarBean roleBean = RestUtil.getEntry(url, sessionId, Util.ACLROLES, roleId, ACLRoles.INSERT_PROJECTION, linkNameToFieldsArrayForActions);
-                    SugarBean[] roleRelationBeans = roleBean.getRelationshipBeans(actionsLinkNameField);
-                    if (roleRelationBeans != null) {
-                        databaseHelper.insertActions(roleId, roleRelationBeans);
+                        // get the aclRole along with the acl actions associated
+                        SugarBean roleBean = RestUtil.getEntry(url, sessionId, Util.ACLROLES, roleId, ACLRoles.INSERT_PROJECTION, linkNameToFieldsArrayForActions);
+                        SugarBean[] roleRelationBeans = roleBean.getRelationshipBeans(actionsLinkNameField);
+                        if (roleRelationBeans != null) {
+                            databaseHelper.insertActions(roleId, roleRelationBeans);
+                        }
                     }
                 }
             }
             return true;
         } catch (SugarCrmException sce) {
-            Log.e(LOG_TAG, "" + sce.getMessage());
+            Log.e(LOG_TAG, "" + sce.getMessage(), sce);
         }
         return false;
     }
@@ -887,7 +887,7 @@ public class SugarSyncManager {
 
             return true;
         } catch (SugarCrmException sce) {
-            Log.e(LOG_TAG, "" + sce.getMessage());
+            Log.e(LOG_TAG, "" + sce.getMessage(), sce);
         }
         return false;
     }

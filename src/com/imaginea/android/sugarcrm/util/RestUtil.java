@@ -1,6 +1,59 @@
 package com.imaginea.android.sugarcrm.util;
 
-import static com.imaginea.android.sugarcrm.RestUtilConstants.*;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.APPLICATION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_ID;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.BEAN_IDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.CREATED;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.DELETED;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.DESCRIPTION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.FAILED;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.FIELDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_AVAILABLE_MODULES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRIES_COUNT;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_ENTRY_LIST;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_MODULE_FIELDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_RELATIONSHIPS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.GET_SERVER_INFO;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.ID;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.IDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.INPUT_TYPE;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.JSON;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.JSON_EXCEPTION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.LINK_FIELD_NAME;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.LINK_FIELD_NAMES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.LINK_NAME_TO_FIELDS_ARRAY;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.LOGIN;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.MAX_RESULTS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.METHOD;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULE_NAME;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.MODULE_NAMES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME_VALUE_LIST;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME_VALUE_LISTS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.OFFSET;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.ORDER_BY;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.PASSWORD;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.QUERY;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_FIELDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_IDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_MODULE_LINK_NAME_TO_FIELDS_ARRAY;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RELATED_MODULE_QUERY;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RESPONSE_TYPE;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.REST_DATA;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.RESULT_COUNT;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SEARCH_BY_MODULE;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SEARCH_STRING;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SELECT_FIELDS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SESSION;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_ENTRIES;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_ENTRY;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_RELATIONSHIP;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_RELATIONSHIPS;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_AUTH;
+import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_NAME;
 
 import android.util.Log;
 
@@ -988,6 +1041,7 @@ public class RestUtil {
      */
     public static String getServerInfo(String url) throws SugarCrmException {
 
+        String version = null;
         try {
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost req = new HttpPost(url);
@@ -1006,12 +1060,19 @@ public class RestUtil {
             }
             String response = EntityUtils.toString(res.getEntity()).toString();
             // TODO: have to parse the response
-            // JSONObject jsonResponse = new JSONObject(response);
-
-            return response;
+            JSONObject jsonResponse;
+            try {
+                jsonResponse = new JSONObject(response);
+                version = (String) jsonResponse.get("version");
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         } catch (IOException ioe) {
             throw new SugarCrmException(ioe.getMessage());
         }
+
+        return version;
     }
 
 }

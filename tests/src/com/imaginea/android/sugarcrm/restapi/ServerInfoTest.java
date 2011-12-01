@@ -4,18 +4,12 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.imaginea.android.sugarcrm.util.RestUtil;
 
-import org.json.JSONObject;
-
 public class ServerInfoTest extends RestAPITest {
-    
-    @SmallTest
-    public void testGetServerInfo() throws Exception {
-        String response = RestUtil.getServerInfo(url);
-        System.out.println("getServerInfo : " + response);
 
-        JSONObject jsonResponse = new JSONObject(response);
-        assertNotNull(jsonResponse.get("flavor").toString());
-        assertNotNull(jsonResponse.get("version").toString());
-        assertNotNull(jsonResponse.get("gmt_time").toString());
-    }
+	@SmallTest
+	public void testGetServerInfo() throws Exception {
+		String serverVersion = RestUtil.getServerInfo(url);
+		assertNotNull(serverVersion);
+		assertEquals("6.3.0", serverVersion);
+	}
 }

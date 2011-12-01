@@ -31,7 +31,7 @@ public class RestAPITest extends AndroidTestCase {
     /**
      * used by module specific unit tests
      */
-    protected String url = "http://192.168.1.83/sugarcrm/service/v2/rest.php";
+    protected String url = "http://192.168.1.147:8080/sugarcrm/service/v2/rest.php";
 
     protected String userName = "will";
 

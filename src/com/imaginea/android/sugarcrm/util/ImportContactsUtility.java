@@ -9,9 +9,11 @@ public class ImportContactsUtility {
 
     private static Map<String, String> getContactApiVsModuleFieldsMap() {
         Map<String, String> contactsApiNamesVsModuleFieldNames = new HashMap<String, String>();
-        contactsApiNamesVsModuleFieldNames.put(ContactsApiConstants.NAME, ContactsColumns.FIRST_NAME);
+        contactsApiNamesVsModuleFieldNames.put(ContactsApiConstants.FIRST_NAME, ContactsColumns.FIRST_NAME);
+        contactsApiNamesVsModuleFieldNames.put(ContactsApiConstants.LAST_NAME, ContactsColumns.LAST_NAME);
         contactsApiNamesVsModuleFieldNames.put(ContactsApiConstants.EMAIL, ContactsColumns.EMAIL1);
-        contactsApiNamesVsModuleFieldNames.put(ContactsApiConstants.PHNO, ContactsColumns.PHONE_MOBILE);
+        contactsApiNamesVsModuleFieldNames.put(ContactsApiConstants.PHONE_MOBILE, ContactsColumns.PHONE_MOBILE);
+        contactsApiNamesVsModuleFieldNames.put(ContactsApiConstants.PHONE_WORK, ContactsColumns.PHONE_WORK);
 
         return contactsApiNamesVsModuleFieldNames;
     }
@@ -25,10 +27,14 @@ public class ImportContactsUtility {
 
     public interface ContactsApiConstants {
 
-        final String NAME = "name";
+        final String FIRST_NAME = "first_name";
+
+        final String LAST_NAME = "last_name";
 
         final String EMAIL = "email";
 
-        final String PHNO = "phno";
+        final String PHONE_MOBILE = "phone_mobile";
+
+        final String PHONE_WORK = "phone_work";
     }
 }

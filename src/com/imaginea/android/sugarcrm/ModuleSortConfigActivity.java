@@ -93,8 +93,7 @@ public class ModuleSortConfigActivity extends Activity {
         mSortOrderSpinner.setEnabled(false);
 
         mModuleNameSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                            int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // store the selected module index
                 selectedModuleIndex = position;
 
@@ -133,8 +132,7 @@ public class ModuleSortConfigActivity extends Activity {
         });
 
         mFieldNameSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                            int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // store the selected field index
                 selectedFieldIndex = position;
                 mSortOrderSpinner.setEnabled(true);
@@ -146,8 +144,7 @@ public class ModuleSortConfigActivity extends Activity {
         });
 
         mSortOrderSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                            int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // store the selected order index
                 selectedOrderIndex = position;
             }
@@ -185,8 +182,7 @@ public class ModuleSortConfigActivity extends Activity {
         String module = (String) mModuleNameSpinner.getAdapter().getItem(selectedModuleIndex);
         String fieldName = fieldMap.get(mFieldNameSpinner.getAdapter().getItem(selectedFieldIndex));
         String sortBy = orderMap.get(mSortOrderSpinner.getAdapter().getItem(selectedOrderIndex));
-        Log.i(TAG, "module : " + module + " field : " + fieldName + " order : "
-                                        + sortBy);
+        Log.i(TAG, "module : " + module + " field : " + fieldName + " order : " + sortBy);
 
         app.setModuleSortOrder(module, fieldName, sortBy);
 

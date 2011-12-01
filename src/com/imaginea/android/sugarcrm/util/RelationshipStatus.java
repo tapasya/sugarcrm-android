@@ -6,8 +6,10 @@ package com.imaginea.android.sugarcrm.util;
  * number of relationships deleted. This class can be used to get that status.
  * */
 /**
- * <p>RelationshipStatus class.</p>
- *
+ * <p>
+ * RelationshipStatus class.
+ * </p>
+ * 
  */
 public class RelationshipStatus {
 
@@ -18,11 +20,16 @@ public class RelationshipStatus {
     private int mDeletedCount;
 
     /**
-     * <p>Constructor for RelationshipStatus.</p>
-     *
-     * @param createdCount a int.
-     * @param failedCount a int.
-     * @param deletedCount a int.
+     * <p>
+     * Constructor for RelationshipStatus.
+     * </p>
+     * 
+     * @param createdCount
+     *            a int.
+     * @param failedCount
+     *            a int.
+     * @param deletedCount
+     *            a int.
      */
     public RelationshipStatus(int createdCount, int failedCount, int deletedCount) {
         this.mCreatedCount = createdCount;
@@ -31,8 +38,10 @@ public class RelationshipStatus {
     }
 
     /**
-     * <p>getCreatedCount</p>
-     *
+     * <p>
+     * getCreatedCount
+     * </p>
+     * 
      * @return a int.
      */
     public int getCreatedCount() {
@@ -40,8 +49,10 @@ public class RelationshipStatus {
     }
 
     /**
-     * <p>getFailedCount</p>
-     *
+     * <p>
+     * getFailedCount
+     * </p>
+     * 
      * @return a int.
      */
     public int getFailedCount() {
@@ -49,8 +60,10 @@ public class RelationshipStatus {
     }
 
     /**
-     * <p>getDeletedCount</p>
-     *
+     * <p>
+     * getDeletedCount
+     * </p>
+     * 
      * @return a int.
      */
     public int getDeletedCount() {

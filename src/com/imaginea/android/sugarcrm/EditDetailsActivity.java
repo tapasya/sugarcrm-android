@@ -249,7 +249,7 @@ public class EditDetailsActivity extends Activity {
                 // Log.i(TAG, "label: "+values[4]);
                 AutoCompleteTextView valueView = (AutoCompleteTextView) values[5];
                 valueView.setTag(fieldName);
-                // Log.i(TAG, "edittextview: "+valueView.getTag());
+                Log.i(TAG, "edittextview: " + valueView.getTag());
                 String editTextValue = (String) values[6];
                 valueView.setText(editTextValue);
                 // Log.i(TAG, "edittext: "+valueView.getText());
@@ -582,23 +582,24 @@ public class EditDetailsActivity extends Activity {
 
             AutoCompleteTextView editText = (AutoCompleteTextView) ((ViewGroup) mDetailsTable.getChildAt(rowsCount)).getChildAt(1);
             String fieldValue = editText.getText().toString();
-            Log.i(TAG, fieldName + " : " + fieldValue);
 
             if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))) {
-                if (!Validation.isEmailValid(fieldValue)) {
+                if (Validation.isNotEmpty(fieldValue) && !Validation.isEmailValid(fieldValue)) {
                     editText.setError(getString(R.string.emailValidationErrorMsg));
                     hasError = true;
                 }
             }
 
-            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHNO))) {
-                if (!Validation.isPhoneNumberValid(fieldValue)) {
+            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
+                                            || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                if (Validation.isNotEmpty(fieldValue) && !Validation.isPhoneNumberValid(fieldValue)) {
                     editText.setError(getString(R.string.phNoValidationErrorMsg));
                     hasError = true;
                 }
             }
 
-            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_NAME))) {
+            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))
+                                            || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))) {
                 if (!Validation.isNotEmpty(fieldValue)) {
                     editText.setError(String.format(this.getString(R.string.emptyValidationErrorMsg), fieldName));
                     hasError = true;
@@ -736,29 +737,19 @@ public class EditDetailsActivity extends Activity {
         while (cursor.moveToNext()) {
             String contactId = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
 
-            // You will get name of selected Contact here
-            String contactName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
-            ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_NAME))).setText(contactName);
+            Cursor nameCursor = getApplicationContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, ContactsContract.Data.MIMETYPE
+                                            + " = ? AND "
+                                            + ContactsContract.RawContactsEntity.CONTACT_ID
+                                            + " = ? ", new String[] {
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE, contactId }, null);
 
-            /*
-             * Cursor nameCur =
-             * getApplicationContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI,
-             * null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null,
-             * ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME);
-             * 
-             * 
-             * while (nameCur.moveToNext()) { String given =
-             * nameCur.getString(nameCur.getColumnIndex
-             * (ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)); String family =
-             * nameCur
-             * .getString(nameCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName
-             * .FAMILY_NAME)); String display =
-             * nameCur.getString(nameCur.getColumnIndex(ContactsContract
-             * .CommonDataKinds.StructuredName.DISPLAY_NAME)); Log.v(TAG,"*********names:  " + given
-             * + " - " + family + " - " + display + " - " +
-             * nameCur.getString(nameCur.getColumnIndex(ContactsContract.Data.MIMETYPE))); }
-             * nameCur.close();
-             */
+            while (nameCursor.moveToNext()) {
+                String givenName = nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
+                String familyName = nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))).setText(givenName);
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))).setText(familyName);
+            }
+            nameCursor.close();
 
             String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
@@ -772,25 +763,23 @@ public class EditDetailsActivity extends Activity {
                                                 + " = " + contactId, null, null);
                 while (phones.moveToNext()) {
                     String contactPhno = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHNO))).setText(contactPhno);
-                    break;
+                    int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                    if (ContactsContract.CommonDataKinds.Phone.TYPE_WORK == type)
+                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))).setText(contactPhno);
+                    if (ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE == type)
+                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))).setText(contactPhno);
                 }
                 phones.close();
             }
 
-            // Find Email Addresses
             Cursor emails = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID
                                             + " = " + contactId, null, null);
             while (emails.moveToNext()) {
-                // You will get email of selected Contact here
                 String contactEmail = emails.getString(emails.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                // System.out.println(":::email- "+contactEmail);
                 ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))).setText(contactEmail);
-
             }
             emails.close();
-
-        } // while (cursor.moveToNext())
+        }
         cursor.close();
 
     }// getContactInfo

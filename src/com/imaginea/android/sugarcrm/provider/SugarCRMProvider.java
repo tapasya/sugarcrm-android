@@ -97,9 +97,9 @@ public class SugarCRMProvider extends ContentProvider {
     private static final int USERS = 25;
 
     private static final int SEARCH = 26;
-    
+
     private static final int RECENT = 27;
-    
+
     private static final UriMatcher sUriMatcher;
 
     private static final String TAG = SugarCRMProvider.class.getSimpleName();
@@ -411,12 +411,12 @@ public class SugarCRMProvider extends ContentProvider {
         case USERS:
             c = db.query(DatabaseHelper.USERS_TABLE_NAME, projection, selection, selectionArgs, null, null, null);
             break;
-              
+
         case RECENT:
-        	Log.e(TAG,"query made for recent");
-        	c = db.query(DatabaseHelper.RECENT_TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-        	break;
-        	
+            Log.e(TAG, "query made for recent");
+            c = db.query(DatabaseHelper.RECENT_TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -847,18 +847,17 @@ public class SugarCRMProvider extends ContentProvider {
                 return campaignUri;
             }
             break;
-               
+
         case RECENT:
-        	Log.e(TAG,"insert made for recent");
-        	rowId = db.insert(DatabaseHelper.RECENT_TABLE_NAME, "", values);
-        	
-        	if (rowId > 0) {
+            Log.e(TAG, "insert made for recent");
+            rowId = db.insert(DatabaseHelper.RECENT_TABLE_NAME, "", values);
+
+            if (rowId > 0) {
                 Uri campaignUri = ContentUris.withAppendedId(Campaigns.CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(campaignUri, null);
                 return campaignUri;
             }
-        	break;
-        	
+            break;
 
         default:
             // return uri;
@@ -1032,9 +1031,9 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
         case RECENT:
-        	Log.e(TAG,"delete made for recent");
-        	break;
-        	
+            Log.e(TAG, "delete made for recent");
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -1773,10 +1772,10 @@ public class SugarCRMProvider extends ContentProvider {
                                                                             : ""), whereArgs);
             break;
         case RECENT:
-        	Log.e(TAG,"update made for recent");
-        	count=0;
-        	break;
-        	
+            Log.e(TAG, "update made for recent");
+            count = 0;
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -1853,10 +1852,8 @@ public class SugarCRMProvider extends ContentProvider {
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.CAMPAIGNS + "/#/#", CAMPAIGN);
 
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.USERS, USERS);
-        
-        
+
         sUriMatcher.addURI(SugarCRMContent.AUTHORITY, Util.RECENT, RECENT);
-        
 
         // sUriMatcher.addURI(SugarBeans.AUTHORITY, "sugarbeans/#", SUGAR_BEAN_ID);
 
