@@ -17,7 +17,7 @@ public final class SugarCRMContent {
     public static final String AUTHORITY = SugarCRMProvider.AUTHORITY;
 
     public static final String RECORD_ID = "_id";
-    
+
     public static final String SUGAR_BEAN_ID = ModuleFields.ID;
 
     public static final String MODULE_ROW_ID = "module_id";
@@ -251,22 +251,24 @@ public final class SugarCRMContent {
 
         public String DELETED = ModuleFields.DELETED;
     }
-    
+
     public interface RecentColumns {
-    	public String ID = RECORD_ID;
-    	
+        public String ID = RECORD_ID;
+
         public String ACTUAL_ID = ModuleFields.ACTUAL_RECORD_ID;
 
         public String BEAN_ID = SUGAR_BEAN_ID;
 
         public String REF_MODULE_NAME = ModuleFields.MODULE_NAME;
-        
+
         public String NAME_1 = ModuleFields.NAME_1;
+
         public String NAME_2 = ModuleFields.NAME_2;
+
         public String DELETED = ModuleFields.DELETED;
 
-        
     }
+
     public static final class Recent implements RecentColumns {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + SugarCRMProvider.AUTHORITY
@@ -277,12 +279,13 @@ public final class SugarCRMContent {
          */
         public static final String DEFAULT_SORT_ORDER = ModuleFields.NAME + " ASC";
 
-        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME_1,NAME_2,REF_MODULE_NAME};
+        public static final String[] LIST_PROJECTION = { RECORD_ID, BEAN_ID, NAME_1, NAME_2,
+                REF_MODULE_NAME };
 
-        public static final String[] LIST_VIEW_PROJECTION = { NAME_1,NAME_2 };
+        public static final String[] LIST_VIEW_PROJECTION = { NAME_1, NAME_2 };
 
-        //Details projection is not needed for recent, as the record_id, bean_id and module name
-        //will be used to show the detailed view
+        // Details projection is not needed for recent, as the record_id, bean_id and module name
+        // will be used to show the detailed view
 
     }
 

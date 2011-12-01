@@ -8,18 +8,18 @@ import android.view.KeyEvent;
  * Instrumentation class for Contacts List launch performance testing.
  */
 public class ContactListInstrumentation extends
-                                ActivityInstrumentationTestCase2<ContactListActivity> {
+                                ActivityInstrumentationTestCase2<ModuleListActivity> {
 
     public static final String LOG_TAG = "ContactListInstrumentation";
 
     public ContactListInstrumentation() {
-        super(ContactListActivity.class);
+        super(ModuleListActivity.class);
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        final ContactListActivity a = getActivity();
+        final ModuleListActivity a = getActivity();
         // ensure a valid handle to the activity has been returned
         assertNotNull(a);
 

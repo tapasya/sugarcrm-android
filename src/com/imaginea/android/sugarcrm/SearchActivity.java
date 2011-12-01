@@ -49,7 +49,7 @@ public class SearchActivity extends ListActivity {
 
         Bundle appData = intent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
-            mModuleName = appData.getString(RestUtilConstants.MODULE_NAME);            
+            mModuleName = appData.getString(RestUtilConstants.MODULE_NAME);
         }
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -102,8 +102,7 @@ public class SearchActivity extends ListActivity {
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View view,
-                                            int position, long id) {
+            public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
                 openDetailScreen(position);
             }
         });
@@ -126,8 +125,7 @@ public class SearchActivity extends ListActivity {
         // getListView().getItemAtPosition(position);
         // TODO
         if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "beanId:" + cursor.getString(1) + " rowId: "
-                                            + cursor.getString(0));
+            Log.d(TAG, "beanId:" + cursor.getString(1) + " rowId: " + cursor.getString(0));
         }
         detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
@@ -139,8 +137,7 @@ public class SearchActivity extends ListActivity {
      */
     private final class GenericCursorAdapter extends SimpleCursorAdapter {
 
-        public GenericCursorAdapter(Context context, int layout, Cursor c,
-                                        String[] from, int[] to) {
+        public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
             super(context, layout, c, from, to);
         }
 

@@ -155,7 +155,7 @@ public class ModuleDetailsActivity extends Activity {
         if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
             mTask.cancel(true);
         }
-    }   
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -190,10 +190,10 @@ public class ModuleDetailsActivity extends Activity {
         default:
             if (Log.isLoggable(LOG_TAG, Log.INFO)) {
                 Log.i(LOG_TAG, "item id : " + item.getItemId());
-            }           
-            openListScreen(mRelationshipModules[item.getItemId() - 1]);           
+            }
+            openListScreen(mRelationshipModules[item.getItemId() - 1]);
             return true;
-        }      
+        }
     }
 
     class LoadContentTask extends AsyncTask<Object, Object, Object> {
@@ -321,7 +321,7 @@ public class ModuleDetailsActivity extends Activity {
         @Override
         protected Object doInBackground(Object... params) {
             try {
-                mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));                
+                mCursor = getContentResolver().query(getIntent().getData(), mSelectFields, null, null, mDbHelper.getModuleSortOrder(mModuleName));
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 return Util.FETCH_FAILED;
