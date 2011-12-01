@@ -158,4 +158,6 @@
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+	<uses-permission android:name="android.permission.READ_CONTACTS"/>
+	<uses-permission android:name="android.permission.CALL_PHONE"/>
 </manifest>

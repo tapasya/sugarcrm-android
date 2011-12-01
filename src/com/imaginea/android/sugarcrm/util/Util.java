@@ -66,6 +66,8 @@ public class Util {
 
     public static final int LIST_MODE = 5;
 
+    public static final int CONTACT_IMPORT_FLAG = 1;
+
     // constants for settings / Preferences
     public static final String PREF_REST_URL = "restUrl";
 
@@ -117,8 +119,16 @@ public class Util {
     public static final String ACLACTIONS = "ACLActions";
 
     public static final String STATUS = "Status";
-    
+
     public static final String RECENT = "Recent";
+
+    public static final String IMPORT_FLAG = "importFlag";
+
+    public static final String CONTACT_NAME = "name";
+
+    public static final String CONTACT_EMAIL = "email";
+
+    public static final String CONTACT_PHNO = "phno";
 
     // sql sort order contacts
     public static final String ASC = "ASC";
@@ -175,6 +185,8 @@ public class Util {
     public static final int LOGIN_REQUEST_CODE = 0;
 
     public static final int SYNC_DATA_REQUEST_CODE = 1;
+
+    public static final int IMPORT_CONTACTS_REQUEST_CODE = 1;
 
     public static final String SQL_FILE = "sortOrderAndGroup.sql";
 

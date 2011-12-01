@@ -109,9 +109,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             case Util.SYNC_ALL_META_DATA:
                 // should be used once for one time set-up
                 boolean modulesSyncd = SugarSyncManager.syncModules(mContext, account.name, sessionId);
-                boolean aclAccessSyncd = SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
+                Log.d(LOG_TAG, "syncModules done. success: %d" + modulesSyncd);
+
+                // boolean aclAccessSyncd = SugarSyncManager.syncAclAccess(mContext, account.name,
+                // sessionId);
+                // Log.d(LOG_TAG, "ACL access aync done. success: %d" + aclAccessSyncd);
+
                 boolean usersSyncd = SugarSyncManager.syncUsersList(mContext, sessionId);
-                if (modulesSyncd && aclAccessSyncd & usersSyncd) {
+                Log.d(LOG_TAG, "Users aync done. success: %d" + usersSyncd);
+
+                // TODO - Need to resolve SYNC issue.
+
+                // if (modulesSyncd && aclAccessSyncd & usersSyncd) {
+                if (modulesSyncd && usersSyncd) {
                     Editor editor = pref.edit();
                     editor.putBoolean(Util.SYNC_METADATA_COMPLETED, true);
                     editor.commit();
@@ -119,7 +129,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 break;
             case Util.SYNC_ACL_ACCESS_META_DATA:
                 // use this only for testing
-                SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
+                // SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
                 break;
 
             case Util.SYNC_MODULES_DATA:
@@ -134,7 +144,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             case Util.SYNC_ALL:
                 // testing
                 SugarSyncManager.syncModules(mContext, account.name, sessionId);
-                SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
+                // SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
                 syncAllModulesData(account, extras, authority, sessionId, syncResult);
                 break;
             default:
