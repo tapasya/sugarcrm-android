@@ -878,7 +878,7 @@ public class SugarSyncManager {
             for (SugarBean userBean : userBeans) {
                 Map<String, String> userBeanValues = getUserBeanValues(userBean);
                 String userName = userBean.getFieldValue(ModuleFields.USER_NAME);
-                if (userBeanValues != null & userBeanValues.size() > 0)
+                if (userBeanValues != null && userBeanValues.size() > 0)
                     usersMap.put(userName, userBeanValues);
             }
 
