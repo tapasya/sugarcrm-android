@@ -14,8 +14,10 @@ import android.os.Message;
 import android.os.Messenger;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,7 +39,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Users;
 import com.imaginea.android.sugarcrm.util.ImportContactsUtility;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
-import com.imaginea.android.sugarcrm.util.Validation;
+import com.imaginea.android.sugarcrm.util.ModuleFieldValidator;
 import com.imaginea.android.sugarcrm.util.ViewUtil;
 
 import java.util.LinkedHashMap;
@@ -96,6 +98,8 @@ public class EditDetailsActivity extends Activity {
     private String mUserName;
 
     private ProgressDialog mProgressDialog;
+
+    private boolean hasError;
 
     /**
      * {@inheritDoc}
@@ -158,8 +162,9 @@ public class EditDetailsActivity extends Activity {
         mTask = new LoadContentTask();
         mTask.execute(null, null, null);
 
-        if (importFlag == Util.CONTACT_IMPORT_FLAG)
+        if (importFlag == Util.CONTACT_IMPORT_FLAG) {
             importContact();
+        }
     }
 
     /** {@inheritDoc} */
@@ -237,7 +242,7 @@ public class EditDetailsActivity extends Activity {
             switch ((Integer) values[0]) {
 
             case STATIC_ROW:
-                String fieldName = (String) values[1];
+                final String fieldName = (String) values[1];
                 // Log.i(TAG, "field Name: "+fieldName);
                 View editRow = (View) values[2];
                 // Log.i(TAG, "view: "+editRow);
@@ -247,11 +252,104 @@ public class EditDetailsActivity extends Activity {
                 // Log.i(TAG, "labelview: "+values[3]+" - "+labelView);
                 labelView.setText((String) values[4]);
                 // Log.i(TAG, "label: "+values[4]);
-                AutoCompleteTextView valueView = (AutoCompleteTextView) values[5];
+                final AutoCompleteTextView valueView = (AutoCompleteTextView) values[5];
                 valueView.setTag(fieldName);
-                Log.i(TAG, "edittextview: " + valueView.getTag());
+                // Log.i(TAG, "edittextview: " + valueView.getTag());
                 String editTextValue = (String) values[6];
                 valueView.setText(editTextValue);
+
+                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))) {
+                    valueView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            // TODO Auto-generated method stub
+                            String email = s.toString();
+                            // Log.i(TAG,"****Changed as:"+email);
+                            if (ModuleFieldValidator.isNotEmpty(email)
+                                                            && !ModuleFieldValidator.isEmailValid(email)) {
+                                // Log.i(TAG,"invalid email");
+                                hasError = true;
+                                valueView.setError(getString(R.string.emailValidationErrorMsg));
+                            } else {
+                                Log.i(TAG, "valid Email");
+                            }
+                        }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count,
+                                                        int after) {
+                            // TODO Auto-generated method stub
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // TODO Auto-generated method stub
+                            // Log.i(TAG,"****Changed as:"+s);
+                        }
+                    });
+                }
+
+                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
+                                                || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                    valueView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            // TODO Auto-generated method stub
+                            String phoneNumber = s.toString();
+                            // Log.i(TAG,"****Changed as:"+phoneNumber);
+                            if (ModuleFieldValidator.isNotEmpty(phoneNumber)
+                                                            && !ModuleFieldValidator.isPhoneNumberValid(phoneNumber)) {
+                                // Log.i(TAG,"invalid phoneNumber");
+                                hasError = true;
+                                valueView.setError(getString(R.string.phNoValidationErrorMsg));
+                            } else {
+                                Log.i(TAG, "valid phoneNumber");
+                            }
+                        }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count,
+                                                        int after) {
+                            // TODO Auto-generated method stub
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // TODO Auto-generated method stub
+                            // Log.i(TAG,"****Changed as:"+s);
+                        }
+                    });
+                }
+
+                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))
+                                                || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))) {
+                    valueView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            // TODO Auto-generated method stub
+                            if (!ModuleFieldValidator.isNotEmpty(s.toString())) {
+                                hasError = true;
+                                valueView.setError(String.format(getString(R.string.emptyValidationErrorMsg), fieldName));
+                            } else {
+                                Log.i(TAG, "valid name");
+                            }
+
+                        }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count,
+                                                        int after) {
+                            // TODO Auto-generated method stub
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // TODO Auto-generated method stub
+                            // Log.i(TAG,"****Changed as:"+s);
+                        }
+                    });
+                }
+
                 // Log.i(TAG, "edittext: "+valueView.getText());
 
                 // set the adapter to auto-suggest
@@ -323,91 +421,184 @@ public class EditDetailsActivity extends Activity {
                 break;
 
             case DYNAMIC_ROW:
-                fieldName = (String) values[1];
+                final String dynamicFieldName = (String) values[1];
 
                 editRow = (View) values[2];
                 editRow.setVisibility(View.VISIBLE);
 
                 labelView = (TextView) values[3];
                 labelView.setText((String) values[4]);
-                valueView = (AutoCompleteTextView) values[5];
-                valueView.setTag(fieldName);
+                final AutoCompleteTextView dynamicValueView = (AutoCompleteTextView) values[5];
+                dynamicValueView.setTag(dynamicFieldName);
                 editTextValue = (String) values[6];
-                valueView.setText(editTextValue);
+                dynamicValueView.setText(editTextValue);
 
-                // set the adapter to auto-suggest
-                if (!Util.ACCOUNTS.equals(mModuleName)
-                                                && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
-                    // only if the module is directly related to Accounts,
-                    // disable the account name
-                    // field populating it with the corresponding account name
-                    if (MODE == Util.NEW_RELATIONSHIP_MODE) {
-
-                        // get the module name from the URI
-                        String module = mIntentUri.getPathSegments().get(0);
-
-                        // only if the module is directly related with the
-                        // Accounts module
-                        if (Util.ACCOUNTS.equals(module)) {
-
-                            if (mDbHelper == null)
-                                mDbHelper = new DatabaseHelper(getBaseContext());
-
-                            // get the account name using the account row id in
-                            // the URI
-                            int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
-                            String selection = AccountsColumns.ID + "=" + accountRowId;
-                            Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
-                            cursor.moveToFirst();
-                            String accountName = cursor.getString(2);
-                            cursor.close();
-
-                            // pre-populate the field with the account name and
-                            // disable it
-                            valueView.setText(accountName);
-                            valueView.setEnabled(false);
-                        } else {
-                            // if the module is not directly related to Accounts
-                            // module, show the
-                            // auto-suggest instead of pre-populating the
-                            // account name field
-                            valueView.setAdapter(mAccountAdapter);
-                            valueView.setOnItemClickListener(new AccountsClickedItemListener());
-                        }
-                    } else {
-                        // set the apadter to show the auto-suggest
-                        valueView.setAdapter(mAccountAdapter);
-                        valueView.setOnItemClickListener(new AccountsClickedItemListener());
-
-                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE)
-                            // store the account name in mAccountName if the
-                            // bean is already related
-                            // to an account
-                            if (!TextUtils.isEmpty(editTextValue)) {
-                                mAccountName = editTextValue;
+                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))) {
+                    dynamicValueView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            // TODO Auto-generated method stub
+                            String email = s.toString();
+                            // Log.i(TAG,"****Changed as:"+email);
+                            if (ModuleFieldValidator.isNotEmpty(email)
+                                                            && !ModuleFieldValidator.isEmailValid(email)) {
+                                // Log.i(TAG,"invalid email");
+                                hasError = true;
+                                dynamicValueView.setError(getString(R.string.emailValidationErrorMsg));
+                            } else {
+                                Log.i(TAG, "valid email");
                             }
-                    }
-                } else if (fieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
-                    // set the apadter to show the auto-suggest
-                    valueView.setAdapter(mUserAdapter);
-                    valueView.setOnItemClickListener(new UsersClickedItemListener());
-
-                    if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
-                        // store the user name in mUserName if the bean is
-                        // already assigned to a
-                        // user
-                        if (!TextUtils.isEmpty(editTextValue)) {
-                            mUserName = editTextValue;
                         }
-                    }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count,
+                                                        int after) {
+                            // TODO Auto-generated method stub
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // TODO Auto-generated method stub
+                            // Log.i(TAG,"****Changed as:"+s);
+                        }
+                    });
                 }
 
-                mDetailsTable.addView(editRow);
-                break;
+                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
+                                                || dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                    dynamicValueView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            // TODO Auto-generated method stub
+                            String phoneNumber = s.toString();
+                            Log.i(TAG, "****Changed as:" + phoneNumber);
+                            if (ModuleFieldValidator.isNotEmpty(phoneNumber)
+                                                            && !ModuleFieldValidator.isEmailValid(phoneNumber)) {
+                                Log.i(TAG, "invalid phone");
+                                hasError = true;
+                                dynamicValueView.setError(getString(R.string.phNoValidationErrorMsg));
+                            } else {
+                                Log.i(TAG, "valid phoneNumber");
+                            }
+
+                        }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count,
+                                                        int after) {
+                            // TODO Auto-generated method stub
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // TODO Auto-generated method stub
+                            // Log.i(TAG,"****Changed as:"+s);
+                        }
+                    });
+                }
+
+                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))
+                                                || dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))) {
+                    dynamicValueView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            // TODO Auto-generated method stub
+                            if (!ModuleFieldValidator.isNotEmpty(s.toString())) {
+                                hasError = true;
+                                dynamicValueView.setError(String.format(getString(R.string.emptyValidationErrorMsg), dynamicFieldName));
+                            } else {
+                                Log.i(TAG, "valid name");
+                            }
+                        }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count,
+                                                        int after) {
+                            // TODO Auto-generated method stub
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // TODO Auto-generated method stub
+                            // Log.i(TAG,"****Changed as:"+s);
+                        }
+                    });
+
+                    // set the adapter to auto-suggest
+                    if (!Util.ACCOUNTS.equals(mModuleName)
+                                                    && dynamicFieldName.equals(ModuleFields.ACCOUNT_NAME)) {
+                        // only if the module is directly related to Accounts,
+                        // disable the account name
+                        // field populating it with the corresponding account name
+                        if (MODE == Util.NEW_RELATIONSHIP_MODE) {
+
+                            // get the module name from the URI
+                            String module = mIntentUri.getPathSegments().get(0);
+
+                            // only if the module is directly related with the
+                            // Accounts module
+                            if (Util.ACCOUNTS.equals(module)) {
+
+                                if (mDbHelper == null)
+                                    mDbHelper = new DatabaseHelper(getBaseContext());
+
+                                // get the account name using the account row id in
+                                // the URI
+                                int accountRowId = Integer.parseInt(mIntentUri.getPathSegments().get(1));
+                                String selection = AccountsColumns.ID + "=" + accountRowId;
+                                Cursor cursor = getContentResolver().query(mDbHelper.getModuleUri(Util.ACCOUNTS), Accounts.LIST_PROJECTION, selection, null, null);
+                                cursor.moveToFirst();
+                                String accountName = cursor.getString(2);
+                                cursor.close();
+
+                                // pre-populate the field with the account name and
+                                // disable it
+                                dynamicValueView.setText(accountName);
+                                dynamicValueView.setEnabled(false);
+                            } else {
+                                // if the module is not directly related to Accounts
+                                // module, show the
+                                // auto-suggest instead of pre-populating the
+                                // account name field
+                                dynamicValueView.setAdapter(mAccountAdapter);
+                                dynamicValueView.setOnItemClickListener(new AccountsClickedItemListener());
+                            }
+                        } else {
+                            // set the apadter to show the auto-suggest
+                            dynamicValueView.setAdapter(mAccountAdapter);
+                            dynamicValueView.setOnItemClickListener(new AccountsClickedItemListener());
+
+                            if (MODE == Util.EDIT_ORPHAN_MODE
+                                                            || MODE == Util.EDIT_RELATIONSHIP_MODE)
+                                // store the account name in mAccountName if the
+                                // bean is already related
+                                // to an account
+                                if (!TextUtils.isEmpty(editTextValue)) {
+                                    mAccountName = editTextValue;
+                                }
+                        }
+                    } else if (dynamicFieldName.equals(ModuleFields.ASSIGNED_USER_NAME)) {
+                        // set the apadter to show the auto-suggest
+                        dynamicValueView.setAdapter(mUserAdapter);
+                        dynamicValueView.setOnItemClickListener(new UsersClickedItemListener());
+
+                        if (MODE == Util.EDIT_ORPHAN_MODE || MODE == Util.EDIT_RELATIONSHIP_MODE) {
+                            // store the user name in mUserName if the bean is
+                            // already assigned to a
+                            // user
+                            if (!TextUtils.isEmpty(editTextValue)) {
+                                mUserName = editTextValue;
+                            }
+                        }
+                    }
+
+                    mDetailsTable.addView(editRow);
+                    break;
+                }
 
             case INPUT_TYPE:
-                valueView = (AutoCompleteTextView) values[1];
-                valueView.setInputType((Integer) values[2]);
+                AutoCompleteTextView inputTypeValueView = (AutoCompleteTextView) values[1];
+                inputTypeValueView.setInputType((Integer) values[2]);
                 break;
 
             }
@@ -560,7 +751,6 @@ public class EditDetailsActivity extends Activity {
         mProgressDialog = ViewUtil.getProgressDialog(EditDetailsActivity.this, getString(R.string.saving), true);
         mProgressDialog.show();
 
-        boolean hasError = false;
         String[] detailsProjection = mSelectFields;
 
         Map<String, String> modifiedValues = new LinkedHashMap<String, String>();
@@ -582,31 +772,6 @@ public class EditDetailsActivity extends Activity {
 
             AutoCompleteTextView editText = (AutoCompleteTextView) ((ViewGroup) mDetailsTable.getChildAt(rowsCount)).getChildAt(1);
             String fieldValue = editText.getText().toString();
-
-            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))) {
-                if (Validation.isNotEmpty(fieldValue) && !Validation.isEmailValid(fieldValue)) {
-                    editText.setError(getString(R.string.emailValidationErrorMsg));
-                    hasError = true;
-                }
-            }
-
-            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
-                                            || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
-                if (Validation.isNotEmpty(fieldValue) && !Validation.isPhoneNumberValid(fieldValue)) {
-                    editText.setError(getString(R.string.phNoValidationErrorMsg));
-                    hasError = true;
-                }
-            }
-
-            if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))
-                                            || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))) {
-                if (!Validation.isNotEmpty(fieldValue)) {
-                    editText.setError(String.format(this.getString(R.string.emptyValidationErrorMsg), fieldName));
-                    hasError = true;
-                }
-            }
-
-            // TODO: validation
 
             if (!Util.ACCOUNTS.equals(mModuleName) && fieldName.equals(ModuleFields.ACCOUNT_NAME)) {
 
@@ -713,6 +878,9 @@ public class EditDetailsActivity extends Activity {
         ViewUtil.dismissVirtualKeyboard(getBaseContext(), v);
     }
 
+    /***************************************
+     * importContact for invoking a subactivity for picking up contact from device contacts
+     ***************************************/
     public void importContact() {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         startActivityForResult(intent, Util.IMPORT_CONTACTS_REQUEST_CODE);
@@ -753,10 +921,11 @@ public class EditDetailsActivity extends Activity {
 
             String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
-            if (hasPhone.equalsIgnoreCase("1"))
+            if (hasPhone.equalsIgnoreCase("1")) {
                 hasPhone = "true";
-            else
+            } else {
                 hasPhone = "false";
+            }
 
             if (Boolean.parseBoolean(hasPhone)) {
                 Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID
@@ -764,10 +933,12 @@ public class EditDetailsActivity extends Activity {
                 while (phones.moveToNext()) {
                     String contactPhno = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-                    if (ContactsContract.CommonDataKinds.Phone.TYPE_WORK == type)
+                    if (ContactsContract.CommonDataKinds.Phone.TYPE_WORK == type) {
                         ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))).setText(contactPhno);
-                    if (ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE == type)
+                    }
+                    if (ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE == type) {
                         ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))).setText(contactPhno);
+                    }
                 }
                 phones.close();
             }
@@ -955,4 +1126,5 @@ public class EditDetailsActivity extends Activity {
 
         }
     }
+
 }
