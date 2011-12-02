@@ -12,8 +12,7 @@ public class Validation {
     * @return boolean: true if email address is valid, false otherwise.
     */
     public static boolean isEmailValid(String email){
-    boolean isValid = false;
-    
+    boolean isValid = false;    
     /*
     Email format: A valid email address will have following format:
             [\\w\\.-]+: Begins with word characters, (may include periods and hypens).
@@ -107,7 +106,7 @@ public class Validation {
      */
     public static boolean isNotEmpty(String input) {
         boolean isValid = false;
-        if (input.equals(null)) {
+        if (input == null) {
 
         } else {
             if (input.length() > 0) {
@@ -115,14 +114,6 @@ public class Validation {
             }
         }
         return isValid;
-    }
-
-    public static void main(String args[]) {
-        System.out.println(":::email is- " + "my@idcom" + " - "
-                                        + Validation.isEmailValid("my@idcom"));
-        System.out.println(":::phone is- 9550011838 - "
-                                        + Validation.isPhoneNumberValid("9550011838"));
-        System.out.println(":::numeric is- abc - " + Validation.isNumeric("abc"));
     }
 
 }
