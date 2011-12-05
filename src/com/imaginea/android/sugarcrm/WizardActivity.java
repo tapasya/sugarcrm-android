@@ -119,7 +119,7 @@ public class WizardActivity extends Activity {
                 wizardState = Util.URL_AVAILABLE;
 
                 setFlipper();
-                View loginView = inflateLoginView();
+                inflateLoginView();
                 this.updateButtons(wizardState);
 
             } else {
@@ -421,8 +421,7 @@ public class WizardActivity extends Activity {
 
                 // check moduleNames for null
                 mDbHelper = new DatabaseHelper(getBaseContext());
-                List<String> userModules = mDbHelper.getUserModules();
-                Log.i(LOG_TAG, "userModules : size - " + userModules.size());
+                List<String> userModules = mDbHelper.getUserModules();                
                 if (userModules == null || userModules.size() == 0) {
                     userModules = RestUtil.getAvailableModules(url, sessionId);
                     try {

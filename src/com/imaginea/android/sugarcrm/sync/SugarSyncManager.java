@@ -404,7 +404,7 @@ public class SugarSyncManager {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateRelatedModuleItem");
         // Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
-        String[] projections = databaseHelper.getModuleProjections(relatedModuleName);
+        //String[] projections = databaseHelper.getModuleProjections(relatedModuleName);
         // Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
 
         // modified the uri to have moduleName/#/relatedModuleName/# so the uri would take care of
@@ -828,9 +828,10 @@ public class SugarSyncManager {
             for (SugarBean userBean : userBeans) {
                 // get the acl roles
                 SugarBean[] roleBeans = userBean.getRelationshipBeans(aclLinkNameField);
-                List<String> roleIds = new ArrayList<String>();
-                // get the beanIds of the roles that are inserted
+                               // get the beanIds of the roles that are inserted
                 if (roleBeans != null) {
+                    List<String> roleIds = new ArrayList<String>();
+
                     roleIds = databaseHelper.insertRoles(roleBeans);
 
                     // get the acl actions for each roleId

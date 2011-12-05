@@ -145,7 +145,7 @@ public class SugarService extends Service {
      *            a long.
      * @return a boolean.
      */
-    public synchronized static boolean isRunning(long transactionId) {
+    public synchronized static boolean isRunning(int transactionId) {
 
         AsyncServiceTask task = mTaskMap.get(transactionId);
         // /Log.d(TAG, "task " + task);
@@ -253,7 +253,7 @@ public class SugarService extends Service {
      *            a long.
      * @return a boolean.
      */
-    public synchronized static boolean isCancelled(long transactionId) {
+    public synchronized static boolean isCancelled(int transactionId) {
         // AsyncServiceTask task = mTaskMap.get(transactionId);
         AsyncServiceTask task = mTaskMap.get(transactionId);
         if (task != null) {

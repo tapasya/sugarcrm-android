@@ -351,7 +351,7 @@ public class ModuleListActivity extends ListActivity {
         // startActivity(detailIntent);
     }
 
-    private class DeleteContentObserver extends ContentObserver {
+    private static class DeleteContentObserver extends ContentObserver {
 
         public DeleteContentObserver(Handler handler) {
             super(handler);

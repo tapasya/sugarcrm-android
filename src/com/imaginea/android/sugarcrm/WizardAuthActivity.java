@@ -160,7 +160,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     Log.i(LOG_TAG, "REST URL is available but not the username!");
                     wizardState = Util.URL_AVAILABLE;
                     setFlipper();
-                    View loginView = inflateLoginView();
+                    inflateLoginView();
                     this.updateButtons(wizardState);
 
                 } else {
@@ -453,9 +453,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
     // Task to authenticate
     class AuthenticationTask extends AsyncTask<Object, Object, Object> implements
                                     SyncStatusObserver {
-        private String usr;
-
-        private String pwd;
+        private String usr;      
 
         boolean hasExceptions = false;
 
@@ -523,9 +521,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                 Log.e(LOG_TAG, ie.getMessage(), ie);
             }
             // test Account manager code
-
             return sessionId;
-
         }
 
         @Override

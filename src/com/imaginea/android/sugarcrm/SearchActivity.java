@@ -135,7 +135,7 @@ public class SearchActivity extends ListActivity {
     /**
      * GenericCursorAdapter
      */
-    private final class GenericCursorAdapter extends SimpleCursorAdapter {
+    private static class GenericCursorAdapter extends SimpleCursorAdapter {
 
         public GenericCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
             super(context, layout, c, from, to);

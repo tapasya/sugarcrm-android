@@ -200,13 +200,13 @@ public class EditDetailsActivity extends Activity {
 
         int staticRowsCount;
 
-        final int STATIC_ROW = 1;
+        final static int STATIC_ROW = 1;
 
-        final int DYNAMIC_ROW = 2;
+        final static int DYNAMIC_ROW = 2;
 
-        final int SAVE_BUTTON = 3;
+        final static int SAVE_BUTTON = 3;
 
-        final int INPUT_TYPE = 4;
+        final static int INPUT_TYPE = 4;
 
         LoadContentTask() {
             mDetailsTable = (ViewGroup) findViewById(R.id.accountDetalsTable);

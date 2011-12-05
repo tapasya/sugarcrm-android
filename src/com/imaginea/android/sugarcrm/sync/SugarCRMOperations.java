@@ -39,7 +39,7 @@ public class SugarCRMOperations {
 
     private boolean mIsNewId;
 
-    private final String TAG = "SugarCRMOperations";
+    private final static String TAG = "SugarCRMOperations";
 
     /**
      * Returns an instance of SugarCRMOperations instance for adding new module item to the sugar

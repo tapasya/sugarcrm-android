@@ -134,7 +134,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
 
-    private static List<String> moduleList;
+    //private static List<String> moduleList;
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
 
@@ -1367,7 +1367,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public List<String> getUserModules() {
         SQLiteDatabase db = getReadableDatabase();
-        moduleList = new ArrayList<String>();
+        ArrayList<String> moduleList = new ArrayList<String>();
         // get a sorted list with module_name OrderBy
         Cursor cursor = db.query(MODULES_TABLE_NAME, Modules.DETAILS_PROJECTION, null, null, null, null, ModuleColumns.MODULE_NAME);
         cursor.moveToFirst();

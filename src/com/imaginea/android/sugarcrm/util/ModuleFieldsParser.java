@@ -37,7 +37,7 @@ public class ModuleFieldsParser {
      */
     public ModuleFieldsParser(String jsonResponse) throws JSONException {
         JSONObject responseObj = new JSONObject(jsonResponse);
-        String moduleName = responseObj.get("module_name").toString();
+        //String moduleName = responseObj.get("module_name").toString();
 
         JSONObject moduleFieldsJSON = (JSONObject) responseObj.get("module_fields");
         setModuleFields(moduleFieldsJSON);
