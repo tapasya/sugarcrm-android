@@ -283,6 +283,7 @@ public class EditDetailsActivity extends Activity {
 
                 if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
                                                 || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                    valueView.setInputType(InputType.TYPE_CLASS_NUMBER);
                     valueView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void afterTextChanged(Editable s) {
@@ -442,6 +443,7 @@ public class EditDetailsActivity extends Activity {
 
                 if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
                                                 || dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                    dynamicValueView.setInputType(InputType.TYPE_CLASS_NUMBER);
                     dynamicValueView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void afterTextChanged(Editable s) {
