@@ -570,8 +570,8 @@ public class EditDetailsActivity extends Activity {
                 }
 
             case INPUT_TYPE:
-                AutoCompleteTextView inputTypeValueView = (AutoCompleteTextView) values[1];
-                inputTypeValueView.setInputType((Integer) values[2]);
+//                AutoCompleteTextView inputTypeValueView = (AutoCompleteTextView) values[1];
+//                inputTypeValueView.setInputType((Integer) values[2]);
                 break;
 
             }

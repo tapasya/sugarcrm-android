@@ -579,7 +579,7 @@ public class SugarCRMProvider extends ContentProvider {
                         val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
                         long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
                         if (relationRowId > 0)
-                            Log.i(TAG, "created relation: contactId - " + rowId + " accountId - "
+                            Log.d(TAG, "created relation: contactId - " + rowId + " accountId - "
                                                             + newAccountId);
                     }
                 }
@@ -615,7 +615,7 @@ public class SugarCRMProvider extends ContentProvider {
                 // TODO - date_modified
                 long relationRowId = db.insert(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, "", val2);
                 if (relationRowId > 0)
-                    Log.i(TAG, "created relation: opportunityId - " + rowId + " contactId - "
+                    Log.d(TAG, "created relation: opportunityId - " + rowId + " contactId - "
                                                     + contactId);
 
                 // accounts_opportunities relationship
@@ -638,7 +638,7 @@ public class SugarCRMProvider extends ContentProvider {
                             // TODO - date_modified
                             relationRowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
                             if (relationRowId > 0)
-                                Log.i(TAG, "created relation: opportunityId - " + rowId
+                                Log.d(TAG, "created relation: opportunityId - " + rowId
                                                                 + " accountId - " + newAccountId);
                         }
                     }
@@ -704,7 +704,7 @@ public class SugarCRMProvider extends ContentProvider {
                             val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
                             long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
                             if (relationRowId > 0)
-                                Log.i(TAG, "created relation: opportunityId - " + rowId
+                                Log.d(TAG, "created relation: opportunityId - " + rowId
                                                                 + " accountId - " + newAccountId);
                         }
                     }
@@ -753,7 +753,7 @@ public class SugarCRMProvider extends ContentProvider {
                             // TODO - date_modified
                             long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
                             if (relationRowId > 0)
-                                Log.i(TAG, "created relation: contactId - " + rowId
+                                Log.d(TAG, "created relation: contactId - " + rowId
                                                                 + " accountId - " + newAccountId);
                         }
                     }
@@ -787,7 +787,7 @@ public class SugarCRMProvider extends ContentProvider {
                             val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
                             long relationRowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
                             if (relationRowId > 0)
-                                Log.i(TAG, "created relation: caseId - " + rowId + " accountId - "
+                                Log.d(TAG, "created relation: caseId - " + rowId + " accountId - "
                                                                 + newAccountId);
                         }
                     }
@@ -1081,7 +1081,7 @@ public class SugarCRMProvider extends ContentProvider {
                             val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
                             long rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
                             if (rowId > 0)
-                                Log.i(TAG, "created relation: contactId - " + contactId
+                                Log.d(TAG, "created relation: contactId - " + contactId
                                                                 + " accountId - " + newAccountId);
                         }
                     }
@@ -1158,7 +1158,7 @@ public class SugarCRMProvider extends ContentProvider {
                             val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
                             long rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
                             if (rowId > 0)
-                                Log.i(TAG, "created relation: opportunityId - " + opportunityId
+                                Log.d(TAG, "created relation: opportunityId - " + opportunityId
                                                                 + " accountId - " + newAccountId);
                         }
                     }
@@ -1222,7 +1222,7 @@ public class SugarCRMProvider extends ContentProvider {
                             val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
                             long rowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
                             if (rowId > 0)
-                                Log.i(TAG, "created relation: caseId - " + caseId + " accountId - "
+                                Log.d(TAG, "created relation: caseId - " + caseId + " accountId - "
                                                                 + newAccountId);
                         }
                     }
@@ -1235,7 +1235,7 @@ public class SugarCRMProvider extends ContentProvider {
                                                     + AccountsCasesColumns.CASE_ID + "=" + caseId;
                     val2.put(AccountsCasesColumns.DELETED, Util.DELETED_ITEM);
                     db.update(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, val2, selection, null);
-                    Log.i(TAG, "updated deleted flag for the relation: caseId - " + caseId
+                    Log.d(TAG, "updated deleted flag for the relation: caseId - " + caseId
                                                     + " oldAccountId - " + accountId);
                 }
             }
@@ -1308,7 +1308,7 @@ public class SugarCRMProvider extends ContentProvider {
                                 val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
                                 long rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
                                 if (rowId > 0)
-                                    Log.i(TAG, "created relation: contactId - " + contactId
+                                    Log.d(TAG, "created relation: contactId - " + contactId
                                                                     + " accountId - "
                                                                     + newAccountId);
                             }
@@ -1342,7 +1342,7 @@ public class SugarCRMProvider extends ContentProvider {
             relationValues.put(ContactsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
             long rowId = db.insert(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, "", relationValues);
             if (rowId > 0)
-                Log.i(TAG, "created relation: opportunityId - " + opportunityId + " contactId - "
+                Log.d(TAG, "created relation: opportunityId - " + opportunityId + " contactId - "
                                                 + contactId);
 
             if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
@@ -1391,7 +1391,7 @@ public class SugarCRMProvider extends ContentProvider {
                             val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
                             rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
                             if (rowId > 0)
-                                Log.i(TAG, "created relation: opportunityId - " + opportunityId
+                                Log.d(TAG, "created relation: opportunityId - " + opportunityId
                                                                 + " accountId - " + newAccountId);
                         }
                     }
@@ -1526,7 +1526,7 @@ public class SugarCRMProvider extends ContentProvider {
                                 val3.put(AccountsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
                                 rowId = db.insert(DatabaseHelper.ACCOUNTS_OPPORTUNITIES_TABLE_NAME, "", val3);
                                 if (rowId > 0)
-                                    Log.i(TAG, "created relation: opportunityId - " + opportunityId
+                                    Log.d(TAG, "created relation: opportunityId - " + opportunityId
                                                                     + " accountId - "
                                                                     + newAccountId);
                             }
@@ -1561,7 +1561,7 @@ public class SugarCRMProvider extends ContentProvider {
             relationValues.put(ContactsOpportunitiesColumns.DELETED, Util.NEW_ITEM);
             rowId = db.insert(DatabaseHelper.CONTACTS_OPPORTUNITIES_TABLE_NAME, "", relationValues);
             if (rowId > 0)
-                Log.i(TAG, "created relation: opportunityId - " + opportunityId + " contactId - "
+                Log.d(TAG, "created relation: opportunityId - " + opportunityId + " contactId - "
                                                 + contactId);
 
             if (values.containsKey(ModuleFields.ACCOUNT_NAME)) {
@@ -1608,7 +1608,7 @@ public class SugarCRMProvider extends ContentProvider {
                             val3.put(AccountsContactsColumns.DELETED, Util.NEW_ITEM);
                             rowId = db.insert(DatabaseHelper.ACCOUNTS_CONTACTS_TABLE_NAME, "", val3);
                             if (rowId > 0)
-                                Log.i(TAG, "created relation: contactId - " + contactId
+                                Log.d(TAG, "created relation: contactId - " + contactId
                                                                 + " accountId - " + newAccountId);
                         }
                     }
@@ -1691,7 +1691,7 @@ public class SugarCRMProvider extends ContentProvider {
                                 val3.put(AccountsCasesColumns.DELETED, Util.NEW_ITEM);
                                 rowId = db.insert(DatabaseHelper.ACCOUNTS_CASES_TABLE_NAME, "", val3);
                                 if (rowId > 0)
-                                    Log.i(TAG, "created relation: caseId - " + caseId
+                                    Log.d(TAG, "created relation: caseId - " + caseId
                                                                     + " accountId - "
                                                                     + newAccountId);
                             }

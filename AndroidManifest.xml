@@ -9,7 +9,7 @@
 
       <!--  by default all are true for 1.6 -->
     <supports-screen
-          android:largeScreens="true"
+          android:largeScreens="false"
           android:normalScreens="true"
           android:smallScreens="true"                   
           android:anyDensity="true" />

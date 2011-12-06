@@ -156,19 +156,19 @@ public class SugarSyncManager {
 
                 if (rawId != 0) {
                     if (!sBean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
-                        Log.i(LOG_TAG, "updating... " + moduleName + ": " + rawId + ") " + name);
+                        Log.d(LOG_TAG, "updating... " + moduleName + ": " + rawId + ") " + name);
                         updateModuleItem(context, resolver, account, moduleName, sBean, rawId, batchOperation);
                     } else {
                         // delete module item - never delete the item here, just update the deleted
                         // flag
-                        Log.i(LOG_TAG, "deleting... " + moduleName + ": " + rawId + ") " + name);
+                        Log.d(LOG_TAG, "deleting... " + moduleName + ": " + rawId + ") " + name);
                         deleteModuleItem(context, rawId, moduleName, batchOperation);
                     }
                 } else {
                     // add new moduleItem
                     // Log.v(LOG_TAG, "In addModuleItem");
                     if (!sBean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
-                        Log.i(LOG_TAG, "inserting... " + moduleName + ": " + " " + name);
+                        Log.d(LOG_TAG, "inserting... " + moduleName + ": " + " " + name);
                         addModuleItem(context, account, sBean, moduleName, batchOperation);
                     }
                 }
@@ -276,7 +276,7 @@ public class SugarSyncManager {
                     // add new moduleItem
                     // Log.v(LOG_TAG, "In addModuleItem");
                     if (!relationbean.getFieldValue(ModuleFields.DELETED).equals(Util.DELETED_ITEM)) {
-                        Log.i(LOG_TAG, "inserting... " + moduleName + "_" + relation);
+                        Log.d(LOG_TAG, "inserting... " + moduleName + "_" + relation);
                         addRelatedModuleItem(context, account, rawId, bean, relationbean, moduleName, relation, batchOperation);
                     }
                 }
