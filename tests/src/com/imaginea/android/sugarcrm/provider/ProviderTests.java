@@ -7,7 +7,7 @@ import android.test.ProviderTestCase2;
  * Tests of the SugarCRM Provider.
  * 
  * You can run this entire test case with: runtest -c
- * com.iamginea.android.sugarcrm.provider.ProviderTests crm
+ * com.imaginea.android.sugarcrm.provider.ProviderTests crm
  */
 public class ProviderTests extends ProviderTestCase2<SugarCRMProvider> {
 

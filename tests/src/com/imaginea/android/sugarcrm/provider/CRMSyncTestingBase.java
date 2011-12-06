@@ -25,8 +25,6 @@ import java.util.UUID;
  * 
  * CRMSyncTestingBase
  * 
- * @author chander
- * 
  */
 public class CRMSyncTestingBase extends SyncBaseInstrumentation {
     protected AccountManager mAccountManager;

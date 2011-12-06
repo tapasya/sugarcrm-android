@@ -2,7 +2,6 @@ package com.imaginea.android.sugarcrm;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.MediumTest;
-import android.view.KeyEvent;
 
 /**
  * Instrumentation class for Contacts List launch performance testing.
