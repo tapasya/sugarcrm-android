@@ -302,7 +302,6 @@ public class ModuleListActivity extends ListActivity {
      * @param position
      */
     private void openEditScreen(int position) {
-        Intent detailIntent = new Intent(ModuleListActivity.this, EditDetailsActivity.class);
 
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
         if (cursor == null) {
@@ -312,14 +311,16 @@ public class ModuleListActivity extends ListActivity {
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             Log.d(LOG_TAG, "beanId:" + cursor.getString(1));
-        detailIntent.putExtra(Util.ROW_ID, cursor.getString(0));
+
+        Intent editDetailsIntent = new Intent(ModuleListActivity.this, EditDetailsActivity.class);
+        editDetailsIntent.putExtra(Util.ROW_ID, cursor.getString(0));
         if (mIntentUri != null)
-            detailIntent.setData(Uri.withAppendedPath(mIntentUri, cursor.getString(0)));
+            editDetailsIntent.setData(Uri.withAppendedPath(mIntentUri, cursor.getString(0)));
 
-        detailIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
-        detailIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
+        editDetailsIntent.putExtra(RestUtilConstants.BEAN_ID, cursor.getString(1));
+        editDetailsIntent.putExtra(RestUtilConstants.MODULE_NAME, mModuleName);
 
-        startActivity(detailIntent);
+        startActivity(editDetailsIntent);
     }
 
     /**

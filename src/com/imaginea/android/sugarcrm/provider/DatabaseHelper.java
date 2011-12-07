@@ -1394,6 +1394,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void setUserModules(List<String> moduleNames) throws SugarCrmException {
         boolean hasFailed = false;
         SQLiteDatabase db = getWritableDatabase();
+        
+        try {
+            //TODO: This has to be removed and is only added to fix the DB insertion issue, 
+            int numOfUserModulesDeleted = db.delete(MODULES_TABLE_NAME, null, null);
+            Log.d(TAG, "number of user modules deleted: " + numOfUserModulesDeleted);
+        } catch (SQLException sqlex) {
+            // IGNORE even if it fails
+        }
+        
         db.beginTransaction();
 
         HashSet<String> moduleNamesSet = new HashSet<String>(moduleNames);
