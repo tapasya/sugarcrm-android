@@ -1,9 +1,9 @@
 package com.imaginea.android.sugarcrm.util;
 
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ContactsColumns;
 
 public class ImportContactsUtility {
 

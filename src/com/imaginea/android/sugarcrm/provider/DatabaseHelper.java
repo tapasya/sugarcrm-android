@@ -1,5 +1,19 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -56,20 +70,6 @@ import com.imaginea.android.sugarcrm.util.ModuleFieldBean;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 /**
  * This class helps open, create, and upgrade the database file.
@@ -134,7 +134,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static HashMap<String, Integer> moduleIcons = new HashMap<String, Integer>();
 
-    //private static List<String> moduleList;
+    // private static List<String> moduleList;
 
     private static final HashMap<String, String[]> moduleProjections = new HashMap<String, String[]>();
 

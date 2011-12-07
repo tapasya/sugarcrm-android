@@ -1,5 +1,7 @@
 package com.imaginea.android.sugarcrm.sync;
 
+import java.util.Map;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -9,8 +11,6 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.SugarBean;
-
-import java.util.Map;
 
 /**
  * Helper class for storing data in the sugarcrm content providers.

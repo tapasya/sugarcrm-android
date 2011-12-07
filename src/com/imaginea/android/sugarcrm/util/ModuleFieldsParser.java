@@ -1,15 +1,15 @@
 package com.imaginea.android.sugarcrm.util;
 
-import android.util.Log;
-
-import com.imaginea.android.sugarcrm.RestUtilConstants;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import android.util.Log;
+
+import com.imaginea.android.sugarcrm.RestUtilConstants;
 
 /**
  * <p>
@@ -37,7 +37,7 @@ public class ModuleFieldsParser {
      */
     public ModuleFieldsParser(String jsonResponse) throws JSONException {
         JSONObject responseObj = new JSONObject(jsonResponse);
-        //String moduleName = responseObj.get("module_name").toString();
+        // String moduleName = responseObj.get("module_name").toString();
 
         JSONObject moduleFieldsJSON = (JSONObject) responseObj.get("module_fields");
         setModuleFields(moduleFieldsJSON);

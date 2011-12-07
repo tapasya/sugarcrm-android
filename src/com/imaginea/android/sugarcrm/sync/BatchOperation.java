@@ -1,5 +1,7 @@
 package com.imaginea.android.sugarcrm.sync;
 
+import java.util.ArrayList;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
@@ -8,8 +10,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.SugarCRMProvider;
-
-import java.util.ArrayList;
 
 /**
  * This class handles execution of batch mOperations on SugarCRM provider.

@@ -1,13 +1,19 @@
 package com.imaginea.android.sugarcrm.sync;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.http.ParseException;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SyncResult;
 import android.content.SharedPreferences.Editor;
+import android.content.SyncResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -20,12 +26,6 @@ import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import org.apache.http.ParseException;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 /**
  * SyncAdapter implementation for syncing sugarcrm modules on the server to sugar crm provider and
@@ -109,13 +109,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             case Util.SYNC_ALL_META_DATA:
                 // should be used once for one time set-up
                 boolean modulesSyncd = SugarSyncManager.syncModules(mContext, account.name, sessionId);
-                //Log.d(LOG_TAG, "syncModules done. success: " + modulesSyncd);
-                
-                //boolean aclAccessSyncd = SugarSyncManager.syncAclAccess(mContext, account.name, sessionId);
-                //Log.d(LOG_TAG, "ACL access aync done. success: " + aclAccessSyncd);
-                
+                // Log.d(LOG_TAG, "syncModules done. success: " + modulesSyncd);
+
+                // boolean aclAccessSyncd = SugarSyncManager.syncAclAccess(mContext, account.name,
+                // sessionId);
+                // Log.d(LOG_TAG, "ACL access aync done. success: " + aclAccessSyncd);
+
                 boolean usersSyncd = SugarSyncManager.syncUsersList(mContext, sessionId);
-                //Log.d(LOG_TAG, "Users aync done. success: " + usersSyncd);
+                // Log.d(LOG_TAG, "Users aync done. success: " + usersSyncd);
 
                 // TODO - Need to resolve SYNC issue.
                 // if (modulesSyncd && aclAccessSyncd & usersSyncd) {

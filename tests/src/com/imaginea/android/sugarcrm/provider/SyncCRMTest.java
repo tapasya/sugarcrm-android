@@ -69,7 +69,7 @@ public class SyncCRMTest extends CRMSyncTestingBase {
     public void testSyncModules() throws Exception {
         Uri insertUri = insertAccount();
         Bundle extras = new Bundle();
-        //extras.putInt(key, value)
+        // extras.putInt(key, value)
         ContentResolver.requestSync(getAccount(), SugarCRMProvider.AUTHORITY, extras);
     }
 }

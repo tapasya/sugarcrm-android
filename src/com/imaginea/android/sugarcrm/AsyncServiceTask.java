@@ -15,11 +15,6 @@
  */
 package com.imaginea.android.sugarcrm;
 
-import android.content.Context;
-import android.os.PowerManager;
-import android.os.Process;
-import android.util.Log;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -31,6 +26,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import android.content.Context;
+import android.os.PowerManager;
+import android.os.Process;
+import android.util.Log;
 
 /**
  * Modified version of AsyncTask borrowed from Android open source which does not post to UI but

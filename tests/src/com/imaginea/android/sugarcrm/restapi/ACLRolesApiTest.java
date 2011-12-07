@@ -1,15 +1,15 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * ACLApiTest, tests the rest api calls

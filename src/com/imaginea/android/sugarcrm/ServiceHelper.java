@@ -1,14 +1,14 @@
 package com.imaginea.android.sugarcrm;
 
+import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * ServiceHelper

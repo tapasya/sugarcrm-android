@@ -1,5 +1,14 @@
 package com.imaginea.android.sugarcrm;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -32,15 +41,6 @@ import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * <p>
@@ -421,7 +421,7 @@ public class WizardActivity extends Activity {
 
                 // check moduleNames for null
                 mDbHelper = new DatabaseHelper(getBaseContext());
-                List<String> userModules = mDbHelper.getUserModules();                
+                List<String> userModules = mDbHelper.getUserModules();
                 if (userModules == null || userModules.size() == 0) {
                     userModules = RestUtil.getAvailableModules(url, sessionId);
                     try {

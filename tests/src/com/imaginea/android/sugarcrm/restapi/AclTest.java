@@ -5,18 +5,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
-import com.imaginea.android.sugarcrm.RestUtilConstants;
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActionColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLActions;
-import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoleColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.ACLRoles;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
@@ -55,8 +49,8 @@ public class AclTest extends RestAPITest {
                 if (roleBeans != null) {
                     // get the beanIds of the roles that are inserted
                     roleIds = dbHelper.insertRoles(roleBeans);
-                    
-                 // get the acl actions for each roleId
+
+                    // get the acl actions for each roleId
                     for (String roleId : roleIds) {
                         if (Log.isLoggable(TAG, Log.DEBUG))
                             Log.d(TAG, "roleId - " + roleId);

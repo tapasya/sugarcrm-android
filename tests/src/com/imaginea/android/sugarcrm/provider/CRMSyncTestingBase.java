@@ -1,5 +1,12 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
@@ -13,13 +20,6 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * 
@@ -171,7 +171,7 @@ public class CRMSyncTestingBase extends SyncBaseInstrumentation {
         Log.v(TAG, "Found " + accounts.length + " accounts; using the last one, " + account.name);
         return account.name;
     }
-    
+
     /**
      * Returns the default sugar crm account on the device.
      * 

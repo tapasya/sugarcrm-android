@@ -1,5 +1,9 @@
 package com.imaginea.android.sugarcrm;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -19,10 +23,6 @@ import com.imaginea.android.sugarcrm.util.RelationshipStatus;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * UpdateServiceTask

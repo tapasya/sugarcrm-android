@@ -1,5 +1,13 @@
 package com.imaginea.android.sugarcrm;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,14 +24,6 @@ import android.util.Log;
 
 import com.imaginea.android.sugarcrm.util.CRMCustomLogFormatter;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * SugarService, follows the APIDemos pattern of command handling example of a Service

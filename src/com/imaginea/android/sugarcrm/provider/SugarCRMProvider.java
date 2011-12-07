@@ -1,5 +1,8 @@
 package com.imaginea.android.sugarcrm.provider;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -32,9 +35,6 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Meetings;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Opportunities;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.OpportunitiesColumns;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * SugarCRMProvider Provides access to a database of sugar modules, their data and relationships.
@@ -118,8 +118,8 @@ public class SugarCRMProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                                     String sortOrder) {
         Cursor c = null;
-        //TODO - take care of maxResults limit
-        //String maxResultsLimit = null;
+        // TODO - take care of maxResults limit
+        // String maxResultsLimit = null;
         String offset = null;
 
         // Get the database and run the query
@@ -236,8 +236,8 @@ public class SugarCRMProvider extends ContentProvider {
                 Log.d(TAG, "Querying Contacts");
                 Log.d(TAG, "Uri:->" + uri.toString());
 
-                Log.d(TAG, "Offset" + offset);                
-            }           
+                Log.d(TAG, "Offset" + offset);
+            }
             c = db.query(DatabaseHelper.CONTACTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder, "");
 
             break;
@@ -282,8 +282,8 @@ public class SugarCRMProvider extends ContentProvider {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Querying Leads");
                 Log.d(TAG, "Uri:->" + uri.toString());
-                Log.d(TAG, "Offset" + offset);                
-            }           
+                Log.d(TAG, "Offset" + offset);
+            }
             c = db.query(DatabaseHelper.LEADS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder, "");
 
             break;
@@ -310,9 +310,9 @@ public class SugarCRMProvider extends ContentProvider {
 
                 // qb.setTables(DatabaseHelper.CONTACTS_TABLE_NAME);
 
-                Log.d(TAG, "Offset" + offset);                
+                Log.d(TAG, "Offset" + offset);
             }
-            
+
             c = db.query(DatabaseHelper.OPPORTUNITIES_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder, "");
 
             break;

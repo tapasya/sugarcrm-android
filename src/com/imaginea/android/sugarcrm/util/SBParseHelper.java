@@ -2,12 +2,12 @@ package com.imaginea.android.sugarcrm.util;
 
 import static com.imaginea.android.sugarcrm.RestUtilConstants.VALUE;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * <p>

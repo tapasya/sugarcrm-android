@@ -47,10 +47,14 @@ public class ContactsApiTest extends RestAPITest {
         int offset = 0;
         int maxResults = 20;
         SugarBean[] sBeans = getSugarBeansFilterByDate(offset, maxResults);
+        assertNotNull(sBeans);
+        assertTrue(sBeans.length > 0);
+
         int totalRuns = 1;
         while (sBeans.length > 0) {
             offset += 20;
             sBeans = getSugarBeans(offset, maxResults);
+            assertNotNull(sBeans);
             totalRuns++;
         }
         Log.d(LOG_TAG, "Total Runs:" + totalRuns);
@@ -62,11 +66,12 @@ public class ContactsApiTest extends RestAPITest {
         int maxResults = 10;
         // String[] selectFields = new String[] {};
         SugarBean[] sBeans = getSugarBeans(offset, maxResults);
+        assertNotNull(sBeans);
         assertTrue(sBeans.length > 0);
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             for (SugarBean sBean : sBeans) {
-                ;
+                assertNotNull(sBean);
                 Log.d(LOG_TAG, sBean.getBeanId());
                 Log.d(LOG_TAG, sBean.getFieldValue(ModuleFields.EMAIL1));
             }
@@ -79,10 +84,14 @@ public class ContactsApiTest extends RestAPITest {
         int maxResults = 20;
         // String[] selectFields = new String[] {};
         SugarBean[] sBeans = getSugarBeans(offset, maxResults);
+        assertNotNull(sBeans);
+        assertTrue(sBeans.length > 0);
+
         int totalRuns = 1;
         while (sBeans.length > 0) {
             offset += 20;
             sBeans = getSugarBeans(offset, maxResults);
+            assertNotNull(sBeans);
             totalRuns++;
         }
         Log.d(LOG_TAG, "Total Runs:" + totalRuns);

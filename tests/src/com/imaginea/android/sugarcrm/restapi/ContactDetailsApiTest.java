@@ -1,14 +1,14 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import java.util.HashMap;
+import java.util.List;
+
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
-
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * ContactsApiTest, tests the rest api calls
@@ -43,10 +43,10 @@ public class ContactDetailsApiTest extends RestAPITest {
         for (int i = 0; i < selectFields.length; i++) {
             String fieldValue = sBean.getFieldValue(selectFields[i]);
             Log.i(LOG_TAG, "FieldName:|Field value " + selectFields[i] + ":" + fieldValue);
-            //assertNotNull(fieldValue);
+            // assertNotNull(fieldValue);
         }
     }
-    
+
     /**
      * demonstrates the usage of RestUtil for contacts List. ModuleFields.NAME or FULL_NAME is not
      * returned by Sugar CRM. The fields that are not returned by SugarCRM can be automated, but not

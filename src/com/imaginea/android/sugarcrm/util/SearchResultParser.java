@@ -4,12 +4,12 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.ENTRY_LIST;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.NAME;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.RECORDS;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>

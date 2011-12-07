@@ -1,13 +1,13 @@
 package com.imaginea.android.sugarcrm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Application;
 
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>

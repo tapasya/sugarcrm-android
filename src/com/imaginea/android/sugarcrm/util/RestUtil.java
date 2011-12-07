@@ -55,9 +55,13 @@ import static com.imaginea.android.sugarcrm.RestUtilConstants.SET_RELATIONSHIPS;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_AUTH;
 import static com.imaginea.android.sugarcrm.RestUtilConstants.USER_NAME;
 
-import android.util.Log;
-
-import com.imaginea.android.sugarcrm.ModuleFields;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -71,13 +75,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import android.util.Log;
+
+import com.imaginea.android.sugarcrm.ModuleFields;
 
 /**
  * <p>
@@ -951,7 +951,7 @@ public class RestUtil {
             List<String> modules = new ArrayList<String>();
             for (int i = 0; i < modulesArray.length(); i++) {
                 String module = modulesArray.getString(i).toString();
-                //Log.d(LOG_TAG, "getAvailableModules: module - " + module);
+                // Log.d(LOG_TAG, "getAvailableModules: module - " + module);
                 modules.add(module);
             }
 

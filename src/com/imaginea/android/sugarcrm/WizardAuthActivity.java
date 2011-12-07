@@ -1,5 +1,14 @@
 package com.imaginea.android.sugarcrm;
 
+import java.io.IOException;
+import java.util.concurrent.Semaphore;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -11,8 +20,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SyncStatusObserver;
 import android.content.SharedPreferences.Editor;
+import android.content.SyncStatusObserver;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,15 +45,6 @@ import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
 import com.imaginea.android.sugarcrm.util.ViewUtil;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.IOException;
-import java.util.concurrent.Semaphore;
 
 /**
  * WizardAuthActivity, same as Wizard Activity, but with account manager integration works only with
@@ -453,7 +453,7 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
     // Task to authenticate
     class AuthenticationTask extends AsyncTask<Object, Object, Object> implements
                                     SyncStatusObserver {
-        private String usr;      
+        private String usr;
 
         boolean hasExceptions = false;
 

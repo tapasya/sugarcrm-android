@@ -1,5 +1,10 @@
 package com.imaginea.android.sugarcrm;
 
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,19 +27,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.Util;
 import com.imaginea.android.sugarcrm.util.ViewUtil;
-
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * ModuleDetailsActivity is used to show details for all modules. Note: Ideally we would have to
@@ -411,93 +411,101 @@ public class ModuleDetailsActivity extends Activity {
                 ModuleField moduleField = fieldNameVsModuleField.get(fieldName);
 
                 if (moduleField != null) {
-	                ViewGroup tableRow;
-	                TextView textViewForLabel;
-	                TextView textViewForValue;
-	                // first two columns in the detail projection are ROW_ID and BEAN_ID
-	                if (staticRowsCount > rowsCount) {
-	                    tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
-	                    textViewForLabel = (TextView) tableRow.getChildAt(0);
-	                    textViewForValue = (TextView) tableRow.getChildAt(1);
-	                } else {
-	                    tableRow = (ViewGroup) inflater.inflate(R.layout.table_row, null);
-	                    textViewForLabel = (TextView) tableRow.getChildAt(0);
-	                    textViewForValue = (TextView) tableRow.getChildAt(1);
-	                }
-	
-	                // set the title
-	                if (titleFields.contains(fieldName)) {
-	                    title = title + tempValue + " ";
-	                    publishProgress(HEADER, fieldName, textViewForTitle, title);
-	                    continue;
-	                }
-	                
-	                String label = moduleField.getLabel();
-	                
-	
-	                // check for the billing and shipping address groups only if the module is
-	                // 'Accounts'
-	                if (Util.ACCOUNTS.equals(mModuleName)) {
-	                    if (billingAddressGroup.contains(fieldName)) {
-	                        if (fieldName.equals(ModuleFields.BILLING_ADDRESS_STREET)) {
-	                            // First field in the group
-	                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
-	                            continue;
-	                        } else if (fieldName.equals(ModuleFields.BILLING_ADDRESS_COUNTRY)) {
-	                            // last field in the group
-	
-	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
-	                            label = getBaseContext().getString(R.string.billing_address);
-	                        } else {
-	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
-	                            continue;
-	                        }
-	                    } else if (shippingAddressGroup.contains(fieldName)) {
-	                        if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_STREET)) {
-	                            // First field in the group
-	                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
-	                            continue;
-	                        } else if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_COUNTRY)) {
-	                            // Last field in the group
-	
-	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
-	                            label = getBaseContext().getString(R.string.shipping_address);
-	                        } else {
-	
-	                            value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + ", " : "");
-	                            continue;
-	                        }
-	                    } else {
-	                        value = tempValue;
-	                    }
-	                } else if (durationGroup.contains(fieldName)) {
-	                    if (fieldName.equals(ModuleFields.DURATION_HOURS)) {
-	                        // First field in the group
-	                        value = (!TextUtils.isEmpty(tempValue)) ? tempValue + "hr " : "";
-	                        continue;
-	                    } else if (fieldName.equals(ModuleFields.DURATION_MINUTES)) {
-	                        // Last field in the group
-	                        value = value + (!TextUtils.isEmpty(tempValue) ? tempValue + "mins " : "");
-	                        label = getBaseContext().getString(R.string.duration);
-	                    }
-	                } else {
-	                    value = tempValue;
-	                }
-	
-	                if (moduleField.getType().equals("phone"))
-	                    textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
-	
-	                int command = staticRowsCount < rowsCount ? DYNAMIC_ROW : STATIC_ROW;
-	
-	                if (!TextUtils.isEmpty(value)) {
-	                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, value);
-	                } else {
-	                    publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, getString(R.string.notAvailable));
-	                }
-	
-	                rowsCount++;
+                    ViewGroup tableRow;
+                    TextView textViewForLabel;
+                    TextView textViewForValue;
+                    // first two columns in the detail projection are ROW_ID and BEAN_ID
+                    if (staticRowsCount > rowsCount) {
+                        tableRow = (ViewGroup) mDetailsTable.getChildAt(rowsCount);
+                        textViewForLabel = (TextView) tableRow.getChildAt(0);
+                        textViewForValue = (TextView) tableRow.getChildAt(1);
+                    } else {
+                        tableRow = (ViewGroup) inflater.inflate(R.layout.table_row, null);
+                        textViewForLabel = (TextView) tableRow.getChildAt(0);
+                        textViewForValue = (TextView) tableRow.getChildAt(1);
+                    }
+
+                    // set the title
+                    if (titleFields.contains(fieldName)) {
+                        title = title + tempValue + " ";
+                        publishProgress(HEADER, fieldName, textViewForTitle, title);
+                        continue;
+                    }
+
+                    String label = moduleField.getLabel();
+
+                    // check for the billing and shipping address groups only if the module is
+                    // 'Accounts'
+                    if (Util.ACCOUNTS.equals(mModuleName)) {
+                        if (billingAddressGroup.contains(fieldName)) {
+                            if (fieldName.equals(ModuleFields.BILLING_ADDRESS_STREET)) {
+                                // First field in the group
+                                value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
+                                continue;
+                            } else if (fieldName.equals(ModuleFields.BILLING_ADDRESS_COUNTRY)) {
+                                // last field in the group
+
+                                value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
+                                label = getBaseContext().getString(R.string.billing_address);
+                            } else {
+                                value = value
+                                                                + (!TextUtils.isEmpty(tempValue) ? tempValue
+                                                                                                + ", "
+                                                                                                : "");
+                                continue;
+                            }
+                        } else if (shippingAddressGroup.contains(fieldName)) {
+                            if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_STREET)) {
+                                // First field in the group
+                                value = (!TextUtils.isEmpty(tempValue)) ? tempValue + ", " : "";
+                                continue;
+                            } else if (fieldName.equals(ModuleFields.SHIPPING_ADDRESS_COUNTRY)) {
+                                // Last field in the group
+
+                                value = value + (!TextUtils.isEmpty(tempValue) ? tempValue : "");
+                                label = getBaseContext().getString(R.string.shipping_address);
+                            } else {
+
+                                value = value
+                                                                + (!TextUtils.isEmpty(tempValue) ? tempValue
+                                                                                                + ", "
+                                                                                                : "");
+                                continue;
+                            }
+                        } else {
+                            value = tempValue;
+                        }
+                    } else if (durationGroup.contains(fieldName)) {
+                        if (fieldName.equals(ModuleFields.DURATION_HOURS)) {
+                            // First field in the group
+                            value = (!TextUtils.isEmpty(tempValue)) ? tempValue + "hr " : "";
+                            continue;
+                        } else if (fieldName.equals(ModuleFields.DURATION_MINUTES)) {
+                            // Last field in the group
+                            value = value
+                                                            + (!TextUtils.isEmpty(tempValue) ? tempValue
+                                                                                            + "mins "
+                                                                                            : "");
+                            label = getBaseContext().getString(R.string.duration);
+                        }
+                    } else {
+                        value = tempValue;
+                    }
+
+                    if (moduleField.getType().equals("phone"))
+                        textViewForValue.setAutoLinkMask(Linkify.PHONE_NUMBERS);
+
+                    int command = staticRowsCount < rowsCount ? DYNAMIC_ROW : STATIC_ROW;
+
+                    if (!TextUtils.isEmpty(value)) {
+                        publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, value);
+                    } else {
+                        publishProgress(command, fieldName, tableRow, textViewForLabel, label, textViewForValue, getString(R.string.notAvailable));
+                    }
+
+                    rowsCount++;
                 } else {
-                	// module fields is null
+                    // module fields is null
                 }
 
             }

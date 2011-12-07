@@ -1,5 +1,18 @@
 package com.imaginea.android.sugarcrm.sync;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -27,19 +40,6 @@ import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.SugarCrmException;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * Class for managing sugar crm sync related mOperations. should be capable of updating the
@@ -404,7 +404,7 @@ public class SugarSyncManager {
         if (Log.isLoggable(LOG_TAG, Log.VERBOSE))
             Log.v(LOG_TAG, "In updateRelatedModuleItem");
         // Uri contentUri = databaseHelper.getModuleUri(relatedModuleName);
-        //String[] projections = databaseHelper.getModuleProjections(relatedModuleName);
+        // String[] projections = databaseHelper.getModuleProjections(relatedModuleName);
         // Uri uri = ContentUris.withAppendedId(contentUri, relationRawId);
 
         // modified the uri to have moduleName/#/relatedModuleName/# so the uri would take care of
@@ -515,7 +515,8 @@ public class SugarSyncManager {
 
         try {
             if (userModules == null || userModules.size() == 0) {
-            	//Log.d(LOG_TAG, "No user modules available in the database. Trying to get available modules from the server.");
+                // Log.d(LOG_TAG,
+                // "No user modules available in the database. Trying to get available modules from the server.");
                 userModules = RestUtil.getAvailableModules(url, sessionId);
             }
             // Log.i(LOG_TAG, "userModules : " + userModules.size());
@@ -828,7 +829,7 @@ public class SugarSyncManager {
             for (SugarBean userBean : userBeans) {
                 // get the acl roles
                 SugarBean[] roleBeans = userBean.getRelationshipBeans(aclLinkNameField);
-                               // get the beanIds of the roles that are inserted
+                // get the beanIds of the roles that are inserted
                 if (roleBeans != null) {
                     List<String> roleIds = new ArrayList<String>();
 

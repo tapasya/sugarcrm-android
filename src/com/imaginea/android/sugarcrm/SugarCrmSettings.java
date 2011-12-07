@@ -1,5 +1,8 @@
 package com.imaginea.android.sugarcrm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -9,9 +12,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>

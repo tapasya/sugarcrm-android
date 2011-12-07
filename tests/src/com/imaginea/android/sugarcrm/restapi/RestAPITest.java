@@ -1,15 +1,11 @@
 package com.imaginea.android.sugarcrm.restapi;
 
+import junit.framework.TestCase;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
 
 import com.imaginea.android.sugarcrm.util.RestUtil;
-
-import junit.framework.TestCase;
-
-import org.json.JSONObject;
 
 /**
  * 
@@ -28,10 +24,11 @@ public class RestAPITest extends AndroidTestCase {
     protected Context mTargetContext;
 
     protected String mAccount;
+
     /**
      * used by module specific unit tests
      */
-    protected String url = "http://192.168.1.147:8080/sugarcrm/service/v2/rest.php";
+    protected String url = "http://192.168.1.83/sugarcrm/service/v2/rest.php";
 
     protected String userName = "will";
 
@@ -43,10 +40,10 @@ public class RestAPITest extends AndroidTestCase {
     protected void setUp() throws Exception {
 
         super.setUp();
-       // mTargetContext = getInstrumentation().getTargetContext();
+        // mTargetContext = getInstrumentation().getTargetContext();
 
-      //  mAccountManager = AccountManager.get(mTargetContext);
-       // mAccount = getAccount();
+        // mAccountManager = AccountManager.get(mTargetContext);
+        // mAccount = getAccount();
         authenticate();
     }
 
@@ -54,5 +51,5 @@ public class RestAPITest extends AndroidTestCase {
 
         mSessionId = RestUtil.loginToSugarCRM(url, userName, password);
         assertNotNull(mSessionId);
-    }      
+    }
 }

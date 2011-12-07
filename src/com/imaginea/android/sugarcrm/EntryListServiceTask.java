@@ -1,5 +1,8 @@
 package com.imaginea.android.sugarcrm;
 
+import java.util.HashMap;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +15,6 @@ import android.util.Log;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 import com.imaginea.android.sugarcrm.util.Util;
-
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * EntryListServiceTask

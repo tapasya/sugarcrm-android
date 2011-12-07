@@ -1,5 +1,9 @@
 package com.imaginea.android.sugarcrm.util;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -10,10 +14,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Common utilties and constants required by everyone
@@ -209,7 +209,7 @@ public class Util {
      */
     public static String MD5(String text) throws SugarCrmException {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");            
+            MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(text.getBytes("iso-8859-1"), 0, text.length());
             byte[] md5hash = md.digest();
             return convertToHex(md5hash);

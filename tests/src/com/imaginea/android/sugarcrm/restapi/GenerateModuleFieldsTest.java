@@ -1,17 +1,5 @@
 package com.imaginea.android.sugarcrm.restapi;
 
-import android.os.Environment;
-import android.test.suitebuilder.annotation.LargeTest;
-import android.util.Log;
-
-import com.imaginea.android.sugarcrm.util.ModuleField;
-import com.imaginea.android.sugarcrm.util.RestUtil;
-
-//import org.apache.velocity.VelocityContext;
-///import org.apache.velocity.app.Velocity;
-//import org.apache.velocity.exception.MethodInvocationException;
-//import org.apache.velocity.exception.ParseErrorException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,6 +11,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import android.os.Environment;
+import android.test.suitebuilder.annotation.LargeTest;
+import android.util.Log;
+
+import com.imaginea.android.sugarcrm.util.ModuleField;
+import com.imaginea.android.sugarcrm.util.RestUtil;
 
 /**
  * Do not run this, exclude this from the test suite
@@ -73,13 +68,13 @@ public class GenerateModuleFieldsTest extends RestAPITest {
 
         moduleFields = RestUtil.getModuleFields(url, mSessionId, "Calls", fields).getModuleFields();
         addToModuleFieldList(moduleFields);
-        
+
         moduleFields = RestUtil.getModuleFields(url, mSessionId, "ACLRoles", fields).getModuleFields();
         addToModuleFieldList(moduleFields);
-        
+
         moduleFields = RestUtil.getModuleFields(url, mSessionId, "ACLActions", fields).getModuleFields();
         addToModuleFieldList(moduleFields);
-        
+
         moduleFields = RestUtil.getModuleFields(url, mSessionId, "Users", fields).getModuleFields();
         addToModuleFieldList(moduleFields);
 
@@ -87,7 +82,7 @@ public class GenerateModuleFieldsTest extends RestAPITest {
             ModuleField field = (ModuleField) iterator.next();
             Log.i("ModuleFields:", field.getName());
         }
-        //generateClass(moduleFieldsSet);
+        // generateClass(moduleFieldsSet);
         // Log.i("ModuleFields:"+ moduleName.)
     }
 
@@ -107,7 +102,7 @@ public class GenerateModuleFieldsTest extends RestAPITest {
         try {
             Properties prop = new Properties();
             prop.put("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
-           // Velocity.init(prop);
+            // Velocity.init(prop);
             // Velocity.addProperty("runtime.log.logsystem.class",
             // "org.apache.velocity.runtime.log.NullLogSystem");
         } catch (Exception e) {
@@ -117,9 +112,9 @@ public class GenerateModuleFieldsTest extends RestAPITest {
 
         /* lets make a Context and put data into it */
 
-       // VelocityContext context = new VelocityContext();
-      //  context.put("fields", set);
-//
+        // VelocityContext context = new VelocityContext();
+        // context.put("fields", set);
+        //
         /* lets render a template */
 
         StringWriter w = new StringWriter();
@@ -155,22 +150,23 @@ public class GenerateModuleFieldsTest extends RestAPITest {
         w = new StringWriter();
 
         try {
-           // Velocity.evaluate(context, w, "mystring", s);
-        } 
-        /*catch (ParseErrorException pee) {
-            
-             // thrown if something is wrong with the syntax of our template string
-             
-            Log.e(LOG_TAG, "ParseErrorException : " + pee);
-        } */
-        //catch (MethodInvocationException mee) {
-            /*
-             * thrown if a method of a reference called by the template throws an exception. That
-             * won't happen here as we aren't calling any methods in this example, but we have to
-             * catch them anyway
-             */
-          //  Log.e(LOG_TAG, "MethodInvocationException : " + mee);
-        //}
+            // Velocity.evaluate(context, w, "mystring", s);
+        }
+        /*
+         * catch (ParseErrorException pee) {
+         * 
+         * // thrown if something is wrong with the syntax of our template string
+         * 
+         * Log.e(LOG_TAG, "ParseErrorException : " + pee); }
+         */
+        // catch (MethodInvocationException mee) {
+        /*
+         * thrown if a method of a reference called by the template throws an exception. That won't
+         * happen here as we aren't calling any methods in this example, but we have to catch them
+         * anyway
+         */
+        // Log.e(LOG_TAG, "MethodInvocationException : " + mee);
+        // }
         catch (Exception e) {
             Log.e(LOG_TAG, "Exception : " + e);
         }

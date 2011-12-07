@@ -3,7 +3,6 @@ package com.imaginea.android.sugarcrm.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * ModuleFieldValidator: Validates the various module fields while creating or updating
  * 
@@ -14,7 +13,8 @@ public class ModuleFieldValidator {
      * isEmailValid: Validate email address using Java reg ex. This method checks if the input
      * string is a valid email address.
      * 
-     * @param email Email address to validate
+     * @param email
+     *            Email address to validate
      * @return boolean: true if email address is valid, false otherwise.
      */
     public static boolean isEmailValid(final String email) {
@@ -47,7 +47,8 @@ public class ModuleFieldValidator {
      * isPhoneNumberValid: Validate phone number using Java reg ex. This method checks if the input
      * string is a valid phone number.
      * 
-     * @param phoneNumber Phone number to validate
+     * @param phoneNumber
+     *            Phone number to validate
      * @return boolean: true if phone number is valid, false otherwise.
      */
     public static boolean isPhoneNumberValid(final String phoneNumber) {
@@ -77,7 +78,8 @@ public class ModuleFieldValidator {
      * isNumeric: Validate a number using Java regex. This method checks if the input string
      * contains all numeric characters.
      * 
-     * @param number Number to validate
+     * @param number
+     *            Number to validate
      * @return boolean: true if the input is all numeric, false otherwise.
      */
     public static boolean isNumeric(final String number) {

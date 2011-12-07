@@ -7,6 +7,8 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
+import com.imaginea.android.sugarcrm.util.Module;
+import com.imaginea.android.sugarcrm.util.ModuleField;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
 
@@ -36,7 +38,21 @@ public class LeadsApiTest extends RestAPITest {
     @SmallTest
     public void testGetAllModuleFields() throws Exception {
 
-        RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
+        Module module = RestUtil.getModuleFields(url, mSessionId, moduleName, fields);
+        assertNotNull(module);
+
+        List<ModuleField> moduleFields = module.getModuleFields();
+        assertNotNull(moduleFields);
+        assertTrue(moduleFields.size() > 0);
+
+        for (ModuleField moduleField : moduleFields) {
+            Log.d(LOG_TAG, "name :" + moduleField.getName());
+            Log.d(LOG_TAG, "label :" + moduleField.getLabel());
+            Log.d(LOG_TAG, "type :" + moduleField.getType());
+            Log.d(LOG_TAG, "isReuired :" + moduleField.isRequired());
+            assertNotNull(moduleField);
+            assertNotNull(moduleField.getName());
+        }
     }
 
     @SmallTest
@@ -45,10 +61,12 @@ public class LeadsApiTest extends RestAPITest {
         int maxResults = 10;
         // String[] selectFields = new String[] {};
         SugarBean[] sBeans = getSugarBeans(offset, maxResults);
+        assertNotNull(sBeans);
         assertTrue(sBeans.length > 0);
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             for (SugarBean sBean : sBeans) {
+                assertNotNull(sBean);
                 Log.d(LOG_TAG, sBean.getBeanId());
                 Log.d(LOG_TAG, sBean.getFieldValue(ModuleFields.EMAIL1));
             }
