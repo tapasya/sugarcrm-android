@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.imaginea.android.sugarcrm.ModuleFields;
-import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Users;
 import com.imaginea.android.sugarcrm.util.RestUtil;
 import com.imaginea.android.sugarcrm.util.SugarBean;
@@ -23,11 +22,16 @@ public class UsersTest extends RestAPITest {
     @SmallTest
     public void testUsersInsertion() throws Exception {
         SugarBean[] userBeans = getUsers();
+        assertNotNull(userBeans);
+        assertTrue(userBeans.length > 0);
 
         Map<String, Map<String, String>> usersMap = new TreeMap<String, Map<String, String>>();
         for (SugarBean userBean : userBeans) {
+        	assertNotNull(userBean);
             Map<String, String> userBeanValues = getUserBeanValues(userBean);
+            assertNotNull(userBeanValues);
             String userName = userBean.getFieldValue(ModuleFields.USER_NAME);
+            assertNotNull(userName);
             if (userBeanValues != null & userBeanValues.size() > 0)
                 usersMap.put(userName, userBeanValues);
         }
@@ -44,9 +48,8 @@ public class UsersTest extends RestAPITest {
             String fieldValue = userBean.getFieldValue(fieldName);
             userBeanValues.put(fieldName, fieldValue);
         }
-        if (userBeanValues.size() > 0)
-            return userBeanValues;
-        return null;
+        
+        return userBeanValues;
     }
 
     private SugarBean[] getUsers() throws Exception {
