@@ -253,7 +253,7 @@ public class EditDetailsActivity extends Activity {
                 String editTextValue = (String) values[6];
                 valueView.setText(editTextValue);
 
-                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))) {
+                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.EMAIL1))) {
                     valueView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void afterTextChanged(Editable s) {
@@ -276,8 +276,8 @@ public class EditDetailsActivity extends Activity {
                     });
                 }
 
-                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
-                                                || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.PHONE_MOBILE))
+                                                || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.PHONE_WORK))) {
                     valueView.setInputType(InputType.TYPE_CLASS_NUMBER);
                     valueView.addTextChangedListener(new TextWatcher() {
                         @Override
@@ -301,8 +301,8 @@ public class EditDetailsActivity extends Activity {
                     });
                 }
 
-                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))
-                                                || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))) {
+                if (fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.FIRST_NAME))
+                                                || fieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.LAST_NAME))) {
                     valueView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void afterTextChanged(Editable s) {
@@ -404,7 +404,7 @@ public class EditDetailsActivity extends Activity {
                 editTextValue = (String) values[6];
                 dynamicValueView.setText(editTextValue);
 
-                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))) {
+                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.EMAIL1))) {
                     dynamicValueView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void afterTextChanged(Editable s) {
@@ -427,8 +427,8 @@ public class EditDetailsActivity extends Activity {
                     });
                 }
 
-                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))
-                                                || dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))) {
+                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.PHONE_MOBILE))
+                                                || dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.PHONE_WORK))) {
                     dynamicValueView.setInputType(InputType.TYPE_CLASS_NUMBER);
                     dynamicValueView.addTextChangedListener(new TextWatcher() {
                         @Override
@@ -452,8 +452,8 @@ public class EditDetailsActivity extends Activity {
                     });
                 }
 
-                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))
-                                                || dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))) {
+                if (dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.FIRST_NAME))
+                                                || dynamicFieldName.equalsIgnoreCase(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.LAST_NAME))) {
                     dynamicValueView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void afterTextChanged(Editable s) {
@@ -550,8 +550,8 @@ public class EditDetailsActivity extends Activity {
                 }
 
             case INPUT_TYPE:
-                // AutoCompleteTextView inputTypeValueView = (AutoCompleteTextView) values[1];
-                // inputTypeValueView.setInputType((Integer) values[2]);
+                TextView inputTypeValueView = (TextView) values[1];
+                inputTypeValueView.setInputType((Integer) values[2]);
                 break;
 
             }
@@ -686,6 +686,7 @@ public class EditDetailsActivity extends Activity {
         private void setInputType(TextView editTextForValue, ModuleField moduleField) {
             if (Log.isLoggable(TAG, Log.VERBOSE))
                 Log.v(TAG, "ModuleField type:" + moduleField.getType());
+            // TODO: there has to be a better way to get the constant
             if (moduleField.getType().equals("phone")) {
                 // editTextForValue.setInputType(InputType.TYPE_CLASS_PHONE);
                 publishProgress(INPUT_TYPE, editTextForValue, InputType.TYPE_CLASS_PHONE);
@@ -832,9 +833,9 @@ public class EditDetailsActivity extends Activity {
         ViewUtil.dismissVirtualKeyboard(getBaseContext(), v);
     }
 
-    /***************************************
+    /**
      * importContact for invoking a subactivity for picking up contact from device contacts
-     ***************************************/
+     */
     public void importContact() {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         startActivityForResult(intent, Util.IMPORT_CONTACTS_REQUEST_CODE);
@@ -868,8 +869,8 @@ public class EditDetailsActivity extends Activity {
             while (nameCursor.moveToNext()) {
                 String givenName = nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
                 String familyName = nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
-                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_FIRST_NAME))).setText(givenName);
-                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_LAST_NAME))).setText(familyName);
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.FIRST_NAME))).setText(givenName);
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.LAST_NAME))).setText(familyName);
             }
             nameCursor.close();
 
@@ -888,10 +889,10 @@ public class EditDetailsActivity extends Activity {
                     String contactPhno = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
                     if (ContactsContract.CommonDataKinds.Phone.TYPE_WORK == type) {
-                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_WORK))).setText(contactPhno);
+                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.PHONE_WORK))).setText(contactPhno);
                     }
                     if (ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE == type) {
-                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_PHONE_MOBILE))).setText(contactPhno);
+                        ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.PHONE_MOBILE))).setText(contactPhno);
                     }
                 }
                 phones.close();
@@ -901,7 +902,7 @@ public class EditDetailsActivity extends Activity {
                                             + " = " + contactId, null, null);
             while (emails.moveToNext()) {
                 String contactEmail = emails.getString(emails.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(Util.CONTACT_EMAIL))).setText(contactEmail);
+                ((AutoCompleteTextView) mDetailsTable.findViewWithTag(ImportContactsUtility.getModuleFieldNameForContactsField(ModuleFields.EMAIL1))).setText(contactEmail);
             }
             emails.close();
         }
@@ -1080,5 +1081,4 @@ public class EditDetailsActivity extends Activity {
 
         }
     }
-
 }
