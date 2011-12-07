@@ -124,16 +124,6 @@ public class Util {
 
     public static final String IMPORT_FLAG = "importFlag";
 
-    public static final String CONTACT_FIRST_NAME = "first_name";
-
-    public static final String CONTACT_LAST_NAME = "last_name";
-
-    public static final String CONTACT_EMAIL = "email";
-
-    public static final String CONTACT_PHONE_MOBILE = "phone_mobile";
-
-    public static final String CONTACT_PHONE_WORK = "phone_work";
-
     // sql sort order contacts
     public static final String ASC = "ASC";
 
@@ -209,7 +199,7 @@ public class Util {
      */
     public static String MD5(String text) throws SugarCrmException {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");            
+            MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(text.getBytes("iso-8859-1"), 0, text.length());
             byte[] md5hash = md.digest();
             return convertToHex(md5hash);
