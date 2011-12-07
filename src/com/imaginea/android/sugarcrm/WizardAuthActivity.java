@@ -508,18 +508,19 @@ public class WizardAuthActivity extends AccountAuthenticatorActivity {
                     // databaseHelper.executeSQLFromFile(Util.SQL_FILE);
                     // TODO - note , we need a mechanism to release the lock incase the metadata
                     // sync never happens, or its gets killed.
-                    resultWait.acquire();
+                    //resultWait.acquire();
                 }
 
             } catch (SugarCrmException sce) {
                 hasExceptions = true;
                 sceDesc = sce.getDescription();
                 Log.e(LOG_TAG, sceDesc, sce);
-            } catch (InterruptedException ie) {
-                hasExceptions = true;
-                sceDesc = ie.getMessage();
-                Log.e(LOG_TAG, ie.getMessage(), ie);
             }
+//            catch (InterruptedException ie) {
+//                hasExceptions = true;
+//                sceDesc = ie.getMessage();
+//                Log.e(LOG_TAG, ie.getMessage(), ie);
+//            }
             // test Account manager code
             return sessionId;
         }

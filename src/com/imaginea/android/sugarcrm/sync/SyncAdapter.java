@@ -163,6 +163,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
            * e.getMessage(), e); }
            */catch (SugarCrmException se) {
             Log.e(LOG_TAG, se.getMessage(), se);
+        } catch (Exception ex) {
+            Log.e(LOG_TAG, ex.getMessage(), ex);
         }
     }
 

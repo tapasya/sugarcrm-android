@@ -546,11 +546,11 @@ public class EditDetailsActivity extends Activity {
                     }
 
                     mDetailsTable.addView(editRow);
-                    break;
                 }
+                break;
 
             case INPUT_TYPE:
-                TextView inputTypeValueView = (TextView) values[1];
+                AutoCompleteTextView inputTypeValueView = (AutoCompleteTextView) values[1];
                 inputTypeValueView.setInputType((Integer) values[2]);
                 break;
 
