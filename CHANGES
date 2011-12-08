@@ -1,0 +1,11 @@
+1.0 (07 Dec 2012)
+- Initial Internal Beta release
+  - Supports versions 5.x(starting v5.5.3)  of Sugar CRM
+  - Modules - Accounts, Contacts,, Leads, Opportunities, Calls, Meetings
+  - Related Relationships for the modules	
+  - Ability to access, create, edit and delete a record in a module
+  - Links for Phone, website url, email address and billing address 
+  - Search feature within a module and across modules
+  - Recent records to quickly navigate to the recently visited records of various modules.
+  - Shortcut for the app can be added on the Home screen
+  - Offline support for the synced records
