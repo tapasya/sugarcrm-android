@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.imaginea.android.sugarcrm.provider.DatabaseHelper;
@@ -247,7 +248,9 @@ public class SugarCRMOperations {
         Map<String, String> map = sBean.getEntryList();
         for (String fieldName : map.keySet()) {
             String fieldValue = map.get(fieldName);
-            mValues.put(fieldName, fieldValue);
+            if (!TextUtils.isEmpty(fieldValue)) {
+                mValues.put(fieldName, fieldValue);
+            }
         }
         if (mValues.size() > 0) {
             addInsertOp();
@@ -270,7 +273,9 @@ public class SugarCRMOperations {
         Map<String, String> map = relatedBean.getEntryList();
         for (String fieldName : map.keySet()) {
             String fieldValue = map.get(fieldName);
-            mValues.put(fieldName, fieldValue);
+            if (!TextUtils.isEmpty(fieldValue)) {
+                mValues.put(fieldName, fieldValue);
+            }
         }
         if (mValues.size() > 0) {
             // String beandIdValue = sBean.getFieldValue(SugarSyncManager.mBeanIdField);
@@ -294,7 +299,9 @@ public class SugarCRMOperations {
         Map<String, String> map = sBean.getEntryList();
         for (String fieldName : map.keySet()) {
             String fieldValue = map.get(fieldName);
-            mValues.put(fieldName, fieldValue);
+            if (!TextUtils.isEmpty(fieldValue)) {
+                mValues.put(fieldName, fieldValue);
+            }
         }
         if (mValues.size() > 0) {
             if (Log.isLoggable(TAG, Log.DEBUG))
