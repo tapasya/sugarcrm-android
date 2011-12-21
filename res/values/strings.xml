@@ -72,7 +72,7 @@
     <!-- Search -->
     <string name="searchHint">Search SugarCRM</string>
     <string name="search">Search</string>
-    <string name="searching">Searching...</string>
+    <string name="searching">Searching &#8230;</string>
     <string name="searchresults">Search Results</string>
     <string name="searchResultsHeaderText"> : Search results</string>
 
@@ -124,7 +124,7 @@
     <string name="module">Module</string>
     <string name="moduleField">Field name</string>
     <string name="settingsSaved">Settings saved!</string>
-    <string name="saving">Saving...</string>
-    <string name="loading">Loading...</string>
+    <string name="saving">Saving &#8230;</string>
+    <string name="loading">Loading &#8230;</string>
 
 </resources>

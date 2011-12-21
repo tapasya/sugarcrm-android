@@ -24,7 +24,7 @@
 	        style="@style/text_label"/>   
         
 
-		<TextView android:id="@+id/what_label"
+		<TextView android:id="@+id/startDate_label"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/startDate"
@@ -42,7 +42,7 @@
                 style="@style/button_style"/>              
 
         </LinearLayout>   
-        <TextView android:id="@+id/what_label"
+        <TextView android:id="@+id/endDate_label"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/endDate"

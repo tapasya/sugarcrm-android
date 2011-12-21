@@ -14,7 +14,7 @@
 		android:gravity="center" 
 		android:layout_centerHorizontal="true"
 		style="?android:attr/progressBarStyle" 
-		android:paddingRight="10px" />
+		android:paddingRight="10dip" />
 	<TextView android:id="@+id/mainText" 
 		style="@style/empty_textview_style" 
 		android:layout_below="@id/progress"
