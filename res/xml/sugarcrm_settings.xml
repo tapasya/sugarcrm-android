@@ -11,6 +11,9 @@
 		android:summary="@string/userSummary"
 		android:defaultValue="@string/defaultUser" />
 		
+	<CheckBoxPreference android:key="alarm"
+		android:title="Enable/Disable alarms" />
+		
 	<PreferenceScreen android:key="sortSettings"
          android:title="@string/sortSettings"
          android:summary="@string/sortSummary">
