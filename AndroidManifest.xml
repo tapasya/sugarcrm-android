@@ -150,6 +150,14 @@
 				android:resource="@xml/syncadapter" />
 
 		</service>
+		
+		<receiver android:name="com.imaginea.android.sugarcrm.util.AlarmReceiver"> 
+        	<intent-filter> 
+            	<action android:name=
+                	"com.imaginea.android.sugarcrm.ALARM_RECEIVED" /> 
+        	</intent-filter> 
+    	</receiver>
+    	
 		<!-- TODO : permissions, grantUri and export flags need to be set appropriately, 
 		we want to share our provider only with apps signed by our certificate or running with the same UID -->
 		<!-- permission android:name="com.imaginea.android.sugarcrm.permission.ACCESS_SUGAR_CRM_PROVIDER" 

@@ -37,6 +37,7 @@ import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsCasesColum
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsContactsColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AccountsOpportunitiesColumns;
+import com.imaginea.android.sugarcrm.provider.SugarCRMContent.AlarmColumns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Calls;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Campaigns;
 import com.imaginea.android.sugarcrm.provider.SugarCRMContent.Cases;
@@ -98,6 +99,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String LEADS_TABLE_NAME = "leads";
 
     public static final String RECENT_TABLE_NAME = "recent";
+
+    public static final String ALARM_TABLE_NAME = "alarms";
 
     public static final String OPPORTUNITIES_TABLE_NAME = "opportunities";
 
@@ -362,6 +365,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createCallsTable(db);
         createMeetingsTable(db);
         createCampaignsTable(db);
+        createAlarmsTable(db);
 
         // create meta-data tables
         createModulesTable(db);
@@ -524,6 +528,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropSyncTable(db);
         dropRecentTable(db);
     }
+    
+    private static void createAlarmsTable(SQLiteDatabase db) {
+
+        db.execSQL("CREATE TABLE " + ALARM_TABLE_NAME + " (" + AlarmColumns.ID+ " INTEGER,"
+                                        +  AlarmColumns.ALARM_STATE + " INTEGER" + ");");
+    }
+
 
     private static void createRecentTable(SQLiteDatabase db) {
 

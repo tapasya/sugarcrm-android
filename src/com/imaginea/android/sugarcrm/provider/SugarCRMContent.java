@@ -881,4 +881,10 @@ public final class SugarCRMContent {
 
         public static final String DEFAULT_SORT_ORDER = FIELD_SORT_ID + " ASC";
     }
+    
+    public interface AlarmColumns {
+        public String ID = Util.ROW_ID;
+        
+        public String ALARM_STATE = Util.PREF_ALARM_STATE;
+    }
 }

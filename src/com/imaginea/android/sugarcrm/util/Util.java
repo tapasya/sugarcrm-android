@@ -75,6 +75,8 @@ public class Util {
 
     public static final String PREF_PASSWORD = "pwd";
 
+    public static final String PREF_ALARM_STATE = "alarm";
+
     public static final String PREF_REMEMBER_PASSWORD = "rememberPwd";
 
     public static final String PROJECTION = "select";
@@ -319,6 +321,19 @@ public class Util {
         n.setLatestEventInfo(context, title, message, pendingIntent);
         int id = getId();
         nm.notify(id, n);
+        return id;
+    }
+
+    public static synchronized int notify(Context context, Intent intent, String ticker,
+                                    String title, String message) {
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+        Notification n = new Notification(android.R.drawable.stat_notify_sync_noanim, ticker, System.currentTimeMillis());
+        n.setLatestEventInfo(context, title, message, pendingIntent);
+        n.flags = Notification.FLAG_AUTO_CANCEL;
+        n.defaults |= Notification.DEFAULT_SOUND;
+        int id = getId();
+        nm.notify(0, n);
         return id;
     }
 }
